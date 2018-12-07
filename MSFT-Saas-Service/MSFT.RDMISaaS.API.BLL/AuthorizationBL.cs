@@ -1,0 +1,55 @@
+﻿using MSFT.RDMISaaS.API.Model;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Net.Http;
+using System.Text;
+using System.Net.Http.Headers;
+
+namespace MSFT.RDMISaaS.API.BLL
+{
+    public class AuthorizationBL
+    {
+
+        public List<RdMgmtRoleAssignment> GetRoleAssignments(string deploymentUrl,string accessToken)
+        {
+            List<RdMgmtRoleAssignment> rdMgmtRoleAssignments = new List<RdMgmtRoleAssignment>();
+            try
+            {
+                //call rest api to get tenant details -- july code bit
+                //HttpResponseMessage response = CommonBL.InitializeHttpClient(deploymentUrl, accessToken).GetAsync("RdsManagement/V1/Rds.Authorization/roleAssignments").Result;
+                HttpResponseMessage response = CommonBL.InitializeHttpClient(deploymentUrl, accessToken).GetAsync("RdsManagement/V1//Rds.Authorization/roleAssignments").Result;
+           
+
+                string strJson = response.Content.ReadAsStringAsync().Result;
+                if (response.IsSuccessStatusCode)
+                {
+                    //Deserialize the string to JSON object
+                    var jObj = (JArray)JsonConvert.DeserializeObject(strJson);
+                    if (jObj.Count > 0)
+                    {
+                        rdMgmtRoleAssignments = jObj.Select(item => new RdMgmtRoleAssignment
+                        {
+                            roleAssignmentId = (string)item["roleAssignmentId"],
+                            scope = (string)item["scope"],
+                            displayName = (string)item["displayName"],
+                            signInName = (string)item["signInName"],
+                            roleDefinitionName = (string)item["roleDefinitionName"],
+                            roleDefinitionId = (string)item["roleDefinitionId"],
+                            objectId = (string)item["objectId"],
+                            objectType = (string)item["objectType"]
+                        }).ToList();
+                    }
+
+                }
+            }
+            catch (Exception ex)
+            {
+                return null;
+            }
+            return rdMgmtRoleAssignments;
+        }
+    }
+}
