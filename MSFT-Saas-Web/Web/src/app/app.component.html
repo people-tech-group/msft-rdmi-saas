@@ -40,13 +40,12 @@
             </ul>
           </div>
         </li>
-        <li (clickOutside)="OnClickedOutside($event)" class="login-details" (click)="OpenSignOut($event)"
+        <li (clickOutside)="OnClickedOutside()" class="login-details" (click)="OpenSignOut()"
             [ngClass]="{ 'login-details-active': isSingoutButton, 'login-details-inactive': !isSingoutButton  }">
           <div>
             <div style="overflow: hidden; float:left; padding-top:10px; cursor:pointer;">
               <span style="padding-left:35px;">{{profileName}}<br /><span style="font-size:10px;float: right;">{{roleDefinitionName}}</span>&nbsp;</span>&nbsp;<br />
             </div>
-            <!--<img style="border-radius: 15px; margin-left:10px; width:30px; margin-top: 10px;margin-right: 5px;" src="../assets/Images/avatar.png" />-->
             <div class="profile_icon">
               <span>{{profileIcon}}</span>
             </div>
@@ -54,7 +53,6 @@
           <div style="background-color:#484848; height:180px;width:350px; position:fixed; top:53px; right:0px; float:right;"
                id="signoutTray" [@slidetoggle]="state">
             <div style="padding:10px 20px 10px 20px;" class="row">
-              <!--<img style="border-radius: 50%; width: 50px;" src="../assets/Images/avatar.png" />-->
               <div class="profile_icon">
                 <span>{{profileIcon}}</span>
               </div>

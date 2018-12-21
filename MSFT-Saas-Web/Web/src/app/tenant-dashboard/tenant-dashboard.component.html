@@ -25,7 +25,7 @@
 </div>
 
 <div class="addDeploy">
-  <h3>Tenant "{{tenantInfo.tenantName}}"</h3>
+  <h3>Tenant "{{tenantName}}"</h3>
   <div class="tabbable-panel">
     <div class="tabbable-line">
       <ul class="nav nav-tabs">
@@ -379,7 +379,7 @@
             </div>
             <div class="col-sm-12 form-group">
               <label>Hostpool Friendly Name – <span class="ashColor">optional</span></label>
-              <input type="text" name="friendlyName" formControlName="friendlyName" [readonly]="isEnableUser" />
+              <input type="text" name="friendlyName" formControlName="friendlyName" />
               <div *ngIf="hostpoolFormEdit.controls['friendlyName'].hasError('pattern')" class="colorRed">
                 Please enter Valid Hostpool friendly name
               </div>

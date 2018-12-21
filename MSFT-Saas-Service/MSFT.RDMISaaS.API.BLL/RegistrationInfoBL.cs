@@ -56,7 +56,7 @@ namespace MSFT.RDMISaaS.API.BLL
         /// <param name="accessToken"></param>
         /// <param name="rdMgmtRegistrationInfo"></param>
         /// <returns></returns>
-        public RegistrationInfoResult CreateRegistrationInfo(string tenantGroupName, string deploymentUrl, string accessToken, RdMgmtRegistrationInfo rdMgmtRegistrationInfo)
+        public RegistrationInfoResult CreateRegistrationInfo(string deploymentUrl, string accessToken, RdMgmtRegistrationInfo rdMgmtRegistrationInfo)
         {
             try
             {
@@ -64,10 +64,11 @@ namespace MSFT.RDMISaaS.API.BLL
                 registrationInfoDTO.tenantName = rdMgmtRegistrationInfo.tenantName;
                 registrationInfoDTO.hostPoolName = rdMgmtRegistrationInfo.hostPoolName;
                 registrationInfoDTO.expirationTime = rdMgmtRegistrationInfo.expirationUtc;
+                registrationInfoDTO.tenantGroupName = rdMgmtRegistrationInfo.tenantGroupName;
 
                 //call rest api to generate registration key -- july code bit
                 var content = new StringContent(JsonConvert.SerializeObject(registrationInfoDTO), Encoding.UTF8, "application/json");
-                HttpResponseMessage response = CommonBL.InitializeHttpClient(deploymentUrl, accessToken).PostAsync("/RdsManagement/V1/TenantGroups/" + tenantGroupName + "/Tenants/" + rdMgmtRegistrationInfo.tenantName + "/HostPools/" + rdMgmtRegistrationInfo.hostPoolName + "/RegistrationInfos/", content).Result;
+                HttpResponseMessage response = CommonBL.InitializeHttpClient(deploymentUrl, accessToken).PostAsync("/RdsManagement/V1/TenantGroups/" + rdMgmtRegistrationInfo.tenantGroupName + "/Tenants/" + rdMgmtRegistrationInfo.tenantName + "/HostPools/" + rdMgmtRegistrationInfo.hostPoolName + "/RegistrationInfos/", content).Result;
 
                 string strJson = response.Content.ReadAsStringAsync().Result;
                 if (response.IsSuccessStatusCode)

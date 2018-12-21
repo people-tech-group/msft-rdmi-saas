@@ -12,10 +12,11 @@ import * as FileSaver from 'file-saver';
 import { IMyOptions, IMyDateModel, IMyDate } from 'mydatepicker';
 import { SearchPipe } from "../../assets/Pipes/Search.pipe";
 import { ClipboardModule } from 'ngx-clipboard';
-import { AdminMenuComponent } from "../admin-menu/admin-menu.component";
 import { trigger, state, style, animate, transition } from '@angular/animations';
 
+
 @Component({
+
   selector: 'app-hostpool-dashboard',
   templateUrl: './hostpool-dashboard.component.html',
   styleUrls: ['./hostpool-dashboard.component.css'],
@@ -75,13 +76,9 @@ export class HostpoolDashboardComponent implements OnInit {
   public curentHostIndex: any;
   public currentNoOfPagesHostCount: any = 1;
   public HostlastEntry: any = '';
-  //public isPrevious: boolean = false;
-  //public isNext: boolean = false;
-  //public isDescending: boolean = false;
   //hosts ends
 
   public state: string = 'down';
-  //public listItem: any = 10;
   public showAppGroupCreateDialog: boolean = false;
   public isEditAppgroupDisabled: boolean = true;
   public isDeleteAppgroupDisabled: boolean = true;
@@ -204,7 +201,6 @@ export class HostpoolDashboardComponent implements OnInit {
   public isDate: boolean = false;
   public showAddAppGalleryDialog: boolean = false;
   public galleryAppLoader: boolean = false;
-  //public scopeArray: any;
   public hostDeleteData: any;
   public currentNoOfAppsPagesCount: any = 1;
   public currentNoOfUsersPagesCount: any = 1;
@@ -225,21 +221,40 @@ export class HostpoolDashboardComponent implements OnInit {
   public galleryAppPageSize: any = 10;
   @ViewChild('closeModal') closeModal: ElementRef;
 
-  constructor(private _AppService: AppService, private fb: FormBuilder, private http: Http, private route: ActivatedRoute, private _notificationsService: NotificationsService, private router: Router, private adminmenucom: AdminMenuComponent) {
-    this.tenantName = sessionStorage.getItem('TenantName');
-    /*This block of code is used to get the Hostpool Name from the Url paramter*/
-    this.route.params.subscribe(params => {
-      this.hostPoolName = params["hostpoolName"];
-      this.scopeArray = localStorage.getItem("Scope").split(",");
-      this.CheckAppGroupAccess(this.hostPoolName);
-    });
+  constructor(private _AppService: AppService, private fb: FormBuilder, private http: Http, private route: ActivatedRoute, private _notificationsService: NotificationsService, private router: Router) {
+    
   }
 
   /*
    * Public event that calls directly on page load
    */
   ngOnInit() {
-    this.tenantGroupName = sessionStorage.getItem("TenantGroupName");
+    /*This block of code is used to get the Hostpool Name from the Url paramter*/
+    this.route.params.subscribe(params => {
+      this.tenantGroupName = sessionStorage.getItem("TenantGroupName");
+      this.tenantName = sessionStorage.getItem('TenantName');
+      this.hostPoolName = params["hostpoolName"];
+      let data = [{
+        name: 'Tenants',
+        type: 'Tenants',
+        path: 'Tenants',
+      }];
+      BreadcrumComponent.GetCurrentPage(data);
+      data = [{
+        name: this.tenantName,
+        type: 'Tenant',
+        path: 'tenantDashboard',
+      }];
+      BreadcrumComponent.GetCurrentPage(data);
+      data = [{
+        name: this.hostPoolName,
+        type: 'Hostpool',
+        path: 'hostpoolDashboard',
+      }];
+      BreadcrumComponent.GetCurrentPage(data);
+      this.scopeArray = localStorage.getItem("Scope").split(",");
+      this.CheckAppGroupAccess(this.hostPoolName);
+    });
     this.tenantDashboard = new FormGroup({
       local: new FormControl("", Validators.required),
       Description: new FormControl('', Validators.required),
@@ -396,7 +411,6 @@ export class HostpoolDashboardComponent implements OnInit {
     });
     this.expiryDate = '';
     this.isDate = false;
-    //this.showHostCreate = true;
     this.responseValue = "";
     this.responseMessage = "";
     /*
@@ -491,8 +505,6 @@ export class HostpoolDashboardComponent implements OnInit {
     this.hostpoolDetailsUrl = this._AppService.ApiUrl + '/api/HostPool/GetHostPoolDetails?tenantGroupName=' + this.tenantGroupName +'&tenantName=' + this.tenantName + '&hostPoolName=' + hostPoolName + '&refresh_token=' + sessionStorage.getItem("Refresh_Token");
     this._AppService.GetData(this.hostpoolDetailsUrl).subscribe(response => {
       let HostPoolList = JSON.parse(response['_body']);
-      //this.appgroupsCount = this.hostPoolDetails.noOfAppgroups;
-   
       if (HostPoolList) {
         if (HostPoolList.code == "Invalid Token") {
           this.router.navigate(['/invalidtokenmessage']);
@@ -643,7 +655,6 @@ export class HostpoolDashboardComponent implements OnInit {
    */
   /* This function is used to  divide the number of pages based on Tenants Count */
   public GetcurrentNoOfPagesCountHost() {
-    //this.hostCount = this.hostPoolDetails.noOfActivehosts;
     let currentNoOfPagesCountCount = Math.floor(this.hostCount / this.HostpageSize);
     let remaingCount = this.hostCount % this.HostpageSize;
     if (remaingCount > 0) {
@@ -652,7 +663,6 @@ export class HostpoolDashboardComponent implements OnInit {
     else {
       this.currentNoOfPagesHostCount = currentNoOfPagesCountCount;
     }
-    console.log(this.currentNoOfPagesHostCount);
     this.curentHostIndex = 0;
   }
 
@@ -669,7 +679,6 @@ export class HostpoolDashboardComponent implements OnInit {
     this._AppService.GetData(this.getAllSessionHostUrl).subscribe(response => {
       let HostList = JSON.parse(response['_body']);
       this.sessionHostLists = HostList.reverse();
-      //this.tenants = responseObject.rdMgmtTenants.reverse();
       this.HostpreviousPageNo = this.HostCurrentPageNo;
       this.HostCurrentPageNo = this.HostCurrentPageNo - 1;
 
@@ -892,7 +901,6 @@ export class HostpoolDashboardComponent implements OnInit {
     this.getAllSessionHostUrl = this._AppService.ApiUrl + '/api/SessionHost/GetSessionhostList?tenantGroupName=' + this.tenantGroupName +'&tenantName=' + this.tenantName + '&hostPoolName=' + this.hostPoolName + '&refresh_token=' + sessionStorage.getItem("Refresh_Token") + '&pageSize=' + this.HostpageSize + '&sortField=SessionHostName&isDescending=false&initialSkip=' + this.hostinitialSkip + '&lastEntry=%22%20%22';
     this._AppService.GetData(this.getAllSessionHostUrl).subscribe(response => {
       this.sessionHostLists = JSON.parse(response['_body']);
-      //this.GetcurrentNoOfPagesCountHost();
       /* This Block of code is used to Exchange the allowNewSession value 'true' or 'false' to 'Yes' or 'No' */
       /*Exchange Block starting*/
       for (let j in this.sessionHostLists) {
@@ -1241,7 +1249,6 @@ export class HostpoolDashboardComponent implements OnInit {
       }
       /* If response data is success then it enters into if and this block of code will execute to show the 'Registration Key Generated Successfully' notification */
       if (responseData.isSuccess === true) {
-        //this.showHostCreate = false;
         this._notificationsService.html(
           '<i class="icon icon-check angular-Notify col-xs-1 no-pad"></i>' +
           '<label class="notify-label col-xs-10 no-pad">Registration Key Generated Successfully</label>' +
@@ -1444,7 +1451,6 @@ export class HostpoolDashboardComponent implements OnInit {
     this._AppService.GetData(this.getAllAppGroupsListUrl).subscribe(response => {
       let AppGroupList = JSON.parse(response['_body']);
       this.appGroupsList = AppGroupList.reverse();
-      //this.tenants = responseObject.rdMgmtTenants.reverse();
       this.AppGrouppreviousPageNo = this.AppGroupCurrentPageNo;
       this.AppGroupCurrentPageNo = this.AppGroupCurrentPageNo - 1;
     
@@ -1456,7 +1462,6 @@ export class HostpoolDashboardComponent implements OnInit {
           this.router.navigate(['/invalidtokenmessage']);
         }
       }
-      //this.GetcurrentNoOfPagesCountAppgroup();
       this.appGroupsListSearch = JSON.parse(response['_body']);
       if (this.appGroupsListSearch.length == 0) {
         this.editedBodyAppGroup = true;
@@ -1507,9 +1512,7 @@ export class HostpoolDashboardComponent implements OnInit {
           this.router.navigate(['/invalidtokenmessage']);
         }
       }
-      //this.GetcurrentNoOfPagesCountAppgroup();
       this.appGroupsListSearch = JSON.parse(response['_body']);
-      console.log(this.appGroupsListSearch);
       if (this.appGroupsListSearch.length == 0) {
         this.editedBodyAppGroup = true;
         this.editedLBody = false;
@@ -1550,9 +1553,7 @@ export class HostpoolDashboardComponent implements OnInit {
           this.router.navigate(['/invalidtokenmessage']);
         }
       }
-      //this.GetcurrentNoOfPagesCountAppgroup();
       this.appGroupsListSearch = JSON.parse(response['_body']);
-      console.log(this.appGroupsListSearch);
       if (this.appGroupsListSearch.length == 0) {
         this.editedBodyAppGroup = true;
         this.editedLBody = false;
@@ -1592,9 +1593,7 @@ export class HostpoolDashboardComponent implements OnInit {
           this.router.navigate(['/invalidtokenmessage']);
         }
       }
-      //this.GetcurrentNoOfPagesCountAppgroup();
       this.appGroupsListSearch = JSON.parse(response['_body']);
-      console.log(this.appGroupsListSearch);
       if (this.appGroupsListSearch.length == 0) {
         this.editedBodyAppGroup = true;
         this.editedLBody = false;
@@ -1802,6 +1801,7 @@ export class HostpoolDashboardComponent implements OnInit {
         groupType = 0;
       }
       var Appdata = {
+        "tenantGroupName": this.tenantGroupName,
         "tenantName": this.tenantName,
         "hostPoolName": this.hostPoolName,
         "appGroupName": appGroupCreateData.txtAppGroupName.trim(),
@@ -1897,6 +1897,7 @@ export class HostpoolDashboardComponent implements OnInit {
    */
   public UpdateAppGroup(updateAppGroupData: any) {
     var updateArray = {
+      "tenantGroupName": this.tenantGroupName,
       "tenantName": this.tenantName,
       "hostPoolName": this.hostPoolName,
       "appGroupName": this.selectedAppGroupName,
@@ -2209,7 +2210,6 @@ export class HostpoolDashboardComponent implements OnInit {
       this.usersIsDescending = true;
       this.usersLastEntry = this.appUsersList[0].userPrincipalName;
     }
-    //this.previousPageNo = this.currentPageNo;
     this.getAppGroupUserUrl = this._AppService.ApiUrl + '/api/AppGroup/GetUsersList?tenantGroupName=' + this.tenantGroupName +'&tenantName=' + this.tenantName + '&hostPoolName=' + this.hostPoolName + '&appGroupName=' + this.selectedAppGroupName + '&refresh_token=' + sessionStorage.getItem("Refresh_Token") + '&pageSize=' + this.pageSize + '&sortField=UserPrincipalName&isDescending=' + this.usersIsDescending +'&initialSkip=' + this.usersInitialSkip + '&lastEntry=' + this.usersLastEntry;
     this._AppService.GetData(this.getAppGroupUserUrl).subscribe(response => {
       this.appUsersList = JSON.parse(response['_body']);
@@ -2379,7 +2379,6 @@ export class HostpoolDashboardComponent implements OnInit {
     if (this.userCheckedTrue.length == 1) {
       this.selectedUsergroupName = userPrincipalName;
       this.deleteCountSelectedUser = this.appUsersListSearch[index].userPrincipalName;
-     // this.deleteCountSelectedUser = userPrincipalName;
       this.isDeleteUserDisabled = false;
     }
     else if (this.userCheckedTrue.length > 1) {
@@ -2451,7 +2450,7 @@ export class HostpoolDashboardComponent implements OnInit {
       appGroupName: this.AppgroupName,
       userPrincipalName: createNewActiveDrctryData.UserPrincipalName,
       refresh_token: sessionStorage.getItem("Refresh_Token"),
-      tenantGroupName: sessionStorage.getItem("TenantGroupName"),
+      "tenantGroupName": this.tenantGroupName
     };
     this.addNewUser = this._AppService.ApiUrl + '/api/AppGroup/PostUsers';
     this._AppService.AddingUserstoAppGroup(this.addNewUser, AddUserdata).subscribe(response => {
@@ -2719,7 +2718,6 @@ export class HostpoolDashboardComponent implements OnInit {
       this.appsIsDescending = true;
       this.appsLastEntry = this.appGroupAppList[0].remoteAppName;
     }
-    //this.previousPageNo = this.currentPageNo;
     this.getAppGroupAppsUrl = this._AppService.ApiUrl + '/api/RemoteApp/GetRemoteAppList?tenantGroupName=' + this.tenantGroupName +'&tenantName=' + this.tenantName + '&hostPoolName=' + this.hostPoolName + '&appGroupName=' + this.selectedAppGroupName + '&refresh_token=' + sessionStorage.getItem("Refresh_Token") + '&pageSize=' + this.pageSize + '&sortField=RemoteAppName&isDescending=' + this.appsIsDescending + '&initialSkip=' + this.appsInitialSkip + '&lastEntry=' + this.appsLastEntry;
     this._AppService.GetData(this.getAppGroupAppsUrl).subscribe(response => {
       this.appGroupAppList = JSON.parse(response['_body']);
@@ -3157,6 +3155,7 @@ export class HostpoolDashboardComponent implements OnInit {
   public CreatingAppFromPath(createAppGroupData: any) {
     this.refreshHostpoolLoading = true;
     var AppdataRds = {
+      "tenantGroupName": this.tenantGroupName,
       "tenantName": this.tenantName,
       "hostPoolName": this.hostPoolName,
       "appGroupName": this.selectedAppGroupName,
@@ -3171,7 +3170,7 @@ export class HostpoolDashboardComponent implements OnInit {
       "requiredCommandLine": null,
       "showInWebFeed": true,
       "refresh_token": sessionStorage.getItem("Refresh_Token"),
-      "tenantGroupName": sessionStorage.getItem("TenantGroupName"),
+      
     };
     this.createappGroupApps = this._AppService.ApiUrl + '/api/RemoteApp/Post';
     this._AppService.CreateAppGroup(this.createappGroupApps, AppdataRds).subscribe(response => {

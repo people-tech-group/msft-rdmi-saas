@@ -83,11 +83,15 @@ export class AppComponent implements OnInit {
    */
   ngOnInit() {
     var code = sessionStorage.getItem("Code");
-    console.log(code);
-    if (code != "undefined" && code != null) {
+    var gotCode = sessionStorage.getItem("gotCode");
+    this.profileIcon = sessionStorage.getItem("profileIcon");
+    this.profileName = sessionStorage.getItem("profileName");
+    this.roleDefinitionName = sessionStorage.getItem("roleDefinitionName");
+    this.profileEmail = sessionStorage.getItem("profileEmail");
+    if (code != "undefined" && code != null && gotCode == 'yes') {
       this.redirectUri = sessionStorage.getItem('redirectUri');
       var codData = {
-        Code: code
+        Code: code,
       }
       fetch(this._AppService.ApiUrl + '/api/Login/PostLogin', {
         method: 'POST',
@@ -117,8 +121,11 @@ export class AppComponent implements OnInit {
           /*This block of code is used to get the Role Assignment Acces level*/
           //Role Assignment Acces level -Starts
           this.tenantGroupName = respdata.TenantGroupName;
-          sessionStorage.setItem("TenantGroupName", this.tenantGroupName);
           this.roleDefinitionName = respdata.RoleAssignment.roleDefinitionName;
+          sessionStorage.setItem("TenantGroupName", this.tenantGroupName);
+          sessionStorage.setItem("profileIcon", this.profileIcon);
+          sessionStorage.setItem("profileName", this.profileName);
+          sessionStorage.setItem("roleDefinitionName", this.roleDefinitionName);
           if (respdata.RoleAssignment.scope == '/') {
             this.scope = 'All (Root)';
           }
@@ -131,12 +138,16 @@ export class AppComponent implements OnInit {
           sessionStorage.setItem("Refresh_Token", respdata.Refresh_Token);
           var roleDef = respdata.RoleAssignment.scope.substring(1).split("/");        
           localStorage.setItem("Scope", roleDef);
+          sessionStorage.setItem('profileEmail', this.profileEmail);
+          sessionStorage.setItem('Scope', roleDef);
+          sessionStorage.setItem('gotCode', 'no');
           this.router.navigate(['/admin/Tenants']);
         }).catch((error: any) => {
            this.router.navigate(['/invalidtokenmessage']);
         });
 
-    } else {
+    }
+    else if (gotCode != 'no') {
       sessionStorage.clear();
       let headers = new Headers({ 'Accept': 'application/json' });
       var url = this._AppService.ApiUrl + '/api/Login/GetLoginUrl';
@@ -145,10 +156,10 @@ export class AppComponent implements OnInit {
       }).subscribe(values => {
         var loginUrl = values.json();
         sessionStorage.setItem("redirectUri", loginUrl.split('&')[2].split('=')[1]);
+        sessionStorage.setItem('gotCode', 'yes');
         window.location.replace(loginUrl);
       });
     }
-    this.router.navigate(['']);
   }
 
   /*
@@ -184,12 +195,8 @@ export class AppComponent implements OnInit {
 
   /*
    * This function is used to shows signout dropdown on click on user Name
-   * ----------
-   * parameters
-   * $event - Accepts $event
-   * ----------
    */
-  public OpenSignOut(event: any) {
+  public OpenSignOut() {
     this.showNotificationDialog = false;
     this.state = (this.state === 'slideup' ? 'slidedown' : 'slideup');
     if (this.state === 'slideup') {
@@ -204,6 +211,7 @@ export class AppComponent implements OnInit {
    * This function is used to Signout User
    */
   public Signout() {
+    sessionStorage.clear();
     let headers = new Headers({ 'Accept': 'application/json' });
     var url = this._AppService.ApiUrl + '/api/Login/GetRedirectUrl'
     this.http.get(url, {
@@ -219,24 +227,16 @@ export class AppComponent implements OnInit {
 
   /*
    * This function is used to close the User profile on clicking Outside
-   * ----------
-   * parameters
-   * $event - Accepts $event
-   * ----------
    */
-  public OnClickedOutside($event) {
+  public OnClickedOutside() {
     this.state = 'slideup';
     this.isSingoutButton = false;
   }
 
   /*
    * This function is used to Redirect to Home On click Home Icon
-   * ----------
-   * parameters
-   * $event - Accepts $event
-   * ----------
    */
-  public OnClickHome($event) {
+  public OnClickHome() {
     this.router.navigate(['/admin/Tenants']);
   }
 

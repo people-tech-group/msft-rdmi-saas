@@ -88,7 +88,9 @@ namespace MSFT.RDMISaaS.API.BLL
                 }
 
                 //call rest api to get all tenants -- sept code bit
-                HttpResponseMessage response = CommonBL.InitializeHttpClient(deploymenturl, accessToken).GetAsync("/RdsManagement/V1/TenantGroups/" + tenantGroupName + "/Tenants?PageSize="+ pageSize + "&LastEntry="+ lastEntry + "&SortField="+ sortField + "&IsDescending="+ isDescending + "&InitialSkip="+ initialSkip).Result;
+                HttpResponseMessage response = CommonBL.InitializeHttpClient(deploymenturl, accessToken).GetAsync("/RdsManagement/V1/TenantGroups/" + tenantGroupName + "/Tenants").Result;
+
+                //HttpResponseMessage response = CommonBL.InitializeHttpClient(deploymenturl, accessToken).GetAsync("/RdsManagement/V1/TenantGroups/" + tenantGroupName + "/Tenants?PageSize="+ pageSize + "&LastEntry="+ lastEntry + "&SortField="+ sortField + "&IsDescending="+ isDescending + "&InitialSkip="+ initialSkip).Result;
                 var headers = response.Headers;
 
                 if (headers.Contains("next"))
@@ -147,7 +149,7 @@ namespace MSFT.RDMISaaS.API.BLL
                     }
                 }
             }
-            catch 
+            catch (Exception ex)
             {
                 lstTenants= null;
             }
@@ -162,21 +164,24 @@ namespace MSFT.RDMISaaS.API.BLL
         /// <param name="accessToken">Aaccess Token</param>
         /// <param name="rdMgmtTenant">Tenant Class</param>
         /// <returns></returns>
-        public TenantResult CreateTenant(string tenantGroupName,string deploymenturl, string accessToken, RdMgmtTenant rdMgmtTenant)
+        public TenantResult CreateTenant(string deploymenturl, string accessToken, RdMgmtTenant rdMgmtTenant)
         {
             try
             {
                 TenantDataDTO tenantDataDTO = new TenantDataDTO();
                 tenantDataDTO.tenantName = rdMgmtTenant.tenantName;
                 tenantDataDTO.friendlyName = rdMgmtTenant.friendlyName;
-                tenantDataDTO.description = rdMgmtTenant.description;
-                tenantDataDTO.id = rdMgmtTenant.id;
+                tenantDataDTO.description = rdMgmtTenant.description;               
                 tenantDataDTO.aadTenantId = rdMgmtTenant.aadTenantId;
+                tenantDataDTO.id=rdMgmtTenant.id;
                 tenantDataDTO.tenantGroupName = rdMgmtTenant.tenantGroupName;
+
+               
+
 
                 //call rest api to create tenant-- july code bit
                 var content = new StringContent(JsonConvert.SerializeObject(tenantDataDTO), Encoding.UTF8, "application/json");
-                HttpResponseMessage response = CommonBL.InitializeHttpClient(deploymenturl, accessToken).PostAsync("/RdsManagement/V1/TenantGroups/"+ tenantGroupName + "/Tenants/" + rdMgmtTenant.tenantName,content).Result;
+                HttpResponseMessage response = CommonBL.InitializeHttpClient(deploymenturl, accessToken).PostAsync("/RdsManagement/V1/TenantGroups/"+ rdMgmtTenant.tenantGroupName + "/Tenants/" + rdMgmtTenant.tenantName,content).Result;
                 string strJson = response.Content.ReadAsStringAsync().Result;
                 if(response.IsSuccessStatusCode)
                 {
@@ -215,7 +220,7 @@ namespace MSFT.RDMISaaS.API.BLL
         /// <param name="accessToken">Access Token</param>
         /// <param name="rdMgmtTenant">Tenant Class</param>
         /// <returns></returns>
-        public TenantResult UpdateTenant(string tenantGroupName,string deploymenturl, string accessToken, RdMgmtTenant rdMgmtTenant)
+        public TenantResult UpdateTenant(string deploymenturl, string accessToken, RdMgmtTenant rdMgmtTenant)
         {
             try
             {
@@ -230,9 +235,10 @@ namespace MSFT.RDMISaaS.API.BLL
                 tenantDataDTO.ssoClientSecret = rdMgmtTenant.ssoClientSecret;
                 tenantDataDTO.tenantGroupName = rdMgmtTenant.tenantGroupName;
 
+
                 //call rest api to update tenant -- july code bit
                 var content = new StringContent(JsonConvert.SerializeObject(tenantDataDTO), Encoding.UTF8, "application/json");
-                HttpResponseMessage response = CommonBL.PatchAsync(deploymenturl, accessToken, "/RdsManagement/V1/TenantGroups/"+ tenantGroupName + "/Tenants/" + tenantDataDTO.tenantName, content).Result;
+                HttpResponseMessage response = CommonBL.PatchAsync(deploymenturl, accessToken, "/RdsManagement/V1/TenantGroups/"+ rdMgmtTenant.tenantGroupName + "/Tenants/" + tenantDataDTO.tenantName, content).Result;
                 string strJson = response.Content.ReadAsStringAsync().Result;
                 if (response.IsSuccessStatusCode)
                 {

@@ -14,6 +14,7 @@ namespace MSFT.RDMISaaS.API.Model
         public DateTime expirationUtc { get; set; }
         // public string tenantGroupName { get; set; }
         public string tenantName { get; set; }
+        public string tenantGroupName { get; set; }
         public string hostPoolName { get; set; }
         public string code { get; set; }
         public string refresh_token { get; set; }
@@ -38,6 +39,7 @@ namespace MSFT.RDMISaaS.API.Model
         // public string tenantGroupName { get; set; }
         public string tenantName { get; set; }
         public string hostPoolName { get; set; }
+        public string tenantGroupName { get; set; }
     }
     #endregion  "Class - RegistrationInfoDTO"
 }

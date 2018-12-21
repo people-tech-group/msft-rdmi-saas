@@ -73,7 +73,7 @@ namespace MSFT.RDMISaaS.API.Controllers
         /// </summary>
         /// <param name="rdMgmtRemoteApp">Remote App class</param>
         /// <returns></returns>
-        public IHttpActionResult Post([FromBody] string tenantGroupName, RdMgmtRemoteApp rdMgmtRemoteApp)
+        public IHttpActionResult Post([FromBody] RdMgmtRemoteApp rdMgmtRemoteApp)
         {
             //get deployment url
             deploymentUrl = configurations.rdBrokerUrl;
@@ -88,7 +88,7 @@ namespace MSFT.RDMISaaS.API.Controllers
                         accessToken = common.GetTokenValue(rdMgmtRemoteApp.refresh_token);
                         if (!string.IsNullOrEmpty(accessToken) && accessToken.ToString().ToLower() != invalidToken && accessToken.ToString().ToLower() != invalidCode)
                         {
-                            remoteAppResult = remoteAppBL.CreateRemoteApp(tenantGroupName, deploymentUrl, accessToken, rdMgmtRemoteApp);
+                            remoteAppResult = remoteAppBL.CreateRemoteApp(deploymentUrl, accessToken, rdMgmtRemoteApp);
                         }
                         else
                         {
@@ -117,7 +117,7 @@ namespace MSFT.RDMISaaS.API.Controllers
         /// <param name="rdMgmtRemoteApps"></param>
         /// <param name="refresh_token">Refresh token to get Access Token</param>
         /// <returns></returns>
-        public IHttpActionResult PostApps([FromBody] string tenantGroupName, List<RdMgmtRemoteApp> rdMgmtRemoteApps, string refresh_token)
+        public IHttpActionResult PostApps([FromBody] List<RdMgmtRemoteApp> rdMgmtRemoteApps, string refresh_token)
         {
             //get deployment url
             deploymentUrl = configurations.rdBrokerUrl;
@@ -134,7 +134,7 @@ namespace MSFT.RDMISaaS.API.Controllers
                         {
                             for (int i = 0; i < rdMgmtRemoteApps.Count; i++)
                             {
-                                remoteAppResult = remoteAppBL.CreateRemoteApp(tenantGroupName, deploymentUrl, accessToken, rdMgmtRemoteApps[i]);
+                                remoteAppResult = remoteAppBL.CreateRemoteApp(deploymentUrl, accessToken, rdMgmtRemoteApps[i]);
                                 lstremoteAppResult.Add(remoteAppResult);
                             }
                         }

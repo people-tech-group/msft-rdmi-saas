@@ -1,8 +1,7 @@
-import { Component, OnInit, Input, Output, OnChanges, EventEmitter, trigger, state, style, animate, transition, ViewChild, ElementRef } from '@angular/core';
+import { Component, OnInit, ViewChild, ElementRef } from '@angular/core';
 import { FormGroup, FormControl, Validators } from '@angular/forms'; //This is for Model driven form
 import { Router, ActivatedRoute } from '@angular/router';
-import { Http, Response, Headers, RequestOptions } from '@angular/http';
-import { Observable } from "rxjs";
+import { Http, Headers } from '@angular/http';
 import { AppService } from '../shared/app.service';
 import { NotificationsService } from "angular2-notifications";
 import { SearchPipe } from "../../assets/Pipes/Search.pipe";
@@ -35,9 +34,7 @@ export class TenantDashboardComponent implements OnInit {
   public isNext: boolean = false;
   public hasError: boolean = false;
   public isDescending: boolean = false;
-
   public hostpoolsCount: any = 0;
-
   public listItem: any = 10;  // pagination
   public createHostpoolUniqueName: boolean = false;
   public hostpoolNextButtonDisable: boolean = true;
@@ -70,7 +67,6 @@ export class TenantDashboardComponent implements OnInit {
   public nonPersistant: boolean = true;
   public PersistentChecked: any;
   public selectedHostpoolradio: any;
-  //public scopeArray: any;
   public options: any = {
     timeOut: 2000,
     position: ["top", "right"]
@@ -89,17 +85,33 @@ export class TenantDashboardComponent implements OnInit {
 
   constructor(private _AppService: AppService, private http: Http, private route: ActivatedRoute,
     private _notificationsService: NotificationsService, private router: Router, private adminMenuComponent: AdminMenuComponent) {
-    /*This block of code is used to get the Tenant Name from the Url paramter*/
-    this.route.params.subscribe(params => {
-      this.tenantName = params["tenantName"];
-      this.scopeArray = localStorage.getItem("Scope").split(",");
-      this.CheckHostpoolAccess(this.tenantName);
-    });
   }
 
   /* This function is  called directly on page load */
   public ngOnInit() {
     this.tenantGroupName = sessionStorage.getItem("TenantGroupName");
+    /*This block of code is used to get the Tenant Name from the Url paramter*/
+    this.route.params.subscribe(params => {
+      this.tenantGroupName = sessionStorage.getItem("TenantGroupName");
+      this.refreshToken = sessionStorage.getItem("Refresh_Token");
+      this.tenantName = params["tenantName"];
+      let data = [{
+        name: 'Tenants',
+        type: 'Tenants',
+        path: 'Tenants',
+      }];
+      BreadcrumComponent.GetCurrentPage(data);
+      data = [{
+        name: this.tenantName,
+        type: 'Tenant',
+        path: 'tenantDashboard',
+      }];
+      BreadcrumComponent.GetCurrentPage(data);
+      var index = +sessionStorage.getItem("TenantNameIndex");
+      this.adminMenuComponent.selectedTenant = index;
+      this.scopeArray = localStorage.getItem("Scope").split(",");
+      this.CheckHostpoolAccess(this.tenantName);
+    });
     this.adminMenuComponent.SetSelectedhostPool(null, '', '');
     this.refreshToken = sessionStorage.getItem("Refresh_Token");
     this.hostpoolForm = new FormGroup({
@@ -258,8 +270,6 @@ export class TenantDashboardComponent implements OnInit {
 
   /* This function is used to  divide the number of pages based on Tenants Count */
   public GetcurrentNoOfPagesHostpoolsCount() {
-    //this.hostpoolsCount = this.tenantInfo.noOfHostpool;
-    //let currentNoOfPagesCountHostpool = Math.floor(this.hostpoolsCount / this.pageSize);
     let cnt = Math.floor(this.hostpoolsCount / this.pageSize);
     let remaingCount = this.hostpoolsCount % this.pageSize;
     if (remaingCount > 0) {
@@ -512,7 +522,6 @@ export class TenantDashboardComponent implements OnInit {
     this.getHostpoolsUrl = this._AppService.ApiUrl + '/api/HostPool/GetHostPoolList?tenantGroupName=' + this.tenantGroupName +'&tenantName=' + this.tenantName + '&refresh_token=' + sessionStorage.getItem("Refresh_Token") + '&pageSize=' + this.pageSize + '&sortField=HostPoolName&isDescending=true&initialSkip=' + this.initialSkip + '&lastEntry=' + this.lastEntry;
     this._AppService.GetTenantDetails(this.getHostpoolsUrl).subscribe(response => {
       this.hostPoolsList = JSON.parse(response['_body']);
-      console.log(this.hostPoolsList);
       this.previousPageNo = this.currentPageNo;
       this.currentPageNo = this.currentPageNo - 1;
       //this.hostpoolsCount = this.tenantInfo.noOfHostpool
@@ -579,12 +588,8 @@ export class TenantDashboardComponent implements OnInit {
     this.getHostpoolsUrl = this._AppService.ApiUrl + '/api/HostPool/GetHostPoolList?tenantGroupName=' + this.tenantGroupName +'&tenantName=' + this.tenantName + '&refresh_token=' + sessionStorage.getItem("Refresh_Token") + '&pageSize=' + this.pageSize+'&sortField=HostPoolName&isDescending=false&initialSkip=' + this.initialSkip +'&lastEntry=' + this.lastEntry;
     this._AppService.GetTenantDetails(this.getHostpoolsUrl).subscribe(response => {
       this.hostPoolsList = JSON.parse(response['_body']);
-      console.log(this.hostPoolsList);
       this.previousPageNo = this.currentPageNo;
       this.currentPageNo = this.currentPageNo + 1;
-      //this.hostPools = responseObject.rdMgmtTenants;
-      //this.hostpoolsCount = this.tenantInfo.noOfHostpool;
-      //this.hostpoolsCount = this.tenantInfo.noOfHostpool
       for (let i in this.hostPoolsList) {
         if (this.hostPoolsList[i].enableUserProfileDisk === true) {
           this.hostPoolsList[i].enableUserProfileDisk = 'Yes';
@@ -659,8 +664,6 @@ export class TenantDashboardComponent implements OnInit {
     this.getHostpoolsUrl = this._AppService.ApiUrl + '/api/HostPool/GetHostPoolList?tenantGroupName=' + this.tenantGroupName +'&tenantName=' + this.tenantName + '&refresh_token=' + sessionStorage.getItem("Refresh_Token") + '&pageSize=' + this.pageSize + ' &sortField=HostPoolName&isDescending=' + this.isDescending + '&initialSkip=' + this.initialSkip + '&lastEntry=' + this.lastEntry;
     this._AppService.GetTenantDetails(this.getHostpoolsUrl).subscribe(response => {
       this.hostPoolsList = JSON.parse(response['_body']);
-      //console.log(this.hostPoolsList);
-      //this.hostpools=
       this.hostpoolsCount = this.tenantInfo.noOfHostpool;
       for (let i in this.hostPoolsList) {
         if (this.hostPoolsList[i].enableUserProfileDisk === true) {
@@ -676,7 +679,6 @@ export class TenantDashboardComponent implements OnInit {
           this.router.navigate(['/invalidtokenmessage']);
         }
       }
-      //this.GetcurrentNoOfPagesHostpoolsCount();
       this.searchHostPools = JSON.parse(response['_body']);
       for (let i in this.searchHostPools) {
         if (this.searchHostPools[i].enableUserProfileDisk === true) {
@@ -732,7 +734,7 @@ export class TenantDashboardComponent implements OnInit {
     /*
      * Access level of Tenant block End
      */
-    this.getHostpoolsUrl = this._AppService.ApiUrl + '/api/HostPool/GetHostPoolList?tenantGroupName=' + this.tenantGroupName +'&tenantName=' + tenantName + '&refresh_token=' + sessionStorage.getItem("Refresh_Token") + '&pageSize=0&sortField=HostPoolName&isDescending=false&initialSkip=0&lastEntry=""';
+    this.getHostpoolsUrl = this._AppService.ApiUrl + '/api/HostPool/GetHostPoolList?tenantGroupName=' + this.tenantGroupName +'&tenantName=' + tenantName + '&refresh_token=' + sessionStorage.getItem("Refresh_Token") + '&pageSize=100&sortField=HostPoolName&isDescending=false&initialSkip=0&lastEntry=""';
     this._AppService.GetTenantDetails(this.getHostpoolsUrl).subscribe(response => {
       var list = JSON.parse(response['_body']);
       this.adminMenuComponent.GetHostpools(list, tenantName);
@@ -760,10 +762,7 @@ export class TenantDashboardComponent implements OnInit {
      */
     this.getHostpoolsUrl = this._AppService.ApiUrl + '/api/HostPool/GetHostPoolList?tenantGroupName=' + this.tenantGroupName +'&tenantName=' + tenantName + '&refresh_token=' + sessionStorage.getItem("Refresh_Token") + '&pageSize=' + this.pageSize + '&sortField=HostPoolName&isDescending=false&initialSkip=' + this.initialSkip +' &lastEntry='+this.lastEntry;
     this._AppService.GetTenantDetails(this.getHostpoolsUrl).subscribe(response => {
-      this.hostPoolsList = JSON.parse(response['_body']);
-      console.log(this.hostPoolsList);
-      //this.hostpoolsCount = this.tenantInfo.noOfHostpool
-      
+      this.hostPoolsList = JSON.parse(response['_body']);      
       for (let i in this.hostPoolsList) {
         if (this.hostPoolsList[i].enableUserProfileDisk === true) {
           this.hostPoolsList[i].enableUserProfileDisk = 'Yes';
@@ -778,7 +777,6 @@ export class TenantDashboardComponent implements OnInit {
           this.router.navigate(['/invalidtokenmessage']);
         }
       }
-      //this.GetcurrentNoOfPagesHostpoolsCount();
       this.searchHostPools = JSON.parse(response['_body']);
       
       for (let i in this.searchHostPools) {
@@ -1038,7 +1036,7 @@ export class TenantDashboardComponent implements OnInit {
     this.refreshHostpoolLoading = true;
     for (let i = 0; i < this.selectedRows.length; i++) {
       let index = this.selectedRows[i];
-      this.hostpoolDeleteUrl = this._AppService.ApiUrl + '/api/HostPool/Delete?tenantName=' + this.searchHostPools[index].tenantName + '&hostPoolName=' + this.searchHostPools[index].hostPoolName + '&refresh_token=' + sessionStorage.getItem("Refresh_Token");
+      this.hostpoolDeleteUrl = this._AppService.ApiUrl + '/api/HostPool/Delete?tenantGroupName=' + this.tenantGroupName +'&tenantName=' + this.searchHostPools[index].tenantName + '&hostPoolName=' + this.searchHostPools[index].hostPoolName + '&refresh_token=' + sessionStorage.getItem("Refresh_Token");
       this._AppService.DeleteTenantService(this.hostpoolDeleteUrl).subscribe(response => {
         this.refreshHostpoolLoading = false;
         var responseData = JSON.parse(response['_body']);

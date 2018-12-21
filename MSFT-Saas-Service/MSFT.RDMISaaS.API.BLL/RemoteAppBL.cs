@@ -57,7 +57,7 @@ namespace MSFT.RDMISaaS.API.BLL
         /// <param name="accessToken">Access Token</param>
         /// <param name="rdMgmtRemoteApp">Remote App class</param>
         /// <returns></returns>
-        public RemoteAppResult CreateRemoteApp(string tenantGroupName, string deploymentUrl, string accessToken, RdMgmtRemoteApp rdMgmtRemoteApp)
+        public RemoteAppResult CreateRemoteApp(string deploymentUrl, string accessToken, RdMgmtRemoteApp rdMgmtRemoteApp)
         {
             try
             {
@@ -77,7 +77,7 @@ namespace MSFT.RDMISaaS.API.BLL
                 remoteAppDTO.tenantGroupName = rdMgmtRemoteApp.tenantGroupName;
                 //call rest api to publish remote appgroup app -- july code bit
                 var content = new StringContent(JsonConvert.SerializeObject(remoteAppDTO), Encoding.UTF8, "application/json");
-                HttpResponseMessage response = CommonBL.InitializeHttpClient(deploymentUrl, accessToken).PostAsync("/RdsManagement/V1/TenantGroups/" + tenantGroupName + "/Tenants/" + rdMgmtRemoteApp.tenantName + "/HostPools/" + rdMgmtRemoteApp.hostPoolName + "/AppGroups/" + rdMgmtRemoteApp.appGroupName + "/RemoteApps/" + rdMgmtRemoteApp.remoteAppName, content).Result;
+                HttpResponseMessage response = CommonBL.InitializeHttpClient(deploymentUrl, accessToken).PostAsync("/RdsManagement/V1/TenantGroups/" + rdMgmtRemoteApp.tenantGroupName + "/Tenants/" + rdMgmtRemoteApp.tenantName + "/HostPools/" + rdMgmtRemoteApp.hostPoolName + "/AppGroups/" + rdMgmtRemoteApp.appGroupName + "/RemoteApps/" + rdMgmtRemoteApp.remoteAppName, content).Result;
                 string strJson = response.Content.ReadAsStringAsync().Result;
                 if (response.IsSuccessStatusCode)
                 {

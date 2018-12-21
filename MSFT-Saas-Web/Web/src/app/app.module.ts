@@ -31,7 +31,12 @@ var redirectUri = sessionStorage.getItem('redirectUri');
 if (window.location.href != redirectUri) {
   var sPageURL = window.location.search.substring(1);
   var codeInfo = sPageURL.split('&')[0].split('=')[1];
-  sessionStorage.setItem("Code", codeInfo);
+  if (codeInfo == "" || codeInfo == null || codeInfo == undefined) {
+    var code = sessionStorage.getItem('Code');
+    sessionStorage.setItem("Code", code);
+  } else {
+    sessionStorage.setItem("Code", codeInfo);
+  }
 }
 
 @NgModule({
@@ -61,7 +66,7 @@ if (window.location.href != redirectUri) {
       {
         path: 'invalidtokenmessage',
         component: InvalidtokenmessageComponent,
-        canActivate: [AuthGuard],
+        canActivate: [AuthGuard]
       },
       {
         path: 'admin',

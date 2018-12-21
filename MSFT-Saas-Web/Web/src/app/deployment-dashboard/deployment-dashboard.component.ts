@@ -1,9 +1,8 @@
-import { Component, OnInit, Input, Output, OnChanges, EventEmitter, trigger, state, style, animate, transition, ViewChild, ElementRef } from '@angular/core';
+import { Component, OnInit, ViewChild, ElementRef } from '@angular/core';
 import { FormGroup, FormControl, Validators } from '@angular/forms'; //This is for Model driven form
-import { Router, ActivatedRoute, Params } from '@angular/router';
-import { Http, Response, Headers, RequestOptions } from '@angular/http';
+import { Router, ActivatedRoute } from '@angular/router';
+import { Http } from '@angular/http';
 import { AppService } from '../shared/app.service';
-import { Observable } from "rxjs";
 import { NotificationsService } from "angular2-notifications";
 import { SearchPipe } from "../../assets/Pipes/Search.pipe";
 import { AppComponent } from "../app.component";
@@ -81,17 +80,17 @@ export class DeploymentDashboardComponent implements OnInit {
     this.editclose.nativeElement.click();
   }
 
-  constructor(private _AppService: AppService, private http: Http, private route: ActivatedRoute,
-    private _notificationsService: NotificationsService, private _BreadcrumComponent: BreadcrumComponent,
-    private router: Router, private adminMenuComponent: AdminMenuComponent) {
+  constructor(private _AppService: AppService, private _notificationsService: NotificationsService, private router: Router,
+    private adminMenuComponent: AdminMenuComponent) {
   }
 
   /* This function is  called directly on page load */
   public ngOnInit() {
-    this.tenantGroupName = sessionStorage.getItem("TenantGroupName");
+    this.adminMenuComponent.hostPoolList = [];
+    this.adminMenuComponent.selectedTenant = null;
+    this.adminMenuComponent.selectedHostPool = null;
     this.hasError = true;
-    //this.tenantsCount = [1,2,3,4,5];
-    this.adminMenuComponent.SetSelectedTenant(null, '');
+    //this.adminMenuComponent.SetSelectedTenant(null, '');
     let data = [{
       name: 'Tenants',
       type: 'Tenants',
@@ -112,7 +111,6 @@ export class DeploymentDashboardComponent implements OnInit {
       friendlyName: new FormControl("", Validators.compose([Validators.required, Validators.pattern(/^[^\s\W\_]([A-Za-z0-9\s\.\-\_])+$/)])),
       description: new FormControl("", Validators.compose([Validators.required, Validators.pattern(/^[\dA-Za-z]+[\dA-Za-z\s\.\-\_\!\@\#\$\%\^\&\*\(\)\{\}\[\]\:\'\"\?\>\<\,\;\/\\\+\=\|]{0,1600}$/)])),
     });
-    this.scopeArray = localStorage.getItem("Scope").split(",");
     this.CheckTenantAccess();
   }
 
@@ -120,6 +118,8 @@ export class DeploymentDashboardComponent implements OnInit {
    * This Function is called on Component Load and it is used to check the Access level of Tenant 
    */
   public CheckTenantAccess() {
+    this.tenantGroupName = sessionStorage.getItem("TenantGroupName");
+    this.scopeArray = localStorage.getItem("Scope").split(",");
     if (this.scopeArray != null && this.scopeArray.length > 2) {
       this.tenants = [{
         "id": "",
@@ -140,11 +140,9 @@ export class DeploymentDashboardComponent implements OnInit {
         "refresh_token": null
       }];
       this.searchTenants = this.tenants;
-     // this.adminMenuComponent.GetAllTenants(this.tenants);
     }
     else {
       this.GetTenants();
-      this.GetAllTenantsList();
     }
   }
 
@@ -384,6 +382,7 @@ export class DeploymentDashboardComponent implements OnInit {
   */
   public SetSelectedTenant(index: any, TenantName: any) {
     sessionStorage.setItem("TenantName", TenantName);
+    sessionStorage.setItem("TenantNameIndex", index);
     this.adminMenuComponent.SetSelectedTenant(index, TenantName);
     this.router.navigate(['/admin/tenantDashboard/', TenantName]);
     let data = [{
@@ -423,31 +422,9 @@ export class DeploymentDashboardComponent implements OnInit {
     this.curentIndex = 0;
   }
 
-  public GetAllTenantsList() {
-    this.refreshToken = sessionStorage.getItem("Refresh_Token");
-    this.refreshTenantLoading = true;
-    this.getTenantsUrl = this._AppService.ApiUrl + '/api/Tenant/GetAllTenants?tenantGroupName=' + this.tenantGroupName +'&refresh_token=' + this.refreshToken;
-    this._AppService.GetTenants(this.getTenantsUrl).subscribe(response => {
-      let responseObject = JSON.parse(response['_body']);
-      this.tenantsList = responseObject;
-      this.adminMenuComponent.GetAllTenants(this.tenantsList);
-      if (this.tenantsList.length > 0) {
-        if (this.tenantsList[0]) {
-          if (this.tenantsList[0].code == "Invalid Token") {
-            sessionStorage.clear();
-            this.router.navigate(['/invalidtokenmessage']);
-          }
-        }
-      }
-    },
-      error => {
-        this.refreshTenantLoading = false;
-      }
-    );
-  }
-
   /* This function is used to  loads all the tenants into table on page load */
   public GetTenants() {
+    this.tenantGroupName = sessionStorage.getItem("TenantGroupName");
     this.refreshToken = sessionStorage.getItem("Refresh_Token");
     this.refreshTenantLoading = true;
     this.tenantlistErrorFound = false;
@@ -520,7 +497,6 @@ export class DeploymentDashboardComponent implements OnInit {
         }
       }
       this.searchTenants = this.tenants;
-      //this.adminMenuComponent.GetAllTenants(this.tenants);
       if (this.searchTenants.length == 0) {
         this.editedBody = true;
         this.showCreateTenant = true;
@@ -575,9 +551,7 @@ export class DeploymentDashboardComponent implements OnInit {
       this.isDescending = true;
       this.lastEntry = this.searchTenants[0].tenantName;
     }
-    //this.previousPageNo = this.currentPageNo;
     this.getTenantsUrl = this._AppService.ApiUrl + '/api/Tenant/GetTenantList?tenantGroupName=' + this.tenantGroupName +'&refresh_token=' + this.refreshToken + '&pageSize=' + this.pageSize + '&sortField=TenantName&isDescending=' + this.isDescending + '&initialSkip=' + this.initialSkip + '&lastEntry=' + this.lastEntry;
-    console.log(this.getTenantsUrl);
     this._AppService.GetTenants(this.getTenantsUrl).subscribe(response => {
       let responseObject = JSON.parse(response['_body']);
       this.tenants = responseObject.rdMgmtTenants; //.splice(0, 3)
@@ -589,7 +563,6 @@ export class DeploymentDashboardComponent implements OnInit {
         }
       }
       this.searchTenants = this.tenants;
-      //this.adminMenuComponent.GetAllTenants(this.tenants);
       if (this.searchTenants.length == 0) {
         this.editedBody = true;
         this.showCreateTenant = true;
@@ -635,7 +608,6 @@ export class DeploymentDashboardComponent implements OnInit {
       this.tenantsCount = responseObject.count;
       this.previousPageNo = this.currentPageNo;
       this.currentPageNo = this.currentPageNo + 1;
-      //this.tenants = JSON.parse(response['_body']);
       if (this.tenants[0]) {
         if (this.tenants[0].code == "Invalid Token") {
           sessionStorage.clear();
@@ -643,7 +615,6 @@ export class DeploymentDashboardComponent implements OnInit {
         }
       }
       this.searchTenants = this.tenants;
-     // this.adminMenuComponent.GetAllTenants(this.tenants);
       if (this.searchTenants.length == 0) {
         this.editedBody = true;
         this.showCreateTenant = true;
@@ -791,9 +762,9 @@ export class DeploymentDashboardComponent implements OnInit {
     var updateArray = {
       "refresh_token": sessionStorage.getItem("Refresh_Token"),
       "tenantGroupName": sessionStorage.getItem("TenantGroupName"),
-      "tenantName": tenantData.tenantName.trim(),
-      "friendlyName": tenantData.friendlyName.trim(),
-      "description": tenantData.description.trim(),
+      "tenantName": tenantData.tenantName,
+      "friendlyName": tenantData.friendlyName,
+      "description": tenantData.description,
       "aadTenantId": this.aadTenantId,
       "id": "00000000-0000-0000-0000-000000000000",
     };
@@ -905,7 +876,6 @@ export class DeploymentDashboardComponent implements OnInit {
           )
           AppComponent.GetNotification('icon icon-check angular-Notify', 'Tenant Deleted Successfully', responseData.message, new Date());
           this.RefreshTenant();
-          //this.GetTenants();
         }
         /* If response data is Failure then it enters into else and this block of code will execute to show the 'Failed To Delete Tenant' notification */
         else {

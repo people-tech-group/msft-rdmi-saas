@@ -7,8 +7,7 @@ export class AppService {
   public ApiEndpoint: any;
   public ApiUrl: string;
   constructor(private http: Http) {
-   //this.ApiUrl = "https://msftrdmisaasapi.azurewebsites.net";
-    this.ApiUrl = "http://localhost:34816/";
+   this.ApiUrl = "https://msftrdmisaasapi.azurewebsites.net";
     
   }
 
@@ -106,7 +105,7 @@ export class AppService {
     let result = {
       "message": "success"
     }
-    let headers = new Headers({ 'Content-Type': 'application/json;charset=utf8', 'Accept': 'application/json', 'Authorization': sessionStorage.getItem('Code') });
+    let headers = new Headers({ 'Content-Type': 'application/json;charset=utf8', 'Accept': 'application/json' });
     let options = new RequestOptions({ headers: headers });
     return this.http.post(tenanturl, JSON.stringify(data), options)
       .catch((error: any) => Observable.throw(error));

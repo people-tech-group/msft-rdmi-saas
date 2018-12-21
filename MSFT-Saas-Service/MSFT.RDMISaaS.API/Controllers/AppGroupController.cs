@@ -226,7 +226,7 @@ namespace MSFT.RDMISaaS.API.Controllers
         /// </summary>
         /// <param name="rdMgmtAppGroup">Remote app group class </param>
         /// <returns></returns>
-        public IHttpActionResult Post([FromBody] string tenantGroupName,RdMgmtAppGroup rdMgmtAppGroup)
+        public IHttpActionResult Post([FromBody] RdMgmtAppGroup rdMgmtAppGroup)
         {
             //get deployment url
             deploymentUrl = configurations.rdBrokerUrl;
@@ -241,7 +241,7 @@ namespace MSFT.RDMISaaS.API.Controllers
                         accessToken = common.GetTokenValue(rdMgmtAppGroup.refresh_token);
                         if (!string.IsNullOrEmpty(accessToken) && accessToken.ToString().ToLower() != invalidToken && accessToken.ToString().ToLower() != invalidCode)
                         {
-                            groupResult = appGroupBL.CreateAppGroup(tenantGroupName,deploymentUrl, accessToken, rdMgmtAppGroup);
+                            groupResult = appGroupBL.CreateAppGroup(deploymentUrl, accessToken, rdMgmtAppGroup);
                         }
                         else
                         {
@@ -275,7 +275,7 @@ namespace MSFT.RDMISaaS.API.Controllers
         /// </summary>
         /// <param name="rdMgmtAppGroup"> Remote app group class </param>
         /// <returns></returns>
-        public IHttpActionResult Put([FromBody] string tenantGroupName, RdMgmtAppGroup rdMgmtAppGroup)
+        public IHttpActionResult Put([FromBody] RdMgmtAppGroup rdMgmtAppGroup)
         {
             //get deployment url
             deploymentUrl = configurations.rdBrokerUrl;
@@ -290,7 +290,7 @@ namespace MSFT.RDMISaaS.API.Controllers
                         token = common.GetTokenValue(rdMgmtAppGroup.refresh_token);
                         if (!string.IsNullOrEmpty(token) && token.ToString().ToLower() != invalidToken && token.ToString().ToLower() != invalidCode)
                         {
-                            groupResult = appGroupBL.UpdateAppGroup(tenantGroupName,deploymentUrl, token, rdMgmtAppGroup);
+                            groupResult = appGroupBL.UpdateAppGroup(deploymentUrl, token, rdMgmtAppGroup);
                         }
                         else
                         {
@@ -366,7 +366,7 @@ namespace MSFT.RDMISaaS.API.Controllers
         /// </summary>
         /// <param name="appGroupUser"> Object of App group user class </param>
         /// <returns></returns>
-        public IHttpActionResult PostUsers([FromBody] string tenantGroupName,RdMgmtUser rdMgmtUser)
+        public IHttpActionResult PostUsers([FromBody] RdMgmtUser rdMgmtUser)
         {
             //get deployment url
             deploymentUrl = configurations.rdBrokerUrl;
@@ -381,7 +381,7 @@ namespace MSFT.RDMISaaS.API.Controllers
                         accessToken = common.GetTokenValue(rdMgmtUser.refresh_token);
                         if (!string.IsNullOrEmpty(accessToken) && accessToken.ToString().ToLower() != invalidToken && accessToken.ToString().ToLower() != invalidCode)
                         {
-                            groupResult = appGroupBL.CreateAppGroupUser(tenantGroupName,deploymentUrl, accessToken, rdMgmtUser);
+                            groupResult = appGroupBL.CreateAppGroupUser(deploymentUrl, accessToken, rdMgmtUser);
                         }
                         else
                         {

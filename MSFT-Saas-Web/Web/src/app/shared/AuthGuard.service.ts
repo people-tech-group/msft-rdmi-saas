@@ -28,14 +28,15 @@ export class AuthGuard implements CanActivate {
     var Code = sessionStorage.getItem("Code");
     if (Code != "undefined" && Code != null) {
       this.parameter = state.url.split('/')[state.url.split('/').length - 1];
-      if (this.MSFTSaasRoutes.indexOf(state.url) >= 0 || decodeURIComponent(this.parameter) === route.params["tenantName"] || decodeURIComponent(this.parameter) === route.params["hostpoolName"]) {
+      if (this.MSFTSaasRoutes.indexOf(state.url) >= 0 || decodeURIComponent(this.parameter) === route.params["tenantName"] || decodeURIComponent(this.parameter) === route.params["hostpoolName"] || this.parameter) {
         return true;
       }
       else {
         this.changeUrl();
       }
-    } else {
-      this.router.navigate(['/invalidtokenmessage']);
+    }
+    else {
+      this.changeUrl();
       return false;
     }
   }

@@ -71,7 +71,7 @@ namespace MSFT.RDMISaaS.API.Controllers
         /// </summary>
         /// <param name="rdMgmtRegistrationInfo"> refistration info class</param>
         /// <returns></returns>
-        public IHttpActionResult Post([FromBody] string tenantGroupName, RdMgmtRegistrationInfo rdMgmtRegistrationInfo)
+        public IHttpActionResult Post([FromBody] RdMgmtRegistrationInfo rdMgmtRegistrationInfo)
         {
             //get deployment url
             deploymentUrl = configurations.rdBrokerUrl;
@@ -86,7 +86,7 @@ namespace MSFT.RDMISaaS.API.Controllers
                         token = common.GetTokenValue(rdMgmtRegistrationInfo.refresh_token);
                         if (!string.IsNullOrEmpty(token) && token.ToString().ToLower() != invalidToken && token.ToString().ToLower() != invalidCode)
                         {
-                            infoResult = registrationInfobl.CreateRegistrationInfo(tenantGroupName,deploymentUrl, token, rdMgmtRegistrationInfo);
+                            infoResult = registrationInfobl.CreateRegistrationInfo(deploymentUrl, token, rdMgmtRegistrationInfo);
                         }
                         else
                         {
