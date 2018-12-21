@@ -62,11 +62,9 @@ export class DeploymentDashboardComponent implements OnInit {
   public isEditDisabled: boolean = true;
   public isDeleteDisabled: boolean = true;
   public tenantlistErrorFound: boolean = false;
-  public showDashboard: boolean = false;
   public tenantGroupName: any;
   public deleteCount: any;
   public refreshToken: any;
-  public tenantGroupForm: any;
   public options: any = {
     timeOut: 2000,
     position: ["top", "right"]
@@ -109,9 +107,6 @@ export class DeploymentDashboardComponent implements OnInit {
       tenantName: new FormControl("", Validators.compose([Validators.required, Validators.pattern(/^[^\s\W\_]([A-Za-z0-9\s\.\-\_])+$/)])),
       friendlyName: new FormControl("", Validators.compose([Validators.required, Validators.pattern(/^[^\s\W\_]([A-Za-z0-9\s\.\-\_])+$/)])),
       description: new FormControl("", Validators.compose([Validators.required, Validators.pattern(/^[\dA-Za-z]+[\dA-Za-z\s\.\-\_\!\@\#\$\%\^\&\*\(\)\{\}\[\]\:\'\"\?\>\<\,\;\/\\\+\=\|]{0,1600}$/)])),
-    });
-    this.tenantGroupForm = new FormGroup({
-      tenantGroupName: new FormControl('', Validators.compose([Validators.required, Validators.pattern(/^[^\s\W\_]([A-Za-z0-9\s\-\_\.])+$/)])),
     });
     this.CheckTenantAccess();
   }

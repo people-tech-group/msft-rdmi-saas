@@ -8,7 +8,6 @@ import { SearchPipe } from "../../assets/Pipes/Search.pipe";
 import { AppComponent } from "../app.component";
 import { BreadcrumComponent } from "../breadcrum/breadcrum.component";
 import { AdminMenuComponent } from "../admin-menu/admin-menu.component";
-import { DeploymentDashboardComponent } from '../deployment-dashboard/deployment-dashboard.component';
 
 @Component({
   selector: 'app-tenant-dashboard',
@@ -87,8 +86,7 @@ export class TenantDashboardComponent implements OnInit {
   @ViewChild('closeModal') closeModal: ElementRef;
 
   constructor(private _AppService: AppService, private http: Http, private route: ActivatedRoute,
-    private _notificationsService: NotificationsService, private router: Router, private adminMenuComponent: AdminMenuComponent,
-    private _DeploymentDashboardComponent: DeploymentDashboardComponent) {
+    private _notificationsService: NotificationsService, private router: Router, private adminMenuComponent: AdminMenuComponent) {
   }
 
   /* This function is  called directly on page load */
@@ -112,12 +110,10 @@ export class TenantDashboardComponent implements OnInit {
       }];
       BreadcrumComponent.GetCurrentPage(data);
       var index = sessionStorage.getItem("TenantNameIndex");
-      this.CheckTenantAccess();
-      this._DeploymentDashboardComponent.SetSelectedTenant(index, this.tenantName);
       this.scopeArray = localStorage.getItem("Scope").split(",");
       this.CheckHostpoolAccess(this.tenantName);
     });
-    //this.adminMenuComponent.SetSelectedhostPool(null, '', '');
+    this.adminMenuComponent.SetSelectedhostPool(null, '', '');
     this.refreshToken = sessionStorage.getItem("Refresh_Token");
     this.hostpoolForm = new FormGroup({
       hostPoolName: new FormControl('', Validators.compose([Validators.required, Validators.maxLength(36), Validators.pattern(/^[^\s\W\_]([A-Za-z0-9\s\-\_\.])+$/)])),
@@ -133,35 +129,6 @@ export class TenantDashboardComponent implements OnInit {
       enableUserProfileDisk: new FormControl(""),
       IsPersistent: new FormControl("false")
     });
-  }
-
-  public CheckTenantAccess() {
-    this.tenantGroupName = sessionStorage.getItem("TenantGroupName");
-    this.scopeArray = localStorage.getItem("Scope").split(",");
-    if (this.scopeArray != null && this.scopeArray.length > 2) {
-      var tenants = [{
-        "id": "",
-        "tenantGroupName": "",
-        "aadTenantId": "",
-        "tenantName": this.scopeArray[1],
-        "description": "",
-        "friendlyName": "",
-        "ssoAdfsAuthority": "",
-        "ssoClientId": "",
-        "ssoClientSecret": "",
-        "noOfHostpool": "",
-        "noOfActivehosts": "",
-        "noOfAppgroups": "",
-        "noOfUsers": "",
-        "noOfSessions": "",
-        "code": null,
-        "refresh_token": null
-      }];
-      this.adminMenuComponent.GetAllTenants(tenants);
-    }
-    else {
-      this.GetAllTenantsList();
-    }
   }
 
   public GetAllTenantsList() {

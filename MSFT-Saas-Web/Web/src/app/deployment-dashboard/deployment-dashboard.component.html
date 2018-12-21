@@ -1,4 +1,4 @@
-<div [hidden]="showDashboard">
+<div>
   <!-- A Ribbon Flag that displays when there no tenants to display -->
   <div class="rdsNotification" *ngIf="showCreateTenant">
     <div class="info">
@@ -294,39 +294,3 @@
     </div>
   </div>
 </div>
-
-<div [hidden]="!showDashboard" style="margin-top: 170px;margin-left: 238px;">
-  <h2 style="margin-left: -60px;">Please Select Tenant Group Name to Continue Further</h2>
-  <button type="button" class="btn btn-default" data-toggle="modal" style="margin-left: 153px;margin-top: 12px;" data-target="#tenantGroupModal">Select Tenant Group</button>
-</div>
-
-<button type="button" id="openTenantGroupModal" [hidden]="true" data-toggle="modal" data-target="#tenantGroupModal"></button>
-
-<!--Tenant Group Modal -->
-<div class="modal fade" id="tenantGroupModal" role="dialog">
-  <div class="modal-dialog modal-lg">
-    <div class="modal-content">
-      <div class="modal-header">
-        <button type="button" class="close" data-dismiss="modal">&times;</button>
-        <h4 class="modal-title">Welcome to Windows Virtual Desktop App,to continue further please enter <b>'TenantGroupName'</b> </h4>
-      </div>
-      <div class="modal-body">
-          <form [formGroup]="tenantGroupForm">
-            <div class="form-group">
-              <label for="usr">Default Tenant Group Name:</label>
-              <input type="text" formControlName="tenantGroupName" name="tenantGroupName" class="form-control" id="tenantGroupName" />
-              <div *ngIf="tenantGroupForm.controls['tenantGroupName'].hasError('pattern')" class="colorRed">
-                Please enter Valid TenantGroup name
-              </div>
-            </div>
-          </form>
-      </div>
-      <div class="modal-footer">
-        <button type="button" [disabled]="tenantGroupForm.invalid" class="btn btn-default" (click)="openDashboard(tenantGroupForm.value)" data-dismiss="modal">Submit</button>
-        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-      </div>
-    </div>
-  </div>
-</div>
-
-

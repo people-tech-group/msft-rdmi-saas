@@ -92,7 +92,7 @@ if (window.location.href != redirectUri) {
       }
     ])
   ],
-  providers: [AppService, AuthGuard, NotificationsService, BreadcrumComponent, DeploymentDashboardComponent, AdminMenuComponent],
+  providers: [AppService, AuthGuard, NotificationsService, BreadcrumComponent],
   bootstrap: [AppComponent]
 })
 export class AppModule {
