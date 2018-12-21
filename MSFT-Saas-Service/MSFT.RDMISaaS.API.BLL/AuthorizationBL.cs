@@ -18,9 +18,7 @@ namespace MSFT.RDMISaaS.API.BLL
             List<RdMgmtRoleAssignment> rdMgmtRoleAssignments = new List<RdMgmtRoleAssignment>();
             try
             {
-                //call rest api to get tenant details -- july code bit
-                //HttpResponseMessage response = CommonBL.InitializeHttpClient(deploymentUrl, accessToken).GetAsync("RdsManagement/V1/Rds.Authorization/roleAssignments").Result;
-                HttpResponseMessage response = CommonBL.InitializeHttpClient(deploymentUrl, accessToken).GetAsync("RdsManagement/V1//Rds.Authorization/roleAssignments").Result;
+                HttpResponseMessage response = CommonBL.InitializeHttpClient(deploymentUrl, accessToken).GetAsync("RdsManagement/V1/Rds.Authorization/roleAssignments").Result;
            
 
                 string strJson = response.Content.ReadAsStringAsync().Result;
@@ -44,6 +42,47 @@ namespace MSFT.RDMISaaS.API.BLL
                     }
 
                 }
+
+            }
+            catch (Exception ex)
+            {
+                return null;
+            }
+            return rdMgmtRoleAssignments;
+        }
+
+
+        public List<RdMgmtRoleAssignment> GetRoleAssignmentsByUser(string deploymentUrl, string accessToken, string loginUserName)
+        {
+            List<RdMgmtRoleAssignment> rdMgmtRoleAssignments = new List<RdMgmtRoleAssignment>();
+            try
+            {
+                HttpResponseMessage response = CommonBL.InitializeHttpClient(deploymentUrl, accessToken).GetAsync("RdsManagement/V1/Rds.Authorization/roleAssignments").Result;
+
+
+                string strJson = response.Content.ReadAsStringAsync().Result;
+                if (response.IsSuccessStatusCode)
+                {
+                    //Deserialize the string to JSON object
+                    var jObj = (JArray)JsonConvert.DeserializeObject(strJson);
+                    if (jObj.Count > 0 && jObj.Select(x => (string)x["signInName"] == loginUserName).Count() > 0)
+                    {
+                        
+                        rdMgmtRoleAssignments = jObj.Select(item => new RdMgmtRoleAssignment
+                        {
+                            roleAssignmentId = (string)item["roleAssignmentId"],
+                            scope = (string)item["scope"],
+                            displayName = (string)item["displayName"],
+                            signInName = (string)item["signInName"],
+                            roleDefinitionName = (string)item["roleDefinitionName"],
+                            roleDefinitionId = (string)item["roleDefinitionId"],
+                            objectId = (string)item["objectId"],
+                            objectType = (string)item["objectType"]
+                        }).ToList();
+                    }
+
+                }
+
             }
             catch (Exception ex)
             {

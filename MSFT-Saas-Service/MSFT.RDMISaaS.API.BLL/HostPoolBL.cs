@@ -8,6 +8,7 @@ using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Text;
+
 #endregion "Import Namespaces"
 
 #region "MSFT.RDMISaaS.API.BLL"
@@ -71,7 +72,7 @@ namespace MSFT.RDMISaaS.API.BLL
                     }
                 }
             }
-            catch 
+            catch (Exception ex)
             {
                 return null;
             }
@@ -126,14 +127,14 @@ namespace MSFT.RDMISaaS.API.BLL
                                 hostPoolName = (string)item["hostPoolName"],
                                 friendlyName = (string)item["friendlyName"],
                                 description = (string)item["description"],
-                                persistent = item["persistent"] != null ? item["persistent"].ToString() : null,
+                                persistent = item["persistent"] != null ? Convert.ToBoolean(item["persistent"].ToString()) : false,
                                 diskPath = (string)item["diskPath"],
                                 enableUserProfileDisk = item["enableUserProfileDisk"] != null ? Convert.ToBoolean(item["enableUserProfileDisk"].ToString()) : false,
-                                excludeFolderPath = (string)item["excludeFolderPath"],
-                                includeFilePath = (string)item["includeFilePath"],
-                                includeFolderPath = (string)item["includeFolderPath"],
-                                customRdpProperty = (string)item["customRdpProperty"],
-                                maxSessionLimit = (int)item["maxSessionLimit"],
+                               // excludeFolderPath = (string)item["excludeFolderPath"],
+                               // includeFilePath = item["includeFilePath"],
+                                //includeFolderPath = item["includeFolderPath"],
+                                //customRdpProperty = item["customRdpProperty"],
+                                maxSessionLimit = (string)item["maxSessionLimit"],
                                 useReverseConnect = item["useReverseConnect"] != null ? item["useReverseConnect"].ToString() : "false",
                             }).ToList();
                         }
@@ -166,7 +167,7 @@ namespace MSFT.RDMISaaS.API.BLL
         /// <param name="accessToken">Access Token</param>
         /// <param name="rdMgmtHostPool">Hostpool class</param>
         /// <returns></returns>
-        public HostPoolResult CreateHostPool(string tenantGroupName,string deploymentUrl, string accessToken, RdMgmtHostPool rdMgmtHostPool)
+        public HostPoolResult CreateHostPool(string deploymentUrl, string accessToken, RdMgmtHostPool rdMgmtHostPool)
         {
             try
             {
@@ -176,11 +177,14 @@ namespace MSFT.RDMISaaS.API.BLL
                 hostpoolDataDTO.hostpoolName = rdMgmtHostPool.hostPoolName;
                 hostpoolDataDTO.friendlyName = rdMgmtHostPool.friendlyName;
                 hostpoolDataDTO.description = rdMgmtHostPool.description;
-               
+                if (rdMgmtHostPool.persistent == false)
+                    rdMgmtHostPool.loadBalancerType = rdMgmtHostPool.loadBalancerTypeName == "BreadthFirst" ? Convert.ToInt32(Enums.loadBalancer.BreadthFirst) : Convert.ToInt32(Enums.loadBalancer.DepthFirst);
+                else
+                    rdMgmtHostPool.loadBalancerType = Convert.ToInt32(Enums.loadBalancer.Persistent);
 
                 //call rest api to create host pool -- july code bit
                 var content = new StringContent(JsonConvert.SerializeObject(hostpoolDataDTO), Encoding.UTF8, "application/json");
-                HttpResponseMessage response = CommonBL.InitializeHttpClient(deploymentUrl, accessToken).PostAsync("/RdsManagement/V1/TenantGroups/"+ tenantGroupName + "/Tenants/" + rdMgmtHostPool.tenantName + "/HostPools/" + rdMgmtHostPool.hostPoolName, content).Result;
+                HttpResponseMessage response = CommonBL.InitializeHttpClient(deploymentUrl, accessToken).PostAsync("/RdsManagement/V1/TenantGroups/"+ rdMgmtHostPool.tenantGroupName + "/Tenants/" + rdMgmtHostPool.tenantName + "/HostPools/" + rdMgmtHostPool.hostPoolName, content).Result;
                 string strJson = response.Content.ReadAsStringAsync().Result;
                 if (response.IsSuccessStatusCode)
                 {
@@ -218,7 +222,7 @@ namespace MSFT.RDMISaaS.API.BLL
         /// <param name="accessToken"> Access Token</param>
         /// <param name="rdMgmtHostPool">Hostpool Class</param>
         /// <returns></returns>
-        public HostPoolResult UpdateHostPool(string tenantGroupName,string deploymentUrl, string accessToken, RdMgmtHostPool rdMgmtHostPool)
+        public HostPoolResult UpdateHostPool(string deploymentUrl, string accessToken, RdMgmtHostPool rdMgmtHostPool)
         {
             try
             {
@@ -226,6 +230,7 @@ namespace MSFT.RDMISaaS.API.BLL
                 HostPoolDataDTO hostpoolDataDTO = new HostPoolDataDTO();
                 hostpoolDataDTO.tenantName = rdMgmtHostPool.tenantName;
                 hostpoolDataDTO.hostpoolName = rdMgmtHostPool.hostPoolName;
+                hostpoolDataDTO.tenantGroupName = rdMgmtHostPool.tenantGroupName;
                 if ((!string.IsNullOrEmpty(rdMgmtHostPool.diskPath)) && rdMgmtHostPool.enableUserProfileDisk == true)
                 {
                     hostpoolDataDTO.diskPath = rdMgmtHostPool.diskPath;
@@ -240,7 +245,7 @@ namespace MSFT.RDMISaaS.API.BLL
 
                 //call rest api to update hostpool -- july code bit
                 var content = new StringContent(JsonConvert.SerializeObject(hostpoolDataDTO), Encoding.UTF8, "application/json");
-                HttpResponseMessage response = CommonBL.PatchAsync(deploymentUrl, accessToken, "/RdsManagement/V1/TenantGroups/" + tenantGroupName + "/Tenants/" + hostpoolDataDTO.tenantName + "/HostPools/" + hostpoolDataDTO.hostpoolName, content).Result;
+                HttpResponseMessage response = CommonBL.PatchAsync(deploymentUrl, accessToken, "/RdsManagement/V1/TenantGroups/" + rdMgmtHostPool.tenantGroupName + "/Tenants/" + hostpoolDataDTO.tenantName + "/HostPools/" + hostpoolDataDTO.hostpoolName, content).Result;
                 string strJson = response.Content.ReadAsStringAsync().Result;
                 if (response.IsSuccessStatusCode)
                 {

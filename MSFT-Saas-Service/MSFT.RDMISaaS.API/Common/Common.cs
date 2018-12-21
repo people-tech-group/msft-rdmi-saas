@@ -19,7 +19,9 @@ using MSFT.RDMISaaS.API.BLL;
 
 #region "MSFT.RDMISaaS.API.Common"
 namespace MSFT.RDMISaaS.API.Common
+
 {
+   
     #region "Common"
     public class Common
     {
@@ -29,9 +31,10 @@ namespace MSFT.RDMISaaS.API.Common
         AuthorizationBL authorizationBL = new AuthorizationBL();
         #endregion
 
-       
+
 
         #region "Functions/Methods"
+       
 
         /// <summary>
         /// Description - Get access token from code

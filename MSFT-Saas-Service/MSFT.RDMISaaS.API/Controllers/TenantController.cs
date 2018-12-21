@@ -106,7 +106,7 @@ namespace MSFT.RDMISaaS.API.Controllers
         /// </summary>
         /// <param name="rdMgmtTenant">Tenant class</param>
         /// <returns></returns>
-        public IHttpActionResult Post([FromBody] string tenantGroupName, RdMgmtTenant rdMgmtTenant)
+        public IHttpActionResult Post([FromBody] RdMgmtTenant rdMgmtTenant)
         {
             //get deployment url
             deploymentUrl = configurations.rdBrokerUrl;
@@ -121,7 +121,7 @@ namespace MSFT.RDMISaaS.API.Controllers
                         accessToken = common.GetTokenValue(rdMgmtTenant.refresh_token);
                         if (!string.IsNullOrEmpty(accessToken) && accessToken.ToString().ToLower() != invalidToken && accessToken.ToString().ToLower() != invalidCode)
                         {
-                            tenantResult = tenantBL.CreateTenant(tenantGroupName,deploymentUrl, accessToken, rdMgmtTenant);
+                            tenantResult = tenantBL.CreateTenant(deploymentUrl, accessToken, rdMgmtTenant);
                         }
                         else
                         {
@@ -150,7 +150,7 @@ namespace MSFT.RDMISaaS.API.Controllers
         /// </summary>
         /// <param name="rdMgmtTenant"></param>
         /// <returns></returns>
-        public IHttpActionResult Put([FromBody] string tenantGroupName, RdMgmtTenant rdMgmtTenant)
+        public IHttpActionResult Put([FromBody] RdMgmtTenant rdMgmtTenant)
         {
             //get deployment url
             deploymentUrl = configurations.rdBrokerUrl;
@@ -165,7 +165,7 @@ namespace MSFT.RDMISaaS.API.Controllers
                         accessToken = common.GetTokenValue(rdMgmtTenant.refresh_token);
                         if (!string.IsNullOrEmpty(accessToken) && accessToken.ToString().ToLower() != invalidToken && accessToken.ToString().ToLower() != invalidCode)
                         {
-                            tenantResult = tenantBL.UpdateTenant(tenantGroupName,deploymentUrl, accessToken, rdMgmtTenant);
+                            tenantResult = tenantBL.UpdateTenant(deploymentUrl, accessToken, rdMgmtTenant);
                         }
                         else
                         {

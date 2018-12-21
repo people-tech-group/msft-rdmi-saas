@@ -38,6 +38,7 @@ namespace MSFT.RDMISaaS.API.Model
         public string appGroupName { get; set; }
         public string appGroupUser { get; set; }
         public string userPrincipalName { get; set; }
+        public string tenantGroupName { get; set; }
     }
     #endregion  "Class - AppGroupUserDTO"
 }

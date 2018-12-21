@@ -293,7 +293,7 @@ namespace MSFT.RDMISaaS.API.BLL
         /// <param name="accessToken"> Access Token</param>
         /// <param name="rdMgmtAppGroup"> App Group Class </param>
         /// <returns></returns>
-        public AppGroupResult CreateAppGroup(string tenantGroupName, string deploymentUrl, string accessToken, RdMgmtAppGroup rdMgmtAppGroup)
+        public AppGroupResult CreateAppGroup(string deploymentUrl, string accessToken, RdMgmtAppGroup rdMgmtAppGroup)
         {
             try
             {
@@ -309,7 +309,7 @@ namespace MSFT.RDMISaaS.API.BLL
 
                 //call rest service to create app group -- july code bit
                 var content = new StringContent(JsonConvert.SerializeObject(appGroupDTO), Encoding.UTF8, "application/json");
-                HttpResponseMessage response = CommonBL.InitializeHttpClient(deploymentUrl, accessToken).PostAsync("/RdsManagement/V1/TenantGroups/" + tenantGroupName + "/Tenants/" + appGroupDTO.tenantName + "/HostPools/" + appGroupDTO.hostPoolName + "/AppGroups/" + appGroupDTO.appGroupName, content).Result;
+                HttpResponseMessage response = CommonBL.InitializeHttpClient(deploymentUrl, accessToken).PostAsync("/RdsManagement/V1/TenantGroups/" + rdMgmtAppGroup.tenantGroupName + "/Tenants/" + appGroupDTO.tenantName + "/HostPools/" + appGroupDTO.hostPoolName + "/AppGroups/" + appGroupDTO.appGroupName, content).Result;
                 string strJson = response.Content.ReadAsStringAsync().Result;
                 if (response.IsSuccessStatusCode)
                 {
@@ -346,7 +346,7 @@ namespace MSFT.RDMISaaS.API.BLL
         /// <param name="accessToken">Access Token</param>
         /// <param name="rdMgmtAppGroup">App Group Class </param>
         /// <returns></returns>
-        public AppGroupResult UpdateAppGroup(string tenantGroupName, string deploymentUrl, string accessToken, RdMgmtAppGroup rdMgmtAppGroup)
+        public AppGroupResult UpdateAppGroup(string deploymentUrl, string accessToken, RdMgmtAppGroup rdMgmtAppGroup)
         {
             try
             {
@@ -361,7 +361,7 @@ namespace MSFT.RDMISaaS.API.BLL
 
                 //call rest service to update app group details 
                 var content = new StringContent(JsonConvert.SerializeObject(appGroupDTO), Encoding.UTF8, "application/json");
-                HttpResponseMessage response = CommonBL.PatchAsync(deploymentUrl, accessToken, "/RdsManagement/V1/TenantGroups/" + tenantGroupName + "/Tenants/" + appGroupDTO.tenantName + "/HostPools/" + appGroupDTO.hostPoolName + "/AppGroups/" + appGroupDTO.appGroupName, content).Result;
+                HttpResponseMessage response = CommonBL.PatchAsync(deploymentUrl, accessToken, "/RdsManagement/V1/TenantGroups/" + rdMgmtAppGroup.tenantGroupName + "/Tenants/" + appGroupDTO.tenantName + "/HostPools/" + appGroupDTO.hostPoolName + "/AppGroups/" + appGroupDTO.appGroupName, content).Result;
                 string strJson = response.Content.ReadAsStringAsync().Result;
                 if (response.IsSuccessStatusCode)
                 {
@@ -442,7 +442,7 @@ namespace MSFT.RDMISaaS.API.BLL
         /// <param name="accessToken"> Access Token</param>
         /// <param name="rdMgmtUser"> App Group user claass</param>
         /// <returns></returns>
-        public AppGroupResult CreateAppGroupUser(string tenantGroupName, string deploymentUrl, string accessToken, RdMgmtUser rdMgmtUser)
+        public AppGroupResult CreateAppGroupUser(string deploymentUrl, string accessToken, RdMgmtUser rdMgmtUser)
         {
             try
             {
@@ -452,11 +452,12 @@ namespace MSFT.RDMISaaS.API.BLL
                 appGroupUserDTO.hostPoolName = rdMgmtUser.hostPoolName;
                 appGroupUserDTO.tenantName = rdMgmtUser.tenantName;
                 appGroupUserDTO.userPrincipalName = rdMgmtUser.userPrincipalName;
+                appGroupUserDTO.tenantGroupName = rdMgmtUser.tenantGroupName;
 
 
                 //call rest service to add user to app group - july code bit
                 var content = new StringContent(JsonConvert.SerializeObject(appGroupUserDTO), Encoding.UTF8, "application/json");
-                HttpResponseMessage response = CommonBL.InitializeHttpClient(deploymentUrl, accessToken).PostAsync("/RdsManagement/V1/TenantGroups/" + tenantGroupName + "/Tenants/" + appGroupUserDTO.tenantName + "/HostPools/" + appGroupUserDTO.hostPoolName + "/AppGroups/" + appGroupUserDTO.appGroupName + "/AssignedUsers/" + appGroupUserDTO.userPrincipalName, content).Result;
+                HttpResponseMessage response = CommonBL.InitializeHttpClient(deploymentUrl, accessToken).PostAsync("/RdsManagement/V1/TenantGroups/" + rdMgmtUser.tenantGroupName + "/Tenants/" + appGroupUserDTO.tenantName + "/HostPools/" + appGroupUserDTO.hostPoolName + "/AppGroups/" + appGroupUserDTO.appGroupName + "/AssignedUsers/" + appGroupUserDTO.userPrincipalName, content).Result;
                 string strJson = response.Content.ReadAsStringAsync().Result;
                 if (response.IsSuccessStatusCode)
                 {

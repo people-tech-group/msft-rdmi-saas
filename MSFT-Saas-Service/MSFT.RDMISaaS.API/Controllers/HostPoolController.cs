@@ -72,7 +72,7 @@ namespace MSFT.RDMISaaS.API.Controllers
         /// </summary>
         /// <param name="rdMgmthostpool"> Hostpool Class </param>
         /// <returns></returns>
-        public IHttpActionResult Post([FromBody] string tenantGroupName, RdMgmtHostPool rdMgmthostpool)
+        public IHttpActionResult Post([FromBody] RdMgmtHostPool rdMgmthostpool)
         {
             //get deployment url
             deploymentUrl = configurations.rdBrokerUrl;
@@ -87,7 +87,7 @@ namespace MSFT.RDMISaaS.API.Controllers
                         accessToken = common.GetTokenValue(rdMgmthostpool.refresh_token);
                         if (!string.IsNullOrEmpty(accessToken) && accessToken.ToString().ToLower() != invalidToken && accessToken.ToString().ToLower() != invalidCode)
                         {
-                            poolResult = hostPoolBL.CreateHostPool(tenantGroupName, deploymentUrl, accessToken, rdMgmthostpool);
+                            poolResult = hostPoolBL.CreateHostPool(deploymentUrl, accessToken, rdMgmthostpool);
                         }
                         else
                         {
@@ -194,7 +194,7 @@ namespace MSFT.RDMISaaS.API.Controllers
         /// </summary>
         /// <param name="rdMgmthostpool">Hostpool class </param>
         /// <returns></returns>
-        public IHttpActionResult Put([FromBody] string tenantGroupName, RdMgmtHostPool rdMgmthostpool)
+        public IHttpActionResult Put([FromBody] RdMgmtHostPool rdMgmthostpool)
         {
             //get deployment url
             deploymentUrl = configurations.rdBrokerUrl;
@@ -209,7 +209,7 @@ namespace MSFT.RDMISaaS.API.Controllers
                         token = common.GetTokenValue(rdMgmthostpool.refresh_token);
                         if (!string.IsNullOrEmpty(token) && token.ToString().ToLower() != invalidToken && token.ToString().ToLower() != invalidCode)
                         {
-                            poolResult = hostPoolBL.UpdateHostPool(tenantGroupName, deploymentUrl, token, rdMgmthostpool);
+                            poolResult = hostPoolBL.UpdateHostPool(deploymentUrl, token, rdMgmthostpool);
                         }
                         else
                         {
