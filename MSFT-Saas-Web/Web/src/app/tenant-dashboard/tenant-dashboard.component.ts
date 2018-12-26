@@ -34,9 +34,7 @@ export class TenantDashboardComponent implements OnInit {
   public isNext: boolean = false;
   public hasError: boolean = false;
   public isDescending: boolean = false;
-
   public hostpoolsCount: any = 0;
-
   public listItem: any = 10;  // pagination
   public createHostpoolUniqueName: boolean = false;
   public hostpoolNextButtonDisable: boolean = true;
@@ -109,7 +107,8 @@ export class TenantDashboardComponent implements OnInit {
         path: 'tenantDashboard',
       }];
       BreadcrumComponent.GetCurrentPage(data);
-      var index = sessionStorage.getItem("TenantNameIndex");
+      var index = +sessionStorage.getItem("TenantNameIndex");
+      this.adminMenuComponent.selectedTenant = index;
       this.scopeArray = localStorage.getItem("Scope").split(",");
       this.CheckHostpoolAccess(this.tenantName);
     });
@@ -128,25 +127,6 @@ export class TenantDashboardComponent implements OnInit {
       diskPath: new FormControl("", Validators.compose([Validators.required, Validators.pattern(/^((\\|\\\\)[a-z A-Z]+)+((\\|\\\\)[a-z0-9A-Z]+)$/)])),
       enableUserProfileDisk: new FormControl(""),
       IsPersistent: new FormControl("false")
-    });
-  }
-
-  public GetAllTenantsList() {
-    this.tenantGroupName = sessionStorage.getItem("TenantGroupName");
-    this.refreshToken = sessionStorage.getItem("Refresh_Token");
-    let getTenantsUrl = this._AppService.ApiUrl + '/api/Tenant/GetAllTenants?tenantGroupName=' + this.tenantGroupName + '&refresh_token=' + this.refreshToken;
-    this._AppService.GetTenants(getTenantsUrl).subscribe(response => {
-      let responseObject = JSON.parse(response['_body']);
-      let tenantsList = responseObject;
-      this.adminMenuComponent.GetAllTenants(tenantsList);
-      if (tenantsList.length > 0) {
-        if (tenantsList[0]) {
-          if (tenantsList[0].code == "Invalid Token") {
-            sessionStorage.clear();
-            this.router.navigate(['/invalidtokenmessage']);
-          }
-        }
-      }
     });
   }
 
@@ -542,7 +522,6 @@ export class TenantDashboardComponent implements OnInit {
     this.getHostpoolsUrl = this._AppService.ApiUrl + '/api/HostPool/GetHostPoolList?tenantGroupName=' + this.tenantGroupName +'&tenantName=' + this.tenantName + '&refresh_token=' + sessionStorage.getItem("Refresh_Token") + '&pageSize=' + this.pageSize + '&sortField=HostPoolName&isDescending=true&initialSkip=' + this.initialSkip + '&lastEntry=' + this.lastEntry;
     this._AppService.GetTenantDetails(this.getHostpoolsUrl).subscribe(response => {
       this.hostPoolsList = JSON.parse(response['_body']);
-      console.log(this.hostPoolsList);
       this.previousPageNo = this.currentPageNo;
       this.currentPageNo = this.currentPageNo - 1;
       //this.hostpoolsCount = this.tenantInfo.noOfHostpool
@@ -609,7 +588,6 @@ export class TenantDashboardComponent implements OnInit {
     this.getHostpoolsUrl = this._AppService.ApiUrl + '/api/HostPool/GetHostPoolList?tenantGroupName=' + this.tenantGroupName +'&tenantName=' + this.tenantName + '&refresh_token=' + sessionStorage.getItem("Refresh_Token") + '&pageSize=' + this.pageSize+'&sortField=HostPoolName&isDescending=false&initialSkip=' + this.initialSkip +'&lastEntry=' + this.lastEntry;
     this._AppService.GetTenantDetails(this.getHostpoolsUrl).subscribe(response => {
       this.hostPoolsList = JSON.parse(response['_body']);
-      console.log(this.hostPoolsList);
       this.previousPageNo = this.currentPageNo;
       this.currentPageNo = this.currentPageNo + 1;
       for (let i in this.hostPoolsList) {

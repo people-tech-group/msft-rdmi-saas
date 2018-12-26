@@ -12,10 +12,11 @@ import * as FileSaver from 'file-saver';
 import { IMyOptions, IMyDateModel, IMyDate } from 'mydatepicker';
 import { SearchPipe } from "../../assets/Pipes/Search.pipe";
 import { ClipboardModule } from 'ngx-clipboard';
-import { AdminMenuComponent } from "../admin-menu/admin-menu.component";
 import { trigger, state, style, animate, transition } from '@angular/animations';
 
+
 @Component({
+
   selector: 'app-hostpool-dashboard',
   templateUrl: './hostpool-dashboard.component.html',
   styleUrls: ['./hostpool-dashboard.component.css'],
@@ -220,7 +221,7 @@ export class HostpoolDashboardComponent implements OnInit {
   public galleryAppPageSize: any = 10;
   @ViewChild('closeModal') closeModal: ElementRef;
 
-  constructor(private _AppService: AppService, private fb: FormBuilder, private http: Http, private route: ActivatedRoute, private _notificationsService: NotificationsService, private router: Router, private adminmenucom: AdminMenuComponent) {
+  constructor(private _AppService: AppService, private fb: FormBuilder, private http: Http, private route: ActivatedRoute, private _notificationsService: NotificationsService, private router: Router) {
     
   }
 
@@ -662,7 +663,6 @@ export class HostpoolDashboardComponent implements OnInit {
     else {
       this.currentNoOfPagesHostCount = currentNoOfPagesCountCount;
     }
-    console.log(this.currentNoOfPagesHostCount);
     this.curentHostIndex = 0;
   }
 
@@ -1513,7 +1513,6 @@ export class HostpoolDashboardComponent implements OnInit {
         }
       }
       this.appGroupsListSearch = JSON.parse(response['_body']);
-      console.log(this.appGroupsListSearch);
       if (this.appGroupsListSearch.length == 0) {
         this.editedBodyAppGroup = true;
         this.editedLBody = false;
@@ -1555,7 +1554,6 @@ export class HostpoolDashboardComponent implements OnInit {
         }
       }
       this.appGroupsListSearch = JSON.parse(response['_body']);
-      console.log(this.appGroupsListSearch);
       if (this.appGroupsListSearch.length == 0) {
         this.editedBodyAppGroup = true;
         this.editedLBody = false;
@@ -1596,7 +1594,6 @@ export class HostpoolDashboardComponent implements OnInit {
         }
       }
       this.appGroupsListSearch = JSON.parse(response['_body']);
-      console.log(this.appGroupsListSearch);
       if (this.appGroupsListSearch.length == 0) {
         this.editedBodyAppGroup = true;
         this.editedLBody = false;

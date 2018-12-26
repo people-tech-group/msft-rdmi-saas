@@ -87,7 +87,7 @@ export class DeploymentDashboardComponent implements OnInit {
   /* This function is  called directly on page load */
   public ngOnInit() {
     this.hasError = true;
-    this.adminMenuComponent.SetSelectedTenant(null, '');
+    //this.adminMenuComponent.SetSelectedTenant(null, '');
     let data = [{
       name: 'Tenants',
       type: 'Tenants',
@@ -140,7 +140,6 @@ export class DeploymentDashboardComponent implements OnInit {
     }
     else {
       this.GetTenants();
-      this.GetAllTenantsList();
     }
   }
 
@@ -420,30 +419,6 @@ export class DeploymentDashboardComponent implements OnInit {
     this.curentIndex = 0;
   }
 
-  public GetAllTenantsList() {
-    this.tenantGroupName = sessionStorage.getItem("TenantGroupName");
-    this.refreshToken = sessionStorage.getItem("Refresh_Token");
-    this.refreshTenantLoading = true;
-    this.getTenantsUrl = this._AppService.ApiUrl + '/api/Tenant/GetAllTenants?tenantGroupName=' + this.tenantGroupName +'&refresh_token=' + this.refreshToken;
-    this._AppService.GetTenants(this.getTenantsUrl).subscribe(response => {
-      let responseObject = JSON.parse(response['_body']);
-      this.tenantsList = responseObject;
-      this.adminMenuComponent.GetAllTenants(this.tenantsList);
-      if (this.tenantsList.length > 0) {
-        if (this.tenantsList[0]) {
-          if (this.tenantsList[0].code == "Invalid Token") {
-            sessionStorage.clear();
-            this.router.navigate(['/invalidtokenmessage']);
-          }
-        }
-      }
-    },
-      error => {
-        this.refreshTenantLoading = false;
-      }
-    );
-  }
-
   /* This function is used to  loads all the tenants into table on page load */
   public GetTenants() {
     this.tenantGroupName = sessionStorage.getItem("TenantGroupName");
@@ -574,7 +549,6 @@ export class DeploymentDashboardComponent implements OnInit {
       this.lastEntry = this.searchTenants[0].tenantName;
     }
     this.getTenantsUrl = this._AppService.ApiUrl + '/api/Tenant/GetTenantList?tenantGroupName=' + this.tenantGroupName +'&refresh_token=' + this.refreshToken + '&pageSize=' + this.pageSize + '&sortField=TenantName&isDescending=' + this.isDescending + '&initialSkip=' + this.initialSkip + '&lastEntry=' + this.lastEntry;
-    console.log(this.getTenantsUrl);
     this._AppService.GetTenants(this.getTenantsUrl).subscribe(response => {
       let responseObject = JSON.parse(response['_body']);
       this.tenants = responseObject.rdMgmtTenants; //.splice(0, 3)

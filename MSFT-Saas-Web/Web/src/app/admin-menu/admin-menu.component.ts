@@ -2,6 +2,7 @@ import { Component } from '@angular/core';
 import * as $ from 'jquery';
 import { BreadcrumComponent } from '../breadcrum/breadcrum.component';
 import { Router } from '@angular/router';
+import { AppService } from '../shared/app.service';
 
 @Component({
   selector: 'app-admin-menu',
@@ -25,13 +26,18 @@ export class AdminMenuComponent {
   public tenantLength: any = 10;
   public storeLength: any = 0;
   public tenantListLength: any;
-  constructor(private router: Router) {
+
+  constructor(private router: Router, private appService: AppService) {
     if (this.tenantListLength == 1) {
       this.loadMore = false;
     }
     else {
       this.loadMore = true;
     }
+  }
+
+  public ngOnInit() {
+    this.GetAllTenantsList();
   }
 
   /*
@@ -48,12 +54,33 @@ export class AdminMenuComponent {
     this.selectedHostPool = null;
     this.router.navigate(['/admin/Tenants']);
   }
+
+  /**
+   * This method is used to get the tenant List for side menu nav
+   **/
+  public GetAllTenantsList() {
+    let tenantGroupName = sessionStorage.getItem("TenantGroupName");
+    let refreshToken = sessionStorage.getItem("Refresh_Token");
+    let getTenantsUrl = this.appService.ApiUrl + '/api/Tenant/GetAllTenants?tenantGroupName=' + tenantGroupName + '&refresh_token=' + refreshToken;
+    this.appService.GetTenants(getTenantsUrl).subscribe(response => {
+      let responseObject = JSON.parse(response['_body']);
+      this.GetAllTenants(responseObject);
+      if (responseObject.length > 0) {
+        if (responseObject[0]) {
+          if (responseObject[0].code == "Invalid Token") {
+            sessionStorage.clear();
+            this.router.navigate(['/invalidtokenmessage']);
+          }
+        }
+      }
+    });
+  }
  
   /**
    * This function is used  to Load all the tenants list
    * ---------
    * Parameters
-   * data - Accepts Tenant List
+   * data - Accepts Tenant List from get All TenantList Method
    * ---------
    */
   public GetAllTenants(data: any) {
@@ -73,6 +100,13 @@ export class AdminMenuComponent {
       this.hostPoolList = [];
       this.selectedTenant = null;
       this.selectedAllTenants = true;
+      let path = window.location.pathname;
+      let hostpoolName = sessionStorage.getItem("selectedhostpoolname");
+      let tenantName = sessionStorage.getItem("TenantName");
+      if (path == `/admin/hostpoolDashboard/${hostpoolName}`) {
+        let hostpoolList = JSON.parse(sessionStorage.getItem("hostpoolList"));
+        this.GetHostpools(hostpoolList, tenantName);
+      }
     }
   }
 
@@ -124,18 +158,20 @@ export class AdminMenuComponent {
    * ----------
    */
   public GetHostpools(hostpoolData: any, tenantName: any) {
+    sessionStorage.setItem("hostpoolList", JSON.stringify(hostpoolData));
     this.hostPoolList = [];
     this.hostPoolList = hostpoolData;
-    $(".sub-sub-group-list").addClass("collapse");
-    $(".sub-sub-group-list").eq(this.selectedTenant).removeClass("collapse");
-    $(".sub-group-list li input[type='checkbox']").prop("checked", "");
-    $("#sub-group-" + tenantName).prop("checked", true);
     let data = [{
       name: tenantName,
       type: 'Tenant',
       path: 'tenantDashboard',
     }];
     BreadcrumComponent.GetCurrentPage(data);
+    let tenantIndex = +sessionStorage.getItem("TenantNameIndex");
+    let hostpoolIndex = +sessionStorage.getItem("hostpoolNameIndex");
+    let hostpoolName = sessionStorage.getItem("selectedhostpoolname");
+    this.SetSelectedTenant(tenantIndex, tenantName);
+    this.SetSelectedhostPool(hostpoolIndex, tenantName, hostpoolName);
   }
 
   /*
@@ -151,6 +187,7 @@ export class AdminMenuComponent {
     this.selectedHostPool = index;
     this.selectedHostpoolName = hostpoolName;
     sessionStorage.setItem('selectedhostpoolname', this.selectedHostpoolName);
+    sessionStorage.setItem("hostpoolNameIndex", index);
     let data = [{
       name: hostpoolName,
       type: 'Hostpool',
