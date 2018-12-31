@@ -54,6 +54,7 @@ export class AppComponent implements OnInit {
   public isSingoutButton: boolean = false;
   public showNotificationDialog: boolean = false;
   public isInvalidToken: boolean = true;
+  public appLoader: boolean = false;
   public tenantGroupName: any;
 
   constructor(private _AppService: AppService, private router: Router, private route: ActivatedRoute, private http: Http,) {
@@ -89,6 +90,7 @@ export class AppComponent implements OnInit {
     this.roleDefinitionName = sessionStorage.getItem("roleDefinitionName");
     this.profileEmail = sessionStorage.getItem("profileEmail");
     if (code != "undefined" && code != null && gotCode == 'yes') {
+      this.appLoader = true;
       this.redirectUri = sessionStorage.getItem('redirectUri');
       var codData = {
         Code: code,
@@ -141,11 +143,12 @@ export class AppComponent implements OnInit {
           sessionStorage.setItem('profileEmail', this.profileEmail);
           sessionStorage.setItem('Scope', roleDef);
           sessionStorage.setItem('gotCode', 'no');
+          this.appLoader = false;
           this.router.navigate(['/admin/Tenants']);
         }).catch((error: any) => {
-           this.router.navigate(['/invalidtokenmessage']);
+          this.router.navigate(['/invalidtokenmessage']);
+          this.appLoader = false;
         });
-
     }
     else if (gotCode != 'no') {
       sessionStorage.clear();

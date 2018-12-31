@@ -103,7 +103,7 @@ export class AdminMenuComponent {
       let path = window.location.pathname;
       let hostpoolName = sessionStorage.getItem("selectedhostpoolname");
       let tenantName = sessionStorage.getItem("TenantName");
-      if (path == `/admin/hostpoolDashboard/${hostpoolName}`) {
+      if (decodeURIComponent(path) == `/admin/hostpoolDashboard/${hostpoolName}`) {
         let hostpoolList = JSON.parse(sessionStorage.getItem("hostpoolList"));
         this.GetHostpools(hostpoolList, tenantName);
       }

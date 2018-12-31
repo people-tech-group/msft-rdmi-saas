@@ -288,7 +288,6 @@ export class HostpoolDashboardComponent implements OnInit {
     });
     this.formCreateNewAppGroup.patchValue({ radiobtnAppType: 'Desktop' });
     this.scopeArray = localStorage.getItem("Scope").split(",");
-    this.GetAllSessionHost();
   }
 
   public options: any = {
@@ -313,6 +312,7 @@ export class HostpoolDashboardComponent implements OnInit {
     else {
       this.GetHostPoolDetails(hostPoolName);
     }
+    this.GetAllSessionHost();
   }
 
   /* This function is used to Change the Expiry Data
@@ -489,7 +489,6 @@ export class HostpoolDashboardComponent implements OnInit {
     this.state = "down";
     this.CheckAppGroupAccess(this.hostPoolName);    
     this.GetAllSessionHost();
-    
   }
 
   /*
