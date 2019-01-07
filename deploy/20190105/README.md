@@ -4,4 +4,4 @@ Deploy a msft-rdmi-saas-ux your azure environment.
 
 Click the button below to deploy:
 
-[![Deploy to Azure](https://azuredeploy.net/deploybutton.png)](https://portal.azure.com/#create/Microsoft.Template/uri/https://raw.githubusercontent.com/people-tech-group/msft-rdmi-saas/master/deploy/20190105/azuredeploy.json)
+[![Deploy to Azure](https://azuredeploy.net/deploybutton.png)](https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2Fpeople-tech-group%2Fmsft-rdmi-saas%2Fmaster%2Fdeploy%2F20190105%2Fazuredeploy.json)
