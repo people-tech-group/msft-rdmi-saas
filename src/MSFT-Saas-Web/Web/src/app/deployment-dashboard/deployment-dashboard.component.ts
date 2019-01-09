@@ -118,7 +118,7 @@ export class DeploymentDashboardComponent implements OnInit {
    */
   public CheckTenantAccess() {
     this.tenantGroupName = sessionStorage.getItem("TenantGroupName");
-    this.scopeArray = localStorage.getItem("Scope").split(",");
+    this.scopeArray = sessionStorage.getItem("Scope").split(",");
     if (this.scopeArray != null && this.scopeArray.length > 2) {
       this.tenants = [{
         "id": "",

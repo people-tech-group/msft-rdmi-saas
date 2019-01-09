@@ -113,7 +113,7 @@ export class TenantDashboardComponent implements OnInit {
       BreadcrumComponent.GetCurrentPage(data);
       var index = +sessionStorage.getItem("TenantNameIndex");
       this.adminMenuComponent.selectedTenant = index;
-      this.scopeArray = localStorage.getItem("Scope").split(",");
+      this.scopeArray = sessionStorage.getItem("Scope").split(",");
       this.CheckHostpoolAccess(this.tenantName);
     });
     this.adminMenuComponent.SetSelectedhostPool(null, '', '');

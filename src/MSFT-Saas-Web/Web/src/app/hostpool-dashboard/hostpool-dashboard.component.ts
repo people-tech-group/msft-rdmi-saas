@@ -252,7 +252,7 @@ export class HostpoolDashboardComponent implements OnInit {
         path: 'hostpoolDashboard',
       }];
       BreadcrumComponent.GetCurrentPage(data);
-      this.scopeArray = localStorage.getItem("Scope").split(",");
+      this.scopeArray = sessionStorage.getItem("Scope").split(",");
       this.CheckAppGroupAccess(this.hostPoolName);
     });
     this.tenantDashboard = new FormGroup({
@@ -287,7 +287,7 @@ export class HostpoolDashboardComponent implements OnInit {
       radiobtnAppType: new FormControl(''),
     });
     this.formCreateNewAppGroup.patchValue({ radiobtnAppType: 'Desktop' });
-    this.scopeArray = localStorage.getItem("Scope").split(",");
+    this.scopeArray = sessionStorage.getItem("Scope").split(",");
   }
 
   public options: any = {
