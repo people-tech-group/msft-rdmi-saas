@@ -31,8 +31,8 @@
         "accountName": "msftsaas-autoAccount",
         "credentialName": "DefaultAzureCredential",
         "runbookName": "msftsaasbook",
-        "baseURL": "https://raw.githubusercontent.com/Azure/RDS-Templates/master/rdmi-peopletech/msft-rdmi-saas-offering/scripts/",
-        "scriptUri": "https://raw.githubusercontent.com/Azure/RDS-Templates/master/rdmi-peopletech/msft-rdmi-saas-offering/scripts/New-RdmiMgmtSetup.ps1",
+        "baseURL": "https://raw.githubusercontent.com/people-tech-group/msft-rdmi-saas/master/deploy/20190105/scripts/",
+        "scriptUri": "https://raw.githubusercontent.com/people-tech-group/msft-rdmi-saas/master/deploy/20190105/scripts/New-RdmiMgmtSetup.ps1",
         "fileURI": "[concat(variables('baseURL'),'/msft-rdmi-saas-offering.zip')]",
 
         "sku": "Free",
