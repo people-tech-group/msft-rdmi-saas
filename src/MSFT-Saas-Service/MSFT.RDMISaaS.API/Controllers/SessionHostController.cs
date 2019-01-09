@@ -37,7 +37,7 @@ namespace MSFT.RDMISaaS.API.Controllers
         /// <param name="hostPoolName">Name of Hostpool</param>
         /// <param name="refresh_token">Refresh token to get access token</param>
         /// <returns></returns>
-        public List<RdMgmtSessionHost> GetSessionhostList(string tenantName, string hostPoolName, string refresh_token, int pageSize, string sortField, bool isDescending = false, int initialSkip = 0, string lastEntry = null)
+        public List<RdMgmtSessionHost> GetSessionhostList(string tenantGroupName, string tenantName, string hostPoolName, string refresh_token, int pageSize, string sortField, bool isDescending = false, int initialSkip = 0, string lastEntry = null)
         {
 
             //get deployment url
@@ -52,7 +52,7 @@ namespace MSFT.RDMISaaS.API.Controllers
                     accessToken = common.GetTokenValue(refresh_token);
                     if (!string.IsNullOrEmpty(accessToken) && accessToken.ToString().ToLower() != invalidToken && accessToken.ToString().ToLower() != invalidCode)
                     {
-                        rdMgmtSessionHosts = sessionHostBL.GetSessionhostList(deploymentUrl, accessToken, tenantName, hostPoolName, false,false, pageSize, sortField, isDescending, initialSkip, lastEntry);
+                        rdMgmtSessionHosts = sessionHostBL.GetSessionhostList(deploymentUrl, accessToken, tenantGroupName, tenantName, hostPoolName, false,false, pageSize, sortField, isDescending, initialSkip, lastEntry);
                     }
                     else
                     {
@@ -77,7 +77,7 @@ namespace MSFT.RDMISaaS.API.Controllers
         /// <param name="sessionHostName">Name of Session Host</param>
         /// <param name="refresh_token">Refresh token to get access token</param>
         /// <returns></returns>
-        public RdMgmtSessionHost GetSessionHostDetails(string tenantName, string hostPoolName, string sessionHostName, string refresh_token)
+        public RdMgmtSessionHost GetSessionHostDetails(string tenantGroupName,string  tenantName, string hostPoolName, string sessionHostName, string refresh_token)
         {
             //get deployment url
             deploymentUrl = configurations.rdBrokerUrl;
@@ -91,7 +91,7 @@ namespace MSFT.RDMISaaS.API.Controllers
                     accessToken = common.GetTokenValue(refresh_token);
                     if (!string.IsNullOrEmpty(accessToken) && accessToken.ToString().ToLower() != invalidToken && accessToken.ToString().ToLower() != invalidCode)
                     {
-                        rdMgmtSessionHost = sessionHostBL.GetSessionHostDetails(deploymentUrl, accessToken, tenantName, hostPoolName, sessionHostName);
+                        rdMgmtSessionHost = sessionHostBL.GetSessionHostDetails(deploymentUrl, accessToken, tenantGroupName, tenantName, hostPoolName, sessionHostName);
                     }
                     else
                     {
@@ -126,7 +126,7 @@ namespace MSFT.RDMISaaS.API.Controllers
                         accessToken = common.GetTokenValue(rdMgmtSessionHost.refresh_token);
                         if (!string.IsNullOrEmpty(accessToken) && accessToken.ToString().ToLower() != invalidToken && accessToken.ToString().ToLower() != invalidCode)
                         {
-                            hostResult = sessionHostBL.UpdateSessionHost(deploymentUrl, accessToken, rdMgmtSessionHost);
+                            hostResult = sessionHostBL.UpdateSessionHost(deploymentUrl, accessToken,   rdMgmtSessionHost);
                         }
                         else
                         {
@@ -157,7 +157,7 @@ namespace MSFT.RDMISaaS.API.Controllers
         /// <param name="sessionHostName">Name of Session Host</param>
         /// <param name="refresh_token">refresh token to get access token</param>
         /// <returns></returns>
-        public IHttpActionResult DeleteSessionHost(string tenantName, string hostPoolName, string sessionHostName, string refresh_token)
+        public IHttpActionResult DeleteSessionHost(string tenantGroup,string tenantName, string hostPoolName, string sessionHostName, string refresh_token)
         {
             //get deployment url
             deploymentUrl = configurations.rdBrokerUrl;
@@ -171,7 +171,7 @@ namespace MSFT.RDMISaaS.API.Controllers
                     accessToken = common.GetTokenValue(refresh_token);
                     if (!string.IsNullOrEmpty(accessToken) && accessToken.ToString().ToLower() != invalidToken && accessToken.ToString().ToLower() != invalidCode)
                     {
-                        sessionHostResult = sessionHostBL.DeletesessionHost(deploymentUrl, accessToken, tenantName, hostPoolName, sessionHostName);
+                        sessionHostResult = sessionHostBL.DeletesessionHost(deploymentUrl, accessToken,tenantGroup, tenantName, hostPoolName, sessionHostName);
                     }
                     else
                     {

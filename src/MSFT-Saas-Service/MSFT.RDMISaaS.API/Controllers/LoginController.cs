@@ -37,7 +37,7 @@ namespace MSFT.RDMISaaS.API.Controllers
                 List<Login> lst = new List<Login>();
                 login = obj.Login(data.Code);
             }
-            catch 
+            catch (Exception ex)
             {
                 return null;
             }

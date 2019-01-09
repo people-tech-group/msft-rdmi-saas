@@ -2449,7 +2449,7 @@ export class HostpoolDashboardComponent implements OnInit {
       appGroupName: this.AppgroupName,
       userPrincipalName: createNewActiveDrctryData.UserPrincipalName,
       refresh_token: sessionStorage.getItem("Refresh_Token"),
-      "tenantGroupName": this.tenantGroupName
+      tenantGroupName: this.tenantGroupName
     };
     this.addNewUser = this._AppService.ApiUrl + '/api/AppGroup/PostUsers';
     this._AppService.AddingUserstoAppGroup(this.addNewUser, AddUserdata).subscribe(response => {
@@ -2919,6 +2919,7 @@ export class HostpoolDashboardComponent implements OnInit {
    * ----------
    */
   public GalleryAppListRowClicked(appGroupIndex: any) {
+    let index = appGroupIndex;
     this.GalleryAppIsChecked(appGroupIndex);
     this.gappCheckedTrue = [];
     this.selectedGAppRows = [];

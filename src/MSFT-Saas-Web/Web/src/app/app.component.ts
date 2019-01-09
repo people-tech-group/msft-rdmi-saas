@@ -89,6 +89,7 @@ export class AppComponent implements OnInit {
     this.profileName = sessionStorage.getItem("profileName");
     this.roleDefinitionName = sessionStorage.getItem("roleDefinitionName");
     this.profileEmail = sessionStorage.getItem("profileEmail");
+    this.scope = sessionStorage.getItem("Scope");
     if (code != "undefined" && code != null && gotCode == 'yes') {
       this.appLoader = true;
       this.redirectUri = sessionStorage.getItem('redirectUri');
@@ -135,13 +136,11 @@ export class AppComponent implements OnInit {
             this.scope = respdata.RoleAssignment.scope;
           }
           //Role Assignment Acces level -Ends
-
+          sessionStorage.setItem('Scope', this.scope);
           this.profileEmail = respdata.Email;
           sessionStorage.setItem("Refresh_Token", respdata.Refresh_Token);
-          var roleDef = respdata.RoleAssignment.scope.substring(1).split("/");        
-          localStorage.setItem("Scope", roleDef);
+          var roleDef = respdata.RoleAssignment.scope.substring(1).split("/");
           sessionStorage.setItem('profileEmail', this.profileEmail);
-          sessionStorage.setItem('Scope', roleDef);
           sessionStorage.setItem('gotCode', 'no');
           this.appLoader = false;
           this.router.navigate(['/admin/Tenants']);

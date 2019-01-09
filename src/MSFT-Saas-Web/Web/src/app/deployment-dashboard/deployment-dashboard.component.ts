@@ -90,7 +90,6 @@ export class DeploymentDashboardComponent implements OnInit {
     this.adminMenuComponent.selectedTenant = null;
     this.adminMenuComponent.selectedHostPool = null;
     this.hasError = true;
-    //this.adminMenuComponent.SetSelectedTenant(null, '');
     let data = [{
       name: 'Tenants',
       type: 'Tenants',
@@ -435,12 +434,12 @@ export class DeploymentDashboardComponent implements OnInit {
       this.tenantsCount = responseObject.count;
       this.refreshTenantLoading = false;
       //this.lastEntry = responseObject.lastEntry;
-      if (this.tenants[0]) {
-        if (this.tenants[0].code == "Invalid Token") {
-          sessionStorage.clear();
-          this.router.navigate(['/invalidtokenmessage']);
-        }
-      }
+      //if (this.tenants[0]) {
+      //  if (this.tenants[0].code == "Invalid Token") {
+      //    sessionStorage.clear();
+      //    this.router.navigate(['/invalidtokenmessage']);
+      //  }
+      //}
       this.GetcurrentNoOfPagesCount();
       this.searchTenants = this.tenants;
       //this.adminMenuComponent.GetAllTenants(this.tenants);

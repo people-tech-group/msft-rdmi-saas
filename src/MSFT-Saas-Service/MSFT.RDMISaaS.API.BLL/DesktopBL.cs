@@ -14,7 +14,7 @@ namespace MSFT.RDMISaaS.API.BLL
     #region "class-DesktopBL"
     public class DesktopBL
     {
-        string tenantGroup = Constants.tenantGroupName;
+       // string tenantGroup = Constants.tenantGroupName;
 
         /// <summary>
         /// Description-Gets the published desktop for host pool's application group
@@ -25,7 +25,7 @@ namespace MSFT.RDMISaaS.API.BLL
         /// <param name="hostPoolName">Name of Hostpool</param>
         /// <param name="appGroupName">Name of App Group</param>
         /// <returns></returns>
-        public RdMgmtPublishedDesktop GetPublishedDesktop(string deploymentUrl, string accessToken, string tenantName, string hostPoolName, string appGroupName)
+        public RdMgmtPublishedDesktop GetPublishedDesktop(string deploymentUrl, string accessToken, string tenantGroup, string tenantName, string hostPoolName, string appGroupName)
         {
             RdMgmtPublishedDesktop rdMgmtPublishedDesktop = new RdMgmtPublishedDesktop();
             try

@@ -92,6 +92,10 @@ export class TenantDashboardComponent implements OnInit {
     this.tenantGroupName = sessionStorage.getItem("TenantGroupName");
     /*This block of code is used to get the Tenant Name from the Url paramter*/
     this.route.params.subscribe(params => {
+      this.showCreateHostpool = false;
+      this.editedBody = false;
+      this.tenantInfo = {};
+      this.adminMenuComponent.hostPoolList = [];
       this.tenantGroupName = sessionStorage.getItem("TenantGroupName");
       this.refreshToken = sessionStorage.getItem("Refresh_Token");
       this.tenantName = params["tenantName"];
@@ -300,6 +304,7 @@ export class TenantDashboardComponent implements OnInit {
           this.router.navigate(['/invalidtokenmessage']);
         }
       }
+      this.refreshHostpoolLoading = false;
     },
       /*
        * If Any Error (or) Problem With Services (or) Problem in internet this Error Block Will Exequte
@@ -799,6 +804,12 @@ export class TenantDashboardComponent implements OnInit {
         this.showCreateHostpool = false;
       }
       this.refreshHostpoolLoading = false;
+      this.isEditDisabled = true;
+      this.isDeleteDisabled = true;
+      for (let i = 0; i < this.searchHostPools.length; i++) {
+        this.checked[i] = false;
+      }
+      this.checkedMain = false;
     },
       /*
        * If Any Error (or) Problem With Services (or) Problem in internet this Error Block Will Exequte
@@ -808,12 +819,6 @@ export class TenantDashboardComponent implements OnInit {
         this.hostpoollistErrorFound = true;
       }
     );
-    this.isEditDisabled = true;
-    this.isDeleteDisabled = true;
-    for (let i = 0; i < this.searchHostPools.length; i++) {
-      this.checked[i] = false;
-    }
-    this.checkedMain = false;
   }
 
   /* This function is used to check Hostpool Access and refresh the hostpools list */
@@ -829,7 +834,7 @@ export class TenantDashboardComponent implements OnInit {
    */
   public CreateNewHostpool(hostpoolData) {
     let createHostpoolData = {
-      "tenantGroupName": sessionStorage.getItem("TenantGroupName"),
+      tenantGroupName: sessionStorage.getItem("TenantGroupName"),
       tenantName: sessionStorage.getItem("TenantName"),
       hostPoolName: hostpoolData.hostPoolName.trim(),
       friendlyName: hostpoolData.friendlyName.trim(),

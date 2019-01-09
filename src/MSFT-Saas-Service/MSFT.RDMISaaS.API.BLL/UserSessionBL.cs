@@ -15,7 +15,7 @@ namespace MSFT.RDMISaaS.API.BLL
     #region "UserSessionBL"
     public class UserSessionBL
     {
-        string tenantGroup = Constants.tenantGroupName;
+       // string tenantGroup = Constants.tenantGroupName;
 
         #region "Functions/Methods"
         /// <summary>
@@ -26,7 +26,7 @@ namespace MSFT.RDMISaaS.API.BLL
         /// <param name="tenantName"></param>
         /// <param name="hostPoolName"></param>
         /// <returns></returns>
-        public List<RdMgmtUserSession> GetListOfUserSessioons(string deploymentUrl, string accessToken, string tenantName, string hostPoolName, bool isAll, int pageSize, string sortField, bool isDescending, int initialSkip, string lastEntry)
+        public List<RdMgmtUserSession> GetListOfUserSessioons(string deploymentUrl, string accessToken, string tenantGroup, string tenantName, string hostPoolName, bool isAll, int pageSize, string sortField, bool isDescending, int initialSkip, string lastEntry)
         {
             List<RdMgmtUserSession> rdMgmtUserSessions = new List<RdMgmtUserSession>();
             HttpResponseMessage response;

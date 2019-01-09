@@ -31,7 +31,7 @@
                       </span>{{tenants.tenantName}}
                     </a>
                   </label>
-                  <ul class="sub-sub-group-list hostPad">
+                  <ul class="sub-sub-group-list hostPad" *ngIf="selectedTenant === y">
                     <li *ngFor="let hostpool of hostPoolList let z = index">
                       <a [routerLink]="['hostpoolDashboard/', hostpool.hostPoolName]" (click)="SetSelectedhostPool(z,tenants.tenantName,hostpool.hostPoolName)" [ngClass]="{'selected':selectedHostPool === z && selectedTenant === y && selectedAllTenants !== true}">
                         <span class="marginRight3">

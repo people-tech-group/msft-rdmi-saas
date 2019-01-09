@@ -36,7 +36,7 @@ namespace MSFT.RDMISaaS.API.Controllers
         /// <param name="hostPoolName">Name of Hostpool</param>
         /// <param name="refresh_token">Refresh Token to get access token</param>
         /// <returns></returns>
-        public List<RdMgmtUserSession> GetListOfUserSessioons(string tenantName, string hostPoolName, string refresh_token, int pageSize, string sortField, bool isDescending = false, int initialSkip = 0, string lastEntry = null)
+        public List<RdMgmtUserSession> GetListOfUserSessioons( string tenantGroupName, string tenantName, string hostPoolName, string refresh_token, int pageSize, string sortField, bool isDescending = false, int initialSkip = 0, string lastEntry = null)
         {
             //get deployment url
             deploymentUrl = configurations.rdBrokerUrl;
@@ -50,7 +50,7 @@ namespace MSFT.RDMISaaS.API.Controllers
                     accessToken = common.GetTokenValue(refresh_token);
                     if (!string.IsNullOrEmpty(accessToken) && accessToken.ToString().ToLower() != invalidToken && accessToken.ToString().ToLower() != invalidCode)
                     {
-                        rdMgmtUserSessions = userSessionBL.GetListOfUserSessioons(deploymentUrl, accessToken, tenantName, hostPoolName,false, pageSize, sortField, isDescending, initialSkip, lastEntry);
+                        rdMgmtUserSessions = userSessionBL.GetListOfUserSessioons(deploymentUrl, accessToken, tenantGroupName, tenantName, hostPoolName,false, pageSize, sortField, isDescending, initialSkip, lastEntry);
                     }
                     else
                     {

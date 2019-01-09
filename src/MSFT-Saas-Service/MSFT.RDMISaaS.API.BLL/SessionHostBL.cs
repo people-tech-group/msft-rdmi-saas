@@ -17,7 +17,7 @@ namespace MSFT.RDMISaaS.API.BLL
     public class SessionHostBL
     {
         SessionHostResult hostResult = new SessionHostResult();
-        string tenantGroup = Constants.tenantGroupName;
+        //string tenantGroup = Constants.tenantGroupName;
 
         /// <summary>
         /// Description: Gets all Rds SessionHosts associated with the Tenant and Host Pool specified in the Rds context.
@@ -28,7 +28,7 @@ namespace MSFT.RDMISaaS.API.BLL
         /// <param name="hostPoolName">Name of hostpool</param>
         /// <param name="isSessionHostNameOnly">To Get only HostName</param>
         /// <returns></returns>
-        public List<RdMgmtSessionHost> GetSessionhostList(string deploymentUrl, string accessToken, string tenantName, string hostPoolName, bool isSessionHostNameOnly,bool isAll, int pageSize, string sortField, bool isDescending, int initialSkip, string lastEntry)
+        public List<RdMgmtSessionHost> GetSessionhostList(string deploymentUrl, string accessToken,string tenantGroup, string tenantName, string hostPoolName, bool isSessionHostNameOnly,bool isAll, int pageSize, string sortField, bool isDescending, int initialSkip, string lastEntry)
         {
             List<RdMgmtSessionHost> rdMgmtSessionHosts = new List<RdMgmtSessionHost>();
             HttpResponseMessage response; 
@@ -93,7 +93,7 @@ namespace MSFT.RDMISaaS.API.BLL
         /// <param name="hostPoolName">Name of Hostpool</param>
         /// <param name="sessionHostName">Name of Session Host</param>
         /// <returns></returns>
-        public RdMgmtSessionHost GetSessionHostDetails(string deploymentUrl, string accessToken, string tenantName, string hostPoolName, string sessionHostName)
+        public RdMgmtSessionHost GetSessionHostDetails(string deploymentUrl, string accessToken,string tenantGroup,  string tenantName, string hostPoolName, string sessionHostName)
         {
             RdMgmtSessionHost rdMgmtSessionHost = new RdMgmtSessionHost();
             try
@@ -132,10 +132,11 @@ namespace MSFT.RDMISaaS.API.BLL
                 sessionHostDTO.hostPoolName = rdMgmtSessionHost.hostPoolName;
                 sessionHostDTO.sessionHostName = rdMgmtSessionHost.sessionHostName;
                 sessionHostDTO.allowNewSession = rdMgmtSessionHost.allowNewSession;
+                sessionHostDTO.tenantGroupName = rdMgmtSessionHost.tenantGroupName;
 
                 //call rest service to update Sesssion host -- july code bit
                 var content = new StringContent(JsonConvert.SerializeObject(sessionHostDTO), Encoding.UTF8, "application/json");
-                HttpResponseMessage response = CommonBL.PatchAsync(deploymentUrl, accessToken, "/RdsManagement/V1/TenantGroups/" + tenantGroup + "/Tenants/" + rdMgmtSessionHost.tenantName + "/HostPools/" + rdMgmtSessionHost.hostPoolName + "/SessionHosts/" + rdMgmtSessionHost.sessionHostName, content).Result;
+                HttpResponseMessage response = CommonBL.PatchAsync(deploymentUrl, accessToken, "/RdsManagement/V1/TenantGroups/" + rdMgmtSessionHost.tenantGroupName + "/Tenants/" + rdMgmtSessionHost.tenantName + "/HostPools/" + rdMgmtSessionHost.hostPoolName + "/SessionHosts/" + rdMgmtSessionHost.sessionHostName, content).Result;
                 string strJson = response.Content.ReadAsStringAsync().Result;
                 if (response.IsSuccessStatusCode)
                 {
@@ -173,7 +174,7 @@ namespace MSFT.RDMISaaS.API.BLL
         /// <param name="hostPoolName">Name of Hostpool</param>
         /// <param name="sessionHostName">Name of Session Host</param>
         /// <returns></returns>
-        public SessionHostResult DeletesessionHost(string deploymentUrl, string accessToken, string tenantName, string hostPoolName, string sessionHostName)
+        public SessionHostResult DeletesessionHost(string deploymentUrl, string accessToken, string tenantGroup, string tenantName, string hostPoolName, string sessionHostName)
         {
             SessionHostResult sessionHostResult = new SessionHostResult();
             try

@@ -8,6 +8,7 @@ export class AppService {
   public ApiUrl: string;
   constructor(private http: Http) {
    this.ApiUrl = "https://msftrdmisaasapi.azurewebsites.net";
+   //this.ApiUrl = "http://localhost:34816/";
   }
 
   /*

@@ -10,6 +10,8 @@ namespace MSFT.RDMISaaS.API.Model
     #region "Class - RdMgmtSessionHost"
     public class RdMgmtSessionHost
     {
+        public string tenantGroupName { get; set; }
+
         public string sessionHostName { get; set; }
         public string tenantName { get; set; }
         public string hostPoolName { get; set; }
@@ -33,6 +35,8 @@ namespace MSFT.RDMISaaS.API.Model
     #region "Class - SessionHostDTO"
     public class SessionHostDTO
     {
+        public string tenantGroupName { get; set; }
+
         public string sessionHostName { get; set; }
         public string tenantName { get; set; }
         public string hostPoolName { get; set; }

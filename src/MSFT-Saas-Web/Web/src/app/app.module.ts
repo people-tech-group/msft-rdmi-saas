@@ -36,6 +36,7 @@ if (window.location.href != redirectUri) {
     sessionStorage.setItem("Code", code);
   } else {
     sessionStorage.setItem("Code", codeInfo);
+    sessionStorage.setItem('gotCode', 'yes');
   }
 }
 

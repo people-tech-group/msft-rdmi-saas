@@ -59,7 +59,7 @@ namespace MSFT.RDMISaaS.API.BLL
                     
                     //list of active hosts associated with Host pool 
                     SessionHostBL sessionHostBL = new SessionHostBL();
-                    List<RdMgmtSessionHost> rdMgmtSessionHosts = sessionHostBL.GetSessionhostList(deploymentUrl, accessToken, tenantName, rdMgmtHostPool.hostPoolName,true,true, 0, "", false, 0, "");
+                    List<RdMgmtSessionHost> rdMgmtSessionHosts = sessionHostBL.GetSessionhostList(deploymentUrl, accessToken,tenantGroupName, tenantName, rdMgmtHostPool.hostPoolName,true,true, 0, "", false, 0, "");
                     rdMgmtHostPool.noOfActivehosts = rdMgmtHostPool.noOfActivehosts + rdMgmtSessionHosts.Count;
 
                     // sessions associated with hostpool
@@ -67,7 +67,7 @@ namespace MSFT.RDMISaaS.API.BLL
                     {
                         List<RdMgmtUserSession> lstSesssions = new List<RdMgmtUserSession>();
                         UserSessionBL userSessionBL = new UserSessionBL();
-                        lstSesssions = userSessionBL.GetListOfUserSessioons(deploymentUrl, accessToken, tenantName, hostPoolName, true, 0, "", false, 0, "");
+                        lstSesssions = userSessionBL.GetListOfUserSessioons(deploymentUrl, accessToken, tenantGroupName, tenantName, hostPoolName, true, 0, "", false, 0, "");
                         rdMgmtHostPool.noOfSessions = lstSesssions.Count;
                     }
                 }
