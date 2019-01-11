@@ -127,25 +127,37 @@ namespace MSFT.RDMISaaS.API.Common
             {
                 string deploymentUrl = configurations.rdBrokerUrl;
                 List<RdMgmtRoleAssignment> rdMgmtRoleAssignments = new List<RdMgmtRoleAssignment>();
-                rdMgmtRoleAssignments = authorizationBL.GetRoleAssignments(deploymentUrl, loginDetails.Access_Token);
+                List<string> list = new List<string>();
+
+                rdMgmtRoleAssignments = authorizationBL.GetRoleAssignments(deploymentUrl, loginDetails.Access_Token, loginDetails.Email.ToString());
                 for (int i = 0; i < rdMgmtRoleAssignments.Count; i++)
                 {
-                    if (rdMgmtRoleAssignments[i].signInName.ToString().ToLower() == loginDetails.Email.ToString().ToLower())
+                    if (rdMgmtRoleAssignments[i].signInName != null && rdMgmtRoleAssignments[i].signInName.ToString().ToLower() == loginDetails.Email.ToString().ToLower())
                     {
                         loginDetails.RoleAssignment = rdMgmtRoleAssignments[i];
-                        string TenantGroupName = "";
                         if (loginDetails.RoleAssignment.scope.Split('/').Length > 1)
                         {
-                            TenantGroupName = loginDetails.RoleAssignment.scope.Split('/')[1].ToString();
+                            list.Add(loginDetails.RoleAssignment.scope.Split('/')[1].ToString());
                         }
                         else
                         {
-                            TenantGroupName = Constants.tenantGroupName;
+                            list.Add(Constants.tenantGroupName);
                         }
-                        loginDetails.TenantGroupName = TenantGroupName;
-                        break;
+                        //string TenantGroupName = "";
+                        //if (loginDetails.RoleAssignment.scope.Split('/').Length > 1)
+                        //{
+                        //    TenantGroupName = loginDetails.RoleAssignment.scope.Split('/')[1].ToString();
+                        //}
+                        //else
+                        //{
+                        //    TenantGroupName = Constants.tenantGroupName;
+                        //}
+                        //loginDetails.TenantGroupName = TenantGroupName;
+                        // break;
                     }
                 }
+                loginDetails.TenantGroups = list.ToArray();
+
             }
             return loginDetails;
         }

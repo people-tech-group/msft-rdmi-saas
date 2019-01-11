@@ -39,6 +39,7 @@ export class DeploymentDashboardComponent implements OnInit {
   public createTenantId: boolean = false;
   public tenantNextButtonDisable: boolean = true;
   public tenantDoneButtonDisable: boolean = true;
+  public saveButtonDisable: boolean = true;
   public refreshTenantLoading: any = false;
   public searchTenants: any = [];
   private sub: any;
@@ -59,12 +60,16 @@ export class DeploymentDashboardComponent implements OnInit {
   public showCreateTenant: any;
   public showTenantTab2: boolean;
   public showTenantDialog: boolean = false;
+  public showManageTenantDialog: boolean = false;
   public isEditDisabled: boolean = true;
   public isDeleteDisabled: boolean = true;
   public tenantlistErrorFound: boolean = false;
+  public ShowTenantgroupError: boolean = false;
+  public slectedtenantgroupname: any;
   public tenantGroupName: any;
   public deleteCount: any;
   public refreshToken: any;
+  public TenantGroups: any = [];
   public options: any = {
     timeOut: 2000,
     position: ["top", "right"]
@@ -86,6 +91,12 @@ export class DeploymentDashboardComponent implements OnInit {
 
   /* This function is  called directly on page load */
   public ngOnInit() {
+    //localStorage.removeItem("TenantGroupName");
+    this.tenantGroupName = localStorage.getItem("TenantGroupName");
+    if (this.tenantGroupName === null) {
+      this.OpenManageTenant();
+    }
+    this.TenantGroups = JSON.parse(localStorage.getItem("TenantGroups"));
     this.adminMenuComponent.hostPoolList = [];
     this.adminMenuComponent.selectedTenant = null;
     this.adminMenuComponent.selectedHostPool = null;
@@ -117,7 +128,6 @@ export class DeploymentDashboardComponent implements OnInit {
    * This Function is called on Component Load and it is used to check the Access level of Tenant 
    */
   public CheckTenantAccess() {
-    this.tenantGroupName = sessionStorage.getItem("TenantGroupName");
     this.scopeArray = sessionStorage.getItem("Scope").split(",");
     if (this.scopeArray != null && this.scopeArray.length > 2) {
       this.tenants = [{
@@ -195,6 +205,66 @@ export class DeploymentDashboardComponent implements OnInit {
     this.createTenantId = false;
     this.tenantNextButtonDisable = true;
     this.showTenantDialog = true;
+  }
+  /* This function is called  to open Manage tenant modal slide dialog
+   * --------------
+   * paremeters-
+   * event - Accepts event.
+   * -------------
+  */
+  public OpenManageTenant() {
+    this.ShowTenantgroupError = false;
+    this.showManageTenantDialog = true;
+  }
+  /* This function is called  to close Manage tenant modal slide dialog
+ * --------------
+ * paremeters-
+ * event - Accepts event.
+ * -------------
+*/
+  public CloseManageTenant() {
+    this.showManageTenantDialog = false;
+  }
+  /* This function is called  to close Manage tenant modal slide dialog
+* --------------
+* paremeters-
+* event - Accepts event.
+* -------------
+*/
+  public ManageTenantSlideClose(event: any) {
+    event.preventDefault();
+    this.CloseManageTenant();
+  }
+  /* This function is called  when we change the Tenanatgroup name it performs validations
+* --------------
+* paremeters-
+* event - Accepts event.
+* -------------
+*/
+  public changeTenantgroup(data: any) {
+    this.slectedtenantgroupname = data;
+    if (this.slectedtenantgroupname == null || this.slectedtenantgroupname == undefined || this.slectedtenantgroupname == "Choose tenant group") {
+      this.saveButtonDisable = true;
+      this.ShowTenantgroupError = true;
+    }
+    else {
+      this.saveButtonDisable = false;
+      this.ShowTenantgroupError = false;
+    }
+  }
+  /* This function is called  when we save a Tenanat group name in the Tenanat group modal
+* --------------
+* paremeters-
+* event - Accepts event.
+* -------------
+*/
+  public ManageTenant() {
+    localStorage.removeItem("TenantGroupName");
+    this.ManageTenantSlideClose(event);
+    localStorage.setItem("TenantGroupName", this.slectedtenantgroupname);
+    //navigate to appcomponent page
+    let url = sessionStorage.getItem("redirectUri");
+    window.location.replace(url);
   }
 
   /* This function is called  to close the create tenant modal slide dialog
@@ -423,13 +493,13 @@ export class DeploymentDashboardComponent implements OnInit {
 
   /* This function is used to  loads all the tenants into table on page load */
   public GetTenants() {
-    this.tenantGroupName = sessionStorage.getItem("TenantGroupName");
     this.refreshToken = sessionStorage.getItem("Refresh_Token");
     this.refreshTenantLoading = true;
     this.tenantlistErrorFound = false;
-    this.getTenantsUrl = this._AppService.ApiUrl + '/api/Tenant/GetTenantList?tenantGroupName=' + this.tenantGroupName +'&refresh_token=' + this.refreshToken + '&pageSize=' + this.pageSize + '&sortField=TenantName&isDescending=false&initialSkip=' + this.initialSkip + '&lastEntry=' + this.lastEntry;
+    this.getTenantsUrl = this._AppService.ApiUrl + '/api/Tenant/GetTenantList?tenantGroupName=' + this.tenantGroupName + '&refresh_token=' + this.refreshToken + '&pageSize=' + this.pageSize + '&sortField=TenantName&isDescending=false&initialSkip=' + this.initialSkip + '&lastEntry=' + this.lastEntry;
     this._AppService.GetTenants(this.getTenantsUrl).subscribe(response => {
       let responseObject = JSON.parse(response['_body']);
+      this.ShowTenantgroupError = false;
       this.tenants = responseObject.rdMgmtTenants;
       this.tenantsCount = responseObject.count;
       this.refreshTenantLoading = false;
@@ -482,7 +552,7 @@ export class DeploymentDashboardComponent implements OnInit {
     this.tenantlistErrorFound = false;
     this.lastEntry = this.searchTenants[0].tenantName;
     this.curentIndex = this.curentIndex - 1;
-    this.getTenantsUrl = this._AppService.ApiUrl + '/api/Tenant/GetTenantList?tenantGroupName=' + this.tenantGroupName +'&refresh_token=' + this.refreshToken + '&pageSize=' + this.pageSize + '&sortField=TenantName&isDescending=true&initialSkip=' + this.initialSkip + '&lastEntry=' + this.searchTenants[0].tenantName;
+    this.getTenantsUrl = this._AppService.ApiUrl + '/api/Tenant/GetTenantList?tenantGroupName=' + this.tenantGroupName + '&refresh_token=' + this.refreshToken + '&pageSize=' + this.pageSize + '&sortField=TenantName&isDescending=true&initialSkip=' + this.initialSkip + '&lastEntry=' + this.searchTenants[0].tenantName;
     this._AppService.GetTenants(this.getTenantsUrl).subscribe(response => {
       let responseObject = JSON.parse(response['_body']);
       this.tenants = responseObject.rdMgmtTenants.reverse();
@@ -550,7 +620,7 @@ export class DeploymentDashboardComponent implements OnInit {
       this.isDescending = true;
       this.lastEntry = this.searchTenants[0].tenantName;
     }
-    this.getTenantsUrl = this._AppService.ApiUrl + '/api/Tenant/GetTenantList?tenantGroupName=' + this.tenantGroupName +'&refresh_token=' + this.refreshToken + '&pageSize=' + this.pageSize + '&sortField=TenantName&isDescending=' + this.isDescending + '&initialSkip=' + this.initialSkip + '&lastEntry=' + this.lastEntry;
+    this.getTenantsUrl = this._AppService.ApiUrl + '/api/Tenant/GetTenantList?tenantGroupName=' + this.tenantGroupName + '&refresh_token=' + this.refreshToken + '&pageSize=' + this.pageSize + '&sortField=TenantName&isDescending=' + this.isDescending + '&initialSkip=' + this.initialSkip + '&lastEntry=' + this.lastEntry;
     this._AppService.GetTenants(this.getTenantsUrl).subscribe(response => {
       let responseObject = JSON.parse(response['_body']);
       this.tenants = responseObject.rdMgmtTenants; //.splice(0, 3)
@@ -600,7 +670,7 @@ export class DeploymentDashboardComponent implements OnInit {
     this.tenantlistErrorFound = false;
     this.lastEntry = this.searchTenants[this.searchTenants.length - 1].tenantName;
     this.curentIndex = this.curentIndex + 1;
-    this.getTenantsUrl = this._AppService.ApiUrl + '/api/Tenant/GetTenantList?tenantGroupName=' + this.tenantGroupName +'&refresh_token=' + this.refreshToken + '&pageSize=' + this.pageSize + '&sortField=TenantName&isDescending=false&initialSkip=' + this.initialSkip + '&lastEntry=' + this.lastEntry;
+    this.getTenantsUrl = this._AppService.ApiUrl + '/api/Tenant/GetTenantList?tenantGroupName=' + this.tenantGroupName + '&refresh_token=' + this.refreshToken + '&pageSize=' + this.pageSize + '&sortField=TenantName&isDescending=false&initialSkip=' + this.initialSkip + '&lastEntry=' + this.lastEntry;
     this._AppService.GetTenants(this.getTenantsUrl).subscribe(response => {
       let responseObject = JSON.parse(response['_body']);
       this.tenants = responseObject.rdMgmtTenants;
@@ -660,7 +730,7 @@ export class DeploymentDashboardComponent implements OnInit {
     this.refreshTenantLoading = true;
     var newTenantData = {
       refresh_token: sessionStorage.getItem("Refresh_Token"),
-      tenantGroupName: sessionStorage.getItem("TenantGroupName"),
+      tenantGroupName: this.tenantGroupName,
       aadTenantId: this.aadTenantId,
       id: tenantData.id,
       tenantName: tenantData.tenantName.trim(),
@@ -760,7 +830,7 @@ export class DeploymentDashboardComponent implements OnInit {
   public UpdateTenant(tenantData: any) {
     var updateArray = {
       "refresh_token": sessionStorage.getItem("Refresh_Token"),
-      "tenantGroupName": sessionStorage.getItem("TenantGroupName"),
+      "tenantGroupName": this.tenantGroupName,
       "tenantName": tenantData.tenantName,
       "friendlyName": tenantData.friendlyName,
       "description": tenantData.description,
@@ -848,7 +918,7 @@ export class DeploymentDashboardComponent implements OnInit {
     this.refreshTenantLoading = true;
     for (let i = 0; i < this.selectedRows.length; i++) {
       let index = this.selectedRows[i];
-      this.tenantDeleteUrl = this._AppService.ApiUrl + '/api/Tenant/Delete?tenantGroupName=' + this.tenantGroupName +'&tenantName=' + this.searchTenants[index].tenantName + '&refresh_token=' + sessionStorage.getItem("Refresh_Token");
+      this.tenantDeleteUrl = this._AppService.ApiUrl + '/api/Tenant/Delete?tenantGroupName=' + this.tenantGroupName + '&tenantName=' + this.searchTenants[index].tenantName + '&refresh_token=' + sessionStorage.getItem("Refresh_Token");
       this._AppService.DeleteTenantService(this.tenantDeleteUrl).subscribe(response => {
         this.refreshTenantLoading = false;
         var responseData = JSON.parse(response['_body']);

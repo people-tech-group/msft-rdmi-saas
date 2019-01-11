@@ -40,6 +40,7 @@
                   <li><button type="button" id="linkCreateTenant" (click)="OpenCreateTenant($event)"><i class="icon icon-plus" aria-hidden="true"></i> Create Tenant</button></li>
                   <li><button type="button" id="btnEditTenant" data-toggle="modal" data-target="#editModal" [disabled]="isEditDisabled"><i class="icon icon-edit" aria-hidden="true"></i> Edit</button></li>
                   <li><button type="button" id="btnDeleteTenant" class="ManageLink" data-toggle="modal" data-target="#deleteModal" [disabled]="isDeleteDisabled"><i class="icon icon-delete" aria-hidden="true"></i> Delete</button></li>
+                  <li><button type="button" id="linkCreateTenant" (click)="OpenManageTenant($event)"><i class="icon icon-setting" aria-hidden="true"></i> Manage Tenant Groups</button></li>
                   <li><button type="button" (click)="RefreshTenant()" class="ManageLink"><i class="icon icon-refresh" aria-hidden="true"></i> Refresh</button></li>
                 </ul>
               </div>
@@ -135,6 +136,40 @@
       </div>
     </div>
   </div>
+
+  <!-- Create Tenant Modal Dialog -->
+  <div class="overlay" *ngIf="showManageTenantDialog">
+    <div class="createTenent">
+      <div class="createTenantHead">
+        <div class="TenantStatus">
+            <h4>Please select default tenant group</h4>
+            <div class="DeployUrl marginBottom30">
+              <label for="manageTenant" style="font-size:11px"><span class="colorRed">&nbsp;*</span><b>Default Tenant Group</b></label>
+              <select class="form-control" (change)="changeTenantgroup($event.target.value)">
+                <option>Choose tenant group</option>
+                <option *ngFor="let list of TenantGroups" label="">{{list}}</option>
+              </select>
+              <div *ngIf="ShowTenantgroupError" class="colorRed">
+                Please select tenant group
+              </div>
+            </div>
+        </div>
+      </div>
+      <a href="" class="close" id="btnSlideClose" (click)="ManageTenantSlideClose($event)"><i class="icon icon-close" aria-hidden="true"></i></a>
+      <div class="botomBtn">
+        <ul>
+          <li>
+            <input type=button value="Cancel" id="btnCancel" (click)="CloseManageTenant($event)" />
+          </li>
+          <li>
+            <input type="button" value="Save" id="btnDone" (click)="ManageTenant($event)" [disabled]="saveButtonDisable" /> <!--(click)="ManageTenant(tenantForm.value)" [disabled]="tenantDoneButtonDisable"-->
+          </li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+
 
   <!-- Create Tenant Modal Dialog -->
   <div class="overlay" *ngIf="showTenantDialog">

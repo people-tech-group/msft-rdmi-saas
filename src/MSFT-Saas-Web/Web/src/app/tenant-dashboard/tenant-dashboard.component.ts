@@ -89,14 +89,14 @@ export class TenantDashboardComponent implements OnInit {
 
   /* This function is  called directly on page load */
   public ngOnInit() {
-    this.tenantGroupName = sessionStorage.getItem("TenantGroupName");
+    this.tenantGroupName = localStorage.getItem("TenantGroupName");
     /*This block of code is used to get the Tenant Name from the Url paramter*/
     this.route.params.subscribe(params => {
       this.showCreateHostpool = false;
       this.editedBody = false;
       this.tenantInfo = {};
       this.adminMenuComponent.hostPoolList = [];
-      this.tenantGroupName = sessionStorage.getItem("TenantGroupName");
+      this.tenantGroupName = this.tenantGroupName;
       this.refreshToken = sessionStorage.getItem("Refresh_Token");
       this.tenantName = params["tenantName"];
       let data = [{
@@ -834,7 +834,7 @@ export class TenantDashboardComponent implements OnInit {
    */
   public CreateNewHostpool(hostpoolData) {
     let createHostpoolData = {
-      tenantGroupName: sessionStorage.getItem("TenantGroupName"),
+      tenantGroupName: this.tenantGroupName,
       tenantName: sessionStorage.getItem("TenantName"),
       hostPoolName: hostpoolData.hostPoolName.trim(),
       friendlyName: hostpoolData.friendlyName.trim(),
@@ -942,7 +942,7 @@ export class TenantDashboardComponent implements OnInit {
     if (this.selectedHostpoolradio == true) {
       updateArray = {
         "refresh_token": sessionStorage.getItem("Refresh_Token"),
-        "tenantGroupName": sessionStorage.getItem("TenantGroupName"),
+        "tenantGroupName": this.tenantGroupName,
         "tenantName": this.selectedTenantName,
         "hostPoolName": hostpoolData.hostPoolName,
         "diskPath": hostpoolData.diskPath,
@@ -952,7 +952,7 @@ export class TenantDashboardComponent implements OnInit {
     else {
       updateArray = {
         "refresh_token": sessionStorage.getItem("Refresh_Token"),
-        "tenantGroupName": sessionStorage.getItem("TenantGroupName"),
+        "tenantGroupName": this.tenantGroupName,
         "tenantName": this.selectedTenantName.trim(),
         "hostPoolName": hostpoolData.hostPoolName.trim(),
         "friendlyName": hostpoolData.friendlyName.trim(),

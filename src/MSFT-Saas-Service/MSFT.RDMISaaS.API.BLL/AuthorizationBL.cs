@@ -13,12 +13,12 @@ namespace MSFT.RDMISaaS.API.BLL
     public class AuthorizationBL
     {
 
-        public List<RdMgmtRoleAssignment> GetRoleAssignments(string deploymentUrl,string accessToken)
+        public List<RdMgmtRoleAssignment> GetRoleAssignments(string deploymentUrl,string accessToken,string upn)
         {
             List<RdMgmtRoleAssignment> rdMgmtRoleAssignments = new List<RdMgmtRoleAssignment>();
             try
             {
-                HttpResponseMessage response = CommonBL.InitializeHttpClient(deploymentUrl, accessToken).GetAsync("RdsManagement/V1/Rds.Authorization/roleAssignments").Result;
+                HttpResponseMessage response = CommonBL.InitializeHttpClient(deploymentUrl, accessToken).GetAsync("RdsManagement/V1/Rds.Authorization/roleAssignments?upn="+upn).Result;
            
 
                 string strJson = response.Content.ReadAsStringAsync().Result;

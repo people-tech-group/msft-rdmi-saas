@@ -20,7 +20,8 @@ namespace MSFT.RDMISaaS.API.Model
         public string Code { get; set; }
 
         public RdMgmtRoleAssignment RoleAssignment { get; set; }
-        public string TenantGroupName { get; set; }
+        public string[] TenantGroups { get; set; }
+       
     }
     #endregion
 

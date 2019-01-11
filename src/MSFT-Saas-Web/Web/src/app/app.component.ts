@@ -42,6 +42,7 @@ export class AppComponent implements OnInit {
   public profileName: string;
   public profileIcon: string;
   public splitName: any = [];
+  public tenantGroupNameList: any = [];
   public profileNameFirstName: string;
   public profileNameLastName: string;
   public roleDefinitionName: string;
@@ -57,8 +58,8 @@ export class AppComponent implements OnInit {
   public appLoader: boolean = false;
   public tenantGroupName: any;
 
-  constructor(private _AppService: AppService, private router: Router, private route: ActivatedRoute, private http: Http,) {
-
+  constructor(private _AppService: AppService, private router: Router, private route: ActivatedRoute, private http: Http, ) {
+    //localStorage.removeItem("TenantGroupName");
   }
 
   /* This function is used to Call Notifications
@@ -83,8 +84,10 @@ export class AppComponent implements OnInit {
    * Public event that calls directly on page load
    */
   ngOnInit() {
+    this.tenantGroupName = localStorage.getItem("TenantGroupName");
     var code = sessionStorage.getItem("Code");
     var gotCode = sessionStorage.getItem("gotCode");
+    var tenantGroup = localStorage.getItem("TenantGroupName");
     this.profileIcon = sessionStorage.getItem("profileIcon");
     this.profileName = sessionStorage.getItem("profileName");
     this.roleDefinitionName = sessionStorage.getItem("roleDefinitionName");
@@ -123,9 +126,10 @@ export class AppComponent implements OnInit {
 
           /*This block of code is used to get the Role Assignment Acces level*/
           //Role Assignment Acces level -Starts
-          this.tenantGroupName = respdata.TenantGroupName;
+          this.tenantGroupNameList = respdata.TenantGroups;
+          localStorage.setItem("TenantGroups", JSON.stringify(this.tenantGroupNameList));
+          this.tenantGroupName = localStorage.getItem("TenantGroupName");
           this.roleDefinitionName = respdata.RoleAssignment.roleDefinitionName;
-          sessionStorage.setItem("TenantGroupName", this.tenantGroupName);
           sessionStorage.setItem("profileIcon", this.profileIcon);
           sessionStorage.setItem("profileName", this.profileName);
           sessionStorage.setItem("roleDefinitionName", this.roleDefinitionName);
@@ -161,6 +165,9 @@ export class AppComponent implements OnInit {
         sessionStorage.setItem('gotCode', 'yes');
         window.location.replace(loginUrl);
       });
+    }
+    else if (tenantGroup) {
+     this.router.navigate(['/admin/Tenants']);
     }
   }
 

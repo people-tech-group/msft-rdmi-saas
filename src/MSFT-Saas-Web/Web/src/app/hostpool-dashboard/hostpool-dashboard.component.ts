@@ -229,9 +229,11 @@ export class HostpoolDashboardComponent implements OnInit {
    * Public event that calls directly on page load
    */
   ngOnInit() {
+    this.tenantGroupName = localStorage.getItem("TenantGroupName");
     /*This block of code is used to get the Hostpool Name from the Url paramter*/
     this.route.params.subscribe(params => {
-      this.tenantGroupName = sessionStorage.getItem("TenantGroupName");
+      //this.tenantGroupName = sessionStorage.getItem("TenantGroupName");
+      this.tenantGroupName = localStorage.getItem("TenantGroupName");
       this.tenantName = sessionStorage.getItem('TenantName');
       this.hostPoolName = params["hostpoolName"];
       let data = [{
@@ -1098,7 +1100,7 @@ export class HostpoolDashboardComponent implements OnInit {
       "sessionHostName": data.sessionHostName,
       "allowNewSession": data.allowNewSession,
       "refresh_token": sessionStorage.getItem("Refresh_Token"),
-      "tenantGroupName": sessionStorage.getItem("TenantGroupName"),
+      "tenantGroupName": this.tenantGroupName,
     };
     this.updateAppGroupLoading = true;
     this.updateHostUrl = this._AppService.ApiUrl + '/api/SessionHost/Put';
@@ -1226,7 +1228,7 @@ export class HostpoolDashboardComponent implements OnInit {
     var expirationUtc = generateKeyValueData.local.formatted;
     var GenerateKeyValueArray = {
       expirationUtc: expirationUtc,
-      tenantGroupName: sessionStorage.getItem("TenantGroupName"),
+      tenantGroupName: this.tenantGroupName,
       tenantName: this.tenantName,
       hostPoolName: this.hostPoolName,
       refresh_token: sessionStorage.getItem("Refresh_Token"),
@@ -3097,25 +3099,6 @@ export class HostpoolDashboardComponent implements OnInit {
     this.showAddAppGalleryDialog = false;
   }
 
-  /*
-   * This function is used to path change
-   * ----------
-   * parameters
-   * value - Accepts event
-   * ----------
-   */
-  public PathChange(value) {
-    if (value == "") {
-      this.AppPathName = true;
-      this.AppPath = true;
-      this.btnAddPathDisable = true;
-    }
-    else {
-      this.AppPathName = false;
-      this.AppPath = false;
-      this.btnAddPathDisable = false;
-    }
-  }
 
   /*
    * This function is used to open app from path popup
@@ -3123,14 +3106,13 @@ export class HostpoolDashboardComponent implements OnInit {
   public OpenAddAppsFromPath() {
     this.showAddAppGalleryDialog = false;
     this.showAddAppDialog = true;
-    this.addAppsPathButtonDisable = true;
-    this.AppPathName = false;
-    this.AppPath = false;
     this.newAppCreateGroup2 = new FormGroup({
       Browse: new FormControl('', Validators.compose([Validators.required, Validators.pattern(/^(?:[a-zA-Z]:)+(\\[a-z A-Z]+)+(\\[a-zA-Z\d]+)*((\\|\\\\)([a-zA-Z]+)(\.)+[a-zA-Z]{2,3})$/)])),
       Name: new FormControl('', Validators.compose([Validators.required, Validators.pattern(/^[^\s\W\_]([A-Za-z0-9\s])+$/)])),
     });
   }
+
+
 
   /*
    * This function is used to open app from Gallery popup
@@ -3271,7 +3253,7 @@ export class HostpoolDashboardComponent implements OnInit {
         "requiredCommandLine": null,
         "showInWebFeed": true,
         "refresh_token": sessionStorage.getItem("Refresh_Token"),
-        "tenantGroupName": sessionStorage.getItem("TenantGroupName"),
+        "tenantGroupName": this.tenantGroupName,
       };
       this.createappGroupApps = this._AppService.ApiUrl + '/api/RemoteApp/Post';
       this._AppService.CreateAppGroup(this.createappGroupApps, AppdataRds).subscribe(response => {

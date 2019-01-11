@@ -961,7 +961,7 @@ i.notify-close {
 /* Popup CSS End */
 
 /* Overlay CSS Start */
-.createDeploy, .createTenent, .createUserName, .newAppGroup, .notification, .newAppPath, .loginDetails {
+.createDeploy, .createTenent,.manageTenent, .createUserName, .newAppGroup, .notification, .newAppPath, .loginDetails {
   padding: 20px;
   box-sizing: border-box;
   background: #fff;
@@ -1034,19 +1034,19 @@ i.notify-close {
   opacity: 0.8;
 }
 
-.createDeploy h4, .createTenent h4 {
+.createDeploy h4, .createTenent h4, .manageTenent h4 {
   margin: 10px 0px;
 }
 
-.createDeploy p, .createTenent p, loginDetails p {
+.createDeploy p, .createTenent p, .manageTenent p, loginDetails p {
   font-size: 12px;
 }
 
-  .createDeploy p a, .createTenent p a {
+  .createDeploy p a, .createTenent p a, .manageTenent p a {
     color: #0078d7;
   }
 
-    .createDeploy p a i, .createTenent p a i {
+    .createDeploy p a i, .createTenent p a i, .manageTenent p a i {
       font-size: 10px;
       color: #0078d7;
     }
@@ -1058,6 +1058,7 @@ i.notify-close {
 
 .createDeploy input[type=text],
 .createTenent input[type=text],
+.manageTenent input[type=text],
 .DeployUrl input[type=text],
 .DeployUrl input[type=password] {
   height: 30px;
@@ -1626,6 +1627,10 @@ textarea {
 
 .createDeploy .tab-content,
 .createTenent .tab-content {
+  height: calc(100vh - 185px);
+  overflow-y: auto;
+}
+.manageTenent .tab-content {
   height: calc(100vh - 185px);
   overflow-y: auto;
 }

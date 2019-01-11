@@ -26,6 +26,7 @@ export class AdminMenuComponent {
   public tenantLength: any = 10;
   public storeLength: any = 0;
   public tenantListLength: any;
+  public tenantGroupName: any;
 
   constructor(private router: Router, private appService: AppService) {
     if (this.tenantListLength == 1) {
@@ -37,6 +38,7 @@ export class AdminMenuComponent {
   }
 
   public ngOnInit() {
+    this.tenantGroupName = localStorage.getItem("TenantGroupName");
     this.GetAllTenantsList();
   }
 
@@ -59,9 +61,9 @@ export class AdminMenuComponent {
    * This method is used to get the tenant List for side menu nav
    **/
   public GetAllTenantsList() {
-    let tenantGroupName = sessionStorage.getItem("TenantGroupName");
+    //let tenantGroupName = sessionStorage.getItem("TenantGroupName");
     let refreshToken = sessionStorage.getItem("Refresh_Token");
-    let getTenantsUrl = this.appService.ApiUrl + '/api/Tenant/GetAllTenants?tenantGroupName=' + tenantGroupName + '&refresh_token=' + refreshToken;
+    let getTenantsUrl = this.appService.ApiUrl + '/api/Tenant/GetAllTenants?tenantGroupName=' + this.tenantGroupName + '&refresh_token=' + refreshToken;
     this.appService.GetTenants(getTenantsUrl).subscribe(response => {
       let responseObject = JSON.parse(response['_body']);
       this.GetAllTenants(responseObject);
@@ -186,7 +188,7 @@ export class AdminMenuComponent {
   public SetSelectedhostPool(index: any, tenantName: any, hostpoolName: any) {
     this.selectedHostPool = index;
     this.selectedHostpoolName = hostpoolName;
-    sessionStorage.setItem('selectedhostpoolname', this.selectedHostpoolName);
+    sessionStorage.setItem('selectedhostpoolname', this.selectedHostpoolName); 
     sessionStorage.setItem("hostpoolNameIndex", index);
     let data = [{
       name: hostpoolName,
