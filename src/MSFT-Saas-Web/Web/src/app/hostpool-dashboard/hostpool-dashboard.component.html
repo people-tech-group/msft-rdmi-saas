@@ -405,7 +405,7 @@
                           <div class="col-md-9">
                             <ul>
                               <li><button type="button" id="linkAddAppGallery" (click)="OpenAddAppsFromGallery()"><i class="icon icon-plus" aria-hidden="true"></i> Publish Apps from Gallery</button></li>
-                              <li><button type="button" id="linkAddAppPath" (click)="OpenAddAppsFromPath()"><i class="icon icon-plus" aria-hidden="true"></i> Publish App from Path</button></li>
+                              <li><button type="button" id="linkAddAppPath" (click)="OpenAddAppsFromPath($event)"><i class="icon icon-plus" aria-hidden="true"></i> Publish App from Path</button></li>
                               <li><button type="button" data-toggle="modal" [disabled]="isDeleteAppsDisabled" data-target="#deleteModalApps" id="btnDeleteAppPath"><i class="icon icon-delete" aria-hidden="true"></i> Remove Apps</button></li>
                               <li><button type="button" (click)="RefreshBtnClick()"><i class="icon icon-refresh" aria-hidden="true"></i> Refresh</button></li>
                             </ul>
@@ -477,7 +477,7 @@
                                   <img src="../../assets/Images/sad-cloud.png" class="img img-responsive" style="position: relative; width: 10%; left: 44%;" />
                                   <h5 style="color:#808080;font-weight:400;"> No Apps to display</h5>
                                   <p style="color:#808080"> To Publish App, click Publish App button</p>
-                                  <button class="btn btn-sm btn-primary" (click)="OpenAddAppsFromPath()">Publish App</button>
+                                  <button class="btn btn-sm btn-primary" (click)="OpenAddAppsFromPath($event)">Publish App</button>
                                 </div>
                               </div>
                               <div class="EmptyTableMsg" *ngIf="appListErrorFound">
@@ -854,7 +854,7 @@
 <!-- Add App from Path starts-->
 <div class="overlay" *ngIf="showAddAppDialog">
   <div class="newAppPath" id="AddAppPath">
-    <input type="hidden" id="AppGroupNew" value="{{isCreateOpen}}" />
+    <!--<input type="hidden" id="AppGroupNew" value="{{isCreateOpen}}" />-->
     <form [formGroup]="newAppCreateGroup2">
       <div class="createTenantHead">
         <div class="TenantStatus">
@@ -1034,7 +1034,7 @@
               <img src="../../assets/Images/sad-cloud.png" class="img img-responsive" style="position: relative; width: 10%; left: 44%;" />
               <h5 style="color:#808080;font-weight:400;"> No Apps found to display</h5>
               <p style="color:#808080"> To publish apps, click Publish Apps from path </p>
-              <button class="btn btn-sm btn-primary" (click)="OpenAddAppsFromPath()">Publish Apps from path</button>
+              <button class="btn btn-sm btn-primary" (click)="OpenAddAppsFromPath($event)">Publish Apps from path</button>
             </div>
           </div>
           <div *ngIf="appGalleryErrorFound">

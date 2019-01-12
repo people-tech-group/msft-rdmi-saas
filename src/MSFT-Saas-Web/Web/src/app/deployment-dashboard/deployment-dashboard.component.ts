@@ -91,7 +91,6 @@ export class DeploymentDashboardComponent implements OnInit {
 
   /* This function is  called directly on page load */
   public ngOnInit() {
-    //localStorage.removeItem("TenantGroupName");
     this.tenantGroupName = localStorage.getItem("TenantGroupName");
     if (this.tenantGroupName === null) {
       this.OpenManageTenant();

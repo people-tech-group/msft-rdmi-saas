@@ -166,7 +166,7 @@ export class AppComponent implements OnInit {
         window.location.replace(loginUrl);
       });
     }
-    else if (tenantGroup) {
+    else if (tenantGroup && window.location.pathname == "/") {
      this.router.navigate(['/admin/Tenants']);
     }
   }

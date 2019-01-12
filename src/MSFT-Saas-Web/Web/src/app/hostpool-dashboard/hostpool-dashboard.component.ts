@@ -3103,7 +3103,8 @@ export class HostpoolDashboardComponent implements OnInit {
   /*
    * This function is used to open app from path popup
    */
-  public OpenAddAppsFromPath() {
+  public OpenAddAppsFromPath(event) {
+    event.preventDefault();
     this.showAddAppGalleryDialog = false;
     this.showAddAppDialog = true;
     this.newAppCreateGroup2 = new FormGroup({
