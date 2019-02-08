@@ -59,7 +59,7 @@ namespace MSFT.RDMISaaS.API.Controllers
             url = url + "&redirect_uri=" + configurations.redirectUrl;
             url = url + "&response_mode=query";
             url = url + "&resource=" + configurations.resourceUrl + "&state=" + stateGuid;
-            url = url + "&prompt=admin_consent";
+            //url = url + "&prompt=admin_consent";
             return url;
         }
 
