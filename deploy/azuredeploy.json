@@ -4,26 +4,28 @@
     "parameters": {
         "RDBrokerURL": {
             "type": "String",
+            "defaultValue": "https://rdbroker.wvd.microsoft.com",
             "metadata": {
-                "description": "RDBroker URL of the infrastructure.   Ex: https://rdbroker-uiyyft4gnswme.azurewebsites.net"
+                "description": "RDBroker URL of the infrastructure.   Ex: https://rdbroker.wvd.microsoft.com"
             }
         },
         "ResourceURL": {
             "type": "String",
+            "defaultValue": "https://mrs-prod.ame.gbl/mrs-RDInfra-prod",
             "metadata": {
-                "description": "Resource URL of the infrastructure.  Ex: https://ContosoVM.onmicrosoft.com/RDInframsftrdmisaasf658465e2b4948fe85e"
+                "description": "Enterprise application location…"
             }
         },
-        "AzureLoginID": {
+        "AzureADUserPrincipalName": {
             "type": "String",
             "metadata": {
-                "description": "Your Azure Login ID"
+                "description": "User must have RDS Owner on the WVD tenant and must have Contributor on the Azure subscription"
             }
         },
         "AzureLoginPassword": {
             "type": "SecureString",
             "metadata": {
-                "description": "Your Azure Login AzureLoginPassword"
+                "description": "The password that corresponds to the AzureAD UserPrincipalName."
             }
         }
     },
@@ -39,7 +41,7 @@
         "automationVariables": [
             {
                 "name": "Username",
-                "value": "[concat('\"',parameters('AzureLoginID'),'\"')]"
+                "value": "[concat('\"',parameters('AzureADUserPrincipalName'),'\"')]"
             },
             {
                 "name": "password",
@@ -149,7 +151,7 @@
                     "location": "[resourceGroup().location]",
                     "tags": {},
                     "properties": {
-                        "userName": "[parameters('AzureLoginID')]",
+                        "userName": "[parameters('AzureADUserPrincipalName')]",
                         "password": "[parameters('AzureLoginPassword')]"
                     },
                     "dependsOn": [
