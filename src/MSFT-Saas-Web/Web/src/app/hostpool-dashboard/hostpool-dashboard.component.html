@@ -404,7 +404,7 @@
                         <div class="col-xs-12">
                           <div class="col-md-9">
                             <ul>
-                              <li><button type="button" id="linkAddAppGallery" (click)="OpenAddAppsFromGallery()"><i class="icon icon-plus" aria-hidden="true"></i> Publish Apps from Gallery</button></li>
+                              <li><button type="button" id="linkAddAppGallery" (click)="OpenAddAppsFromGallery()"><i class="icon icon-plus" aria-hidden="true"></i> Publish Apps from the Start menu</button></li>
                               <li><button type="button" id="linkAddAppPath" (click)="OpenAddAppsFromPath($event)"><i class="icon icon-plus" aria-hidden="true"></i> Publish App from Path</button></li>
                               <li><button type="button" data-toggle="modal" [disabled]="isDeleteAppsDisabled" data-target="#deleteModalApps" id="btnDeleteAppPath"><i class="icon icon-delete" aria-hidden="true"></i> Remove Apps</button></li>
                               <li><button type="button" (click)="RefreshBtnClick()"><i class="icon icon-refresh" aria-hidden="true"></i> Refresh</button></li>
@@ -924,7 +924,7 @@
 <div class="overlay" *ngIf="showAddUserDialog">
   <div class="createUserName">
     <input type="hidden" id="AddAppCreateOpen" value="{{isCreateOpen}}" />
-    <form [formGroup]="addUserForm">
+    <form [formGroup]="addUserForm" autocomplete="off">
       <div class="createTenantHead">
         <div class="TenantStatus">
           <h4>User Principal Name</h4>
@@ -936,7 +936,7 @@
                   <label>User Principal Name <span class="important-Field">*</span></label>
                   <input type="text" name="name" formControlName="UserPrincipalName" (ngModelChange)="UserPrincipalNameChange($event)" style="width: 359px;" placeholder="Ex. example@demo.onmicrosoft.com" />
                   <div *ngIf="addUserForm.controls['UserPrincipalName'].hasError('pattern')" class="colorRed">
-                    Please enter valid User Principal Name
+                    Please enter valid User Principal Name(Ex: cris@contoso.com)
                   </div>
                   <div *ngIf="userPrincipalName" class="colorRed">
                     Please enter User Principal Name
@@ -989,7 +989,7 @@
     <form>
       <div class="createTenantHead">
         <div class="TenantStatus">
-          <h4>Publish Apps from Gallery</h4>
+          <h4>Publish Apps from the Start menu</h4>
           <div class="col-xs-12">
             <table class="table tableSelection table-hover">
               <thead>
@@ -1008,7 +1008,7 @@
                 </tr>
               </thead>
               <tbody *ngIf="!(GAppslist || appGalleryErrorFound)">
-                <tr *ngFor="let Gapps of appGroupAppListGallery | paginate: { itemsPerPage: galleryAppPageSize, currentPage: GAppsList, id: 'GalleryApps' }; let AGAInd=index" class="TableData" [ngClass]="{'rowSelect':checkedGApps[AGAInd]}" id="row-users-{{Gapps.appAlias}}"
+                <tr *ngFor="let Gapps of appGroupAppListGallery | paginate: { itemsPerPage: galleryAppPageSize, currentPage: pageNo, id: 'GalleryApps' }; let AGAInd=index" class="TableData" [ngClass]="{'rowSelect':checkedGApps[AGAInd]}" id="row-users-{{Gapps.appAlias}}"
                     (click)="GalleryAppListRowClicked(AGAInd)">
                   <td style="width: 4%;text-align: left">
                     <div class="control-group">
@@ -1025,7 +1025,7 @@
               </tbody>
             </table>
             <div class="row" style="margin: 0;" *ngIf="!(GAppslist || appGalleryErrorFound)">
-              <pagination-controls (pageChange)="GAppsList = $event" class="pagination pull-right" id="GalleryApps"></pagination-controls>
+              <pagination-controls (pageChange)="pageNo = $event" class="pagination pull-right" id="GalleryApps"></pagination-controls>
             </div>
           </div>
           <div class="EmptyTableMsg" *ngIf="GAppslist">

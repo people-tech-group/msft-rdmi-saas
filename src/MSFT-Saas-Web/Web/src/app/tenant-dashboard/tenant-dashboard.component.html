@@ -384,8 +384,8 @@
                 Please enter Valid Hostpool friendly name
               </div>
             </div>
-            <div class="col-sm-12"><label>Enable User Profile Disk – <span class="ashColor">optional</span></label></div>
-            <div class="col-sm-12" style="padding:10px 25px">
+            <div [hidden]="true" class="col-sm-12"><label>Enable User Profile Disk – <span class="ashColor">optional</span></label></div>
+            <div [hidden]="true" class="col-sm-12" style="padding:10px 25px">
               <label class="radio-inline" style="padding-left: 30px">
                 <input value=Yes type="radio" name="enableUserProfileDisk" formControlName="enableUserProfileDisk" (ngModelChange)="profileDiskChange($event)">Yes
               </label>
@@ -393,7 +393,7 @@
                 <input value=No type="radio" name="enableUserProfileDisk" formControlName="enableUserProfileDisk" (ngModelChange)="profileDiskChange($event)">No
               </label>
             </div>
-            <div class="col-sm-12 form-group">
+            <div [hidden]="true" class="col-sm-12 form-group">
               <label>Disk Path – <span class="ashColor">optional</span></label>
               <input type="text" name="diskPath" formControlName="diskPath" [readonly]="!isEnableUser" />
               <div *ngIf="hostpoolFormEdit.controls['diskPath'].hasError('pattern')" class="colorRed">

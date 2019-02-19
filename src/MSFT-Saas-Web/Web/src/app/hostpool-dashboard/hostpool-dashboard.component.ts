@@ -219,6 +219,7 @@ export class HostpoolDashboardComponent implements OnInit {
   public usersCurrentPageNo: any = 1;
   public usersIsDescending: boolean = false;
   public galleryAppPageSize: any = 10;
+  public pageNo: number = 1;
   @ViewChild('closeModal') closeModal: ElementRef;
 
   constructor(private _AppService: AppService, private fb: FormBuilder, private http: Http, private route: ActivatedRoute, private _notificationsService: NotificationsService, private router: Router) {
@@ -262,7 +263,7 @@ export class HostpoolDashboardComponent implements OnInit {
       Description: new FormControl('', Validators.required),
     });
     this.newAppCreateGroup2 = new FormGroup({
-      Browse: new FormControl('', Validators.compose([Validators.required, Validators.pattern(/^(?:[a-zA-Z]:)+(\\[a-z A-Z]+)+(\\[a-zA-Z\d]+)*((\\|\\\\)([a-zA-Z]+)(\.)+[a-zA-Z]{2,3})$/)])),
+      Browse: new FormControl('', Validators.compose([Validators.required])),
       Name: new FormControl('', Validators.compose([Validators.required, Validators.pattern(/^[^\s\W\_]([A-Za-z0-9\s])+$/)])),
     });
     this.addUserForm = new FormGroup({
@@ -3108,7 +3109,7 @@ export class HostpoolDashboardComponent implements OnInit {
     this.showAddAppGalleryDialog = false;
     this.showAddAppDialog = true;
     this.newAppCreateGroup2 = new FormGroup({
-      Browse: new FormControl('', Validators.compose([Validators.required, Validators.pattern(/^(?:[a-zA-Z]:)+(\\[a-z A-Z]+)+(\\[a-zA-Z\d]+)*((\\|\\\\)([a-zA-Z]+)(\.)+[a-zA-Z]{2,3})$/)])),
+      Browse: new FormControl('', Validators.compose([Validators.required])),
       Name: new FormControl('', Validators.compose([Validators.required, Validators.pattern(/^[^\s\W\_]([A-Za-z0-9\s])+$/)])),
     });
   }
