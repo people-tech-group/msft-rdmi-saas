@@ -142,9 +142,9 @@
     <div class="createTenent">
       <div class="createTenantHead">
         <div class="TenantStatus">
-            <h4>Please select default tenant group</h4>
+            <h4>Please select a Tenant Group</h4>
             <div class="DeployUrl marginBottom30">
-              <label for="manageTenant" style="font-size:11px"><span class="colorRed">&nbsp;*</span><b>Default Tenant Group</b></label>
+              <label for="manageTenant" style="font-size:11px"><span class="colorRed">&nbsp;*</span><b>Tenant Group</b></label>
               <select class="form-control" (change)="changeTenantgroup($event.target.value)">
                 <option>Choose tenant group</option>
                 <option *ngFor="let list of TenantGroups" label="">{{list}}</option>
@@ -208,7 +208,7 @@
                 <li class="tab-link current" data-tab="tab-2">2</li>
               </ul>
               <div style="clear:both"></div>
-              <h4>Create RDS Tenant</h4>
+              <h4>Create WVD Tenant</h4>
               <div class="DeployUrl marginBottom30">
                 <div class="form-group">
                   <label>Tenant Unique Name <span class="important-Field">*</span></label>

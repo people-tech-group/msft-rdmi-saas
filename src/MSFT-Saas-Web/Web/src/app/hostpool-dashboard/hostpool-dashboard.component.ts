@@ -1659,6 +1659,7 @@ export class HostpoolDashboardComponent implements OnInit {
       var index = i;
       if (event.target.checked) {
         this.checked[i] = true;
+        this.appGroupDetails=[];
         this.state = 'down';
       }
       else {
@@ -1673,6 +1674,7 @@ export class HostpoolDashboardComponent implements OnInit {
       }
     }
     if (this.checkedAllTrueAppGroup.length == 1) {
+      this.appGroupDetails=[];
       this.isEditAppgroupDisabled = false;
       this.isDeleteAppgroupDisabled = false;
       this.state = 'up';
@@ -1702,6 +1704,7 @@ export class HostpoolDashboardComponent implements OnInit {
     else {
       this.isEditAppgroupDisabled = true;
       this.isDeleteAppgroupDisabled = true;
+      this.appGroupDetails=[];
       this.state = 'down';
     }
   }
@@ -1727,6 +1730,7 @@ export class HostpoolDashboardComponent implements OnInit {
       }
     }
     if (this.appGroupcheckedTrue.length == 1) {
+      this.appGroupDetails=[];
       this.state = 'up';
       this.isEditAppgroupDisabled = false;
       this.isDeleteAppgroupDisabled = false;
@@ -2989,6 +2993,7 @@ export class HostpoolDashboardComponent implements OnInit {
    */
   public AppListRowClicked(remoteAppName: any, appInd: any) {
     this.IsCheckedApp(appInd);
+   
     this.isDeleteAppsDisabled = false;
     this.selectedRemoteappName = '';
     this.appCheckedTrue = [];
