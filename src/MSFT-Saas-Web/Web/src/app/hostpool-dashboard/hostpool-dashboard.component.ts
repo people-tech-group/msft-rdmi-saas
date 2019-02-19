@@ -2918,6 +2918,16 @@ export class HostpoolDashboardComponent implements OnInit {
     this.selectedGAppRows = this.checkedAllTrueGApps;
   }
 
+  /**
+   * This function will calculate and return absolute index of gallery apps.
+   * -------------------
+   * @param indexOnPage - Accepts App Index from gallery Apps
+   * -------------------
+   */
+  absoluteIndex(indexOnPage: number): number {
+    return this.galleryAppPageSize * (this.pageNo - 1) + indexOnPage;
+  }
+
   /*
    * This function is used to Row click for AppGroup app list(From Gallery)
    * ----------
@@ -3125,6 +3135,7 @@ export class HostpoolDashboardComponent implements OnInit {
    * This function is used to open app from Gallery popup
    */
   public OpenAddAppsFromGallery() {
+    this.pageNo = 1;
     this.showAddAppGalleryDialog = true;
     this.appGalleryErrorFound = false;
     this.gappCheckedTrue = [];

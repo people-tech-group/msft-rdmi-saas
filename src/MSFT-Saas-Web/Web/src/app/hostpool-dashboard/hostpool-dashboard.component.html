@@ -322,7 +322,7 @@
             <div id="AppGroupDashboard" class="AppGrouptoggle" [@slidemodal]="state">
               <div class="col-xs-12 paddingTop20">
                 <div class="col-xs-10">
-                  <h5 class="paddingLeft0">"{{appGroupDetails.appGroupName}}" Details</h5>
+                  <h5 *ngIf="appGroupDetails.appGroupName" class="paddingLeft0">"{{appGroupDetails.appGroupName}}" Details</h5>
                 </div>
                 <div class="col-xs-2 txtalignRight postionRelTop15">
                   <a class="paddingLeftRight5" *ngIf="selectedClassMin" (click)="MinWindowOpen($event)" title="Minimize">
@@ -1008,12 +1008,12 @@
                 </tr>
               </thead>
               <tbody *ngIf="!(GAppslist || appGalleryErrorFound)">
-                <tr *ngFor="let Gapps of appGroupAppListGallery | paginate: { itemsPerPage: galleryAppPageSize, currentPage: pageNo, id: 'GalleryApps' }; let AGAInd=index" class="TableData" [ngClass]="{'rowSelect':checkedGApps[AGAInd]}" id="row-users-{{Gapps.appAlias}}"
-                    (click)="GalleryAppListRowClicked(AGAInd)">
+                <tr *ngFor="let Gapps of appGroupAppListGallery | paginate: { itemsPerPage: galleryAppPageSize, currentPage: pageNo, id: 'GalleryApps' }; let AGAInd=index" class="TableData" [ngClass]="{'rowSelect':checkedGApps[absoluteIndex(AGAInd)]}" id="row-users-{{Gapps.appAlias}}"
+                    (click)="GalleryAppListRowClicked(absoluteIndex(AGAInd))">
                   <td style="width: 4%;text-align: left">
                     <div class="control-group">
                       <label class="control control--checkbox">
-                        <input type="checkbox" class="solcheckbox" (click)="GalleryAppIsChecked(AGAInd)" [checked]="checkedGApps[AGAInd]">
+                        <input type="checkbox" class="solcheckbox" (click)="GalleryAppIsChecked(absoluteIndex(AGAInd))" [checked]="checkedGApps[absoluteIndex(AGAInd)]">
                         <span class="control__indicator"></span>
                       </label>
                     </div>
