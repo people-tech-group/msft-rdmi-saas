@@ -6,7 +6,7 @@
     </div>
   </div>
   <div class="rdsDeploymnt-leftcontent">
-    <h3>RDS Tenants</h3>
+    <h3>WVD Tenants</h3>
     <div class="col-xs-12 marginLeft7">
       <p class="fontSize12"><i class="icon icon-info searchInfo"></i> Click on arrow(<i class="icon icon-chevron-right arrowIcn"></i>) icon to Expand/Collapse menus.</p>
       <button id="btnRefreshMenu" style="display:none;">Refresh</button>
@@ -34,7 +34,7 @@
                   <ul class="sub-sub-group-list hostPad" *ngIf="selectedTenant === y">
                     <li *ngFor="let hostpool of hostPoolList let z = index">
                       <a [routerLink]="['hostpoolDashboard/', hostpool.hostPoolName]" (click)="SetSelectedhostPool(z,tenants.tenantName,hostpool.hostPoolName)" [ngClass]="{'selected':selectedHostPool === z && selectedTenant === y && selectedAllTenants !== true}">
-                        <span class="marginRight3">
+                        <span class="marginRight3" [hidden]="true">
                           <i class="icon icon-win-hostserver iconAlignment"></i>
                         </span>
                         {{hostpool.hostPoolName}}
