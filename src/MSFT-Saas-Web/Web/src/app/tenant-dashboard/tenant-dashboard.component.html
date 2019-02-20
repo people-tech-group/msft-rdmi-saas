@@ -47,10 +47,6 @@
             <div class="Deployment-details" *ngIf="!getTenantlistErrorFound">
               <div class="row">
                 <div class="col-md-5">
-                  <label>Status</label>
-                  <p><i class="icon icon-check"></i>Healthy</p>
-                </div>
-                <div class="col-md-3">
                   <label>Host pools</label>
                   <p>{{tenantInfo.noOfHostpool}}</p>
                 </div>
@@ -67,8 +63,6 @@
                     <ng-template #TenantNameNotAvailable>N/A</ng-template>
                     <span *ngIf="tenantInfo.tenantName ; then TenantNameAvailable else TenantNameNotAvailable"></span>
                   </p>
-                </div>
-                <div class="col-md-3">
                 </div>
                 <div class="col-md-3">
                   <label>App Groups</label>

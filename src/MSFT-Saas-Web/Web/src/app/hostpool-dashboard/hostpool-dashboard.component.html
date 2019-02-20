@@ -45,10 +45,6 @@
               <div class="Deployment-details" *ngIf="!hostpoolDetailsErrorFound">
                 <div class="row">
                   <div class="col-md-5">
-                    <label>Status</label>
-                    <p><i class="icon icon-check"></i>Healthy</p>
-                  </div>
-                  <div class="col-md-3">
                     <label>Type</label><br />
                     <p>
                       <ng-template #HostTypeAvailable>{{hostPoolDetails.persistent}}</ng-template>
@@ -59,6 +55,10 @@
                   <div class="col-md-3">
                     <label>Active Hosts (Total Hosts)</label>
                     <p>{{hostPoolDetails.noOfActivehosts}}</p>
+                  </div>
+                  <div class="col-md-3">
+                    <label>App Groups</label>
+                    <p>{{hostPoolDetails.noOfAppgroups}}</p>
                   </div>
                 </div>
                 <div class="row">
@@ -77,10 +77,6 @@
                       <ng-template #HostdiskPathNotAvilable>N/A</ng-template>
                       <span *ngIf="hostPoolDetails.diskPath ; then HostdiskPathAvilable else HostdiskPathNotAvilable"></span>
                     </p>
-                  </div>
-                  <div class="col-md-3">
-                    <label>App Groups</label>
-                    <p>{{hostPoolDetails.noOfAppgroups}}</p>
                   </div>
                 </div>
                 <div class="row">
