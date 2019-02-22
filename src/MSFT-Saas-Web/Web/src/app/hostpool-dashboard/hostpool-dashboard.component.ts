@@ -239,6 +239,9 @@ export class HostpoolDashboardComponent implements OnInit {
       this.appGroupsListSearch = [];
       this.sessionHostListsSearch = [];
       this.hostPoolDetails = [];
+      this.checkedMainAppGroup = false;
+      this.isEditAppgroupDisabled = true;
+      this.isDeleteAppgroupDisabled = true;
       this.tenantGroupName = localStorage.getItem("TenantGroupName");
       this.tenantName = sessionStorage.getItem('TenantName');
       this.hostPoolName = params["hostpoolName"];
@@ -357,19 +360,22 @@ export class HostpoolDashboardComponent implements OnInit {
     dateFormat: 'yyyy-mm-dd'
   };
 
- /* This function is used to close the Appgroup details, App & Users split view
-   * --------------
-   * Parameters
-   * event - Accepts Event
-   * --------------  
-  */
- public AppGroupbottomClose(event: any) {
-  this.state = 'down';
-  event.preventDefault();
-  this.checked = [];
-  this.selectedClassMax = true;
-  this.selectedClassMin = false;
-}
+  /* This function is used to close the Appgroup details, App & Users split view
+    * --------------
+    * Parameters
+    * event - Accepts Event
+    * --------------  
+   */
+  public AppGroupbottomClose(event: any) {
+    this.state = 'down';
+    event.preventDefault();
+    this.checked = [];
+    this.selectedClassMax = true;
+    this.selectedClassMin = false;
+    this.checkedMainAppGroup = false;
+    this.isEditAppgroupDisabled = true;
+    this.isDeleteAppgroupDisabled = true;
+  }
 
   /* This function is used to close the Appgroup details, App & Users split view
    * --------------
@@ -571,7 +577,7 @@ export class HostpoolDashboardComponent implements OnInit {
    */
   public GetSearchBySessionHostName(value: any) {
     let _SearchPipe = new SearchPipe();
-    this.sessionHostListsSearch = _SearchPipe.transform(value, 'Name', 'NumberOfSessions', 'MaxSessionLimit', this.sessionHostLists);
+    this.sessionHostListsSearch = _SearchPipe.transform(value, 'sessionHostName', 'allowNewSession', 'lastHeartBeat', this.sessionHostLists);
   }
 
   /*
@@ -2323,6 +2329,7 @@ export class HostpoolDashboardComponent implements OnInit {
   public AppUsersCheckAll(event: any) {
     this.checkedMainUser = !this.checkedMainUser;
     this.userCheckedTrue = [];
+    this.selectedUsersRows = [];
     /* If we check the checkbox then this block of code executes*/
     for (let i = 0; i < this.appUsersListSearch.length; i++) {
       if (event.target.checked) {
@@ -2562,8 +2569,8 @@ export class HostpoolDashboardComponent implements OnInit {
     this.refreshHostpoolLoading = true;
     for (let i = 0; i < this.selectedUsersRows.length; i++) {
       let index = this.selectedUsersRows[i];
-      let selectedUserName = this.appUsersListSearch[index].userPrincipalName
-      this.usersDeleteUrl = this._AppService.ApiUrl + '/api/AppGroup/DeleteAssignedUser?tenantGroupName=' + this.tenantGroupName + '&tenantName=' + this.tenantName + '&hostPoolName=' + this.hostPoolName + '&appGroupName=' + this.selectedAppGroupName + '&appGroupUser=' + this.appUsersListSearch[index].userPrincipalName + '&refresh_token=' + sessionStorage.getItem("Refresh_Token");
+      let selectedUserName = this.appUsersListSearch[index].userPrincipalName;
+      this.usersDeleteUrl = this._AppService.ApiUrl + '/api/AppGroup/DeleteAssignedUser?tenantGroupName=' + this.tenantGroupName + '&tenantName=' + this.tenantName + '&hostPoolName=' + this.hostPoolName + '&appGroupName=' + this.selectedAppGroupName + '&appGroupUser=' + selectedUserName + '&refresh_token=' + sessionStorage.getItem("Refresh_Token");
       this._AppService.DeleteUsersList(this.usersDeleteUrl).subscribe(response => {
         this.refreshHostpoolLoading = false;
         var responseData = JSON.parse(response['_body']);
@@ -3112,7 +3119,7 @@ export class HostpoolDashboardComponent implements OnInit {
         this.deleteCountSelectedApp = this.appGroupsAppListSearch[index].remoteAppName;
       }
       else {
-        this.isDeleteAppsDisabled = true;
+        this.isDeleteAppsDisabled = false;
         this.deleteCountSelectedApp = this.checkedAllTrueApps.length;
       }
     }
