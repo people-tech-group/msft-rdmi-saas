@@ -223,7 +223,7 @@ export class HostpoolDashboardComponent implements OnInit {
   @ViewChild('closeModal') closeModal: ElementRef;
 
   constructor(private _AppService: AppService, private fb: FormBuilder, private http: Http, private route: ActivatedRoute, private _notificationsService: NotificationsService, private router: Router) {
-    
+
   }
 
   /*
@@ -234,6 +234,11 @@ export class HostpoolDashboardComponent implements OnInit {
     /*This block of code is used to get the Hostpool Name from the Url paramter*/
     this.route.params.subscribe(params => {
       //this.tenantGroupName = sessionStorage.getItem("TenantGroupName");
+      this.state = 'down';
+      this.checked = [];
+      this.appGroupsListSearch = [];
+      this.sessionHostListsSearch = [];
+      this.hostPoolDetails = [];
       this.tenantGroupName = localStorage.getItem("TenantGroupName");
       this.tenantName = sessionStorage.getItem('TenantName');
       this.hostPoolName = params["hostpoolName"];
@@ -352,6 +357,20 @@ export class HostpoolDashboardComponent implements OnInit {
     dateFormat: 'yyyy-mm-dd'
   };
 
+ /* This function is used to close the Appgroup details, App & Users split view
+   * --------------
+   * Parameters
+   * event - Accepts Event
+   * --------------  
+  */
+ public AppGroupbottomClose(event: any) {
+  this.state = 'down';
+  event.preventDefault();
+  this.checked = [];
+  this.selectedClassMax = true;
+  this.selectedClassMin = false;
+}
+
   /* This function is used to close the Appgroup details, App & Users split view
    * --------------
    * Parameters
@@ -401,7 +420,7 @@ export class HostpoolDashboardComponent implements OnInit {
     this.isDate = false;
     this.responseValue = "";
     this.responseMessage = "";
-   this.AddHostKeyGenerate();
+    this.AddHostKeyGenerate();
   }
 
   /*
@@ -420,7 +439,7 @@ export class HostpoolDashboardComponent implements OnInit {
      * Registration key and Expiry Data Service Calling
      */
     let headers = new Headers({ 'Accept': 'application/json' });
-    var url = this._AppService.ApiUrl + '/api/RegistrationInfo/GetRegistrationInfo?tenantGroupName=' + this.tenantGroupName +'&tenantName=' + this.tenantName + '&hostPoolName=' + this.hostPoolName + '&refresh_token=' + sessionStorage.getItem("Refresh_Token");
+    var url = this._AppService.ApiUrl + '/api/RegistrationInfo/GetRegistrationInfo?tenantGroupName=' + this.tenantGroupName + '&tenantName=' + this.tenantName + '&hostPoolName=' + this.hostPoolName + '&refresh_token=' + sessionStorage.getItem("Refresh_Token");
     this.http.get(url, {
       headers: headers
     }).subscribe(values => {
@@ -473,7 +492,7 @@ export class HostpoolDashboardComponent implements OnInit {
         AppComponent.GetNotification('icon icon-fail angular-NotifyFail', 'Failed To Generate Registration Key', 'Problem with server, Please try again', new Date());
         this.RefreshData();
       }
-      );
+    );
   }
 
   /*
@@ -490,7 +509,7 @@ export class HostpoolDashboardComponent implements OnInit {
     this.checked = [];
     this.checkedMainAppGroup = false;
     this.state = "down";
-    this.CheckAppGroupAccess(this.hostPoolName);    
+    this.CheckAppGroupAccess(this.hostPoolName);
     this.GetAllSessionHost();
   }
 
@@ -504,7 +523,7 @@ export class HostpoolDashboardComponent implements OnInit {
   public GetHostPoolDetails(hostPoolName: any) {
     this.refreshHostpoolLoading = true;
     this.hostpoolDetailsErrorFound = false;
-    this.hostpoolDetailsUrl = this._AppService.ApiUrl + '/api/HostPool/GetHostPoolDetails?tenantGroupName=' + this.tenantGroupName +'&tenantName=' + this.tenantName + '&hostPoolName=' + hostPoolName + '&refresh_token=' + sessionStorage.getItem("Refresh_Token");
+    this.hostpoolDetailsUrl = this._AppService.ApiUrl + '/api/HostPool/GetHostPoolDetails?tenantGroupName=' + this.tenantGroupName + '&tenantName=' + this.tenantName + '&hostPoolName=' + hostPoolName + '&refresh_token=' + sessionStorage.getItem("Refresh_Token");
     this._AppService.GetData(this.hostpoolDetailsUrl).subscribe(response => {
       let HostPoolList = JSON.parse(response['_body']);
       if (HostPoolList) {
@@ -515,7 +534,7 @@ export class HostpoolDashboardComponent implements OnInit {
       }
       if (HostPoolList.message == null) {
         this.hostPoolDetails = JSON.parse(response['_body']);
-       this.hostCount = this.hostPoolDetails.noOfActivehosts;
+        this.hostCount = this.hostPoolDetails.noOfActivehosts;
       }
       this.GetcurrentNoOfPagesCountAppgroup();
       this.GetcurrentNoOfPagesCountHost();
@@ -675,9 +694,9 @@ export class HostpoolDashboardComponent implements OnInit {
     this.sessionHostCheckedMain = false;
     this.sessionHostchecked = [];
     this.hostListErrorFound = false;
-    this.HostlastEntry = this.sessionHostLists[0].sessionHostName ;
+    this.HostlastEntry = this.sessionHostLists[0].sessionHostName;
     this.curentHostIndex = this.curentHostIndex - 1;
-    this.getAllSessionHostUrl = this._AppService.ApiUrl + '/api/SessionHost/GetSessionhostList?tenantGroupName=' + this.tenantGroupName +'&tenantName=' + this.tenantName + '&hostPoolName=' + this.hostPoolName + '&refresh_token=' + sessionStorage.getItem("Refresh_Token") + '&pageSize=' + this.HostpageSize + '&sortField=SessionHostName&isDescending=true&initialSkip=' + this.hostinitialSkip + '&lastEntry=' + this.HostlastEntry;
+    this.getAllSessionHostUrl = this._AppService.ApiUrl + '/api/SessionHost/GetSessionhostList?tenantGroupName=' + this.tenantGroupName + '&tenantName=' + this.tenantName + '&hostPoolName=' + this.hostPoolName + '&refresh_token=' + sessionStorage.getItem("Refresh_Token") + '&pageSize=' + this.HostpageSize + '&sortField=SessionHostName&isDescending=true&initialSkip=' + this.hostinitialSkip + '&lastEntry=' + this.HostlastEntry;
     this._AppService.GetData(this.getAllSessionHostUrl).subscribe(response => {
       let HostList = JSON.parse(response['_body']);
       this.sessionHostLists = HostList.reverse();
@@ -762,7 +781,7 @@ export class HostpoolDashboardComponent implements OnInit {
     this.sessionHostchecked = [];
     this.hostListErrorFound = false;
     // '/api/AppGroup/GetAppGroupsList?tenantName=' + this.tenantName + '&hostPoolName=' + this.hostPoolName + '&refresh_token=' + sessionStorage.getItem("Refresh_Token") + ' &pageSize=' + this.pageSize + '&sortField=AppGroupName&isDescending=' + this.isDescending + '&initialSkip=' + this.initialSkip + '&lastEntry=' + this.lastEntry;
-    this.getAllSessionHostUrl = this._AppService.ApiUrl + '/api/SessionHost/GetSessionhostList?tenantGroupName=' + this.tenantGroupName +'&tenantName=' + this.tenantName + '&hostPoolName=' + this.hostPoolName + '&refresh_token=' + sessionStorage.getItem("Refresh_Token") + '&pageSize=' + this.HostpageSize + '&sortField=SessionHostName&isDescending=' + this.isDescending + '&initialSkip=' + this.hostinitialSkip + '&lastEntry=' + this.HostlastEntry;
+    this.getAllSessionHostUrl = this._AppService.ApiUrl + '/api/SessionHost/GetSessionhostList?tenantGroupName=' + this.tenantGroupName + '&tenantName=' + this.tenantName + '&hostPoolName=' + this.hostPoolName + '&refresh_token=' + sessionStorage.getItem("Refresh_Token") + '&pageSize=' + this.HostpageSize + '&sortField=SessionHostName&isDescending=' + this.isDescending + '&initialSkip=' + this.hostinitialSkip + '&lastEntry=' + this.HostlastEntry;
     this._AppService.GetData(this.getAllSessionHostUrl).subscribe(response => {
       this.sessionHostLists = JSON.parse(response['_body']);
       /* This Block of code is used to Exchange the allowNewSession value 'true' or 'false' to 'Yes' or 'No' */
@@ -831,7 +850,7 @@ export class HostpoolDashboardComponent implements OnInit {
     this.sessionHostCheckedMain = false;
     this.sessionHostchecked = [];
     this.hostListErrorFound = false;
-    this.getAllSessionHostUrl = this._AppService.ApiUrl + '/api/SessionHost/GetSessionhostList?tenantGroupName=' + this.tenantGroupName +'&tenantName=' + this.tenantName + '&hostPoolName=' + this.hostPoolName + '&refresh_token=' + sessionStorage.getItem("Refresh_Token") + '&pageSize=' + this.HostpageSize + '&sortField=SessionHostName&isDescending=false&initialSkip=' + this.hostinitialSkip + '&lastEntry=' + this.HostlastEntry;
+    this.getAllSessionHostUrl = this._AppService.ApiUrl + '/api/SessionHost/GetSessionhostList?tenantGroupName=' + this.tenantGroupName + '&tenantName=' + this.tenantName + '&hostPoolName=' + this.hostPoolName + '&refresh_token=' + sessionStorage.getItem("Refresh_Token") + '&pageSize=' + this.HostpageSize + '&sortField=SessionHostName&isDescending=false&initialSkip=' + this.hostinitialSkip + '&lastEntry=' + this.HostlastEntry;
     this._AppService.GetData(this.getAllSessionHostUrl).subscribe(response => {
       this.sessionHostLists = JSON.parse(response['_body']);
       this.HostpreviousPageNo = this.HostCurrentPageNo;
@@ -900,7 +919,7 @@ export class HostpoolDashboardComponent implements OnInit {
     this.sessionHostCheckedMain = false;
     this.sessionHostchecked = [];
     this.hostListErrorFound = false;
-    this.getAllSessionHostUrl = this._AppService.ApiUrl + '/api/SessionHost/GetSessionhostList?tenantGroupName=' + this.tenantGroupName +'&tenantName=' + this.tenantName + '&hostPoolName=' + this.hostPoolName + '&refresh_token=' + sessionStorage.getItem("Refresh_Token") + '&pageSize=' + this.HostpageSize + '&sortField=SessionHostName&isDescending=false&initialSkip=' + this.hostinitialSkip + '&lastEntry=%22%20%22';
+    this.getAllSessionHostUrl = this._AppService.ApiUrl + '/api/SessionHost/GetSessionhostList?tenantGroupName=' + this.tenantGroupName + '&tenantName=' + this.tenantName + '&hostPoolName=' + this.hostPoolName + '&refresh_token=' + sessionStorage.getItem("Refresh_Token") + '&pageSize=' + this.HostpageSize + '&sortField=SessionHostName&isDescending=false&initialSkip=' + this.hostinitialSkip + '&lastEntry=%22%20%22';
     this._AppService.GetData(this.getAllSessionHostUrl).subscribe(response => {
       this.sessionHostLists = JSON.parse(response['_body']);
       /* This Block of code is used to Exchange the allowNewSession value 'true' or 'false' to 'Yes' or 'No' */
@@ -970,7 +989,7 @@ export class HostpoolDashboardComponent implements OnInit {
     this.refreshHostpoolLoading = true;
     for (let i = 0; i < this.sessionHostCheckedTrue.length; i++) {
       let index = this.sessionHostCheckedTrue[i];
-      this.hostDeleteUrl = this._AppService.ApiUrl + '/api/SessionHost/DeleteSessionHost?tenantGroupName=' + this.tenantGroupName +'&tenantName=' + this.tenantName + '&hostPoolName=' + this.hostPoolName + '&sessionHostName=' + this.sessionHostName + '&refresh_token=' + sessionStorage.getItem("Refresh_Token");
+      this.hostDeleteUrl = this._AppService.ApiUrl + '/api/SessionHost/DeleteSessionHost?tenantGroupName=' + this.tenantGroupName + '&tenantName=' + this.tenantName + '&hostPoolName=' + this.hostPoolName + '&sessionHostName=' + this.sessionHostName + '&refresh_token=' + sessionStorage.getItem("Refresh_Token");
       this._AppService.DeleteHostService(this.hostDeleteUrl).subscribe(response => {
         this.refreshHostpoolLoading = false;
         var responseData = JSON.parse(response['_body']);
@@ -1327,7 +1346,7 @@ export class HostpoolDashboardComponent implements OnInit {
     else {
       this.isDate = false;
       this.refreshHostpoolLoading = true;
-      this.regeneratekeyURL = this._AppService.ApiUrl + '/api/RegistrationInfo/Delete?tenantGroupName=' + this.tenantGroupName +'&tenantName=' + this.tenantName + '&hostPoolName=' + this.hostPoolName + '&refresh_token=' + sessionStorage.getItem("Refresh_Token");
+      this.regeneratekeyURL = this._AppService.ApiUrl + '/api/RegistrationInfo/Delete?tenantGroupName=' + this.tenantGroupName + '&tenantName=' + this.tenantName + '&hostPoolName=' + this.hostPoolName + '&refresh_token=' + sessionStorage.getItem("Refresh_Token");
       this._AppService.DeleteGeneratedHostKey(this.regeneratekeyURL).subscribe(response => {
         this.regeneratekeyDetails = response.json();
         /* If response data is success then it enters into if and this block of code will execute to show the 'Registration key Regenerated successfully' notification */
@@ -1447,16 +1466,16 @@ export class HostpoolDashboardComponent implements OnInit {
     this.appGroupListErrorFound = false;
     this.editedBodyAppGroup = false;
     this.checkedMainAppGroup = false;
-    this.lastEntry = this.appGroupsListSearch[0].appGroupName ;
+    this.lastEntry = this.appGroupsListSearch[0].appGroupName;
     this.curentIndex = this.curentIndex - 1;
-    this.getAllAppGroupsListUrl = this._AppService.ApiUrl + '/api/AppGroup/GetAppGroupsList?tenantGroupName=' + this.tenantGroupName +'&tenantName=' + this.tenantName + '&hostPoolName=' + this.hostPoolName + '&refresh_token=' + sessionStorage.getItem("Refresh_Token") + ' &pageSize=' + this.pageSize + '&sortField=AppGroupName&isDescending=true&initialSkip=' + this.initialSkip + '&lastEntry=' + this.appGroupsListSearch[0].appGroupName;
+    this.getAllAppGroupsListUrl = this._AppService.ApiUrl + '/api/AppGroup/GetAppGroupsList?tenantGroupName=' + this.tenantGroupName + '&tenantName=' + this.tenantName + '&hostPoolName=' + this.hostPoolName + '&refresh_token=' + sessionStorage.getItem("Refresh_Token") + ' &pageSize=' + this.pageSize + '&sortField=AppGroupName&isDescending=true&initialSkip=' + this.initialSkip + '&lastEntry=' + this.appGroupsListSearch[0].appGroupName;
     this._AppService.GetData(this.getAllAppGroupsListUrl).subscribe(response => {
       let AppGroupList = JSON.parse(response['_body']);
       this.appGroupsList = AppGroupList.reverse();
       this.AppGrouppreviousPageNo = this.AppGroupCurrentPageNo;
       this.AppGroupCurrentPageNo = this.AppGroupCurrentPageNo - 1;
-    
-     
+
+
       this.refreshHostpoolLoading = false;
       if (this.appGroupsList) {
         if (this.appGroupsList.code == "Invalid Token") {
@@ -1486,7 +1505,7 @@ export class HostpoolDashboardComponent implements OnInit {
     this.isEditAppgroupDisabled = true;
     this.isDeleteAppgroupDisabled = true;
   }
-  public CurrentPageAppGroup( index) {
+  public CurrentPageAppGroup(index) {
     this.AppGrouppreviousPageNo = this.AppGroupCurrentPageNo;
     this.AppGroupCurrentPageNo = index + 1;
     this.curentIndex = index;
@@ -1498,13 +1517,13 @@ export class HostpoolDashboardComponent implements OnInit {
       this.lastEntry = this.appGroupsListSearch[this.appGroupsListSearch.length - 1].appGroupName;
     } else {
       this.isDescending = true;
-      this.lastEntry =  this.appGroupsListSearch[0].appGroupName;
+      this.lastEntry = this.appGroupsListSearch[0].appGroupName;
     }
     this.refreshHostpoolLoading = true;
     this.appGroupListErrorFound = false;
     this.editedBodyAppGroup = false;
     this.checkedMainAppGroup = false;
-    this.getAllAppGroupsListUrl = this._AppService.ApiUrl + '/api/AppGroup/GetAppGroupsList?tenantGroupName=' + this.tenantGroupName +'&tenantName=' + this.tenantName + '&hostPoolName=' + this.hostPoolName + '&refresh_token=' + sessionStorage.getItem("Refresh_Token") + ' &pageSize=' + this.pageSize + '&sortField=AppGroupName&isDescending=' + this.isDescending + '&initialSkip=' + this.initialSkip + '&lastEntry=' + this.lastEntry;
+    this.getAllAppGroupsListUrl = this._AppService.ApiUrl + '/api/AppGroup/GetAppGroupsList?tenantGroupName=' + this.tenantGroupName + '&tenantName=' + this.tenantName + '&hostPoolName=' + this.hostPoolName + '&refresh_token=' + sessionStorage.getItem("Refresh_Token") + ' &pageSize=' + this.pageSize + '&sortField=AppGroupName&isDescending=' + this.isDescending + '&initialSkip=' + this.initialSkip + '&lastEntry=' + this.lastEntry;
     this._AppService.GetData(this.getAllAppGroupsListUrl).subscribe(response => {
       this.appGroupsList = JSON.parse(response['_body']);
       this.refreshHostpoolLoading = false;
@@ -1543,7 +1562,7 @@ export class HostpoolDashboardComponent implements OnInit {
     this.appGroupListErrorFound = false;
     this.editedBodyAppGroup = false;
     this.checkedMainAppGroup = false;
-    this.getAllAppGroupsListUrl = this._AppService.ApiUrl + '/api/AppGroup/GetAppGroupsList?tenantGroupName=' + this.tenantGroupName +'&tenantName=' + this.tenantName + '&hostPoolName=' + this.hostPoolName + '&refresh_token=' + sessionStorage.getItem("Refresh_Token") + ' &pageSize=' + this.pageSize + '&sortField=AppGroupName&isDescending=false&initialSkip=' + this.initialSkip + '&lastEntry=' + this.lastEntry;
+    this.getAllAppGroupsListUrl = this._AppService.ApiUrl + '/api/AppGroup/GetAppGroupsList?tenantGroupName=' + this.tenantGroupName + '&tenantName=' + this.tenantName + '&hostPoolName=' + this.hostPoolName + '&refresh_token=' + sessionStorage.getItem("Refresh_Token") + ' &pageSize=' + this.pageSize + '&sortField=AppGroupName&isDescending=false&initialSkip=' + this.initialSkip + '&lastEntry=' + this.lastEntry;
     this._AppService.GetData(this.getAllAppGroupsListUrl).subscribe(response => {
       this.appGroupsList = JSON.parse(response['_body']);
       this.AppGrouppreviousPageNo = this.AppGroupCurrentPageNo;
@@ -1585,7 +1604,7 @@ export class HostpoolDashboardComponent implements OnInit {
     this.appGroupListErrorFound = false;
     this.editedBodyAppGroup = false;
     this.checkedMainAppGroup = false;
-    this.getAllAppGroupsListUrl = this._AppService.ApiUrl + '/api/AppGroup/GetAppGroupsList?tenantGroupName=' + this.tenantGroupName +'&tenantName=' + this.tenantName + '&hostPoolName=' + hostPoolName + '&refresh_token=' + sessionStorage.getItem("Refresh_Token") + ' &pageSize=' + this.pageSize + '&sortField=AppGroupName&isDescending=false&initialSkip=' + this.initialSkip + '&lastEntry=%22%20%22';
+    this.getAllAppGroupsListUrl = this._AppService.ApiUrl + '/api/AppGroup/GetAppGroupsList?tenantGroupName=' + this.tenantGroupName + '&tenantName=' + this.tenantName + '&hostPoolName=' + hostPoolName + '&refresh_token=' + sessionStorage.getItem("Refresh_Token") + ' &pageSize=' + this.pageSize + '&sortField=AppGroupName&isDescending=false&initialSkip=' + this.initialSkip + '&lastEntry=%22%20%22';
     this._AppService.GetData(this.getAllAppGroupsListUrl).subscribe(response => {
       this.appGroupsList = JSON.parse(response['_body']);
       this.refreshHostpoolLoading = false;
@@ -1659,7 +1678,7 @@ export class HostpoolDashboardComponent implements OnInit {
       var index = i;
       if (event.target.checked) {
         this.checked[i] = true;
-        this.appGroupDetails=[];
+        this.appGroupDetails = [];
         this.state = 'down';
       }
       else {
@@ -1674,7 +1693,7 @@ export class HostpoolDashboardComponent implements OnInit {
       }
     }
     if (this.checkedAllTrueAppGroup.length == 1) {
-      this.appGroupDetails=[];
+      this.appGroupDetails = [];
       this.isEditAppgroupDisabled = false;
       this.isDeleteAppgroupDisabled = false;
       this.state = 'up';
@@ -1704,7 +1723,7 @@ export class HostpoolDashboardComponent implements OnInit {
     else {
       this.isEditAppgroupDisabled = true;
       this.isDeleteAppgroupDisabled = true;
-      this.appGroupDetails=[];
+      this.appGroupDetails = [];
       this.state = 'down';
     }
   }
@@ -1730,7 +1749,7 @@ export class HostpoolDashboardComponent implements OnInit {
       }
     }
     if (this.appGroupcheckedTrue.length == 1) {
-      this.appGroupDetails=[];
+      this.appGroupDetails = [];
       this.state = 'up';
       this.isEditAppgroupDisabled = false;
       this.isDeleteAppgroupDisabled = false;
@@ -1998,7 +2017,7 @@ export class HostpoolDashboardComponent implements OnInit {
     this.refreshHostpoolLoading = true;
     for (let i = 0; i < this.selectedAppGroupRows.length; i++) {
       var index = this.selectedAppGroupRows[i];
-      this.appGroupsDeleteUrl = this._AppService.ApiUrl + '/api/AppGroup/Delete?tenantGroupName=' + this.tenantGroupName +'&tenantName=' + this.appGroupsListSearch[index].tenantName + '&hostpoolName=' + this.appGroupsListSearch[index].hostPoolName + '&appgroupName=' + this.appGroupsListSearch[index].appGroupName + '&refresh_token=' + sessionStorage.getItem("Refresh_Token");
+      this.appGroupsDeleteUrl = this._AppService.ApiUrl + '/api/AppGroup/Delete?tenantGroupName=' + this.tenantGroupName + '&tenantName=' + this.appGroupsListSearch[index].tenantName + '&hostpoolName=' + this.appGroupsListSearch[index].hostPoolName + '&appgroupName=' + this.appGroupsListSearch[index].appGroupName + '&refresh_token=' + sessionStorage.getItem("Refresh_Token");
       this._AppService.DeleteAppGroupsList(this.appGroupsDeleteUrl).subscribe(response => {
         this.refreshHostpoolLoading = false;
         var responseData = JSON.parse(response['_body']);
@@ -2082,7 +2101,7 @@ export class HostpoolDashboardComponent implements OnInit {
   public GetAppGroupDetails() {
     this.detailsErrorFound = false;
     this.refreshHostpoolLoading = true;
-    this.getAppGroupDetailsUrl = this._AppService.ApiUrl + '/api/AppGroup/GetAppGroupDetails?tenantGroupName=' + this.tenantGroupName +'&tenantName=' + this.tenantName + '&hostPoolName=' + this.hostPoolName + '&appGroupName=' + this.selectedAppGroupName + '&refresh_token=' + sessionStorage.getItem("Refresh_Token");
+    this.getAppGroupDetailsUrl = this._AppService.ApiUrl + '/api/AppGroup/GetAppGroupDetails?tenantGroupName=' + this.tenantGroupName + '&tenantName=' + this.tenantName + '&hostPoolName=' + this.hostPoolName + '&appGroupName=' + this.selectedAppGroupName + '&refresh_token=' + sessionStorage.getItem("Refresh_Token");
     this._AppService.GetData(this.getAppGroupDetailsUrl).subscribe(response => {
       this.appGroupDetails = JSON.parse(response['_body']);
       this.appsCount = this.appGroupDetails.noOfApps;
@@ -2113,7 +2132,7 @@ export class HostpoolDashboardComponent implements OnInit {
     this.checkedMainUser = false;
     this.usersListErrorFound = false;
     this.refreshHostpoolLoading = true;
-    this.getAppGroupUserUrl = this._AppService.ApiUrl + '/api/AppGroup/GetUsersList?tenantGroupName=' + this.tenantGroupName +'&tenantName=' + this.tenantName + '&hostPoolName=' + this.hostPoolName + '&appGroupName=' + this.selectedAppGroupName + '&refresh_token=' + sessionStorage.getItem("Refresh_Token") + '&pageSize=' + this.pageSize + '&sortField=UserPrincipalName&isDescending=false&initialSkip=' + this.usersInitialSkip + '&lastEntry=' + this.usersLastEntry;
+    this.getAppGroupUserUrl = this._AppService.ApiUrl + '/api/AppGroup/GetUsersList?tenantGroupName=' + this.tenantGroupName + '&tenantName=' + this.tenantName + '&hostPoolName=' + this.hostPoolName + '&appGroupName=' + this.selectedAppGroupName + '&refresh_token=' + sessionStorage.getItem("Refresh_Token") + '&pageSize=' + this.pageSize + '&sortField=UserPrincipalName&isDescending=false&initialSkip=' + this.usersInitialSkip + '&lastEntry=' + this.usersLastEntry;
     this._AppService.GetData(this.getAppGroupUserUrl).subscribe(response => {
       this.appUsersList = JSON.parse(response['_body']);
       if (this.appUsersList) {
@@ -2147,7 +2166,7 @@ export class HostpoolDashboardComponent implements OnInit {
     this.isDeleteUserDisabled = true;
   }
 
-  
+
   /* This function is used to  loads all the Users into table on click of Previous button in the table */
   public usersPreviousPage() {
     this.checkedUsers = [];
@@ -2156,40 +2175,40 @@ export class HostpoolDashboardComponent implements OnInit {
     this.refreshHostpoolLoading = true;
     this.usersLastEntry = this.appUsersList[0].userPrincipalName;
     this.usersCurentIndex = this.usersCurentIndex - 1;
-    this.getAppGroupUserUrl = this._AppService.ApiUrl + '/api/AppGroup/GetUsersList?tenantGroupName=' + this.tenantGroupName +'&tenantName=' + this.tenantName + '&hostPoolName=' + this.hostPoolName + '&appGroupName=' + this.selectedAppGroupName + '&refresh_token=' + sessionStorage.getItem("Refresh_Token") + '&pageSize=' + this.pageSize + '&sortField=UserPrincipalName&isDescending=true&initialSkip=' + this.usersInitialSkip + '&lastEntry=' + this.usersLastEntry;
-  this._AppService.GetData(this.getAppGroupUserUrl).subscribe(response => {
-    this.appUsersList = JSON.parse(response['_body']);
-    this.usersPreviousPageNo = this.usersCurrentPageNo;
-    this.usersCurrentPageNo = this.usersCurrentPageNo - 1;
-    if (this.appUsersList) {
-      if (this.appUsersList.code == "Invalid Token") {
-        sessionStorage.clear();
-        this.router.navigate(['/invalidtokenmessage']);
+    this.getAppGroupUserUrl = this._AppService.ApiUrl + '/api/AppGroup/GetUsersList?tenantGroupName=' + this.tenantGroupName + '&tenantName=' + this.tenantName + '&hostPoolName=' + this.hostPoolName + '&appGroupName=' + this.selectedAppGroupName + '&refresh_token=' + sessionStorage.getItem("Refresh_Token") + '&pageSize=' + this.pageSize + '&sortField=UserPrincipalName&isDescending=true&initialSkip=' + this.usersInitialSkip + '&lastEntry=' + this.usersLastEntry;
+    this._AppService.GetData(this.getAppGroupUserUrl).subscribe(response => {
+      this.appUsersList = JSON.parse(response['_body']);
+      this.usersPreviousPageNo = this.usersCurrentPageNo;
+      this.usersCurrentPageNo = this.usersCurrentPageNo - 1;
+      if (this.appUsersList) {
+        if (this.appUsersList.code == "Invalid Token") {
+          sessionStorage.clear();
+          this.router.navigate(['/invalidtokenmessage']);
+        }
       }
-    }
-    this.GetcurrentNoOfUsersPagesCount(this.usersCount);
-    this.appUsersListSearch = JSON.parse(response['_body']);
-    if (this.appUsersListSearch.length == 0) {
-      this.editedLbodyUsers = true;
-      this.editedBodyUsers = false;
-    }
-    else {
-      if (this.appUsersListSearch[0].Message == null) {
-        this.editedBodyUsers = true;
-        this.editedLbodyUsers = false;
+      this.GetcurrentNoOfUsersPagesCount(this.usersCount);
+      this.appUsersListSearch = JSON.parse(response['_body']);
+      if (this.appUsersListSearch.length == 0) {
+        this.editedLbodyUsers = true;
+        this.editedBodyUsers = false;
       }
-    }
-    this.refreshHostpoolLoading = false;
-  },
-    /*
-     * If Any Error (or) Problem With Services (or) Problem in internet this Error Block Will Exequte
-     */
-    (error) => {
-      this.usersListErrorFound = true;
+      else {
+        if (this.appUsersListSearch[0].Message == null) {
+          this.editedBodyUsers = true;
+          this.editedLbodyUsers = false;
+        }
+      }
       this.refreshHostpoolLoading = false;
-    }
-  );
-  this.isDeleteUserDisabled = true;
+    },
+      /*
+       * If Any Error (or) Problem With Services (or) Problem in internet this Error Block Will Exequte
+       */
+      (error) => {
+        this.usersListErrorFound = true;
+        this.refreshHostpoolLoading = false;
+      }
+    );
+    this.isDeleteUserDisabled = true;
   }
 
   /* This function is used to  loads all the Users into table on click of Current page number values  in the table
@@ -2216,7 +2235,7 @@ export class HostpoolDashboardComponent implements OnInit {
       this.usersIsDescending = true;
       this.usersLastEntry = this.appUsersList[0].userPrincipalName;
     }
-    this.getAppGroupUserUrl = this._AppService.ApiUrl + '/api/AppGroup/GetUsersList?tenantGroupName=' + this.tenantGroupName +'&tenantName=' + this.tenantName + '&hostPoolName=' + this.hostPoolName + '&appGroupName=' + this.selectedAppGroupName + '&refresh_token=' + sessionStorage.getItem("Refresh_Token") + '&pageSize=' + this.pageSize + '&sortField=UserPrincipalName&isDescending=' + this.usersIsDescending +'&initialSkip=' + this.usersInitialSkip + '&lastEntry=' + this.usersLastEntry;
+    this.getAppGroupUserUrl = this._AppService.ApiUrl + '/api/AppGroup/GetUsersList?tenantGroupName=' + this.tenantGroupName + '&tenantName=' + this.tenantName + '&hostPoolName=' + this.hostPoolName + '&appGroupName=' + this.selectedAppGroupName + '&refresh_token=' + sessionStorage.getItem("Refresh_Token") + '&pageSize=' + this.pageSize + '&sortField=UserPrincipalName&isDescending=' + this.usersIsDescending + '&initialSkip=' + this.usersInitialSkip + '&lastEntry=' + this.usersLastEntry;
     this._AppService.GetData(this.getAppGroupUserUrl).subscribe(response => {
       this.appUsersList = JSON.parse(response['_body']);
       if (this.appUsersList) {
@@ -2249,7 +2268,7 @@ export class HostpoolDashboardComponent implements OnInit {
     this.isDeleteUserDisabled = true;
   }
 
-  
+
 
   /* This function is used to  loads all the Users into table on click of Next button in the table */
   public usersNextPage() {
@@ -2259,39 +2278,39 @@ export class HostpoolDashboardComponent implements OnInit {
     this.refreshHostpoolLoading = true;
     this.usersLastEntry = this.appUsersList[this.appUsersList.length - 1].userPrincipalName;
     this.usersCurentIndex = this.usersCurentIndex + 1;
-    this.getAppGroupUserUrl = this._AppService.ApiUrl + '/api/AppGroup/GetUsersList?tenantGroupName=' + this.tenantGroupName +'&tenantName=' + this.tenantName + '&hostPoolName=' + this.hostPoolName + '&appGroupName=' + this.selectedAppGroupName + '&refresh_token=' + sessionStorage.getItem("Refresh_Token") + '&pageSize=' + this.pageSize + '&sortField=UserPrincipalName&isDescending=false&initialSkip=' + this.usersInitialSkip + '&lastEntry=' + this.usersLastEntry;
-  this._AppService.GetData(this.getAppGroupUserUrl).subscribe(response => {
-    this.appUsersList = JSON.parse(response['_body']);
-    this.usersPreviousPageNo = this.usersCurrentPageNo;
-    this.usersCurrentPageNo = this.usersCurrentPageNo + 1;
-    if (this.appUsersList) {
-      if (this.appUsersList.code == "Invalid Token") {
-        sessionStorage.clear();
-        this.router.navigate(['/invalidtokenmessage']);
+    this.getAppGroupUserUrl = this._AppService.ApiUrl + '/api/AppGroup/GetUsersList?tenantGroupName=' + this.tenantGroupName + '&tenantName=' + this.tenantName + '&hostPoolName=' + this.hostPoolName + '&appGroupName=' + this.selectedAppGroupName + '&refresh_token=' + sessionStorage.getItem("Refresh_Token") + '&pageSize=' + this.pageSize + '&sortField=UserPrincipalName&isDescending=false&initialSkip=' + this.usersInitialSkip + '&lastEntry=' + this.usersLastEntry;
+    this._AppService.GetData(this.getAppGroupUserUrl).subscribe(response => {
+      this.appUsersList = JSON.parse(response['_body']);
+      this.usersPreviousPageNo = this.usersCurrentPageNo;
+      this.usersCurrentPageNo = this.usersCurrentPageNo + 1;
+      if (this.appUsersList) {
+        if (this.appUsersList.code == "Invalid Token") {
+          sessionStorage.clear();
+          this.router.navigate(['/invalidtokenmessage']);
+        }
       }
-    }
-    this.appUsersListSearch = JSON.parse(response['_body']);
-    if (this.appUsersListSearch.length == 0) {
-      this.editedLbodyUsers = true;
-      this.editedBodyUsers = false;
-    }
-    else {
-      if (this.appUsersListSearch[0].Message == null) {
-        this.editedBodyUsers = true;
-        this.editedLbodyUsers = false;
+      this.appUsersListSearch = JSON.parse(response['_body']);
+      if (this.appUsersListSearch.length == 0) {
+        this.editedLbodyUsers = true;
+        this.editedBodyUsers = false;
       }
-    }
-    this.refreshHostpoolLoading = false;
-  },
-    /*
-     * If Any Error (or) Problem With Services (or) Problem in internet this Error Block Will Exequte
-     */
-    (error) => {
-      this.usersListErrorFound = true;
+      else {
+        if (this.appUsersListSearch[0].Message == null) {
+          this.editedBodyUsers = true;
+          this.editedLbodyUsers = false;
+        }
+      }
       this.refreshHostpoolLoading = false;
-    }
-  );
-  this.isDeleteUserDisabled = true;
+    },
+      /*
+       * If Any Error (or) Problem With Services (or) Problem in internet this Error Block Will Exequte
+       */
+      (error) => {
+        this.usersListErrorFound = true;
+        this.refreshHostpoolLoading = false;
+      }
+    );
+    this.isDeleteUserDisabled = true;
   };
 
   /*
@@ -2544,7 +2563,7 @@ export class HostpoolDashboardComponent implements OnInit {
     for (let i = 0; i < this.selectedUsersRows.length; i++) {
       let index = this.selectedUsersRows[i];
       let selectedUserName = this.appUsersListSearch[index].userPrincipalName
-      this.usersDeleteUrl = this._AppService.ApiUrl + '/api/AppGroup/DeleteAssignedUser?tenantGroupName=' + this.tenantGroupName +'&tenantName=' + this.tenantName + '&hostPoolName=' + this.hostPoolName + '&appGroupName=' + this.selectedAppGroupName + '&appGroupUser=' + this.appUsersListSearch[index].userPrincipalName + '&refresh_token=' + sessionStorage.getItem("Refresh_Token");
+      this.usersDeleteUrl = this._AppService.ApiUrl + '/api/AppGroup/DeleteAssignedUser?tenantGroupName=' + this.tenantGroupName + '&tenantName=' + this.tenantName + '&hostPoolName=' + this.hostPoolName + '&appGroupName=' + this.selectedAppGroupName + '&appGroupUser=' + this.appUsersListSearch[index].userPrincipalName + '&refresh_token=' + sessionStorage.getItem("Refresh_Token");
       this._AppService.DeleteUsersList(this.usersDeleteUrl).subscribe(response => {
         this.refreshHostpoolLoading = false;
         var responseData = JSON.parse(response['_body']);
@@ -2663,7 +2682,7 @@ export class HostpoolDashboardComponent implements OnInit {
     this.refreshHostpoolLoading = true;
     this.appsLastEntry = this.appGroupAppList[0].remoteAppName;
     this.appsCurentIndex = this.appsCurentIndex - 1;
-    this.getAppGroupAppsUrl = this._AppService.ApiUrl + '/api/RemoteApp/GetRemoteAppList?tenantGroupName=' + this.tenantGroupName +'&tenantName=' + this.tenantName + '&hostPoolName=' + this.hostPoolName + '&appGroupName=' + this.selectedAppGroupName + '&refresh_token=' + sessionStorage.getItem("Refresh_Token") + '&pageSize=' + this.pageSize + '&sortField=RemoteAppName&isDescending=true&initialSkip=' + this.appsInitialSkip + '&lastEntry=' + this.appsLastEntry;
+    this.getAppGroupAppsUrl = this._AppService.ApiUrl + '/api/RemoteApp/GetRemoteAppList?tenantGroupName=' + this.tenantGroupName + '&tenantName=' + this.tenantName + '&hostPoolName=' + this.hostPoolName + '&appGroupName=' + this.selectedAppGroupName + '&refresh_token=' + sessionStorage.getItem("Refresh_Token") + '&pageSize=' + this.pageSize + '&sortField=RemoteAppName&isDescending=true&initialSkip=' + this.appsInitialSkip + '&lastEntry=' + this.appsLastEntry;
     this._AppService.GetData(this.getAppGroupAppsUrl).subscribe(response => {
       this.appsPreviousPageNo = this.appsCurrentPageNo;
       this.appsCurrentPageNo = this.appsCurrentPageNo - 1;
@@ -2724,7 +2743,7 @@ export class HostpoolDashboardComponent implements OnInit {
       this.appsIsDescending = true;
       this.appsLastEntry = this.appGroupAppList[0].remoteAppName;
     }
-    this.getAppGroupAppsUrl = this._AppService.ApiUrl + '/api/RemoteApp/GetRemoteAppList?tenantGroupName=' + this.tenantGroupName +'&tenantName=' + this.tenantName + '&hostPoolName=' + this.hostPoolName + '&appGroupName=' + this.selectedAppGroupName + '&refresh_token=' + sessionStorage.getItem("Refresh_Token") + '&pageSize=' + this.pageSize + '&sortField=RemoteAppName&isDescending=' + this.appsIsDescending + '&initialSkip=' + this.appsInitialSkip + '&lastEntry=' + this.appsLastEntry;
+    this.getAppGroupAppsUrl = this._AppService.ApiUrl + '/api/RemoteApp/GetRemoteAppList?tenantGroupName=' + this.tenantGroupName + '&tenantName=' + this.tenantName + '&hostPoolName=' + this.hostPoolName + '&appGroupName=' + this.selectedAppGroupName + '&refresh_token=' + sessionStorage.getItem("Refresh_Token") + '&pageSize=' + this.pageSize + '&sortField=RemoteAppName&isDescending=' + this.appsIsDescending + '&initialSkip=' + this.appsInitialSkip + '&lastEntry=' + this.appsLastEntry;
     this._AppService.GetData(this.getAppGroupAppsUrl).subscribe(response => {
       this.appGroupAppList = JSON.parse(response['_body']);
       if (this.appGroupAppList) {
@@ -2767,7 +2786,7 @@ export class HostpoolDashboardComponent implements OnInit {
     this.refreshHostpoolLoading = true;
     this.appsLastEntry = this.appGroupAppList[this.appGroupAppList.length - 1].remoteAppName;
     this.appsCurentIndex = this.appsCurentIndex + 1;
-    this.getAppGroupAppsUrl = this._AppService.ApiUrl + '/api/RemoteApp/GetRemoteAppList?tenantGroupName=' + this.tenantGroupName +'&tenantName=' + this.tenantName + '&hostPoolName=' + this.hostPoolName + '&appGroupName=' + this.selectedAppGroupName + '&refresh_token=' + sessionStorage.getItem("Refresh_Token") + '&pageSize=' + this.pageSize + '&sortField=RemoteAppName&isDescending=false&initialSkip=' + this.appsInitialSkip + '&lastEntry=' + this.appsLastEntry;
+    this.getAppGroupAppsUrl = this._AppService.ApiUrl + '/api/RemoteApp/GetRemoteAppList?tenantGroupName=' + this.tenantGroupName + '&tenantName=' + this.tenantName + '&hostPoolName=' + this.hostPoolName + '&appGroupName=' + this.selectedAppGroupName + '&refresh_token=' + sessionStorage.getItem("Refresh_Token") + '&pageSize=' + this.pageSize + '&sortField=RemoteAppName&isDescending=false&initialSkip=' + this.appsInitialSkip + '&lastEntry=' + this.appsLastEntry;
     this._AppService.GetData(this.getAppGroupAppsUrl).subscribe(response => {
       this.appGroupAppList = JSON.parse(response['_body']);
       this.appsPreviousPageNo = this.appsCurrentPageNo;
@@ -2812,7 +2831,7 @@ export class HostpoolDashboardComponent implements OnInit {
     this.checkedMainApp = false;
     this.appListErrorFound = false;
     this.refreshHostpoolLoading = true;
-    this.getAppGroupAppsUrl = this._AppService.ApiUrl + '/api/RemoteApp/GetRemoteAppList?tenantGroupName=' + this.tenantGroupName +'&tenantName=' + this.tenantName + '&hostPoolName=' + this.hostPoolName + '&appGroupName=' + this.selectedAppGroupName + '&refresh_token=' + sessionStorage.getItem("Refresh_Token") + '&pageSize=' + this.pageSize + '&sortField=RemoteAppName&isDescending=false&initialSkip=' + this.appsInitialSkip + '&lastEntry=' + this.appsLastEntry;
+    this.getAppGroupAppsUrl = this._AppService.ApiUrl + '/api/RemoteApp/GetRemoteAppList?tenantGroupName=' + this.tenantGroupName + '&tenantName=' + this.tenantName + '&hostPoolName=' + this.hostPoolName + '&appGroupName=' + this.selectedAppGroupName + '&refresh_token=' + sessionStorage.getItem("Refresh_Token") + '&pageSize=' + this.pageSize + '&sortField=RemoteAppName&isDescending=false&initialSkip=' + this.appsInitialSkip + '&lastEntry=' + this.appsLastEntry;
     this._AppService.GetData(this.getAppGroupAppsUrl).subscribe(response => {
       this.appGroupAppList = JSON.parse(response['_body']);
       if (this.appGroupAppList) {
@@ -2853,7 +2872,7 @@ export class HostpoolDashboardComponent implements OnInit {
    */
   public GetAllAppGroupAppsGallery() {
     this.galleryAppLoader = true;
-    this.getAllAppGroupAppsGalleryUrl = this._AppService.ApiUrl + '/api/AppGroup/GetStartMenuAppsList?tenantGroupName=' + this.tenantGroupName +'&tenantName=' + this.tenantName + '&appGroupName=' + this.selectedAppGroupName + '&hostPoolName=' + this.hostPoolName + '&refresh_token=' + sessionStorage.getItem("Refresh_Token") + '&pageSize=10&sortField=AppAlias&isDescending=false&initialSkip=0';
+    this.getAllAppGroupAppsGalleryUrl = this._AppService.ApiUrl + '/api/AppGroup/GetStartMenuAppsList?tenantGroupName=' + this.tenantGroupName + '&tenantName=' + this.tenantName + '&appGroupName=' + this.selectedAppGroupName + '&hostPoolName=' + this.hostPoolName + '&refresh_token=' + sessionStorage.getItem("Refresh_Token") + '&pageSize=10&sortField=AppAlias&isDescending=false&initialSkip=0';
     this._AppService.GetData(this.getAllAppGroupAppsGalleryUrl).subscribe(response => {
       this.GAppslist = false;
       this.appGroupAppListGallery = JSON.parse(response['_body']);
@@ -3003,7 +3022,7 @@ export class HostpoolDashboardComponent implements OnInit {
    */
   public AppListRowClicked(remoteAppName: any, appInd: any) {
     this.IsCheckedApp(appInd);
-   
+
     this.isDeleteAppsDisabled = false;
     this.selectedRemoteappName = '';
     this.appCheckedTrue = [];
@@ -3089,10 +3108,11 @@ export class HostpoolDashboardComponent implements OnInit {
     if (this.checkedAllTrueApps.length >= 1) {
       /*If the selected checkbox length=1 then this block of code executes to show the selected remoteapp name */
       if (this.checkedAllTrueApps.length == 1) {
+        this.isDeleteAppsDisabled = false;
         this.deleteCountSelectedApp = this.appGroupsAppListSearch[index].remoteAppName;
       }
       else {
-        this.isDeleteAppsDisabled = false;
+        this.isDeleteAppsDisabled = true;
         this.deleteCountSelectedApp = this.checkedAllTrueApps.length;
       }
     }
@@ -3170,7 +3190,7 @@ export class HostpoolDashboardComponent implements OnInit {
       "requiredCommandLine": null,
       "showInWebFeed": true,
       "refresh_token": sessionStorage.getItem("Refresh_Token"),
-      
+
     };
     this.createappGroupApps = this._AppService.ApiUrl + '/api/RemoteApp/Post';
     this._AppService.CreateAppGroup(this.createappGroupApps, AppdataRds).subscribe(response => {
@@ -3360,7 +3380,7 @@ export class HostpoolDashboardComponent implements OnInit {
     this.refreshHostpoolLoading = true;
     for (let i = 0; i < this.selectedAppRows.length; i++) {
       var index = this.selectedAppRows[i];
-      this.appGroupCreateUrl = this._AppService.ApiUrl + '/api/RemoteApp/Delete?tenantGroupName=' + this.tenantGroupName +'&tenantName=' + this.appGroupsAppListSearch[index].tenantName + '&hostPoolName=' + this.appGroupsAppListSearch[index].hostPoolName + '&appGroupName=' + this.appGroupsAppListSearch[index].appGroupName + '&remoteAppName=' + this.appGroupsAppListSearch[index].remoteAppName + '&refresh_token=' + sessionStorage.getItem("Refresh_Token");
+      this.appGroupCreateUrl = this._AppService.ApiUrl + '/api/RemoteApp/Delete?tenantGroupName=' + this.tenantGroupName + '&tenantName=' + this.appGroupsAppListSearch[index].tenantName + '&hostPoolName=' + this.appGroupsAppListSearch[index].hostPoolName + '&appGroupName=' + this.appGroupsAppListSearch[index].appGroupName + '&remoteAppName=' + this.appGroupsAppListSearch[index].remoteAppName + '&refresh_token=' + sessionStorage.getItem("Refresh_Token");
       this._AppService.RemoveRemoteApps(this.appGroupCreateUrl).subscribe(response => {
         this.refreshHostpoolLoading = false;
         var responseData = JSON.parse(response['_body']);
