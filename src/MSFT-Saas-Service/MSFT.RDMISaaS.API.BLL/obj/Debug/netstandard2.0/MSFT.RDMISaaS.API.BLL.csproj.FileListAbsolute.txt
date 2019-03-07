@@ -1,0 +1,12 @@
+E:\Repos\msft-rdmi-saas\src\MSFT-Saas-Service\MSFT.RDMISaaS.API.BLL\bin\Debug\netstandard2.0\MSFT.RDMISaaS.API.BLL.deps.json
+E:\Repos\msft-rdmi-saas\src\MSFT-Saas-Service\MSFT.RDMISaaS.API.BLL\bin\Debug\netstandard2.0\MSFT.RDMISaaS.API.BLL.dll
+E:\Repos\msft-rdmi-saas\src\MSFT-Saas-Service\MSFT.RDMISaaS.API.BLL\bin\Debug\netstandard2.0\MSFT.RDMISaaS.API.BLL.pdb
+E:\Repos\msft-rdmi-saas\src\MSFT-Saas-Service\MSFT.RDMISaaS.API.BLL\bin\Debug\netstandard2.0\MSFT.RDMISaaS.API.Model.dll
+E:\Repos\msft-rdmi-saas\src\MSFT-Saas-Service\MSFT.RDMISaaS.API.BLL\bin\Debug\netstandard2.0\MSFT.RDMISaaS.API.Model.pdb
+E:\Repos\msft-rdmi-saas\src\MSFT-Saas-Service\MSFT.RDMISaaS.API.BLL\obj\Debug\netstandard2.0\MSFT.RDMISaaS.API.BLL.csprojAssemblyReference.cache
+E:\Repos\msft-rdmi-saas\src\MSFT-Saas-Service\MSFT.RDMISaaS.API.BLL\obj\Debug\netstandard2.0\MSFT.RDMISaaS.API.BLL.csproj.CoreCompileInputs.cache
+E:\Repos\msft-rdmi-saas\src\MSFT-Saas-Service\MSFT.RDMISaaS.API.BLL\obj\Debug\netstandard2.0\MSFT.RDMISaaS.API.BLL.AssemblyInfoInputs.cache
+E:\Repos\msft-rdmi-saas\src\MSFT-Saas-Service\MSFT.RDMISaaS.API.BLL\obj\Debug\netstandard2.0\MSFT.RDMISaaS.API.BLL.AssemblyInfo.cs
+E:\Repos\msft-rdmi-saas\src\MSFT-Saas-Service\MSFT.RDMISaaS.API.BLL\obj\Debug\netstandard2.0\MSFT.RDMISaaS.API.BLL.csproj.CopyComplete
+E:\Repos\msft-rdmi-saas\src\MSFT-Saas-Service\MSFT.RDMISaaS.API.BLL\obj\Debug\netstandard2.0\MSFT.RDMISaaS.API.BLL.dll
+E:\Repos\msft-rdmi-saas\src\MSFT-Saas-Service\MSFT.RDMISaaS.API.BLL\obj\Debug\netstandard2.0\MSFT.RDMISaaS.API.BLL.pdb
