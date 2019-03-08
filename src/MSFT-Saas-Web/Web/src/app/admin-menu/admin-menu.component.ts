@@ -63,7 +63,8 @@ export class AdminMenuComponent {
   public GetAllTenantsList() {
     //let tenantGroupName = sessionStorage.getItem("TenantGroupName");
     let refreshToken = sessionStorage.getItem("Refresh_Token");
-    let getTenantsUrl = this.appService.ApiUrl + '/api/Tenant/GetAllTenants?tenantGroupName=' + this.tenantGroupName + '&refresh_token=' + refreshToken;
+    //let getTenantsUrl = this.appService.ApiUrl + '/api/Tenant/GetAllTenants?tenantGroupName=' + this.tenantGroupName + '&refresh_token=' + refreshToken;
+    let getTenantsUrl = 'https://rdbroker.wvd.microsoft.com/RdsManagement/V1/TenantGroups/Default Tenant Group/Tenants';
     this.appService.GetTenants(getTenantsUrl).subscribe(response => {
       let responseObject = JSON.parse(response['_body']);
       this.GetAllTenants(responseObject);

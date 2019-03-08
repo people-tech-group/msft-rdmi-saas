@@ -1,9 +1,10 @@
 import { BrowserModule } from '@angular/platform-browser';
-import { NgModule } from '@angular/core';
+import { NgModule, Component } from '@angular/core';
 import { AppComponent } from './app.component';
 import { FormsModule } from '@angular/forms';
 import { ReactiveFormsModule } from '@angular/forms'; //This is for Model driven form
 import { HttpModule } from '@angular/http';
+import { HttpClientModule } from '@angular/common/http';
 import { RouterModule } from "@angular/router";
 import * as $ from 'jquery';
 import { AdminMenuComponent } from './admin-menu/admin-menu.component';
@@ -21,8 +22,11 @@ import { LocationStrategy, HashLocationStrategy } from '@angular/common';
 import { ClipboardModule } from 'ngx-clipboard';
 import { ClickOutsideModule } from 'ng-click-outside';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { AdalService, AdalGuard, AdalInterceptor } from 'adal-angular4';
 import { NgxPaginationModule } from 'ngx-pagination';
 import { InvalidtokenmessageComponent } from './invalidtokenmessage/invalidtokenmessage.component';
+import { HTTP_INTERCEPTORS } from '@angular/common/http';
+import { PostloginComponent } from './postlogin/postlogin.component';
 
 /* getting redirectURL from Session storage */
 var redirectUri = sessionStorage.getItem('redirectUri');
@@ -49,7 +53,8 @@ if (window.location.href != redirectUri) {
     HostpoolDashboardComponent,
     SearchPipe,
     BreadcrumComponent,
-    InvalidtokenmessageComponent
+    InvalidtokenmessageComponent,
+    PostloginComponent
   ],
   imports: [
     BrowserModule,
@@ -57,43 +62,49 @@ if (window.location.href != redirectUri) {
     ClickOutsideModule,
     ReactiveFormsModule,
     HttpModule,
+    HttpClientModule,
     LoadersCssModule,
     SimpleNotificationsModule,
     MyDatePickerModule,
     ClipboardModule,
     BrowserAnimationsModule,
     NgxPaginationModule,
+
     RouterModule.forRoot([
+      {
+        path: 'postlogin',
+        component: PostloginComponent
+      },
       {
         path: 'invalidtokenmessage',
         component: InvalidtokenmessageComponent,
-        canActivate: [AuthGuard]
+        
       },
       {
         path: 'admin',
         component: AdminMenuComponent,
-        canActivate: [AuthGuard],
+        canActivate: [AdalGuard],
         children: [
           {
             path: 'Tenants',
             component: DeploymentDashboardComponent,
-            canActivate: [AuthGuard]
+            canActivate: [AdalGuard]
           },
           {
             path: 'tenantDashboard/:tenantName',
             component: TenantDashboardComponent,
-            canActivate: [AuthGuard]
+            canActivate: [AdalGuard]
           },
           {
             path: 'hostpoolDashboard/:hostpoolName',
             component: HostpoolDashboardComponent,
-            canActivate: [AuthGuard]
+            canActivate: [AdalGuard]
           },
         ]
       }
     ])
   ],
-  providers: [AppService, AuthGuard, NotificationsService, BreadcrumComponent],
+  providers: [AppService, AuthGuard, NotificationsService, BreadcrumComponent, AdalService, AdalGuard, { provide: HTTP_INTERCEPTORS, useClass: AdalInterceptor, multi: true }],
   bootstrap: [AppComponent]
 })
 export class AppModule {

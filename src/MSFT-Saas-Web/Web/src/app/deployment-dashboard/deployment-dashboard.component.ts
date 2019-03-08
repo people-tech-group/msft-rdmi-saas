@@ -495,7 +495,9 @@ export class DeploymentDashboardComponent implements OnInit {
     this.refreshToken = sessionStorage.getItem("Refresh_Token");
     this.refreshTenantLoading = true;
     this.tenantlistErrorFound = false;
-    this.getTenantsUrl = this._AppService.ApiUrl + '/api/Tenant/GetTenantList?tenantGroupName=' + this.tenantGroupName + '&refresh_token=' + this.refreshToken + '&pageSize=' + this.pageSize + '&sortField=TenantName&isDescending=false&initialSkip=' + this.initialSkip + '&lastEntry=' + this.lastEntry;
+    //this.getTenantsUrl = this._AppService.ApiUrl + '/api/Tenant/GetTenantList?tenantGroupName=' + this.tenantGroupName + '&refresh_token=' + this.refreshToken + '&pageSize=' + this.pageSize + '&sortField=TenantName&isDescending=false&initialSkip=' + this.initialSkip + '&lastEntry=' + this.lastEntry;
+    this.getTenantsUrl = 'https://rdbroker.wvd.microsoft.com/RdsManagement/V1/TenantGroups/Default Tenant Group/Tenants'
+
     this._AppService.GetTenants(this.getTenantsUrl).subscribe(response => {
       let responseObject = JSON.parse(response['_body']);
       this.ShowTenantgroupError = false;

@@ -23,6 +23,7 @@
     "@angular/router": "^4.2.4",
     "@ngui/popup": "^0.5.1",
     "@types/file-saver": "0.0.1",
+    "adal-angular4": "^2.0.16",
     "angular2-loaders-css": "^1.0.9",
     "angular2-notifications": "^0.7.7",
     "core-js": "^2.4.1",

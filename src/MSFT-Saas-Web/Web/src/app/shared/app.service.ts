@@ -1,14 +1,16 @@
 import { Injectable } from "@angular/core";
-import { Http, RequestOptions, Headers } from "@angular/http";
+import { HttpClient} from "@angular/common/http";
+import { RequestOptions, Headers } from "@angular/http";
 import { Observable } from "rxjs";
-
+import { adalConfig } from "./configuration"
+import { AdalService } from 'adal-angular4';
 @Injectable()
 export class AppService {
   public ApiEndpoint: any;
   public ApiUrl: string;
-  constructor(private http: Http) {
-    this.ApiUrl = "https://msftrdmisaasapi.azurewebsites.net";
-  //this.ApiUrl = "http://localhost:34816/";
+  constructor(private http: HttpClient) {
+    // this.ApiUrl = "https://msftrdmisaasapi.azurewebsites.net";
+    this.ApiUrl = "http://localhost:34816/";
   }
 
   /*
@@ -19,23 +21,23 @@ export class AppService {
    * ----------
    */
   public DeleteTenantService(tenantDeleteurl: any) {
-    let headers = new Headers({ 'Accept': 'application/json', 'Authorization': sessionStorage.getItem('Code') });
+    let headers = new Headers({ 'Accept': 'application/json'});
     let options = new RequestOptions({ headers: headers });
-    return this.http.delete(tenantDeleteurl, options)
+    return this.http.delete(tenantDeleteurl)
       .catch((error: any) => Observable.throw(error));
   }
 
-   /*
-   * This Function is used to make Service call to get tenants list
-   * ----------
-   * Parameters
-   * tenantDetailsList - Accepts the Get Tenant URL
-   * ----------
-   */
+  /*
+  * This Function is used to make Service call to get tenants list
+  * ----------
+  * Parameters
+  * tenantDetailsList - Accepts the Get Tenant URL
+  * ----------
+  */
   public GetTenants(tenantDetailsList: any) {
     let headers = new Headers({ 'Accept': 'application/json' });
     let options = new RequestOptions({ headers: headers });
-    return this.http.get(tenantDetailsList, options)
+    return this.http.get(tenantDetailsList)
       .catch((error: any) => Observable.throw(error));
   }
   /*
@@ -48,7 +50,7 @@ export class AppService {
   public GetTenantDetails(tenantDetails: any) {
     let headers = new Headers({ 'Accept': 'application/json' });
     let options = new RequestOptions({ headers: headers });
-    return this.http.get(tenantDetails, options)
+    return this.http.get(tenantDetails)
       .catch((error: any) => Observable.throw(error));
   }
 
@@ -60,23 +62,23 @@ export class AppService {
 * ----------
 */
   public GetHostpools(hostpoolsList: any) {
-    let headers = new Headers({ 'Accept': 'application/json', 'Access-Control-Allow-Origin': '*'  });
+    let headers = new Headers({ 'Accept': 'application/json', 'Access-Control-Allow-Origin': '*' });
     let options = new RequestOptions({ headers: headers });
-    return this.http.get(hostpoolsList, options)
+    return this.http.get(hostpoolsList)
       .catch((error: any) => Observable.throw(error));
   }
 
- /*
-* This Function is used to make Service calls to get in hostpool dashboard
-* ----------
-* Parameters
-* url - Accepts the Get Hostpool URL
-* ----------
-*/
+  /*
+ * This Function is used to make Service calls to get in hostpool dashboard
+ * ----------
+ * Parameters
+ * url - Accepts the Get Hostpool URL
+ * ----------
+ */
   public GetData(url: any) {
     let headers = new Headers({ 'Accept': 'application/json' });
     let options = new RequestOptions({ headers: headers });
-    return this.http.get(url, options)
+    return this.http.get(url)
       .catch((error: any) => Observable.throw(error));
   }
 
@@ -90,7 +92,7 @@ export class AppService {
   public DeleteHostService(hostDeleteurl: any) {
     let headers = new Headers({ 'Accept': 'application/json', 'Authorization': sessionStorage.getItem('Code') });
     let options = new RequestOptions({ headers: headers });
-    return this.http.delete(hostDeleteurl, options)
+    return this.http.delete(hostDeleteurl)
       .catch((error: any) => Observable.throw(error));
   }
 
@@ -107,7 +109,7 @@ export class AppService {
     }
     let headers = new Headers({ 'Content-Type': 'application/json;charset=utf8', 'Accept': 'application/json' });
     let options = new RequestOptions({ headers: headers });
-    return this.http.post(tenanturl, JSON.stringify(data), options)
+    return this.http.post(tenanturl, JSON.stringify(data))
       .catch((error: any) => Observable.throw(error));
   }
 
@@ -124,7 +126,7 @@ export class AppService {
     }
     let headers = new Headers({ 'Content-Type': 'application/json;charset=utf8', 'Accept': 'application/json' });
     let options = new RequestOptions({ headers: headers });
-    return this.http.post(hosturl, JSON.stringify(data), options)
+    return this.http.post(hosturl, JSON.stringify(data))
       .catch((error: any) => Observable.throw(error));
   }
 
@@ -138,7 +140,7 @@ export class AppService {
   public UpdateTenant(updatetenanturl: any, data) {
     let headers = new Headers({ 'Content-Type': 'application/json;charset=utf8', 'Accept': 'application/json' });
     let options = new RequestOptions({ headers: headers });
-    return this.http.put(updatetenanturl, JSON.stringify(data), options)
+    return this.http.put(updatetenanturl, JSON.stringify(data))
       .catch((error: any) => Observable.throw(error));
   }
 
@@ -152,7 +154,7 @@ export class AppService {
   public UpdateAppGroup(updateappgroupurl: any, data) {
     let headers = new Headers({ 'Content-Type': 'application/json;charset=utf8', 'Accept': 'application/json' });
     let options = new RequestOptions({ headers: headers });
-    return this.http.put(updateappgroupurl, JSON.stringify(data), options)
+    return this.http.put(updateappgroupurl, JSON.stringify(data))
       .catch((error: any) => Observable.throw(error));
   }
 
@@ -166,7 +168,7 @@ export class AppService {
   public UpdateHost(updateHosturl: any, data) {
     let headers = new Headers({ 'Content-Type': 'application/json;charset=utf8', 'Accept': 'application/json' });
     let options = new RequestOptions({ headers: headers });
-    return this.http.put(updateHosturl, JSON.stringify(data), options)
+    return this.http.put(updateHosturl, JSON.stringify(data))
       .catch((error: any) => Observable.throw(error));
   }
 
@@ -180,7 +182,7 @@ export class AppService {
   public GenerateKeyValue(generatekeyURL: any, data) {
     let headers = new Headers({ 'Content-Type': 'application/json;charset=utf8', 'Accept': 'application/json' });
     let options = new RequestOptions({ headers: headers });
-    return this.http.post(generatekeyURL, JSON.stringify(data), options)
+    return this.http.post(generatekeyURL, JSON.stringify(data))
       .catch((error: any) => Observable.throw(error));
   }
 
@@ -194,7 +196,7 @@ export class AppService {
   public DeleteAppGroupsList(AppGroupsDeleteurl: any) {
     let headers = new Headers({ 'Accept': 'application/json', 'Authorization': sessionStorage.getItem('access_token') });
     let options = new RequestOptions({ headers: headers });
-    return this.http.delete(AppGroupsDeleteurl, options)
+    return this.http.delete(AppGroupsDeleteurl)
       .catch((error: any) => Observable.throw('Server error'));
   }
 
@@ -211,7 +213,7 @@ export class AppService {
     }
     let headers = new Headers({ 'Content-Type': 'application/json;charset=utf8', 'Accept': 'application/json' });
     let options = new RequestOptions({ headers: headers });
-    return this.http.post(appGroupCreateurl, JSON.stringify(data), options)
+    return this.http.post(appGroupCreateurl, JSON.stringify(data))
       .catch((error: any) => Observable.throw(error));
   }
 
@@ -225,7 +227,7 @@ export class AppService {
   public RemoveRemoteApps(appGroupDeleteurl: any) {
     let headers = new Headers({ 'Accept': 'application/json', 'Authorization': sessionStorage.getItem('access_token') });
     let options = new RequestOptions({ headers: headers });
-    return this.http.delete(appGroupDeleteurl, options)
+    return this.http.delete(appGroupDeleteurl)
       .catch((error: any) => Observable.throw(error));
   }
 
@@ -239,7 +241,7 @@ export class AppService {
   public DeleteUsersList(UsersDeleteurl: any) {
     let headers = new Headers({ 'Accept': 'application/json', 'Authorization': sessionStorage.getItem('access_token') });
     let options = new RequestOptions({ headers: headers });
-    return this.http.delete(UsersDeleteurl, options)
+    return this.http.delete(UsersDeleteurl)
       .catch((error: any) => Observable.throw('Server error'));
   }
 
@@ -256,7 +258,7 @@ export class AppService {
     }
     let headers = new Headers({ 'Content-Type': 'application/json;charset=utf8', 'Accept': 'application/json' });
     let options = new RequestOptions({ headers: headers });
-    return this.http.post(CreateappGroup, JSON.stringify(data), options)
+    return this.http.post(CreateappGroup, JSON.stringify(data))
       .catch((error: any) => Observable.throw(error));
   }
 
@@ -273,7 +275,7 @@ export class AppService {
     }
     let headers = new Headers({ 'Content-Type': 'application/json;charset=utf8', 'Accept': 'application/json' });
     let options = new RequestOptions({ headers: headers });
-    return this.http.post(CreateappGroup, JSON.stringify(data), options)
+    return this.http.post(CreateappGroup, JSON.stringify(data))
       .catch((error: any) => Observable.throw(error));
   }
 
@@ -287,7 +289,7 @@ export class AppService {
   public DeleteGeneratedHostKey(regeneratekeyURL: any) {
     let headers = new Headers({ 'Accept': 'application/json', 'Authorization': sessionStorage.getItem('access_token') });
     let options = new RequestOptions({ headers: headers });
-    return this.http.delete(regeneratekeyURL, options)
+    return this.http.delete(regeneratekeyURL)
       .catch((error: any) => Observable.throw('Server error'));
   }
 

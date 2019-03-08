@@ -1,9 +1,12 @@
 import { Component, OnInit } from '@angular/core';
 import { Http, Response, Headers, RequestOptions } from '@angular/http';
-import * as $ from 'jquery';
 import { Router, ActivatedRoute, Params } from '@angular/router';
 import { AppService } from "./shared/app.service";
 import { trigger, state, style, transition, animate, keyframes } from '@angular/animations';
+import { adalConfig } from './shared/configuration';
+import { Observable } from 'rxjs';
+import { HttpParams, HttpHeaders } from '@angular/common/http';
+import { AdalService } from 'adal-angular4';
 
 @Component({
   selector: 'app-root',
@@ -58,7 +61,9 @@ export class AppComponent implements OnInit {
   public appLoader: boolean = false;
   public tenantGroupName: any;
 
-  constructor(private _AppService: AppService, private router: Router, private route: ActivatedRoute, private http: Http, ) {
+  constructor(private _AppService: AppService, private router: Router, private route: ActivatedRoute, private http: Http, private adalService: AdalService) {
+
+    adalService.init(adalConfig);
     //localStorage.removeItem("TenantGroupName");
   }
 
@@ -84,96 +89,11 @@ export class AppComponent implements OnInit {
    * Public event that calls directly on page load
    */
   ngOnInit() {
-    this.tenantGroupName = localStorage.getItem("TenantGroupName");
-    var code = sessionStorage.getItem("Code");
-    var gotCode = sessionStorage.getItem("gotCode");
-    var tenantGroup = localStorage.getItem("TenantGroupName");
-    this.profileIcon = sessionStorage.getItem("profileIcon");
-    this.profileName = sessionStorage.getItem("profileName");
-    this.roleDefinitionName = sessionStorage.getItem("roleDefinitionName");
-    this.profileEmail = sessionStorage.getItem("profileEmail");
-    this.scope = sessionStorage.getItem("Scope");
-    if (code != "undefined" && code != null && gotCode == 'yes') {
-      this.appLoader = true;
-      this.redirectUri = sessionStorage.getItem('redirectUri');
-      var codData = {
-        Code: code,
-      }
-      fetch(this._AppService.ApiUrl + '/api/Login/PostLogin', {
-        method: 'POST',
-        headers: {
-          'Accept': 'application/json',
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(codData)
-      }).then(response => response.json())
-        .then((respdata) => {
-          this.profileName = respdata.UserName[0].toUpperCase() + respdata.UserName.substring(1);
-
-          /*This block of code is used to Split Letters from Username*/
-          //Slit code -starts
-          this.splitName = respdata.UserName.split(' ');
-          if (this.splitName.length > 1) {
-            this.profileNameFirstName = this.splitName[0];
-            this.profileNameLastName = this.splitName[this.splitName.length - 1];
-            this.profileIcon = this.profileNameFirstName[0].toUpperCase() + this.profileNameLastName[0].toUpperCase();
-          }
-          else {
-            this.profileNameFirstName = this.splitName[0];
-            this.profileIcon = this.profileNameFirstName.substring(0, 2).toUpperCase();
-          }
-          //Slit code -Ends
-
-          /*This block of code is used to get the Role Assignment Acces level*/
-          //Role Assignment Acces level -Starts
-          const unique = (value, index, self) => {
-            return self.indexOf(value) === index;
-          };
-          this.tenantGroupNameList = respdata.TenantGroups;
-          const uniqueTenantGroups = this.tenantGroupNameList.filter(unique);
-          localStorage.setItem("TenantGroups", JSON.stringify(uniqueTenantGroups));
-          this.tenantGroupName = localStorage.getItem("TenantGroupName");
-          this.roleDefinitionName = respdata.RoleAssignment.roleDefinitionName;
-          sessionStorage.setItem("profileIcon", this.profileIcon);
-          sessionStorage.setItem("profileName", this.profileName);
-          sessionStorage.setItem("roleDefinitionName", this.roleDefinitionName);
-          if (respdata.RoleAssignment.scope == '/') {
-            this.scope = 'All (Root)';
-          }
-          else {
-            this.scope = respdata.RoleAssignment.scope;
-          }
-          //Role Assignment Acces level -Ends
-          sessionStorage.setItem('Scope', this.scope);
-          this.profileEmail = respdata.Email;
-          sessionStorage.setItem("Refresh_Token", respdata.Refresh_Token);
-          var roleDef = respdata.RoleAssignment.scope.substring(1).split("/");
-          sessionStorage.setItem('profileEmail', this.profileEmail);
-          sessionStorage.setItem('gotCode', 'no');
-          this.appLoader = false;
-          this.router.navigate(['/admin/Tenants']);
-        }).catch((error: any) => {
-          this.router.navigate(['/invalidtokenmessage']);
-          this.appLoader = false;
-        });
-    }
-    else if (gotCode != 'no') {
-      sessionStorage.clear();
-      let headers = new Headers({ 'Accept': 'application/json' });
-      var url = this._AppService.ApiUrl + '/api/Login/GetLoginUrl';
-      this.http.get(url, {
-        headers: headers
-      }).subscribe(values => {
-        var loginUrl = values.json();
-        sessionStorage.setItem("redirectUri", loginUrl.split('&')[2].split('=')[1]);
-        sessionStorage.setItem('gotCode', 'yes');
-        window.location.replace(loginUrl);
-      });
-    }
-    else if (tenantGroup && window.location.pathname == "/") {
-      this.router.navigate(['/admin/Tenants']);
-    }
+   
   }
+
+
+  
 
   /*
    * This function is used to get Notification List
