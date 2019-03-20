@@ -492,57 +492,60 @@ export class DeploymentDashboardComponent implements OnInit {
 
   /* This function is used to  loads all the tenants into table on page load */
   public GetTenants() {
-    this.refreshToken = sessionStorage.getItem("Refresh_Token");
-    this.refreshTenantLoading = true;
-    this.tenantlistErrorFound = false;
-    this.getTenantsUrl = this._AppService.ApiUrl + '/api/Tenant/GetTenantList?tenantGroupName=' + this.tenantGroupName + '&refresh_token=' + this.refreshToken + '&pageSize=' + this.pageSize + '&sortField=TenantName&isDescending=false&initialSkip=' + this.initialSkip + '&lastEntry=' + this.lastEntry;
-    this._AppService.GetTenants(this.getTenantsUrl).subscribe(response => {
-      let responseObject = JSON.parse(response['_body']);
-      this.ShowTenantgroupError = false;
-      this.tenants = responseObject.rdMgmtTenants;
-      this.tenantsCount = responseObject.count;
-      this.refreshTenantLoading = false;
-      //this.lastEntry = responseObject.lastEntry;
-      //if (this.tenants[0]) {
-      //  if (this.tenants[0].code == "Invalid Token") {
-      //    sessionStorage.clear();
-      //    this.router.navigate(['/invalidtokenmessage']);
-      //  }
-      //}
-      this.GetcurrentNoOfPagesCount();
-      this.searchTenants = this.tenants;
-      //this.adminMenuComponent.GetAllTenants(this.tenants);
-      if (this.searchTenants.length == 0) {
-        this.editedBody = true;
-        this.showCreateTenant = true;
+    let Tenants = JSON.parse(sessionStorage.getItem('Tenants'));
+    if(sessionStorage.getItem('Tenants') && Tenants.rdMgmtTenants.length != 0 && Tenants != null){
+      this.gettingTenants();
+    }
+    else{
+      this.refreshToken = sessionStorage.getItem("Refresh_Token");
+      this.refreshTenantLoading = true;
+      this.tenantlistErrorFound = false;
+      this.getTenantsUrl = this._AppService.ApiUrl + '/api/Tenant/GetTenantList?tenantGroupName=' + this.tenantGroupName + '&refresh_token=' + this.refreshToken + '&pageSize=' + this.pageSize + '&sortField=TenantName&isDescending=false&initialSkip=' + this.initialSkip + '&lastEntry=' + this.lastEntry;
+      this._AppService.GetTenants(this.getTenantsUrl).subscribe(response => {
+        let responseObject = JSON.parse(response['_body']);
+        sessionStorage.setItem('Tenants', JSON.stringify(responseObject));
+        this.ShowTenantgroupError = false;
+        this.refreshTenantLoading = false;
+        this.gettingTenants();
+        this.GetcurrentNoOfPagesCount();
+      },
+        /*
+         * If Any Error (or) Problem With Services (or) Problem in internet this Error Block Will Execute
+         */
+        error => {
+          this.editedBody = false;
+          this.tenantlistErrorFound = true;
+          this.refreshTenantLoading = false;
+        }
+      );
+    }
+  };
+
+  gettingTenants(){
+    this.adminMenuComponent.GetAllTenants();
+    let responseObject = JSON.parse(sessionStorage.getItem('Tenants'));
+    this.tenants = responseObject.rdMgmtTenants;
+    this.tenantsCount = responseObject.count;
+    this.searchTenants = this.tenants;
+    if (this.searchTenants.length == 0) {
+      this.editedBody = true;
+      this.showCreateTenant = true;
+      this.tenantlistErrorFound = false;
+    }
+    else {
+      if (this.searchTenants[0].Message == null) {
+        this.editedBody = false;
+        this.showCreateTenant = false;
         this.tenantlistErrorFound = false;
       }
-      else {
-        if (this.searchTenants[0].Message == null) {
-          this.editedBody = false;
-          this.showCreateTenant = false;
-          this.tenantlistErrorFound = false;
-        }
-      }
-
-    },
-      /*
-       * If Any Error (or) Problem With Services (or) Problem in internet this Error Block Will Execute
-       */
-      error => {
-        this.editedBody = false;
-        this.tenantlistErrorFound = true;
-        this.refreshTenantLoading = false;
-      }
-    );
+    }
     this.isEditDisabled = true;
     this.isDeleteDisabled = true;
     for (let i = 0; i < this.searchTenants.length; i++) {
       this.checked[i] = false;
     }
     this.checkedMain = false;
-
-  };
+  }
 
   /* This function is used to  loads all the tenants into table on click of Previous button in the table */
   public previousPage() {
@@ -716,6 +719,7 @@ export class DeploymentDashboardComponent implements OnInit {
 
   /* This function is used to check Tenant Access and refresh the tenants list */
   public RefreshTenant() {
+    sessionStorage.removeItem('Tenants');
     this.CheckTenantAccess();
   }
 

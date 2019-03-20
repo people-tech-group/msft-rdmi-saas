@@ -18,8 +18,8 @@ export class AdminMenuComponent {
   public loadMore: boolean = false;
   public hostpool: any;
   public tenantName: any;
-  public tenantList: any=[];
-  public displayTenantList: any=[];
+  public tenantList: any = [];
+  public displayTenantList: any = [];
   public hostPoolList: any = [];
   public selectedHostpoolName: any;
   public initialIndex: any = 0;
@@ -39,7 +39,7 @@ export class AdminMenuComponent {
 
   public ngOnInit() {
     this.tenantGroupName = localStorage.getItem("TenantGroupName");
-    this.GetAllTenantsList();
+    //this.GetAllTenantsList();
   }
 
   /*
@@ -60,24 +60,30 @@ export class AdminMenuComponent {
   /**
    * This method is used to get the tenant List for side menu nav
    **/
-  public GetAllTenantsList() {
-    //let tenantGroupName = sessionStorage.getItem("TenantGroupName");
-    let refreshToken = sessionStorage.getItem("Refresh_Token");
-    let getTenantsUrl = this.appService.ApiUrl + '/api/Tenant/GetAllTenants?tenantGroupName=' + this.tenantGroupName + '&refresh_token=' + refreshToken;
-    this.appService.GetTenants(getTenantsUrl).subscribe(response => {
-      let responseObject = JSON.parse(response['_body']);
-      this.GetAllTenants(responseObject);
-      if (responseObject.length > 0) {
-        if (responseObject[0]) {
-          if (responseObject[0].code == "Invalid Token") {
-            sessionStorage.clear();
-            this.router.navigate(['/invalidtokenmessage']);
-          }
-        }
-      }
-    });
-  }
- 
+  // public GetAllTenantsList() {
+  //   let tenants = JSON.parse(sessionStorage.getItem('sideMenuTenants'));
+  //   if (sessionStorage.getItem('sideMenuTenants') &&  tenants.length != 0) {
+  //     this.GetAllTenants();
+  //   }
+  //   else {
+  //     let refreshToken = sessionStorage.getItem("Refresh_Token");
+  //     let getTenantsUrl = this.appService.ApiUrl + '/api/Tenant/GetAllTenants?tenantGroupName=' + this.tenantGroupName + '&refresh_token=' + refreshToken;
+  //     this.appService.GetTenants(getTenantsUrl).subscribe(response => {
+  //       let responseObject = JSON.parse(response['_body']);
+  //       sessionStorage.setItem('sideMenuTenants', JSON.stringify(responseObject));
+  //       this.GetAllTenants();
+  //       if (responseObject.length > 0) {
+  //         if (responseObject[0]) {
+  //           if (responseObject[0].code == "Invalid Token") {
+  //             sessionStorage.clear();
+  //             this.router.navigate(['/invalidtokenmessage']);
+  //           }
+  //         }
+  //       }
+  //     });
+  //   }
+  // }
+
   /**
    * This function is used  to Load all the tenants list
    * ---------
@@ -85,7 +91,9 @@ export class AdminMenuComponent {
    * data - Accepts Tenant List from get All TenantList Method
    * ---------
    */
-  public GetAllTenants(data: any) {
+  public GetAllTenants() {
+    let tenants = JSON.parse(sessionStorage.getItem('Tenants'));
+    let data = tenants.rdMgmtTenants;
     this.tenantList = [];
     this.hostPoolList = [];
     if (data == undefined || data == null) {
@@ -188,7 +196,7 @@ export class AdminMenuComponent {
   public SetSelectedhostPool(index: any, tenantName: any, hostpoolName: any) {
     this.selectedHostPool = index;
     this.selectedHostpoolName = hostpoolName;
-    sessionStorage.setItem('selectedhostpoolname', this.selectedHostpoolName); 
+    sessionStorage.setItem('selectedhostpoolname', this.selectedHostpoolName);
     sessionStorage.setItem("hostpoolNameIndex", index);
     let data = [{
       name: hostpoolName,
