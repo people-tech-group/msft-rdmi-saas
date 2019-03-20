@@ -839,6 +839,7 @@ export class TenantDashboardComponent implements OnInit {
       hostPoolName: hostpoolData.hostPoolName.trim(),
       friendlyName: hostpoolData.friendlyName.trim(),
       description: hostpoolData.description.trim(),
+      persistent: !this.nonPersistant,
       refresh_token: sessionStorage.getItem("Refresh_Token"),
     }
     this.refreshHostpoolLoading = true;

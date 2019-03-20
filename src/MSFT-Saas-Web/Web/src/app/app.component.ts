@@ -126,8 +126,12 @@ export class AppComponent implements OnInit {
 
           /*This block of code is used to get the Role Assignment Acces level*/
           //Role Assignment Acces level -Starts
+          const unique = (value, index, self) => {
+            return self.indexOf(value) === index;
+          };
           this.tenantGroupNameList = respdata.TenantGroups;
-          localStorage.setItem("TenantGroups", JSON.stringify(this.tenantGroupNameList));
+          const uniqueTenantGroups = this.tenantGroupNameList.filter(unique);
+          localStorage.setItem("TenantGroups", JSON.stringify(uniqueTenantGroups));
           this.tenantGroupName = localStorage.getItem("TenantGroupName");
           this.roleDefinitionName = respdata.RoleAssignment.roleDefinitionName;
           sessionStorage.setItem("profileIcon", this.profileIcon);
@@ -167,7 +171,7 @@ export class AppComponent implements OnInit {
       });
     }
     else if (tenantGroup && window.location.pathname == "/") {
-     this.router.navigate(['/admin/Tenants']);
+      this.router.navigate(['/admin/Tenants']);
     }
   }
 
