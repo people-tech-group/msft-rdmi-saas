@@ -6,7 +6,9 @@ $ResourceURL = Get-AutomationVariable -Name 'ResourceURL'
 $fileURI = Get-AutomationVariable -Name 'fileURI'
 $Username = Get-AutomationVariable -Name 'Username'
 $Password = Get-AutomationVariable -Name 'Password'
-
+$AppServicePlan = Get-AutomationVariable -Name 'servicePlanName'
+$WebApp = Get-AutomationVariable -Name 'webApp'
+$ApiApp = Get-AutomationVariable -Name 'apiApp'
 
 Invoke-WebRequest -Uri $fileURI -OutFile "C:\msft-rdmi-saas-offering.zip"
 New-Item -Path "C:\msft-rdmi-saas-offering" -ItemType directory -Force -ErrorAction SilentlyContinue
@@ -31,90 +33,25 @@ Import-Module AzureAD
     $Cred = Get-AutomationPSCredential -Name $CredentialAssetName
     Add-AzureRmAccount -Environment 'AzureCloud' -Credential $Cred
     Select-AzureRmSubscription -SubscriptionId $subsriptionid
-    <#$ServicePrincipalConnectionName = "AzureRunAsConnection"
-    $SPConnection = Get-AutomationConnection -Name $ServicePrincipalConnectionName   
-        Add-AzureRmAccount -ServicePrincipal `
-        -TenantId $SPConnection.TenantId `
-        -ApplicationId $SPConnection.ApplicationId `
-        -CertificateThumbprint $SPConnection.CertificateThumbprint | Write-Verbose
-       #> 
-
     $EnvironmentName = "AzureCloud"
     $CodeBitPath= "C:\msft-rdmi-saas-offering\msft-rdmi-saas-offering"
     $WebAppDirectory = ".\msft-rdmi-saas-web"
     $WebAppExtractionPath = ".\msft-rdmi-saas-web\msft-rdmi-saas-web.zip"
     $ApiAppDirectory = ".\msft-rdmi-saas-api"
     $ApiAppExtractionPath = ".\msft-rdmi-saas-api\msft-rdmi-saas-api.zip"
-    $AppServicePlan = "msft-rdmi-saas-$((get-date).ToString("ddMMyyyyhhmm"))"
-    $WebApp = "RDmiMgmtWeb-$((get-date).ToString("ddMMyyyyhhmm"))"
-    $ApiApp = "RDmiMgmtApi-$((get-date).ToString("ddMMyyyyhhmm"))"
-
-
 try
 {
-    # Copy the files from github to VM
-    Import-Module AzureRM.Profile
-    Import-Module AzureRM.Resources
-
-    ## RESOURCE GROUP ##
-        Add-AzureRmAccount -Environment "AzureCloud" -Credential $Cred
-        Select-AzureRmSubscription -SubscriptionId $subsriptionid
-        
-        try 
-        {
-            ## APPSERVICE PLAN ##
-               
-            #create an appservice plan
-        
-            Write-Output "Creating AppServicePlan in resource group  $ResourceGroupName ...";
-            New-AzureRmAppServicePlan -Name $AppServicePlan -Location $Location -ResourceGroupName $ResourceGroupName -Tier Standard
-            $AppPlan = Get-AzureRmAppServicePlan -Name $AppServicePlan -ResourceGroupName $ResourceGroupName
-            Write-Output "AppServicePlan with name $AppServicePlan has been created"
-
-        }
-        catch [Exception]
-        {
-            Write-Output $_.Exception.Message
-        }
-
-        if($AppServicePlan)
-        {
-            try
-            {
-                ## CREATING APPS ##
-
-                # create a web app
-            
-                Write-Output "Creating a WebApp in resource group  $ResourceGroupName ...";
-                New-AzureRmWebApp -Name $WebApp -Location $Location -AppServicePlan $AppServicePlan -ResourceGroupName $ResourceGroupName
-                Write-Output "WebApp with name $WebApp has been created"
-
-                ## CREATING API-APP ##
-
-                # Create an api app
-            
-                Write-Output "Creating a ApiApp in resource group  $ResourceGroupName ...";
-                $ServerFarmId = $AppPlan.Id
-                $propertiesobject = @{"ServerFarmId"= $ServerFarmId}
-                New-AzureRmResource -Location $Location -ResourceGroupName $ResourceGroupName -ResourceType Microsoft.Web/sites -ResourceName $ApiApp -Kind 'api' -ApiVersion 2016-08-01 -PropertyObject $propertiesobject -Force
-                Write-Output "ApiApp with name $ApiApp has been created"
-            }
-            catch [Exception]
-            {
-                Write-Output $_.Exception.Message
-            }
-        
-        }
-        
-                # Get Url of Web-App 
+                # Get Url of Web-App
                 $GetWebApp = Get-AzureRmWebApp -Name $WebApp -ResourceGroupName $ResourceGroupName
                 $WebUrl = $GetWebApp.DefaultHostName
                  
                 #$requiredAccessName=$ResourceURL.Split("/")[3]
                 $redirectURL="https://"+"$WebUrl"+"/"
                 
-                    #Static value of RDMIInfra web appname
-                    $rdmiInfraWebAppName = "Windows Virtual Desktop"
+                #Static value of RDMIInfra web appname
+                $wvdinfraWebAppId = "5a0aa725-4958-4b0c-80a9-34562e23f3b7"
+                $serviceIdinfo = Get-AzureRmADServicePrincipal -ApplicationId $wvdinfraWebAppId
+                $rdmiInfraWebAppName = $serviceIdinfo.DisplayName
                 #generate unique ID based on subscription ID
                 $unique_subscription_id = ($subsriptionid).Replace('-', '').substring(0, 19)
                 
@@ -123,7 +60,7 @@ try
                 $rdmiSaaS_clientapp_display_name = "RdmiSaaS" + $ResourceGroupName.ToLowerInvariant() + $unique_subscription_id.ToLowerInvariant()
                 #Creating Client application in azure ad
                 Connect-AzureAD -Credential $Cred
-                $clientAdApp = New-AzureADApplication -DisplayName $rdmiSaaS_clientapp_display_name -ReplyUrls $redirectURL -PublicClient $true -AvailableToOtherTenants $true -Verbose -ErrorAction Stop
+                $clientAdApp = New-AzureADApplication -DisplayName $rdmiSaaS_clientapp_display_name -ReplyUrls $redirectURL -PublicClient $true -AvailableToOtherTenants $false -Verbose -ErrorAction Stop
                 $resourceAppId = Get-AzureADServicePrincipal -SearchString $rdmiInfraWebAppName | Where-Object {$_.DisplayName -eq $rdmiInfraWebAppName}
                 $clientappreq = New-Object -TypeName "Microsoft.Open.AzureAD.Model.RequiredResourceAccess"
                 $clientappreq.ResourceAppId = $resourceAppId.AppId
@@ -138,7 +75,6 @@ try
         {
             try
             {
-
                 ## PUBLISHING API-APP PACKAGE ##
                 
                 Set-Location $CodeBitPath
@@ -182,14 +118,7 @@ try
                                     "RDBrokerUrl" = "$RDBrokerURL";
                                     "ResourceUrl" = "$ResourceURL";
                                     "RedirectURI" = "https://"+"$WebUrl"+"/";
-                                    }
-                <#$Redirecturl1="https://"+"$WebUrl"+"/"
-                $Redirecturl2="https://login.microsoftonline.com/common/oauth2/logout?post_logout_redirect_uri="
-                $ADapplication=Get-AzureRmADApplication -ApplicationId $ApplicationID
-                $add=$ADapplication.ReplyUrls.Add($Redirecturl1)
-                $add=$ADapplication.ReplyUrls.Add("$Redirecturl2"+"$Redirecturl1")
-                $ReplyUrls=$ADapplication.ReplyUrls
-                Set-AzureRmADApplication -ApplicationId $ApplicationID -ReplyUrl $ReplyUrls #>
+            }
                 Set-AzureRmWebApp -AppSettings $ApiAppSettings -Name $ApiApp -ResourceGroupName $ResourceGroupName
             }
             catch [Exception]
