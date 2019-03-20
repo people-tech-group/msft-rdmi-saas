@@ -137,7 +137,7 @@
                 "value": "[concat('\"',variables('baseURL'),'/msft-rdmi-saas-offering.zip','\"')]"
             }
         ],
-        "uniqueBase": "[toLower(uniquestring(parameters('ResourceURL'), resourceGroup().id, deployment().name,))]",
+        "uniqueBase": "[toLower(uniquestring(parameters('ResourceURL'), resourceGroup().id, deployment().name))]",
         "newGuid": "[guid(variables('uniqueBase'))]"
     },
     "resources": [
