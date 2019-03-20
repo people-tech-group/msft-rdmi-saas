@@ -8,6 +8,7 @@ using System.Net.Http;
 using System.Web.Http;
 using MSFT.RDMISaaS.API.BLL;
 using System.Web.Http.Cors;
+using Newtonsoft.Json.Linq;
 #endregion "Import Namespaces"
 
 #region "MSFT.RDMISaaS.API.Controllers"
@@ -37,7 +38,7 @@ namespace MSFT.RDMISaaS.API.Controllers
         /// <param name="hostPoolName">Name of Hostpool</param>
         /// <param name="refresh_token">Refresh token to get access token</param>
         /// <returns></returns>
-        public RdMgmtHostPool GetHostPoolDetails(string tenantGroupName,string tenantName, string hostPoolName, string refresh_token)
+        public JObject GetHostPoolDetails(string tenantGroupName,string tenantName, string hostPoolName, string refresh_token)
         {
 
             //get deployment url
@@ -52,19 +53,29 @@ namespace MSFT.RDMISaaS.API.Controllers
                     accessToken = common.GetTokenValue(refresh_token);
                     if (!string.IsNullOrEmpty(accessToken) && accessToken.ToString().ToLower() != invalidToken && accessToken.ToString().ToLower() != invalidCode)
                     {
-                        rdMgmtHostPool = hostPoolBL.GetHostPoolDetails(tenantGroupName,deploymentUrl, accessToken, tenantName, hostPoolName);
+                      return hostPoolBL.GetHostPoolDetails(tenantGroupName,deploymentUrl, accessToken, tenantName, hostPoolName);
+                       // rdMgmtHostPool = hostPoolBL.GetHostPoolDetails(tenantGroupName,deploymentUrl, accessToken, tenantName, hostPoolName);
                     }
                     else
                     {
-                        rdMgmtHostPool.code = Constants.invalidToken;
+                        return new JObject() {
+                            {
+                                "code",Constants.invalidToken
+                            }
+                        };
+                       // rdMgmtHostPool.code = Constants.invalidToken;
                     }
+                }
+                else
+                {
+                    return null;
                 }
             }
             catch 
             {
                 return null;
             }
-            return rdMgmtHostPool;
+           // return rdMgmtHostPool;
         }
 
         /// <summary>
@@ -158,11 +169,11 @@ namespace MSFT.RDMISaaS.API.Controllers
         /// <param name="tenantName">Name of Tenant</param>
         /// <param name="refresh_token">Refresh token to get access token</param>
         /// <returns></returns>
-        public List<RdMgmtHostPool> GetHostPoolList(string tenantGroupName, string tenantName, string refresh_token, int pageSize, string sortField, bool isDescending = false, int initialSkip = 0, string lastEntry = null)
+        public JArray GetHostPoolList(string tenantGroupName, string tenantName, string refresh_token, int pageSize, string sortField, bool isDescending = false, int initialSkip = 0, string lastEntry = null)
         {
             //get deployment url
             deploymentUrl = configurations.rdBrokerUrl;
-            List<RdMgmtHostPool> lsthostpool = new List<RdMgmtHostPool>();
+           // List<RdMgmtHostPool> lsthostpool = new List<RdMgmtHostPool>();
             try
             {
                 if (!string.IsNullOrEmpty(refresh_token))
@@ -172,21 +183,30 @@ namespace MSFT.RDMISaaS.API.Controllers
                     accessToken = common.GetTokenValue(refresh_token);
                     if (!string.IsNullOrEmpty(accessToken) && accessToken.ToString().ToLower() != invalidToken && accessToken.ToString().ToLower() != invalidCode)
                     {
-                        lsthostpool = hostPoolBL.GetHostPoolList(tenantGroupName, deploymentUrl, accessToken, tenantName, false,false,  pageSize,  sortField,  isDescending ,  initialSkip,  lastEntry);
+                        return hostPoolBL.GetHostPoolList(tenantGroupName, deploymentUrl, accessToken, tenantName, false,false,  pageSize,  sortField,  isDescending ,  initialSkip,  lastEntry);
                     }
                     else
                     {
-                        RdMgmtHostPool rdMgmtHostPool = new RdMgmtHostPool();
-                        rdMgmtHostPool.code = Constants.invalidToken;
-                        lsthostpool.Add(rdMgmtHostPool);
+                        JArray newarray = new JArray();
+                        newarray.Add(new JObject() {
+                            { "code",Constants.invalidToken },
+                        });
+                        return newarray;
+                        //RdMgmtHostPool rdMgmtHostPool = new RdMgmtHostPool();
+                        //rdMgmtHostPool.code = Constants.invalidToken;
+                        //lsthostpool.Add(rdMgmtHostPool);
                     }
+                }
+                else
+                {
+                    return null;
                 }
             }
             catch 
             {
                 return null;
             }
-            return lsthostpool;
+          //  return lsthostpool;
         }
 
         /// <summary>

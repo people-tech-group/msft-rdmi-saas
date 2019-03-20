@@ -8,6 +8,7 @@ using System.Net.Http;
 using System.Web.Http;
 using MSFT.RDMISaaS.API.BLL;
 using System.Web.Http.Cors;
+using Newtonsoft.Json.Linq;
 #endregion "Import Namespaces" 
 
 #region "MSFT.RDMISaaS.API.Controllers"
@@ -115,7 +116,7 @@ namespace MSFT.RDMISaaS.API.Controllers
         /// <param name="appGroupName">Name of app group</param>
         /// <returns></returns>
         [HttpGet]
-        public RdMgmtAppGroup GetAppGroupDetails(string tenantGroupName, string tenantName, string hostPoolName, string appGroupName, string refresh_token)
+        public JObject GetAppGroupDetails(string tenantGroupName, string tenantName, string hostPoolName, string appGroupName, string refresh_token)
         {
             //get deployment url
             deploymentUrl = configurations.rdBrokerUrl;
@@ -129,19 +130,28 @@ namespace MSFT.RDMISaaS.API.Controllers
                     accessToken = common.GetTokenValue(refresh_token);
                     if (!string.IsNullOrEmpty(accessToken) && accessToken.ToString().ToLower() != invalidToken && accessToken.ToString().ToLower() != invalidCode)
                     {
-                        rdMgmtAppGroup = appGroupBL.GetAppGroupDetails(tenantGroupName,deploymentUrl, accessToken, tenantName, hostPoolName, appGroupName);
+                        return appGroupBL.GetAppGroupDetails(tenantGroupName,deploymentUrl, accessToken, tenantName, hostPoolName, appGroupName);
+                       // rdMgmtAppGroup = appGroupBL.GetAppGroupDetails(tenantGroupName,deploymentUrl, accessToken, tenantName, hostPoolName, appGroupName);
                     }
                     else
                     {
-                        rdMgmtAppGroup.code = Constants.invalidToken;
+                        return new JObject()
+                        {
+                            { "code",Constants.invalidToken }
+                        };
+                      //  rdMgmtAppGroup.code = Constants.invalidToken;
                     }
+                }
+                else
+                {
+                    return null;
                 }
             }
             catch 
             {
                 return null;
             }
-            return rdMgmtAppGroup;
+            //return rdMgmtAppGroup;
         }
 
         /// <summary>
@@ -151,7 +161,7 @@ namespace MSFT.RDMISaaS.API.Controllers
         /// <param name="hostPoolName"> Name of Hostpool</param>
         /// <returns></returns>
         [HttpGet]
-        public List<RdMgmtAppGroup> GetAppGroupsList(string tenantGroupName,string tenantName, string hostPoolName, string refresh_token, int pageSize, string sortField, bool isDescending = false, int initialSkip = 0, string lastEntry = null)
+        public JArray GetAppGroupsList(string tenantGroupName,string tenantName, string hostPoolName, string refresh_token, int pageSize, string sortField, bool isDescending = false, int initialSkip = 0, string lastEntry = null)
         {
             //get deployment url
             deploymentUrl = configurations.rdBrokerUrl;
@@ -165,21 +175,31 @@ namespace MSFT.RDMISaaS.API.Controllers
                     accessToken = common.GetTokenValue(refresh_token);
                     if (!string.IsNullOrEmpty(accessToken) && accessToken.ToString().ToLower() != invalidToken && accessToken.ToString().ToLower() != invalidCode)
                     {
-                        rdMgmtAppGroups = appGroupBL.GetAppGroupsList(tenantGroupName,deploymentUrl, accessToken, tenantName, hostPoolName, false,false,pageSize,sortField,isDescending,initialSkip, lastEntry);
+                       return appGroupBL.GetAppGroupsList(tenantGroupName,deploymentUrl, accessToken, tenantName, hostPoolName, false,false,pageSize,sortField,isDescending,initialSkip, lastEntry);
                     }
                     else
                     {
-                        RdMgmtAppGroup rdMgmtAppGroup = new RdMgmtAppGroup();
-                        rdMgmtAppGroup.code = Constants.invalidToken;
-                        rdMgmtAppGroups.Add(rdMgmtAppGroup);
+                        JArray newarray = new JArray();
+                        newarray.Add(new JObject() {
+                            { "code",Constants.invalidToken },
+                        });
+                        return newarray;
+                        //RdMgmtAppGroup rdMgmtAppGroup = new RdMgmtAppGroup();
+                        //rdMgmtAppGroup.code = Constants.invalidToken;
+                        //rdMgmtAppGroups.Add(rdMgmtAppGroup);
                     }
+                }
+                else
+                {
+                    return null;
+
                 }
             }
             catch
             {
                 return null;
             }
-            return rdMgmtAppGroups;
+            //return rdMgmtAppGroups;
         }
 
         /// <summary>

@@ -124,7 +124,7 @@ namespace MSFT.RDMISaaS.API.BLL
         /// <param name="hostPoolName">Name of Hostpool</param>
         /// <param name="appGroupName">Name of App group</param>
         /// <returns></returns>
-        public RdMgmtAppGroup GetAppGroupDetails(string tenantGroupName, string deploymentUrl, string accessToken, string tenantName, string hostPoolName, string appGroupName)
+        public JObject GetAppGroupDetails(string tenantGroupName, string deploymentUrl, string accessToken, string tenantName, string hostPoolName, string appGroupName)
         {
             RdMgmtAppGroup rdMgmtAppGroup = new RdMgmtAppGroup();
             try
@@ -134,33 +134,41 @@ namespace MSFT.RDMISaaS.API.BLL
                 string strJson = response.Content.ReadAsStringAsync().Result;
                 if (response.IsSuccessStatusCode)
                 {
-                    //Deserialize the string to JSON object
-                    rdMgmtAppGroup = JsonConvert.DeserializeObject<RdMgmtAppGroup>(strJson);
+                    ////Deserialize the string to JSON object
 
-                    if (rdMgmtAppGroup.resourceType == "0")
-                    {
-                        rdMgmtAppGroup.resourceType = "Remote App Group";
-                    }
-                    else if (rdMgmtAppGroup.resourceType == "1")
-                    {
-                        rdMgmtAppGroup.resourceType = "Desktop App Group";
-                    }
+                    var jObj = (JObject)JsonConvert.DeserializeObject(strJson);
+                    return jObj;
 
-                    //get list of Apps associated with this app group
-                    RemoteAppBL remoteAppBL = new RemoteAppBL();
-                    List<RdMgmtRemoteApp> rdMgmtRemoteApps = remoteAppBL.GetRemoteAppList(tenantGroupName,deploymentUrl, accessToken, tenantName, hostPoolName, rdMgmtAppGroup.appGroupName, true,true, 0, "", false, 0, "");
-                    rdMgmtAppGroup.noOfApps = rdMgmtRemoteApps.Count;
+                    //rdMgmtAppGroup = JsonConvert.DeserializeObject<RdMgmtAppGroup>(strJson);
 
-                    //get list of Users associated with this app group
-                    List<RdMgmtUser> rdMgmtUsers = GetUsersList(tenantGroupName,deploymentUrl, accessToken, tenantName, hostPoolName, rdMgmtAppGroup.appGroupName, true,true, 0, "", false, 0, "");
-                    rdMgmtAppGroup.noOfusers = rdMgmtUsers.Count;
+                    //if (rdMgmtAppGroup.resourceType == "0")
+                    //{
+                    //    rdMgmtAppGroup.resourceType = "Remote App Group";
+                    //}
+                    //else if (rdMgmtAppGroup.resourceType == "1")
+                    //{
+                    //    rdMgmtAppGroup.resourceType = "Desktop App Group";
+                    //}
+
+                    ////get list of Apps associated with this app group
+                    //RemoteAppBL remoteAppBL = new RemoteAppBL();
+                    //List<RdMgmtRemoteApp> rdMgmtRemoteApps = remoteAppBL.GetRemoteAppList(tenantGroupName,deploymentUrl, accessToken, tenantName, hostPoolName, rdMgmtAppGroup.appGroupName, true,true, 0, "", false, 0, "");
+                    //rdMgmtAppGroup.noOfApps = rdMgmtRemoteApps.Count;
+
+                    ////get list of Users associated with this app group
+                    //List<RdMgmtUser> rdMgmtUsers = GetUsersList(tenantGroupName,deploymentUrl, accessToken, tenantName, hostPoolName, rdMgmtAppGroup.appGroupName, true,true, 0, "", false, 0, "");
+                    //rdMgmtAppGroup.noOfusers = rdMgmtUsers.Count;
+                }
+                else
+                {
+                    return null;
                 }
             }
             catch 
             {
                 return null;
             }
-            return rdMgmtAppGroup;
+            //return rdMgmtAppGroup;
         }
 
         /// <summary>
@@ -172,21 +180,19 @@ namespace MSFT.RDMISaaS.API.BLL
         /// <param name="hostPoolName">Name of Hostpool</param>
         /// <param name="isAppGroupNameOnly">used to get Only App Group Name</param>
         /// <returns></returns>
-        public List<RdMgmtAppGroup> GetAppGroupsList(string tenantGroupName, string deploymentUrl, string accessToken, string tenantName, string hostPoolName, bool isAppGroupNameOnly,bool isAll, int pageSize, string sortField, bool isDescending, int initialSkip, string lastEntry)
+        public JArray GetAppGroupsList(string tenantGroupName, string deploymentUrl, string accessToken, string tenantName, string hostPoolName, bool isAppGroupNameOnly,bool isAll, int pageSize, string sortField, bool isDescending, int initialSkip, string lastEntry)
         {
-            List<RdMgmtAppGroup> rdMgmtAppGroups = new List<RdMgmtAppGroup>();
+            //List<RdMgmtAppGroup> rdMgmtAppGroups = new List<RdMgmtAppGroup>();
             try
             {
                 HttpResponseMessage response;
                 if (isAll == true)
                 {
                     response = CommonBL.InitializeHttpClient(deploymentUrl, accessToken).GetAsync("/RdsManagement/V1/TenantGroups/" + tenantGroupName + "/Tenants/" + tenantName + "/HostPools/" + hostPoolName + "/AppGroups").Result;
-
                 }
                 else
                 {
                      response = CommonBL.InitializeHttpClient(deploymentUrl, accessToken).GetAsync("/RdsManagement/V1/TenantGroups/" + tenantGroupName + "/Tenants/" + tenantName + "/HostPools/" + hostPoolName + "/AppGroups?PageSize=" + pageSize + "&LastEntry=" + lastEntry + "&SortField=" + sortField + "&IsDescending=" + isDescending + "&InitialSkip=" + initialSkip).Result;
-
                 }
 
                 //call rest api to get list of app groups -- july code bit
@@ -195,50 +201,56 @@ namespace MSFT.RDMISaaS.API.BLL
                 {
                     //Deserialize the string to JSON object
                     var jObj = (JArray)JsonConvert.DeserializeObject(strJson);
-                    if (jObj.Count > 0)
-                    {
-                        if (isAppGroupNameOnly)
-                        {
-                            rdMgmtAppGroups = jObj.Select(item => new RdMgmtAppGroup
-                            {
-                                appGroupName = (string)item["appGroupName"]
-                            }).ToList();
-                        }
-                        else
-                        {
-                            rdMgmtAppGroups = jObj.Select(item => new RdMgmtAppGroup
-                            {
-                                tenantName = (string)item["tenantName"],
-                                hostPoolName = (string)item["hostPoolName"],
-                                appGroupName = (string)item["appGroupName"],
-                                description = (string)item["description"],
-                                friendlyName = (string)item["friendlyName"],
-                                resourceType = item["resourceType"].ToString() == "0" ? "Remote App Group" : "Desktop App Group"
-                            }).ToList();
-                        }
-                    }
-                }
+                    return jObj;
+                    //if (jObj.Count > 0)
+                    //{
 
-                if (rdMgmtAppGroups.Count > 0)
+                    //    if (isAppGroupNameOnly)
+                    //    {
+                    //        rdMgmtAppGroups = jObj.Select(item => new RdMgmtAppGroup
+                    //        {
+                    //            appGroupName = (string)item["appGroupName"]
+                    //        }).ToList();
+                    //    }
+                    //    else
+                    //    {
+                    //        rdMgmtAppGroups = jObj.Select(item => new RdMgmtAppGroup
+                    //        {
+                    //            tenantName = (string)item["tenantName"],
+                    //            hostPoolName = (string)item["hostPoolName"],
+                    //            appGroupName = (string)item["appGroupName"],
+                    //            description = (string)item["description"],
+                    //            friendlyName = (string)item["friendlyName"],
+                    //            resourceType = item["resourceType"].ToString() == "0" ? "Remote App Group" : "Desktop App Group"
+                    //        }).ToList();
+                    //    }
+                    //}
+                }
+                else
                 {
-                    for (int i = 0; i < rdMgmtAppGroups.Count; i++)
-                    {
-                        //get list of Apps associated with App group
-                        RemoteAppBL remoteAppBL = new RemoteAppBL();
-                        List<RdMgmtRemoteApp> rdMgmtRemoteApps = remoteAppBL.GetRemoteAppList(tenantGroupName,deploymentUrl, accessToken, tenantName, hostPoolName, rdMgmtAppGroups[i].appGroupName, true,true, 0, "", false, 0, "");
-                        rdMgmtAppGroups[i].noOfApps = rdMgmtRemoteApps.Count;
-
-                        //get list of Users associsted with app group
-                        List<RdMgmtUser> rdMgmtUsers = GetUsersList(tenantGroupName,deploymentUrl, accessToken, tenantName, hostPoolName, rdMgmtAppGroups[i].appGroupName, true,true, 0, "", false, 0, "");
-                        rdMgmtAppGroups[i].noOfusers = rdMgmtUsers.Count;
-                    }
+                    return null;
                 }
+
+                //if (rdMgmtAppGroups.Count > 0)
+                //{
+                //    for (int i = 0; i < rdMgmtAppGroups.Count; i++)
+                //    {
+                //        //get list of Apps associated with App group
+                //        RemoteAppBL remoteAppBL = new RemoteAppBL();
+                //        List<RdMgmtRemoteApp> rdMgmtRemoteApps = remoteAppBL.GetRemoteAppList(tenantGroupName,deploymentUrl, accessToken, tenantName, hostPoolName, rdMgmtAppGroups[i].appGroupName, true,true, 0, "", false, 0, "");
+                //        rdMgmtAppGroups[i].noOfApps = rdMgmtRemoteApps.Count;
+
+                //        //get list of Users associsted with app group
+                //        List<RdMgmtUser> rdMgmtUsers = GetUsersList(tenantGroupName,deploymentUrl, accessToken, tenantName, hostPoolName, rdMgmtAppGroups[i].appGroupName, true,true, 0, "", false, 0, "");
+                //        rdMgmtAppGroups[i].noOfusers = rdMgmtUsers.Count;
+                //    }
+                //}
             }
             catch 
             {
                 return null;
             }
-            return rdMgmtAppGroups;
+           // return rdMgmtAppGroups;
         }
 
         /// <summary>

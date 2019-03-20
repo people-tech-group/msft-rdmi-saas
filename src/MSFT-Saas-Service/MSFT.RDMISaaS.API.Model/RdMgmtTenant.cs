@@ -26,7 +26,10 @@ namespace MSFT.RDMISaaS.API.Model
         public int noOfSessions { get; set; }
         public string code { get; set; }
         public string refresh_token { get; set; }
-         
+
+        public string azureSubscriptionId { get; set; }
+
+
     }
     #endregion "Class - RdMgmtTenant"
 

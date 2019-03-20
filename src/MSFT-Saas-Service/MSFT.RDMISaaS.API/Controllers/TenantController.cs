@@ -9,6 +9,7 @@ using System.Web.Http;
 using MSFT.RDMISaaS.API.BLL;
 using System.Web.Http.Cors;
 using MSFT.RDMISaaS.API.Common;
+using Newtonsoft.Json.Linq;
 #endregion "Import Namespaces"
 
 #region "MSFT.RDMISaaS.API.Controllers"
@@ -34,7 +35,7 @@ namespace MSFT.RDMISaaS.API.Controllers
         /// <param name="tenantName">Name of tenant</param>
         /// <param name="refresh_token">Refresh token to get access token</param>
         /// <returns></returns>
-        public RdMgmtTenant GetTenantDetails(string tenantGroupName,string tenantName, string refresh_token)
+        public JObject GetTenantDetails(string tenantGroupName,string tenantName, string refresh_token)
         {
             //get deployment url
             deploymentUrl = configurations.rdBrokerUrl;
@@ -48,19 +49,27 @@ namespace MSFT.RDMISaaS.API.Controllers
                     accessToken = common.GetTokenValue(refresh_token);
                     if (!string.IsNullOrEmpty(accessToken) && accessToken.ToString().ToLower() != invalidToken && accessToken.ToString().ToLower() != invalidCode)
                     {
-                        rdMgmtTenant = tenantBL.GetTenantDetails(tenantGroupName,deploymentUrl, accessToken,tenantName);
+                        return tenantBL.GetTenantDetails(tenantGroupName,deploymentUrl, accessToken,tenantName);
                     }
                     else
                     {
-                        rdMgmtTenant.code = Constants.invalidToken;
+                       return new JObject()
+                        {
+                            {"code",  Constants.invalidToken}
+                        };
+                       // rdMgmtTenant.code = Constants.invalidToken;
                     }
+                }
+                else
+                {
+                    return null;
                 }
             }
             catch 
             {
                 return null;
             }
-            return rdMgmtTenant;
+          //  return rdMgmtTenant;
         }
 
         /// <summary>
@@ -68,7 +77,7 @@ namespace MSFT.RDMISaaS.API.Controllers
         /// </summary>
         /// <param name="refresh_token">effsh token to get access token</param>
         /// <returns></returns>
-        public Tenants GetTenantList(string tenantGroupName, string refresh_token, int pageSize, string sortField, bool isDescending = false, int initialSkip = 0, string lastEntry = "")
+        public JArray GetTenantList(string tenantGroupName, string refresh_token, int pageSize, string sortField, bool isDescending = false, int initialSkip = 0, string lastEntry = "")
         {
             //get deployment url
             deploymentUrl = configurations.rdBrokerUrl;
@@ -82,23 +91,34 @@ namespace MSFT.RDMISaaS.API.Controllers
                     accessToken = common.GetTokenValue(refresh_token);
                     if (!string.IsNullOrEmpty(accessToken) && accessToken.ToString().ToLower() != invalidToken && accessToken.ToString().ToLower() != invalidCode)
                     {
-                        tenants = tenantBL.GetTenantList(tenantGroupName,deploymentUrl, accessToken, pageSize, sortField, isDescending, initialSkip, lastEntry);
+                       return tenantBL.GetTenantList(tenantGroupName,deploymentUrl, accessToken, pageSize, sortField, isDescending, initialSkip, lastEntry);
+                        //tenants = tenantBL.GetTenantList(tenantGroupName,deploymentUrl, accessToken, pageSize, sortField, isDescending, initialSkip, lastEntry);
                     }
                     else
                     {
-                        List<RdMgmtTenant> rdMgmtTenants = new List<RdMgmtTenant>();
-                        RdMgmtTenant rdMgmtTenant = new RdMgmtTenant();
-                        rdMgmtTenant.code = Constants.invalidToken;
-                        rdMgmtTenants.Add(rdMgmtTenant);
-                        tenants.rdMgmtTenants = rdMgmtTenants;
+                        //List<RdMgmtTenant> rdMgmtTenants = new List<RdMgmtTenant>();
+                        //RdMgmtTenant rdMgmtTenant = new RdMgmtTenant();
+                        //rdMgmtTenant.code = Constants.invalidToken;
+                        //rdMgmtTenants.Add(rdMgmtTenant);
+                        //tenants.rdMgmtTenants = rdMgmtTenants;
+                        return new JArray() {
+                            new JObject()
+                            {
+                                {"code", Constants.invalidToken }
+                            }
+                        };
                     }
+                }
+                else
+                {
+                    return null;
                 }
             }
             catch
             {
                 return null;
             }
-            return tenants;
+            //return tenants;
         }
 
         /// <summary>
@@ -234,11 +254,11 @@ namespace MSFT.RDMISaaS.API.Controllers
             }
             return Ok(tenantResult);
         }
-        public List<RdMgmtTenant> GetAllTenants(string tenantGroupName,string refresh_token)
+        public JArray GetAllTenants(string tenantGroupName,string refresh_token)
         {
             //get deployment url
             deploymentUrl = configurations.rdBrokerUrl;
-            List<RdMgmtTenant> rdMgmtTenants = new List<RdMgmtTenant>();
+            //List<RdMgmtTenant> rdMgmtTenants = new List<RdMgmtTenant>();
 
             try
             {
@@ -249,21 +269,30 @@ namespace MSFT.RDMISaaS.API.Controllers
                     accessToken = common.GetTokenValue(refresh_token);
                     if (!string.IsNullOrEmpty(accessToken) && accessToken.ToString().ToLower() != invalidToken && accessToken.ToString().ToLower() != invalidCode)
                     {
-                        rdMgmtTenants = tenantBL.GetAllTenantList(tenantGroupName,deploymentUrl, accessToken);
+                        return tenantBL.GetAllTenantList(tenantGroupName,deploymentUrl, accessToken);
                     }
                     else
                     {
-                        RdMgmtTenant rdMgmtTenant = new RdMgmtTenant();
-                        rdMgmtTenant.code = Constants.invalidToken;
-                        rdMgmtTenants.Add(rdMgmtTenant);
+                        JArray newarray = new JArray();
+                        newarray.Add(new JObject() {
+                            { "code",Constants.invalidToken },
+                        });
+                        return newarray;
+                        //RdMgmtTenant rdMgmtTenant = new RdMgmtTenant();
+                        //rdMgmtTenant.code = Constants.invalidToken;
+                        //rdMgmtTenants.Add(rdMgmtTenant);
                     }
+                }
+                else
+                {
+                    return null;
                 }
             }
             catch
             {
                 return null;
             }
-            return rdMgmtTenants;
+           // return rdMgmtTenants;
         }
     }
 
