@@ -93,7 +93,7 @@ export class AdminMenuComponent {
    */
   public GetAllTenants() {
     this.displayTenantList = [];
-    let tenants = JSON.parse(sessionStorage.getItem('Tenants'));
+    let tenants = sessionStorage.getItem('Tenants') ? JSON.parse(sessionStorage.getItem('Tenants')) : [];
     let data = tenants;
     this.tenantList = [];
     this.hostPoolList = [];
@@ -168,7 +168,7 @@ export class AdminMenuComponent {
    * ----------
    */
   public GetHostpools( tenantName: any) {
-    let hostpoolData = JSON.parse(sessionStorage.getItem('sideMenuHostpools'));
+    let hostpoolData = sessionStorage.getItem('sideMenuHostpools') ? JSON.parse(sessionStorage.getItem('sideMenuHostpools')) : [];
     // sessionStorage.setItem("hostpoolList", JSON.stringify(hostpoolData));
     this.hostPoolList = [];
     this.hostPoolList = hostpoolData;
