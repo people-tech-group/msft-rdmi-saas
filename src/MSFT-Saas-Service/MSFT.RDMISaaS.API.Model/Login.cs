@@ -1,4 +1,5 @@
 ﻿#region "Import Namespaces"
+using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
@@ -18,9 +19,11 @@ namespace MSFT.RDMISaaS.API.Model
         public string Id_Token { get; set; }
         public string Refresh_Token { get; set; }
         public string Code { get; set; }
-
-        public RdMgmtRoleAssignment RoleAssignment { get; set; }
+        public JObject RoleAssignment { get; set; }
+        //public RdMgmtRoleAssignment RoleAssignment { get; set; }
         public string[] TenantGroups { get; set; }
+
+        public JObject Error { get; set; }
        
     }
     #endregion
