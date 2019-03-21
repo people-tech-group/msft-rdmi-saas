@@ -71,10 +71,10 @@
                     </th>
                     <th style="width:15%;text-align:left;">Tenant Name</th>
                     <th style="width:15%;text-align:left;">Friendly Name</th>
-                    <th style="width:12%;text-align:center;">Hosts</th>
-                    <th style="width:12%;text-align:center;">Sessions</th>
-                    <th style="width:12%;text-align:center;">Assigned</th>
-                    <th style="width:12%;text-align:center;">Active</th>
+                    <th style="width:12%;text-align:center;">Description</th>
+                    <th style="width:12%;text-align:center;">Subscription ID</th>
+                    <!-- <th style="width:12%;text-align:center;">Assigned</th>
+                    <th style="width:12%;text-align:center;">Active</th> -->
                   </tr>
                 </thead>
                 <tbody *ngIf="!editedBody">
@@ -91,10 +91,10 @@
                       {{i.tenantName}}
                     </td>
                     <td style="width: 15%;text-align:left;"><span>{{i.friendlyName}}</span></td>
-                    <td style="width:12%;text-align:center;"><span>{{i.noOfActivehosts}}</span></td>
-                    <td style="width:12%;text-align:center;"><span>{{i.noOfSessions}}</span></td>
-                    <td style="width:12%;text-align:center;"><span>{{i.noOfUsers}}</span></td>
-                    <td style="width:12%;text-align:center;"><span>{{i.noOfActivehosts}}</span></td>
+                    <td style="width:12%;text-align:center;"><span>{{i.description}}</span></td>
+                    <td style="width:12%;text-align:center;"><span>{{i.azureSubscriptionId}}</span></td>
+                    <!-- <td style="width:12%;text-align:center;"><span>{{i.noOfUsers}}</span></td>
+                    <td style="width:12%;text-align:center;"><span>{{i.noOfActivehosts}}</span></td> -->
                   </tr>
                 </tbody>
               </table>

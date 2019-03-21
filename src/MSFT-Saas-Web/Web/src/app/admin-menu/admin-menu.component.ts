@@ -92,15 +92,15 @@ export class AdminMenuComponent {
    * ---------
    */
   public GetAllTenants() {
+    this.displayTenantList = [];
     let tenants = JSON.parse(sessionStorage.getItem('Tenants'));
-    let data = tenants.rdMgmtTenants;
+    let data = tenants;
     this.tenantList = [];
     this.hostPoolList = [];
     if (data == undefined || data == null) {
       this.router.navigate(['/admin/Tenants']);
     }
     else {
-      this.displayTenantList = [];
       this.initialIndex = 0;
       this.tenantLength = 10;
       this.storeLength = 0;
@@ -115,7 +115,7 @@ export class AdminMenuComponent {
       let tenantName = sessionStorage.getItem("TenantName");
       if (decodeURIComponent(path) == `/admin/hostpoolDashboard/${hostpoolName}`) {
         let hostpoolList = JSON.parse(sessionStorage.getItem("hostpoolList"));
-        this.GetHostpools(hostpoolList, tenantName);
+        this.GetHostpools(tenantName);
       }
     }
   }
@@ -167,8 +167,9 @@ export class AdminMenuComponent {
    * tenantName -  Accepts Tenant Name
    * ----------
    */
-  public GetHostpools(hostpoolData: any, tenantName: any) {
-    sessionStorage.setItem("hostpoolList", JSON.stringify(hostpoolData));
+  public GetHostpools( tenantName: any) {
+    let hostpoolData = JSON.parse(sessionStorage.getItem('sideMenuHostpools'));
+    // sessionStorage.setItem("hostpoolList", JSON.stringify(hostpoolData));
     this.hostPoolList = [];
     this.hostPoolList = hostpoolData;
     let data = [{

@@ -527,33 +527,39 @@ export class HostpoolDashboardComponent implements OnInit {
    * ----------
    */
   public GetHostPoolDetails(hostPoolName: any) {
-    this.refreshHostpoolLoading = true;
-    this.hostpoolDetailsErrorFound = false;
-    this.hostpoolDetailsUrl = this._AppService.ApiUrl + '/api/HostPool/GetHostPoolDetails?tenantGroupName=' + this.tenantGroupName + '&tenantName=' + this.tenantName + '&hostPoolName=' + hostPoolName + '&refresh_token=' + sessionStorage.getItem("Refresh_Token");
-    this._AppService.GetData(this.hostpoolDetailsUrl).subscribe(response => {
-      let HostPoolList = JSON.parse(response['_body']);
-      if (HostPoolList) {
-        if (HostPoolList.code == "Invalid Token") {
-          this.router.navigate(['/invalidtokenmessage']);
-          sessionStorage.clear();
-        }
-      }
-      if (HostPoolList.message == null) {
-        this.hostPoolDetails = JSON.parse(response['_body']);
-        this.hostCount = this.hostPoolDetails.noOfActivehosts;
-      }
-      this.GetcurrentNoOfPagesCountAppgroup();
-      this.GetcurrentNoOfPagesCountHost();
-      this.GetAllAppGroupsList(hostPoolName);
-    },
-      /*
-       * If Any Error (or) Problem With Services (or) Problem in internet this Error Block Will Exequte
-       */
-      (error) => {
-        this.refreshHostpoolLoading = false;
-        this.hostpoolDetailsErrorFound = true;
-      }
-    );
+    let Hostpools = JSON.parse(sessionStorage.getItem('Hostpools'));
+    let data = Hostpools.filter(item => item.hostPoolName == hostPoolName);
+    this.hostPoolDetails = data[0];
+    this.GetcurrentNoOfPagesCountAppgroup();
+    this.GetcurrentNoOfPagesCountHost();
+    this.GetAllAppGroupsList(hostPoolName);
+    // this.refreshHostpoolLoading = true;
+    // this.hostpoolDetailsErrorFound = false;
+    // this.hostpoolDetailsUrl = this._AppService.ApiUrl + '/api/HostPool/GetHostPoolDetails?tenantGroupName=' + this.tenantGroupName + '&tenantName=' + this.tenantName + '&hostPoolName=' + hostPoolName + '&refresh_token=' + sessionStorage.getItem("Refresh_Token");
+    // this._AppService.GetData(this.hostpoolDetailsUrl).subscribe(response => {
+    //   let HostPoolList = JSON.parse(response['_body']);
+    //   if (HostPoolList) {
+    //     if (HostPoolList.code == "Invalid Token") {
+    //       this.router.navigate(['/invalidtokenmessage']);
+    //       sessionStorage.clear();
+    //     }
+    //   }
+    //   if (HostPoolList.message == null) {
+    //     this.hostPoolDetails = JSON.parse(response['_body']);
+    //     this.hostCount = this.hostPoolDetails.noOfActivehosts;
+    //   }
+    //   this.GetcurrentNoOfPagesCountAppgroup();
+    //   this.GetcurrentNoOfPagesCountHost();
+    //   this.GetAllAppGroupsList(hostPoolName);
+    // },
+    //   /*
+    //    * If Any Error (or) Problem With Services (or) Problem in internet this Error Block Will Exequte
+    //    */
+    //   (error) => {
+    //     this.refreshHostpoolLoading = false;
+    //     this.hostpoolDetailsErrorFound = true;
+    //   }
+    // );
   }
 
   /*
@@ -922,70 +928,83 @@ export class HostpoolDashboardComponent implements OnInit {
   }
   //This.hostsCount=this.hostPoolDetails.noOfActivehosts
   public GetAllSessionHost() {
+    this.refreshHostpoolLoading = true;
     this.sessionHostCheckedMain = false;
     this.sessionHostchecked = [];
     this.hostListErrorFound = false;
-    this.getAllSessionHostUrl = this._AppService.ApiUrl + '/api/SessionHost/GetSessionhostList?tenantGroupName=' + this.tenantGroupName + '&tenantName=' + this.tenantName + '&hostPoolName=' + this.hostPoolName + '&refresh_token=' + sessionStorage.getItem("Refresh_Token") + '&pageSize=' + this.HostpageSize + '&sortField=SessionHostName&isDescending=false&initialSkip=' + this.hostinitialSkip + '&lastEntry=%22%20%22';
-    this._AppService.GetData(this.getAllSessionHostUrl).subscribe(response => {
-      this.sessionHostLists = JSON.parse(response['_body']);
-      /* This Block of code is used to Exchange the allowNewSession value 'true' or 'false' to 'Yes' or 'No' */
-      /*Exchange Block starting*/
-      for (let j in this.sessionHostLists) {
-        if (this.sessionHostLists[j].allowNewSession === true) {
-          this.sessionHostLists[j].allowNewSession = 'Yes';
+    let hosts = JSON.parse(sessionStorage.getItem('Hosts'));
+    if (sessionStorage.getItem('Hosts') && hosts.length != 0 && hosts != null) {
+      this.gettingHosts();
+    }
+    else {
+      this.getAllSessionHostUrl = this._AppService.ApiUrl + '/api/SessionHost/GetSessionhostList?tenantGroupName=' + this.tenantGroupName + '&tenantName=' + this.tenantName + '&hostPoolName=' + this.hostPoolName + '&refresh_token=' + sessionStorage.getItem("Refresh_Token") + '&pageSize=' + this.HostpageSize + '&sortField=SessionHostName&isDescending=false&initialSkip=' + this.hostinitialSkip + '&lastEntry=%22%20%22';
+      this._AppService.GetData(this.getAllSessionHostUrl).subscribe(response => {
+        this.sessionHostLists = JSON.parse(response['_body']);
+        sessionStorage.setItem('Hosts', JSON.stringify(this.sessionHostLists));
+        this.gettingHosts();
+      },
+        /*
+         * If Any Error (or) Problem With Services (or) Problem in internet this Error Block Will Exequte
+         */
+        (error) => {
+          this.hostListErrorFound = true;
+          this.refreshHostpoolLoading = false;
         }
-        else {
-          this.sessionHostLists[j].allowNewSession = 'No';
-        }
-      }
-      /*Exchange Block Ending*/
-
-      if (this.sessionHostLists) {
-        if (this.sessionHostLists.code == "Invalid Token") {
-          sessionStorage.clear();
-          this.router.navigate(['/invalidtokenmessage']);
-        }
-      }
-      if (this.sessionHostLists.length == 0) {
-        this.showHostEmpty = true;
-        this.showHostpoolTab = true;
-      } else {
-        this.showHostEmpty = false;
-        this.showHostpoolTab = false;
-      }
-      this.sessionHostListsSearch = JSON.parse(response['_body']);
-
-      /* This Block of code is used to Exchange the allowNewSession value 'true' or 'false' to 'Yes' or 'No' */
-      /*Exchange Block starting*/
-      for (let i in this.sessionHostListsSearch) {
-        if (this.sessionHostListsSearch[i].allowNewSession === true) {
-          this.sessionHostListsSearch[i].allowNewSession = 'Yes';
-        }
-        else {
-          this.sessionHostListsSearch[i].allowNewSession = 'No';
-        }
-      }
-      /*Exchange Block Ending*/
-
-      if (this.sessionHostListsSearch.length == 0) {
-        this.edited = true;
-      }
-      else {
-        if (this.sessionHostListsSearch[0].Message == null) {
-          this.edited = false;
-        }
-      }
-    },
-      /*
-       * If Any Error (or) Problem With Services (or) Problem in internet this Error Block Will Exequte
-       */
-      (error) => {
-        this.hostListErrorFound = true;
-        this.refreshHostpoolLoading = false;
-      }
-    );
+      );
+    }
     this.editHostDisabled = true;
     this.deleteHostDisabled = true;
+  }
+
+  gettingHosts() {
+    this.sessionHostLists = JSON.parse(sessionStorage.getItem('Hosts'));
+    /* This Block of code is used to Exchange the allowNewSession value 'true' or 'false' to 'Yes' or 'No' */
+    /*Exchange Block starting*/
+    for (let j in this.sessionHostLists) {
+      if (this.sessionHostLists[j].allowNewSession === true) {
+        this.sessionHostLists[j].allowNewSession = 'Yes';
+      }
+      else {
+        this.sessionHostLists[j].allowNewSession = 'No';
+      }
+    }
+    /*Exchange Block Ending*/
+
+    if (this.sessionHostLists) {
+      if (this.sessionHostLists.code == "Invalid Token") {
+        sessionStorage.clear();
+        this.router.navigate(['/invalidtokenmessage']);
+      }
+    }
+    if (this.sessionHostLists.length == 0) {
+      this.showHostEmpty = true;
+      this.showHostpoolTab = true;
+    } else {
+      this.showHostEmpty = false;
+      this.showHostpoolTab = false;
+    }
+    this.sessionHostListsSearch = JSON.parse(sessionStorage.getItem('Hosts'));
+
+    /* This Block of code is used to Exchange the allowNewSession value 'true' or 'false' to 'Yes' or 'No' */
+    /*Exchange Block starting*/
+    for (let i in this.sessionHostListsSearch) {
+      if (this.sessionHostListsSearch[i].allowNewSession === true) {
+        this.sessionHostListsSearch[i].allowNewSession = 'Yes';
+      }
+      else {
+        this.sessionHostListsSearch[i].allowNewSession = 'No';
+      }
+    }
+    /*Exchange Block Ending*/
+
+    if (this.sessionHostListsSearch.length == 0) {
+      this.edited = true;
+    }
+    else {
+      if (this.sessionHostListsSearch[0].Message == null) {
+        this.edited = false;
+      }
+    }
   }
 
   /*
@@ -1610,37 +1629,48 @@ export class HostpoolDashboardComponent implements OnInit {
     this.appGroupListErrorFound = false;
     this.editedBodyAppGroup = false;
     this.checkedMainAppGroup = false;
-    this.getAllAppGroupsListUrl = this._AppService.ApiUrl + '/api/AppGroup/GetAppGroupsList?tenantGroupName=' + this.tenantGroupName + '&tenantName=' + this.tenantName + '&hostPoolName=' + hostPoolName + '&refresh_token=' + sessionStorage.getItem("Refresh_Token") + ' &pageSize=' + this.pageSize + '&sortField=AppGroupName&isDescending=false&initialSkip=' + this.initialSkip + '&lastEntry=%22%20%22';
-    this._AppService.GetData(this.getAllAppGroupsListUrl).subscribe(response => {
-      this.appGroupsList = JSON.parse(response['_body']);
-      this.refreshHostpoolLoading = false;
-      if (this.appGroupsList) {
-        if (this.appGroupsList.code == "Invalid Token") {
-          sessionStorage.clear();
-          this.router.navigate(['/invalidtokenmessage']);
+    let appGroups = JSON.parse(sessionStorage.getItem('Appgroups'));
+    if (sessionStorage.getItem('Appgroups') && appGroups.length != 0 && appGroups != null) {
+      this.gettingAppgroups();
+    } else {
+      this.getAllAppGroupsListUrl = this._AppService.ApiUrl + '/api/AppGroup/GetAppGroupsList?tenantGroupName=' + this.tenantGroupName + '&tenantName=' + this.tenantName + '&hostPoolName=' + hostPoolName + '&refresh_token=' + sessionStorage.getItem("Refresh_Token") + ' &pageSize=' + this.pageSize + '&sortField=AppGroupName&isDescending=false&initialSkip=' + this.initialSkip + '&lastEntry=%22%20%22';
+      this._AppService.GetData(this.getAllAppGroupsListUrl).subscribe(response => {
+        this.appGroupsList = JSON.parse(response['_body']);
+        sessionStorage.setItem('Appgroups', JSON.stringify(this.appGroupsList));
+        this.gettingAppgroups();
+        this.refreshHostpoolLoading = false;
+      },
+        /*
+         * If Any Error (or) Problem With Services (or) Problem in internet this Error Block Will Exequte
+         */
+        (error) => {
+          this.appGroupListErrorFound = true;
         }
-      }
-      this.appGroupsListSearch = JSON.parse(response['_body']);
-      if (this.appGroupsListSearch.length == 0) {
-        this.editedBodyAppGroup = true;
-        this.editedLBody = false;
-      }
-      else {
-        if (this.appGroupsListSearch[0].Message == null) {
-          this.editedLBody = true;
-          this.editedBodyAppGroup = false;
-        }
-      }
-    },
-      /*
-       * If Any Error (or) Problem With Services (or) Problem in internet this Error Block Will Exequte
-       */
-      (error) => {
-        this.appGroupListErrorFound = true;
-      }
-    );
+      );
+    }
     this.isEditAppgroupDisabled = true;
     this.isDeleteAppgroupDisabled = true;
+  }
+
+  gettingAppgroups() {
+    this.appGroupsList = JSON.parse(sessionStorage.getItem('Appgroups'));
+    if (this.appGroupsList) {
+      if (this.appGroupsList.code == "Invalid Token") {
+        sessionStorage.clear();
+        this.router.navigate(['/invalidtokenmessage']);
+      }
+    }
+    this.appGroupsListSearch = JSON.parse(sessionStorage.getItem('Appgroups'));
+    if (this.appGroupsListSearch.length == 0) {
+      this.editedBodyAppGroup = true;
+      this.editedLBody = false;
+    }
+    else {
+      if (this.appGroupsListSearch[0].Message == null) {
+        this.editedLBody = true;
+        this.editedBodyAppGroup = false;
+      }
+    }
   }
 
   /*

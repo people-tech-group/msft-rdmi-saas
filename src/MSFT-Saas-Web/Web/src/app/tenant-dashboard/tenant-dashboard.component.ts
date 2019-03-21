@@ -78,7 +78,7 @@ export class TenantDashboardComponent implements OnInit {
   public isEnableUser: boolean;
   public refreshToken: any;
   public tenantGroupName: any;
-  
+
 
   /*This  is used to close the edit modal popup*/
   @ViewChild('closeModal') closeModal: ElementRef;
@@ -167,10 +167,9 @@ export class TenantDashboardComponent implements OnInit {
       this.tenantInfo = {
         "tenantName": this.scopeArray[1]
       };
-      this.adminMenuComponent.GetHostpools(this.hostPoolsList, this.scopeArray[1]);
+      this.adminMenuComponent.GetHostpools(this.scopeArray[1]);
     }
     else {
-      this.GetHostpools(tenantName);
       this.GetHostpoolsList(tenantName);
     }
   }
@@ -291,29 +290,32 @@ export class TenantDashboardComponent implements OnInit {
    * --------------
    */
   public GetTenantDetails(tenantName: any) {
-    this.refreshHostpoolLoading = true;
-    this.getTenantlistErrorFound = false;
-    this.getTenantDetailsUrl = this._AppService.ApiUrl + '/api/Tenant/GetTenantDetails?tenantGroupName=' + this.tenantGroupName +'&tenantName=' + tenantName + '&refresh_token=' + sessionStorage.getItem("Refresh_Token");
-    this._AppService.GetTenantDetails(this.getTenantDetailsUrl).subscribe(response => {
-      this.tenantInfo = JSON.parse(response['_body']);
-      this.hostpoolsCount = this.tenantInfo.noOfHostpool;
-      this.GetcurrentNoOfPagesHostpoolsCount();
-      if (this.tenantInfo) {
-        if (this.tenantInfo.code == "Invalid Token") {
-          sessionStorage.clear();
-          this.router.navigate(['/invalidtokenmessage']);
-        }
-      }
-      this.refreshHostpoolLoading = false;
-    },
-      /*
-       * If Any Error (or) Problem With Services (or) Problem in internet this Error Block Will Exequte
-       */
-      error => {
-        this.refreshHostpoolLoading = false;
-        this.getTenantlistErrorFound = true;
-      }
-    );
+    let Tenants = JSON.parse(sessionStorage.getItem('Tenants'));
+    let data = Tenants.filter(item => item.tenantName == tenantName);
+    this.tenantInfo = data[0];
+    // this.refreshHostpoolLoading = true;
+    // this.getTenantlistErrorFound = false;
+    // this.getTenantDetailsUrl = this._AppService.ApiUrl + '/api/Tenant/GetTenantDetails?tenantGroupName=' + this.tenantGroupName + '&tenantName=' + tenantName + '&refresh_token=' + sessionStorage.getItem("Refresh_Token");
+    // this._AppService.GetTenantDetails(this.getTenantDetailsUrl).subscribe(response => {
+    //   this.tenantInfo = JSON.parse(response['_body']);
+    //   // this.hostpoolsCount = this.tenantInfo.noOfHostpool;
+    //   this.GetcurrentNoOfPagesHostpoolsCount();
+    //   if (this.tenantInfo) {
+    //     if (this.tenantInfo.code == "Invalid Token") {
+    //       sessionStorage.clear();
+    //       this.router.navigate(['/invalidtokenmessage']);
+    //     }
+    //   }
+    //   this.refreshHostpoolLoading = false;
+    // },
+    //   /*
+    //    * If Any Error (or) Problem With Services (or) Problem in internet this Error Block Will Exequte
+    //    */
+    //   error => {
+    //     this.refreshHostpoolLoading = false;
+    //     this.getTenantlistErrorFound = true;
+    //   }
+    // );
   }
 
 
@@ -524,7 +526,7 @@ export class TenantDashboardComponent implements OnInit {
     /*
      * Access level of Tenant block End
      */
-    this.getHostpoolsUrl = this._AppService.ApiUrl + '/api/HostPool/GetHostPoolList?tenantGroupName=' + this.tenantGroupName +'&tenantName=' + this.tenantName + '&refresh_token=' + sessionStorage.getItem("Refresh_Token") + '&pageSize=' + this.pageSize + '&sortField=HostPoolName&isDescending=true&initialSkip=' + this.initialSkip + '&lastEntry=' + this.lastEntry;
+    this.getHostpoolsUrl = this._AppService.ApiUrl + '/api/HostPool/GetHostPoolList?tenantGroupName=' + this.tenantGroupName + '&tenantName=' + this.tenantName + '&refresh_token=' + sessionStorage.getItem("Refresh_Token") + '&pageSize=' + this.pageSize + '&sortField=HostPoolName&isDescending=true&initialSkip=' + this.initialSkip + '&lastEntry=' + this.lastEntry;
     this._AppService.GetTenantDetails(this.getHostpoolsUrl).subscribe(response => {
       this.hostPoolsList = JSON.parse(response['_body']);
       this.previousPageNo = this.currentPageNo;
@@ -586,11 +588,11 @@ export class TenantDashboardComponent implements OnInit {
     this.refreshHostpoolLoading = true;
     this.hostpoollistErrorFound = false;
     this.lastEntry = this.searchHostPools[this.searchHostPools.length - 1].hostPoolName;
-    this.curentIndex = this.curentIndex + 1;    
+    this.curentIndex = this.curentIndex + 1;
     /*
      * Access level of Tenant block End
      */
-    this.getHostpoolsUrl = this._AppService.ApiUrl + '/api/HostPool/GetHostPoolList?tenantGroupName=' + this.tenantGroupName +'&tenantName=' + this.tenantName + '&refresh_token=' + sessionStorage.getItem("Refresh_Token") + '&pageSize=' + this.pageSize+'&sortField=HostPoolName&isDescending=false&initialSkip=' + this.initialSkip +'&lastEntry=' + this.lastEntry;
+    this.getHostpoolsUrl = this._AppService.ApiUrl + '/api/HostPool/GetHostPoolList?tenantGroupName=' + this.tenantGroupName + '&tenantName=' + this.tenantName + '&refresh_token=' + sessionStorage.getItem("Refresh_Token") + '&pageSize=' + this.pageSize + '&sortField=HostPoolName&isDescending=false&initialSkip=' + this.initialSkip + '&lastEntry=' + this.lastEntry;
     this._AppService.GetTenantDetails(this.getHostpoolsUrl).subscribe(response => {
       this.hostPoolsList = JSON.parse(response['_body']);
       this.previousPageNo = this.currentPageNo;
@@ -666,10 +668,10 @@ export class TenantDashboardComponent implements OnInit {
     /*
      * Access level of Tenant block End
      */
-    this.getHostpoolsUrl = this._AppService.ApiUrl + '/api/HostPool/GetHostPoolList?tenantGroupName=' + this.tenantGroupName +'&tenantName=' + this.tenantName + '&refresh_token=' + sessionStorage.getItem("Refresh_Token") + '&pageSize=' + this.pageSize + ' &sortField=HostPoolName&isDescending=' + this.isDescending + '&initialSkip=' + this.initialSkip + '&lastEntry=' + this.lastEntry;
+    this.getHostpoolsUrl = this._AppService.ApiUrl + '/api/HostPool/GetHostPoolList?tenantGroupName=' + this.tenantGroupName + '&tenantName=' + this.tenantName + '&refresh_token=' + sessionStorage.getItem("Refresh_Token") + '&pageSize=' + this.pageSize + ' &sortField=HostPoolName&isDescending=' + this.isDescending + '&initialSkip=' + this.initialSkip + '&lastEntry=' + this.lastEntry;
     this._AppService.GetTenantDetails(this.getHostpoolsUrl).subscribe(response => {
       this.hostPoolsList = JSON.parse(response['_body']);
-      this.hostpoolsCount = this.tenantInfo.noOfHostpool;
+      this.hostpoolsCount = this.tenantInfo.length;
       for (let i in this.hostPoolsList) {
         if (this.hostPoolsList[i].enableUserProfileDisk === true) {
           this.hostPoolsList[i].enableUserProfileDisk = 'Yes';
@@ -736,14 +738,24 @@ export class TenantDashboardComponent implements OnInit {
         'tenantName': this.scopeArray[1]
       };
     }
-    /*
-     * Access level of Tenant block End
-     */
-    this.getHostpoolsUrl = this._AppService.ApiUrl + '/api/HostPool/GetHostPoolList?tenantGroupName=' + this.tenantGroupName +'&tenantName=' + tenantName + '&refresh_token=' + sessionStorage.getItem("Refresh_Token") + '&pageSize=100&sortField=HostPoolName&isDescending=false&initialSkip=0&lastEntry=""';
-    this._AppService.GetTenantDetails(this.getHostpoolsUrl).subscribe(response => {
-      var list = JSON.parse(response['_body']);
-      this.adminMenuComponent.GetHostpools(list, tenantName);
-    });
+    let sideMenuhostpools = JSON.parse(sessionStorage.getItem('sideMenuHostpools'));
+    if (sessionStorage.getItem('sideMenuHostpools') && sideMenuhostpools.length != 0 && sideMenuhostpools != null) {
+      this.adminMenuComponent.GetAllTenants();
+      this.adminMenuComponent.GetHostpools(tenantName);
+      this.hostpoolsCount = sideMenuhostpools.length;
+    } else {
+      /*
+       * Access level of Tenant block End
+       */
+      this.getHostpoolsUrl = this._AppService.ApiUrl + '/api/HostPool/GetHostPoolList?tenantGroupName=' + this.tenantGroupName + '&tenantName=' + tenantName + '&refresh_token=' + sessionStorage.getItem("Refresh_Token") + '&pageSize=100&sortField=HostPoolName&isDescending=false&initialSkip=0&lastEntry=""';
+      this._AppService.GetTenantDetails(this.getHostpoolsUrl).subscribe(response => {
+        var list = JSON.parse(response['_body']);
+        sessionStorage.setItem('sideMenuHostpools', JSON.stringify(list));
+        this.hostpoolsCount = list.length;
+        this.adminMenuComponent.GetHostpools(tenantName);
+      });
+    }
+    this.GetHostpools(tenantName);
   }
 
   public GetHostpools(tenantName: any) {
@@ -762,68 +774,82 @@ export class TenantDashboardComponent implements OnInit {
         'tenantName': this.scopeArray[1]
       };
     }
-    /*
-     * Access level of Tenant block End
-     */
-    this.getHostpoolsUrl = this._AppService.ApiUrl + '/api/HostPool/GetHostPoolList?tenantGroupName=' + this.tenantGroupName +'&tenantName=' + tenantName + '&refresh_token=' + sessionStorage.getItem("Refresh_Token") + '&pageSize=' + this.pageSize + '&sortField=HostPoolName&isDescending=false&initialSkip=' + this.initialSkip +' &lastEntry='+this.lastEntry;
-    this._AppService.GetTenantDetails(this.getHostpoolsUrl).subscribe(response => {
-      this.hostPoolsList = JSON.parse(response['_body']);      
-      for (let i in this.hostPoolsList) {
-        if (this.hostPoolsList[i].enableUserProfileDisk === true) {
-          this.hostPoolsList[i].enableUserProfileDisk = 'Yes';
-        }
-        else {
-          this.hostPoolsList[i].enableUserProfileDisk = 'No';
-        }
-      }
-      if (this.hostPoolsList[0]) {
-        if (this.hostPoolsList[0].code == "Invalid Token") {
-          sessionStorage.clear();
-          this.router.navigate(['/invalidtokenmessage']);
-        }
-      }
-      this.searchHostPools = JSON.parse(response['_body']);
-      
-      for (let i in this.searchHostPools) {
-        if (this.searchHostPools[i].enableUserProfileDisk === true) {
-          this.searchHostPools[i].enableUserProfileDisk = 'Yes';
-        }
-        else {
-          this.searchHostPools[i].enableUserProfileDisk = 'No';
-        }
-      }
-      if (this.searchHostPools.length == 0) {
-        this.editedBody = true;
-        this.showCreateHostpool = true;
-      }
-      else {
-        if (this.searchHostPools[0].Message == null) {
-          this.editedBody = false;
-        }
 
-        this.showCreateHostpool = false;
-      }
-      this.refreshHostpoolLoading = false;
-      this.isEditDisabled = true;
-      this.isDeleteDisabled = true;
-      for (let i = 0; i < this.searchHostPools.length; i++) {
-        this.checked[i] = false;
-      }
-      this.checkedMain = false;
-    },
+    let hostpools = JSON.parse(sessionStorage.getItem('Hostpools'));
+    if (sessionStorage.getItem('Hostpools') && hostpools.length != 0 && hostpools != null) {
+      this.gettingHostpools();
+    }
+    else {
       /*
-       * If Any Error (or) Problem With Services (or) Problem in internet this Error Block Will Exequte
+       * Access level of Tenant block End
        */
-      error => {
-        this.refreshHostpoolLoading = false;
-        this.hostpoollistErrorFound = true;
-      }
-    );
+      this.getHostpoolsUrl = this._AppService.ApiUrl + '/api/HostPool/GetHostPoolList?tenantGroupName=' + this.tenantGroupName + '&tenantName=' + tenantName + '&refresh_token=' + sessionStorage.getItem("Refresh_Token") + '&pageSize=' + this.pageSize + '&sortField=HostPoolName&isDescending=false&initialSkip=' + this.initialSkip + ' &lastEntry=' + this.lastEntry;
+      this._AppService.GetTenantDetails(this.getHostpoolsUrl).subscribe(response => {
+        this.hostPoolsList = JSON.parse(response['_body']);
+        sessionStorage.setItem('Hostpools', JSON.stringify(this.hostPoolsList));
+        this.gettingHostpools();
+      },
+        /*
+         * If Any Error (or) Problem With Services (or) Problem in internet this Error Block Will Exequte
+         */
+        error => {
+          this.refreshHostpoolLoading = false;
+          this.hostpoollistErrorFound = true;
+        }
+      );
+    }
   }
 
   /* This function is used to check Hostpool Access and refresh the hostpools list */
   public RefreshHostpools() {
+    sessionStorage.removeItem('Hostpools');
     this.CheckHostpoolAccess(this.tenantName);
+  }
+
+  gettingHostpools() {
+    this.hostPoolsList = JSON.parse(sessionStorage.getItem('Hostpools'));
+    for (let i in this.hostPoolsList) {
+      if (this.hostPoolsList[i].enableUserProfileDisk === true) {
+        this.hostPoolsList[i].enableUserProfileDisk = 'Yes';
+      }
+      else {
+        this.hostPoolsList[i].enableUserProfileDisk = 'No';
+      }
+    }
+    if (this.hostPoolsList[0]) {
+      if (this.hostPoolsList[0].code == "Invalid Token") {
+        sessionStorage.clear();
+        this.router.navigate(['/invalidtokenmessage']);
+      }
+    }
+    this.searchHostPools = JSON.parse(sessionStorage.getItem('Hostpools'));
+
+    for (let i in this.searchHostPools) {
+      if (this.searchHostPools[i].enableUserProfileDisk === true) {
+        this.searchHostPools[i].enableUserProfileDisk = 'Yes';
+      }
+      else {
+        this.searchHostPools[i].enableUserProfileDisk = 'No';
+      }
+    }
+    if (this.searchHostPools.length == 0) {
+      this.editedBody = true;
+      this.showCreateHostpool = true;
+    }
+    else {
+      if (this.searchHostPools[0].Message == null) {
+        this.editedBody = false;
+      }
+
+      this.showCreateHostpool = false;
+    }
+    this.refreshHostpoolLoading = false;
+    this.isEditDisabled = true;
+    this.isDeleteDisabled = true;
+    for (let i = 0; i < this.searchHostPools.length; i++) {
+      this.checked[i] = false;
+    }
+    this.checkedMain = false;
   }
 
   /* This function is used to  Create the New Hostpool
@@ -1042,7 +1068,7 @@ export class TenantDashboardComponent implements OnInit {
     this.refreshHostpoolLoading = true;
     for (let i = 0; i < this.selectedRows.length; i++) {
       let index = this.selectedRows[i];
-      this.hostpoolDeleteUrl = this._AppService.ApiUrl + '/api/HostPool/Delete?tenantGroupName=' + this.tenantGroupName +'&tenantName=' + this.searchHostPools[index].tenantName + '&hostPoolName=' + this.searchHostPools[index].hostPoolName + '&refresh_token=' + sessionStorage.getItem("Refresh_Token");
+      this.hostpoolDeleteUrl = this._AppService.ApiUrl + '/api/HostPool/Delete?tenantGroupName=' + this.tenantGroupName + '&tenantName=' + this.searchHostPools[index].tenantName + '&hostPoolName=' + this.searchHostPools[index].hostPoolName + '&refresh_token=' + sessionStorage.getItem("Refresh_Token");
       this._AppService.DeleteTenantService(this.hostpoolDeleteUrl).subscribe(response => {
         this.refreshHostpoolLoading = false;
         var responseData = JSON.parse(response['_body']);
