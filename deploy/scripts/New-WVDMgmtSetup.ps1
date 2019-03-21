@@ -1,12 +1,11 @@
 ﻿$subsriptionid = Get-AutomationVariable -Name 'subsriptionid'
 $ResourceGroupName = Get-AutomationVariable -Name 'ResourceGroupName'
-$Location = Get-AutomationVariable -Name 'Location'
 $RDBrokerURL = Get-AutomationVariable -Name 'RDBrokerURL'
 $ResourceURL = Get-AutomationVariable -Name 'ResourceURL'
 $fileURI = Get-AutomationVariable -Name 'fileURI'
 $Username = Get-AutomationVariable -Name 'Username'
 $Password = Get-AutomationVariable -Name 'Password'
-$AppServicePlan = Get-AutomationVariable -Name 'servicePlanName'
+$accountname = Get-AutomationVariable -Name 'accountName'
 $WebApp = Get-AutomationVariable -Name 'webApp'
 $ApiApp = Get-AutomationVariable -Name 'apiApp'
 
@@ -33,7 +32,6 @@ Import-Module AzureAD
     $Cred = Get-AutomationPSCredential -Name $CredentialAssetName
     Add-AzureRmAccount -Environment 'AzureCloud' -Credential $Cred
     Select-AzureRmSubscription -SubscriptionId $subsriptionid
-    $EnvironmentName = "AzureCloud"
     $CodeBitPath= "C:\msft-rdmi-saas-offering\msft-rdmi-saas-offering"
     $WebAppDirectory = ".\msft-rdmi-saas-web"
     $WebAppExtractionPath = ".\msft-rdmi-saas-web\msft-rdmi-saas-web.zip"
@@ -219,21 +217,13 @@ Import-Module AzureRM.Automation
 `$Securepass=ConvertTo-SecureString -String `$Password -AsPlainText -Force
 `$Azurecred=New-Object -TypeName System.Management.Automation.PSCredential -ArgumentList(`$Username, `$Securepass)
 `$login=Login-AzureRmAccount -Credential `$Azurecred -SubscriptionId `$SubscriptionId
-Remove-AzureRmAutomationAccount -Name "msftsaas-autoAccount" -ResourceGroupName `$ResourceGroupName -Force 
+Remove-AzureRmAutomationAccount -Name `$accountname -ResourceGroupName `$ResourceGroupName -Force 
 "@| Out-File -FilePath RemoveAccount:\RemoveAccount.ps1 -Force
 
-    $CredentialAssetName = 'DefaultAzureCredential'
-
-    #Get the credential with the above name from the Automation Asset store
-    $Cred = Get-AutomationPSCredential -Name $CredentialAssetName
-    login-AzureRmAccount -Environment 'AzureCloud' -Credential $Cred
-    Select-AzureRmSubscription -SubscriptionId $subsriptionid
-
-
-    $runbookName='removemsftsaasact'
-    $automationAccountName="msftsaas-autoAccount"
+    $runbookName='removewvdsaasacctbook'
+    $automationAccountName="$accountname"
     #Create a Run Book
-    $AAcctRunbook=New-AzureRmAutomationRunbook -Name $runbookName -Type PowerShell -ResourceGroupName $ResourceGroupName -AutomationAccountName $automationAccountName
+    New-AzureRmAutomationRunbook -Name $runbookName -Type PowerShell -ResourceGroupName $ResourceGroupName -AutomationAccountName $automationAccountName
 
     #Import modules to Automation Account
     $modules="AzureRM.profile,Azurerm.compute,azurerm.resources"
