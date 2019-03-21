@@ -1464,6 +1464,7 @@ export class HostpoolDashboardComponent implements OnInit {
    */
   public RefreshBtnClick() {
     this.isDeleteAppsDisabled = true;
+    // this.appUsersList=[];
     this.GetAppGroupDetails();
     this.GetAllAppGroupsList(this.hostPoolName);
   }
@@ -2164,44 +2165,55 @@ export class HostpoolDashboardComponent implements OnInit {
    * This function is used to get the Appgroup users list and load into table
    */
   public GetAppGroupUsers() {
-    this.checkedUsers = [];
-    this.checkedMainUser = false;
-    this.usersListErrorFound = false;
-    this.refreshHostpoolLoading = true;
-    this.getAppGroupUserUrl = this._AppService.ApiUrl + '/api/AppGroup/GetUsersList?tenantGroupName=' + this.tenantGroupName + '&tenantName=' + this.tenantName + '&hostPoolName=' + this.hostPoolName + '&appGroupName=' + this.selectedAppGroupName + '&refresh_token=' + sessionStorage.getItem("Refresh_Token") + '&pageSize=' + this.pageSize + '&sortField=UserPrincipalName&isDescending=false&initialSkip=' + this.usersInitialSkip + '&lastEntry=' + this.usersLastEntry;
-    this._AppService.GetData(this.getAppGroupUserUrl).subscribe(response => {
-      this.appUsersList = JSON.parse(response['_body']);
-      if (this.appUsersList) {
-        if (this.appUsersList.code == "Invalid Token") {
-          sessionStorage.clear();
-          this.router.navigate(['/invalidtokenmessage']);
+    let Users = JSON.parse(sessionStorage.getItem('Users'));
+    if (sessionStorage.getItem('Users') && Users.length != 0 && Users != null) {
+      this.getusers()
+    }
+    else {
+      this.checkedUsers = [];
+      this.checkedMainUser = false;
+      this.usersListErrorFound = false;
+      this.refreshHostpoolLoading = true;
+      this.getAppGroupUserUrl = this._AppService.ApiUrl + '/api/AppGroup/GetUsersList?tenantGroupName=' + this.tenantGroupName + '&tenantName=' + this.tenantName + '&hostPoolName=' + this.hostPoolName + '&appGroupName=' + this.selectedAppGroupName + '&refresh_token=' + sessionStorage.getItem("Refresh_Token") + '&pageSize=' + this.pageSize + '&sortField=UserPrincipalName&isDescending=false&initialSkip=' + this.usersInitialSkip + '&lastEntry=' + this.usersLastEntry;
+      this._AppService.GetData(this.getAppGroupUserUrl).subscribe(response => {
+        this.appUsersList = JSON.parse(response['_body']);
+        sessionStorage.setItem('Users', JSON.stringify(this.appUsersList));
+        this.getusers();
+      },
+        /*
+         * If Any Error (or) Problem With Services (or) Problem in internet this Error Block Will Exequte
+         */
+        (error) => {
+          this.usersListErrorFound = true;
+          this.refreshHostpoolLoading = false;
         }
-      }
-      this.GetcurrentNoOfUsersPagesCount(this.usersCount);
-      this.appUsersListSearch = JSON.parse(response['_body']);
-      if (this.appUsersListSearch.length == 0) {
-        this.editedLbodyUsers = true;
-        this.editedBodyUsers = false;
-      }
-      else {
-        if (this.appUsersListSearch[0].Message == null) {
-          this.editedBodyUsers = true;
-          this.editedLbodyUsers = false;
-        }
-      }
-      this.refreshHostpoolLoading = false;
-    },
-      /*
-       * If Any Error (or) Problem With Services (or) Problem in internet this Error Block Will Exequte
-       */
-      (error) => {
-        this.usersListErrorFound = true;
-        this.refreshHostpoolLoading = false;
-      }
-    );
+      );
+    }
     this.isDeleteUserDisabled = true;
   }
 
+  getusers() {
+    let appUsersList = JSON.parse(sessionStorage.getItem('Users'));
+    if (this.appUsersList) {
+      if (this.appUsersList.code == "Invalid Token") {
+        sessionStorage.clear();
+        this.router.navigate(['/invalidtokenmessage']);
+      }
+    }
+    this.GetcurrentNoOfUsersPagesCount(this.usersCount);
+    this.appUsersListSearch = appUsersList;
+    if (this.appUsersListSearch.length == 0) {
+      this.editedLbodyUsers = true;
+      this.editedBodyUsers = false;
+    }
+    else {
+      if (this.appUsersListSearch[0].Message == null) {
+        this.editedBodyUsers = true;
+        this.editedLbodyUsers = false;
+      }
+    }
+    this.refreshHostpoolLoading = false;
+  }
 
   /* This function is used to  loads all the Users into table on click of Previous button in the table */
   public usersPreviousPage() {
@@ -2864,44 +2876,58 @@ export class HostpoolDashboardComponent implements OnInit {
    * This function is used to get All AppGroup RemoteApps
    */
   public GetAllAppGroupApps() {
-    this.checkedApps = [];
-    this.checkedMainApp = false;
-    this.appListErrorFound = false;
-    this.refreshHostpoolLoading = true;
-    this.getAppGroupAppsUrl = this._AppService.ApiUrl + '/api/RemoteApp/GetRemoteAppList?tenantGroupName=' + this.tenantGroupName + '&tenantName=' + this.tenantName + '&hostPoolName=' + this.hostPoolName + '&appGroupName=' + this.selectedAppGroupName + '&refresh_token=' + sessionStorage.getItem("Refresh_Token") + '&pageSize=' + this.pageSize + '&sortField=RemoteAppName&isDescending=false&initialSkip=' + this.appsInitialSkip + '&lastEntry=' + this.appsLastEntry;
-    this._AppService.GetData(this.getAppGroupAppsUrl).subscribe(response => {
-      this.appGroupAppList = JSON.parse(response['_body']);
-      if (this.appGroupAppList) {
-        if (this.appGroupAppList.code == "Invalid Token") {
-          sessionStorage.clear();
-          this.router.navigate(['/invalidtokenmessage']);
+    let Apps = JSON.parse(sessionStorage.getItem('Apps'));
+    if (sessionStorage.getItem('Apps') && Apps.length != 0 && Apps != null) {
+      this.getapps()
+    } else{
+      this.checkedApps = [];
+      this.checkedMainApp = false;
+      this.appListErrorFound = false;
+      this.refreshHostpoolLoading = true;
+      this.getAppGroupAppsUrl = this._AppService.ApiUrl + '/api/RemoteApp/GetRemoteAppList?tenantGroupName=' + this.tenantGroupName + '&tenantName=' + this.tenantName + '&hostPoolName=' + this.hostPoolName + '&appGroupName=' + this.selectedAppGroupName + '&refresh_token=' + sessionStorage.getItem("Refresh_Token") + '&pageSize=' + this.pageSize + '&sortField=RemoteAppName&isDescending=false&initialSkip=' + this.appsInitialSkip + '&lastEntry=' + this.appsLastEntry;
+      this._AppService.GetData(this.getAppGroupAppsUrl).subscribe(response => {
+        this.appGroupAppList = JSON.parse(response['_body']);
+        sessionStorage.setItem('Apps', JSON.stringify(this.appGroupAppList));
+        this.getapps();
+  
+    
+      },
+        /*
+         * If Any Error (or) Problem With Services (or) Problem in internet this Error Block Will Exequte
+         */
+        (error) => {
+          this.appListErrorFound = true;
+          this.refreshHostpoolLoading = false;
         }
-      }
-      this.GetcurrentNoOfAppsPagesCount(this.appsCount);
-      this.appGroupsAppListSearch = JSON.parse(response['_body']);
-      if (this.appGroupsAppListSearch.length == 0) {
-        this.editedBodyApp = true;
-        this.editedLBodyApp = false;
-      }
-      else {
-        if (this.appGroupsAppListSearch[0].Message == null) {
-          this.editedLBodyApp = true;
-          this.editedBodyApp = false;
-        }
-        else if (this.appGroupsAppListSearch[0].Message == "Unauthorized") {
-          sessionStorage.clear();
-        }
-      }
-    },
-      /*
-       * If Any Error (or) Problem With Services (or) Problem in internet this Error Block Will Exequte
-       */
-      (error) => {
-        this.appListErrorFound = true;
-        this.refreshHostpoolLoading = false;
-      }
-    );
+      );
+    }
+   
     this.GetAppGroupUsers();
+  }
+  getapps()
+  {
+    let appGroupAppList = JSON.parse(sessionStorage.getItem('Apps'));
+    if (this.appGroupAppList) {
+      if (this.appGroupAppList.code == "Invalid Token") {
+        sessionStorage.clear();
+        this.router.navigate(['/invalidtokenmessage']);
+      }
+    }
+    this.GetcurrentNoOfAppsPagesCount(this.appsCount);
+    this.appGroupsAppListSearch = appGroupAppList;
+    if (this.appGroupsAppListSearch.length == 0) {
+      this.editedBodyApp = true;
+      this.editedLBodyApp = false;
+    }
+    else {
+      if (this.appGroupsAppListSearch[0].Message == null) {
+        this.editedLBodyApp = true;
+        this.editedBodyApp = false;
+      }
+      else if (this.appGroupsAppListSearch[0].Message == "Unauthorized") {
+        sessionStorage.clear();
+      }
+    }
   }
 
   /*
