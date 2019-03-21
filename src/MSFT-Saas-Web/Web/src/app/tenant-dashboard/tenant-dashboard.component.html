@@ -48,12 +48,12 @@
               <div class="row">
                 <div class="col-md-5">
                   <label>Host pools</label>
-                  <p>{{tenantInfo.noOfHostpool}}</p>
+                  <p>{{hostpoolsCount}}</p>
                 </div>
-                <div class="col-md-3">
+                <!-- <div class="col-md-3">
                   <label>Active Hosts (Total Hosts)</label>
                   <p>{{tenantInfo.noOfActivehosts}}</p>
-                </div>
+                </div> -->
               </div>
               <div class="row">
                 <div class="col-md-5">
@@ -64,10 +64,10 @@
                     <span *ngIf="tenantInfo.tenantName ; then TenantNameAvailable else TenantNameNotAvailable"></span>
                   </p>
                 </div>
-                <div class="col-md-3">
+                <!-- <div class="col-md-3">
                   <label>App Groups</label>
                   <p>{{tenantInfo.noOfAppgroups}}</p>
-                </div>
+                </div> -->
               </div>
               <div class="row">
                 <div class="col-md-5">
@@ -163,10 +163,10 @@
                     </th>
                     <th style="width:15%;text-align:left;">Host pool Name</th>
                     <th style="width:15%;text-align:left;">Friendly Name</th>
-                    <th style="width:15%;text-align:center;">Hosts</th>
-                    <th style="width:15%;text-align:center;">Sessions</th>
-                    <th style="width:15%;text-align:center;">Assigned Users</th>
-                    <th style="width:15%;text-align:center;">Active Users</th>
+                    <th style="width:15%;text-align:center;">Description</th>
+                    <th style="width:15%;text-align:center;">Persistent</th>
+                    <!-- <th style="width:15%;text-align:center;">Assigned Users</th>
+                    <th style="width:15%;text-align:center;">Active Users</th> -->
                   </tr>
                 </thead>
                 <tbody *ngIf="!(hostpoollistErrorFound || editedBody)">
@@ -183,10 +183,10 @@
                       {{i.hostPoolName}}
                     </td>
                     <td style="width:15%;text-align:left;"><span>{{i.friendlyName}}</span></td>
-                    <td style="width:15%;text-align:center;">{{i.noOfActivehosts}}</td>
-                    <td style="width:15%;text-align:center;">{{i.noOfSessions}}</td>
-                    <td style="width:15%;text-align:center;">{{i.noOfUsers}}</td>
-                    <td style="width:15%;text-align:center;">{{i.noOfActivehosts}}</td>
+                    <td style="width:15%;text-align:center;">{{i.description}}</td>
+                    <td style="width:15%;text-align:center;">{{i.persistent}}</td>
+                    <!-- <td style="width:15%;text-align:center;">{{i.noOfUsers}}</td>
+                    <td style="width:15%;text-align:center;">{{i.noOfActivehosts}}</td> -->
                   </tr>
                 </tbody>
               </table>

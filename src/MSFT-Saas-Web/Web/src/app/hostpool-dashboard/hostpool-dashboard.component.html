@@ -47,19 +47,19 @@
                   <div class="col-md-5">
                     <label>Type</label><br />
                     <p>
-                      <ng-template #HostTypeAvailable>{{hostPoolDetails.persistent}}</ng-template>
-                      <ng-template #HostTypeNotAvailable>N/A</ng-template>
-                      <span *ngIf="hostPoolDetails.isPersistent ; then HostTypeAvailable else HostTypeNotAvailable"></span>
+                      <ng-template #HostTypeAvailable>Persistance</ng-template>
+                      <ng-template #HostTypeNotAvailable>Non-Persistance</ng-template>
+                      <span *ngIf="hostPoolDetails.persistent ; then HostTypeAvailable else HostTypeNotAvailable"></span>
                     </p>
                   </div>
-                  <div class="col-md-3">
+                  <!-- <div class="col-md-3">
                     <label>Active Hosts (Total Hosts)</label>
                     <p>{{hostPoolDetails.noOfActivehosts}}</p>
-                  </div>
-                  <div class="col-md-3">
+                  </div> -->
+                  <!-- <div class="col-md-3">
                     <label>App Groups</label>
                     <p>{{hostPoolDetails.noOfAppgroups}}</p>
-                  </div>
+                  </div> -->
                 </div>
                 <div class="row">
                   <div class="col-md-5">
