@@ -28,24 +28,25 @@ namespace MSFT.RDMISaaS.API.BLL
         /// <param name="tenantName">Name of Tenant</param>
         /// <param name="hostPoolName">name of Hostpool</param>
         /// <returns></returns>
-        public JObject GetHostPoolDetails(string tenantGroupName,string deploymentUrl, string accessToken, string tenantName, string hostPoolName)
+        public HttpResponseMessage GetHostPoolDetails(string tenantGroupName,string deploymentUrl, string accessToken, string tenantName, string hostPoolName)
         {
            // RdMgmtHostPool rdMgmtHostPool = new RdMgmtHostPool();
             try
             {
                 //call rest api to get host pool details -- july code bit
                 HttpResponseMessage response = CommonBL.InitializeHttpClient(deploymentUrl, accessToken).GetAsync("/RdsManagement/V1/TenantGroups/"+ tenantGroupName + "/Tenants/" + tenantName + "/HostPools/" + hostPoolName).Result;
-                string strJson = response.Content.ReadAsStringAsync().Result;
-                if (response.IsSuccessStatusCode)
-                {
-                    var jObj = (JObject)JsonConvert.DeserializeObject(strJson);
-                    return jObj;
-                    //rdMgmtHostPool = JsonConvert.DeserializeObject<RdMgmtHostPool>(strJson);
-                }
-                else
-                {
-                    return null;
-                }
+                return response;
+                //string strJson = response.Content.ReadAsStringAsync().Result;
+                //if (response.IsSuccessStatusCode)
+                //{
+                //    var jObj = (JObject)JsonConvert.DeserializeObject(strJson);
+                //    return jObj;
+                //    //rdMgmtHostPool = JsonConvert.DeserializeObject<RdMgmtHostPool>(strJson);
+                //}
+                //else
+                //{
+                //    return null;
+                //}
 
                 //if(!string.IsNullOrEmpty(rdMgmtHostPool.hostPoolName))
                 //{
@@ -78,7 +79,7 @@ namespace MSFT.RDMISaaS.API.BLL
                 //    }
                 //}
             }
-            catch (Exception ex)
+            catch 
             {
                 return null;
             }
@@ -95,7 +96,7 @@ namespace MSFT.RDMISaaS.API.BLL
         /// <returns></returns>
 
 
-        public JArray GetHostPoolList(string tenantGroupName, string deploymentUrl, string accessToken, string tenantName, bool isHostpoolNameOnly, bool isAll, int pageSize, string sortField, bool isDescending, int initialSkip, string lastEntry)
+        public HttpResponseMessage GetHostPoolList(string tenantGroupName, string deploymentUrl, string accessToken, string tenantName, bool isHostpoolNameOnly, bool isAll, int pageSize, string sortField, bool isDescending, int initialSkip, string lastEntry)
         {
             try
             {
@@ -108,19 +109,19 @@ namespace MSFT.RDMISaaS.API.BLL
                 {
                     response = CommonBL.InitializeHttpClient(deploymentUrl, accessToken).GetAsync("/RdsManagement/V1/TenantGroups/" + tenantGroupName + "/Tenants/" + tenantName + "/HostPools?PageSize=" + pageSize + "&LastEntry=" + lastEntry + "&SortField=" + sortField + "&IsDescending=" + isDescending + "&InitialSkip=" + initialSkip).Result;
                 }
-
+                return response;
                 //call rest api to get host pool list -- july code bit
-                string strJson = response.Content.ReadAsStringAsync().Result;
-                if (response.IsSuccessStatusCode)
-                {
-                    //Deserialize the string to JSON object
-                    var jObj = (JArray)JsonConvert.DeserializeObject(strJson);
-                    return jObj;
-                }
-                else
-                {
-                    return null;
-                }
+                //string strJson = response.Content.ReadAsStringAsync().Result;
+                //if (response.IsSuccessStatusCode)
+                //{
+                //    //Deserialize the string to JSON object
+                //    var jObj = (JArray)JsonConvert.DeserializeObject(strJson);
+                //    return jObj;
+                //}
+                //else
+                //{
+                //    return null;
+                //}
             }
             catch
             {

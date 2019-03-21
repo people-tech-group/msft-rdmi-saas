@@ -31,26 +31,26 @@ namespace MSFT.RDMISaaS.API.BLL
         /// <param name="hostPoolName"> Name of Hostpool</param>
         /// <param name="appGroupName">Name of App group</param>
         /// <returns></returns>
-        public RdMgmtUser GetUserDetails(string tenantGroupName,string deploymentUrl, string accessToken, string tenantName, string hostPoolName, string appGroupName, string userPrincipalName)
+        public HttpResponseMessage GetUserDetails(string tenantGroupName,string deploymentUrl, string accessToken, string tenantName, string hostPoolName, string appGroupName, string userPrincipalName)
         {
-            RdMgmtUser rdMgmtUser = new RdMgmtUser();
+            //RdMgmtUser rdMgmtUser = new RdMgmtUser();
             try
             {
                 //call rest api to get app group user details -- july code bit
                 HttpResponseMessage response = CommonBL.InitializeHttpClient(deploymentUrl, accessToken).GetAsync("/RdsManagement/V1/TenantGroups/" + tenantGroupName + "/Tenants/" + tenantName + "/HostPools/" + hostPoolName + "/AppGroups/" + appGroupName + "/AssignedUsers/" + userPrincipalName).Result;
-                string strJson = response.Content.ReadAsStringAsync().Result;
-                if (response.IsSuccessStatusCode)
-                {
-                    //Deserialize the string to JSON object
-                    rdMgmtUser = JsonConvert.DeserializeObject<RdMgmtUser>(strJson);
-                }
+                return response;
+                //string strJson = response.Content.ReadAsStringAsync().Result;
+                //if (response.IsSuccessStatusCode)
+                //{
+                //    //Deserialize the string to JSON object
+                //    rdMgmtUser = JsonConvert.DeserializeObject<RdMgmtUser>(strJson);
+                //}
 
             }
             catch 
             {
                 return null;
             }
-            return rdMgmtUser;
         }
 
         /// <summary>
@@ -63,9 +63,9 @@ namespace MSFT.RDMISaaS.API.BLL
         /// <param name="hostPoolName">Name of Hostpool</param>
         /// <param name="appGroupName">Name of App Group</param>
         /// <returns></returns>
-        public List<RdMgmtUser> GetUsersList(string tenantGroupName,string deploymentUrl, string accessToken, string tenantName, string hostPoolName, string appGroupName, bool isUserNameOnly,bool isAll, int pageSize, string sortField, bool isDescending, int initialSkip, string lastEntry)
+        public HttpResponseMessage GetUsersList(string tenantGroupName,string deploymentUrl, string accessToken, string tenantName, string hostPoolName, string appGroupName, bool isUserNameOnly,bool isAll, int pageSize, string sortField, bool isDescending, int initialSkip, string lastEntry)
         {
-            List<RdMgmtUser> rdMgmtUsers = new List<RdMgmtUser>();
+           // List<RdMgmtUser> rdMgmtUsers = new List<RdMgmtUser>();
             HttpResponseMessage response;
             try
             {
@@ -79,40 +79,43 @@ namespace MSFT.RDMISaaS.API.BLL
                      response = CommonBL.InitializeHttpClient(deploymentUrl, accessToken).GetAsync("/RdsManagement/V1/TenantGroups/" + tenantGroupName + "/Tenants/" + tenantName + "/HostPools/" + hostPoolName + "/AppGroups/" + appGroupName + "/AssignedUsers?PageSize=" + pageSize + "&LastEntry=" + lastEntry + "&SortField=" + sortField + "&IsDescending=" + isDescending + "&InitialSkip=" + initialSkip).Result;
 
                 }
-                //call rest api to get list of app groups users --july code bit
-                string strJson = response.Content.ReadAsStringAsync().Result;
-                if (response.IsSuccessStatusCode)
-                {
-                    //Deserialize the string to JSON object
-                    var jObj = (JArray)JsonConvert.DeserializeObject(strJson);
-                    if (jObj.Count > 0)
-                    {
-                        if (isUserNameOnly)
-                        {
-                            rdMgmtUsers = jObj.Select(item => new RdMgmtUser
-                            {
-                                userPrincipalName = (string)item["userPrincipalName"]
-                            }).ToList();
-                        }
-                        else
-                        {
-                            rdMgmtUsers = jObj.Select(item => new RdMgmtUser
-                            {
-                                userPrincipalName = (string)item["userPrincipalName"],
-                                tenantName = (string)item["tenantName"],
-                                hostPoolName = (string)item["hostPoolName"],
-                                appGroupName = (string)item["appGroupName"]
-                            }).ToList();
-                        }
-                    }
 
-                }
+                return response;
+
+                ////call rest api to get list of app groups users --july code bit
+                //string strJson = response.Content.ReadAsStringAsync().Result;
+                //if (response.IsSuccessStatusCode)
+                //{
+                //    //Deserialize the string to JSON object
+                //    var jObj = (JArray)JsonConvert.DeserializeObject(strJson);
+                //    if (jObj.Count > 0)
+                //    {
+                //        if (isUserNameOnly)
+                //        {
+                //            rdMgmtUsers = jObj.Select(item => new RdMgmtUser
+                //            {
+                //                userPrincipalName = (string)item["userPrincipalName"]
+                //            }).ToList();
+                //        }
+                //        else
+                //        {
+                //            rdMgmtUsers = jObj.Select(item => new RdMgmtUser
+                //            {
+                //                userPrincipalName = (string)item["userPrincipalName"],
+                //                tenantName = (string)item["tenantName"],
+                //                hostPoolName = (string)item["hostPoolName"],
+                //                appGroupName = (string)item["appGroupName"]
+                //            }).ToList();
+                //        }
+                //    }
+
+                //}
             }
             catch
             {
                 return null;
             }
-            return rdMgmtUsers;
+           // return rdMgmtUsers;
         }
 
         /// <summary>
@@ -124,45 +127,46 @@ namespace MSFT.RDMISaaS.API.BLL
         /// <param name="hostPoolName">Name of Hostpool</param>
         /// <param name="appGroupName">Name of App group</param>
         /// <returns></returns>
-        public JObject GetAppGroupDetails(string tenantGroupName, string deploymentUrl, string accessToken, string tenantName, string hostPoolName, string appGroupName)
+        public HttpResponseMessage GetAppGroupDetails(string tenantGroupName, string deploymentUrl, string accessToken, string tenantName, string hostPoolName, string appGroupName)
         {
             RdMgmtAppGroup rdMgmtAppGroup = new RdMgmtAppGroup();
             try
             {
                 //call rest api to get  app groups details -- july code bit
                 HttpResponseMessage response = CommonBL.InitializeHttpClient(deploymentUrl, accessToken).GetAsync("/RdsManagement/V1/TenantGroups/" + tenantGroupName + "/Tenants/" + tenantName + "/HostPools/" + hostPoolName + "/AppGroups/" + appGroupName).Result;
-                string strJson = response.Content.ReadAsStringAsync().Result;
-                if (response.IsSuccessStatusCode)
-                {
-                    ////Deserialize the string to JSON object
+                return response;
+                //string strJson = response.Content.ReadAsStringAsync().Result;
+                //if (response.IsSuccessStatusCode)
+                //{
+                //    ////Deserialize the string to JSON object
 
-                    var jObj = (JObject)JsonConvert.DeserializeObject(strJson);
-                    return jObj;
+                //    var jObj = (JObject)JsonConvert.DeserializeObject(strJson);
+                //    return jObj;
 
-                    //rdMgmtAppGroup = JsonConvert.DeserializeObject<RdMgmtAppGroup>(strJson);
+                //    //rdMgmtAppGroup = JsonConvert.DeserializeObject<RdMgmtAppGroup>(strJson);
 
-                    //if (rdMgmtAppGroup.resourceType == "0")
-                    //{
-                    //    rdMgmtAppGroup.resourceType = "Remote App Group";
-                    //}
-                    //else if (rdMgmtAppGroup.resourceType == "1")
-                    //{
-                    //    rdMgmtAppGroup.resourceType = "Desktop App Group";
-                    //}
+                //    //if (rdMgmtAppGroup.resourceType == "0")
+                //    //{
+                //    //    rdMgmtAppGroup.resourceType = "Remote App Group";
+                //    //}
+                //    //else if (rdMgmtAppGroup.resourceType == "1")
+                //    //{
+                //    //    rdMgmtAppGroup.resourceType = "Desktop App Group";
+                //    //}
 
-                    ////get list of Apps associated with this app group
-                    //RemoteAppBL remoteAppBL = new RemoteAppBL();
-                    //List<RdMgmtRemoteApp> rdMgmtRemoteApps = remoteAppBL.GetRemoteAppList(tenantGroupName,deploymentUrl, accessToken, tenantName, hostPoolName, rdMgmtAppGroup.appGroupName, true,true, 0, "", false, 0, "");
-                    //rdMgmtAppGroup.noOfApps = rdMgmtRemoteApps.Count;
+                //    ////get list of Apps associated with this app group
+                //    //RemoteAppBL remoteAppBL = new RemoteAppBL();
+                //    //List<RdMgmtRemoteApp> rdMgmtRemoteApps = remoteAppBL.GetRemoteAppList(tenantGroupName,deploymentUrl, accessToken, tenantName, hostPoolName, rdMgmtAppGroup.appGroupName, true,true, 0, "", false, 0, "");
+                //    //rdMgmtAppGroup.noOfApps = rdMgmtRemoteApps.Count;
 
-                    ////get list of Users associated with this app group
-                    //List<RdMgmtUser> rdMgmtUsers = GetUsersList(tenantGroupName,deploymentUrl, accessToken, tenantName, hostPoolName, rdMgmtAppGroup.appGroupName, true,true, 0, "", false, 0, "");
-                    //rdMgmtAppGroup.noOfusers = rdMgmtUsers.Count;
-                }
-                else
-                {
-                    return null;
-                }
+                //    ////get list of Users associated with this app group
+                //    //List<RdMgmtUser> rdMgmtUsers = GetUsersList(tenantGroupName,deploymentUrl, accessToken, tenantName, hostPoolName, rdMgmtAppGroup.appGroupName, true,true, 0, "", false, 0, "");
+                //    //rdMgmtAppGroup.noOfusers = rdMgmtUsers.Count;
+                //}
+                //else
+                //{
+                //    return null;
+                //}
             }
             catch 
             {
@@ -180,9 +184,8 @@ namespace MSFT.RDMISaaS.API.BLL
         /// <param name="hostPoolName">Name of Hostpool</param>
         /// <param name="isAppGroupNameOnly">used to get Only App Group Name</param>
         /// <returns></returns>
-        public JArray GetAppGroupsList(string tenantGroupName, string deploymentUrl, string accessToken, string tenantName, string hostPoolName, bool isAppGroupNameOnly,bool isAll, int pageSize, string sortField, bool isDescending, int initialSkip, string lastEntry)
+        public HttpResponseMessage GetAppGroupsList(string tenantGroupName, string deploymentUrl, string accessToken, string tenantName, string hostPoolName, bool isAppGroupNameOnly,bool isAll, int pageSize, string sortField, bool isDescending, int initialSkip, string lastEntry)
         {
-            //List<RdMgmtAppGroup> rdMgmtAppGroups = new List<RdMgmtAppGroup>();
             try
             {
                 HttpResponseMessage response;
@@ -195,13 +198,15 @@ namespace MSFT.RDMISaaS.API.BLL
                      response = CommonBL.InitializeHttpClient(deploymentUrl, accessToken).GetAsync("/RdsManagement/V1/TenantGroups/" + tenantGroupName + "/Tenants/" + tenantName + "/HostPools/" + hostPoolName + "/AppGroups?PageSize=" + pageSize + "&LastEntry=" + lastEntry + "&SortField=" + sortField + "&IsDescending=" + isDescending + "&InitialSkip=" + initialSkip).Result;
                 }
 
+                return response;
+
                 //call rest api to get list of app groups -- july code bit
-                string strJson = response.Content.ReadAsStringAsync().Result;
-                if (response.IsSuccessStatusCode)
-                {
-                    //Deserialize the string to JSON object
-                    var jObj = (JArray)JsonConvert.DeserializeObject(strJson);
-                    return jObj;
+               // string strJson = response.Content.ReadAsStringAsync().Result;
+               // if (response.IsSuccessStatusCode)
+               // {
+                    ////Deserialize the string to JSON object
+                   // var jObj = (JArray)JsonConvert.DeserializeObject(strJson);
+                    //return jObj;
                     //if (jObj.Count > 0)
                     //{
 
@@ -225,11 +230,11 @@ namespace MSFT.RDMISaaS.API.BLL
                     //        }).ToList();
                     //    }
                     //}
-                }
-                else
-                {
-                    return null;
-                }
+                //}
+                //else
+                //{
+                //    return null;
+                //}
 
                 //if (rdMgmtAppGroups.Count > 0)
                 //{
@@ -262,40 +267,41 @@ namespace MSFT.RDMISaaS.API.BLL
         /// <param name="hostPoolName">Name of Hostpool</param>
         /// <param name="appGroupName">Name of App group</param>
         /// <returns></returns>
-        public List<RdMgmtStartMenuApp> GetStartMenuAppsList(string tenantGroupName, string deploymentUrl, string accessToken, string tenantName, string hostPoolName, string appGroupName, int pageSize, string sortField, bool isDescending, int initialSkip, string lastEntry)
+        public HttpResponseMessage GetStartMenuAppsList(string tenantGroupName, string deploymentUrl, string accessToken, string tenantName, string hostPoolName, string appGroupName, int pageSize, string sortField, bool isDescending, int initialSkip, string lastEntry)
         {
             List<RdMgmtStartMenuApp> rdMgmtStartMenuApps = new List<RdMgmtStartMenuApp>();
             try
             {
                 //call rest api to get all startmenu apps in app group -- july code bit
                 HttpResponseMessage response = CommonBL.InitializeHttpClient(deploymentUrl, accessToken).GetAsync("/RdsManagement/V1/TenantGroups/" + tenantGroupName + "/Tenants/" + tenantName + "/HostPools/" + hostPoolName + "/AppGroups/" + appGroupName + "/StartMenuApps?PageSize=" + pageSize + "&LastEntry=" + lastEntry + "&SortField=" + sortField + "&IsDescending=" + isDescending + "&InitialSkip=" + initialSkip).Result;
-                string strJson = response.Content.ReadAsStringAsync().Result;
-                if (response.IsSuccessStatusCode)
-                {
-                    //Deserialize the string to JSON object
-                    var jObj = (JArray)JsonConvert.DeserializeObject(strJson);
-                    if (jObj.Count > 0)
-                    {
-                        rdMgmtStartMenuApps = jObj.Select(item => new RdMgmtStartMenuApp
-                        {
-                            hostPoolName = (string)item["hostPoolName"],
-                            tenantName = (string)item["tenantName"],
-                            appGroupName = (string)item["appGroupName"],
-                            appAlias = (string)item["appAlias"],
-                            friendlyName = (string)item["friendlyName"],
-                            filePath = (string)item["filePath"],
-                            commandLineArguments = (string)item["commandLineArguments"],
-                            iconPath = (string)item["iconPath"],
-                            iconIndex = (int)item["iconIndex"]
-                        }).ToList();
-                    }
-                }
+                return response;
+                //string strJson = response.Content.ReadAsStringAsync().Result;
+                //if (response.IsSuccessStatusCode)
+                //{
+                //    //Deserialize the string to JSON object
+                //    var jObj = (JArray)JsonConvert.DeserializeObject(strJson);
+                //    if (jObj.Count > 0)
+                //    {
+                //        rdMgmtStartMenuApps = jObj.Select(item => new RdMgmtStartMenuApp
+                //        {
+                //            hostPoolName = (string)item["hostPoolName"],
+                //            tenantName = (string)item["tenantName"],
+                //            appGroupName = (string)item["appGroupName"],
+                //            appAlias = (string)item["appAlias"],
+                //            friendlyName = (string)item["friendlyName"],
+                //            filePath = (string)item["filePath"],
+                //            commandLineArguments = (string)item["commandLineArguments"],
+                //            iconPath = (string)item["iconPath"],
+                //            iconIndex = (int)item["iconIndex"]
+                //        }).ToList();
+                //    }
+                //}
             }
             catch
             {
                 return null;
             }
-            return rdMgmtStartMenuApps;
+          //  return rdMgmtStartMenuApps;
         }
 
         /// <summary>

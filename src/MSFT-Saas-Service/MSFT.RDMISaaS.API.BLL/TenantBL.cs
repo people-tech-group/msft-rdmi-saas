@@ -25,25 +25,27 @@ namespace MSFT.RDMISaaS.API.BLL
         /// <param name="accessToken">Access Token</param>
         /// <param name="tenantName">Anme of Tenant</param>
         /// <returns></returns>
-        public JObject GetTenantDetails(string tenantGroupName, string deploymentUrl, string accessToken , string tenantName)
+        public HttpResponseMessage GetTenantDetails(string tenantGroupName, string deploymentUrl, string accessToken , string tenantName)
         {
             //RdMgmtTenant rdMgmtTenant = new RdMgmtTenant();
             try
             {
                 //call rest api to get tenant details -- july code bit
                 HttpResponseMessage response = CommonBL.InitializeHttpClient(deploymentUrl, accessToken).GetAsync("/RdsManagement/V1/TenantGroups/"+ tenantGroupName + "/Tenants/" + tenantName).Result;
-                string strJson = response.Content.ReadAsStringAsync().Result;
-                if (response.IsSuccessStatusCode)
-                {
-                    var jObj = (JObject)JsonConvert.DeserializeObject(strJson);
-                    return jObj;
-                   // rdMgmtTenant = JsonConvert.DeserializeObject<RdMgmtTenant>(strJson);
-                }
-                else
-                {
-                    return null;
-                }
-                
+
+                return response;
+                //string strJson = response.Content.ReadAsStringAsync().Result;
+                //if (response.IsSuccessStatusCode)
+                //{
+                //    var jObj = (JObject)JsonConvert.DeserializeObject(strJson);
+                //    return jObj;
+                //   // rdMgmtTenant = JsonConvert.DeserializeObject<RdMgmtTenant>(strJson);
+                //}
+                //else
+                //{
+                //    return null;
+                //}
+
                 //if(!string.IsNullOrEmpty(rdMgmtTenant.tenantName))
                 //{
                 //    //count hostpools associated with tenant
@@ -77,7 +79,7 @@ namespace MSFT.RDMISaaS.API.BLL
         /// <param name="deploymentUrl">RD Broker Url</param>
         /// <param name="accessToken"> Access token</param>
         /// <returns></returns>
-        public JArray GetTenantList(string tenantGroupName,string deploymenturl, string accessToken,int pageSize, string sortField, bool isDescending, int initialSkip, string lastEntry)
+        public HttpResponseMessage GetTenantList(string tenantGroupName,string deploymenturl, string accessToken,int pageSize, string sortField, bool isDescending, int initialSkip, string lastEntry)
         {
            // Tenants tenants = new Tenants();
            // List<RdMgmtTenant> lstTenants = new List<RdMgmtTenant>();
@@ -86,34 +88,34 @@ namespace MSFT.RDMISaaS.API.BLL
             {
                 //call rest api to get all tenants -- sept code bit
                 HttpResponseMessage response = CommonBL.InitializeHttpClient(deploymenturl, accessToken).GetAsync("/RdsManagement/V1/TenantGroups/" + tenantGroupName + "/Tenants").Result;
-
-                string strJson = response.Content.ReadAsStringAsync().Result;
-                if (response.IsSuccessStatusCode)
-                {
-                    //Deserialize the string to JSON object
-                    var jObj = (JArray)JsonConvert.DeserializeObject(strJson);
-                    return jObj;
-                    //if(jObj.Count>0)
-                    //{
-                    //    lstTenants = jObj.Select(item => new RdMgmtTenant
-                    //    {
-                    //        id = (string)item["id"],
-                    //        tenantGroupName = (string)item["tenantGroupName"],
-                    //        aadTenantId = (string)item["aadTenantId"],
-                    //        tenantName = (string)item["tenantName"],
-                    //        description = (string)item["description"],
-                    //        friendlyName = (string)item["friendlyName"],
-                    //        ssoAdfsAuthority = (string)item["ssoAdfsAuthority"],
-                    //        ssoClientId = (string)item["ssoClientId"],
-                    //        ssoClientSecret = (string)item["ssoClientId"],
-                    //        azureSubscriptionId=(string)item["azureSubscriptionId"]
-                    //    }).ToList();
-                    //}
-                }
-                else
-                {
-                    return null;
-                }
+                return response;
+                //string strJson = response.Content.ReadAsStringAsync().Result;
+                //if (response.IsSuccessStatusCode)
+                //{
+                //    //Deserialize the string to JSON object
+                //    var jObj = (JArray)JsonConvert.DeserializeObject(strJson);
+                //    return jObj;
+                //    //if(jObj.Count>0)
+                //    //{
+                //    //    lstTenants = jObj.Select(item => new RdMgmtTenant
+                //    //    {
+                //    //        id = (string)item["id"],
+                //    //        tenantGroupName = (string)item["tenantGroupName"],
+                //    //        aadTenantId = (string)item["aadTenantId"],
+                //    //        tenantName = (string)item["tenantName"],
+                //    //        description = (string)item["description"],
+                //    //        friendlyName = (string)item["friendlyName"],
+                //    //        ssoAdfsAuthority = (string)item["ssoAdfsAuthority"],
+                //    //        ssoClientId = (string)item["ssoClientId"],
+                //    //        ssoClientSecret = (string)item["ssoClientId"],
+                //    //        azureSubscriptionId=(string)item["azureSubscriptionId"]
+                //    //    }).ToList();
+                //    //}
+                //}
+                //else
+                //{
+                //    return null;
+                //}
             }
             catch (Exception ex)
             {
@@ -363,24 +365,25 @@ namespace MSFT.RDMISaaS.API.BLL
             return tenantResult;
         }
 
-        public JArray GetAllTenantList(string tenantGroupName, string deploymenturl, string accessToken)
+        public HttpResponseMessage GetAllTenantList(string tenantGroupName, string deploymenturl, string accessToken)
         {
             //List<RdMgmtTenant> lstTenants = new List<RdMgmtTenant>();
             try
             {
                 //call rest api to get all tenants -- july code bit
                 HttpResponseMessage response = CommonBL.InitializeHttpClient(deploymenturl, accessToken).GetAsync("/RdsManagement/V1/TenantGroups/" + tenantGroupName + "/Tenants").Result;
-                string strJson = response.Content.ReadAsStringAsync().Result;
-                if (response.IsSuccessStatusCode)
-                {
-                    //Deserialize the string to JSON object
-                    var jObj = (JArray)JsonConvert.DeserializeObject(strJson);
-                    return jObj;
-                }
-                else
-                {
-                    return null;
-                }
+                return response;
+                //string strJson = response.Content.ReadAsStringAsync().Result;
+                //if (response.IsSuccessStatusCode)
+                //{
+                //    //Deserialize the string to JSON object
+                //    var jObj = (JArray)JsonConvert.DeserializeObject(strJson);
+                //    return jObj;
+                //}
+                //else
+                //{
+                //    return null;
+                //}
             }
             catch
             {

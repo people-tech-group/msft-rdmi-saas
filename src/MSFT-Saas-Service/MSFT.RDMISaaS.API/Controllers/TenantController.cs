@@ -35,7 +35,7 @@ namespace MSFT.RDMISaaS.API.Controllers
         /// <param name="tenantName">Name of tenant</param>
         /// <param name="refresh_token">Refresh token to get access token</param>
         /// <returns></returns>
-        public JObject GetTenantDetails(string tenantGroupName,string tenantName, string refresh_token)
+        public HttpResponseMessage GetTenantDetails(string tenantGroupName, string tenantName, string refresh_token)
         {
             //get deployment url
             deploymentUrl = configurations.rdBrokerUrl;
@@ -49,15 +49,15 @@ namespace MSFT.RDMISaaS.API.Controllers
                     accessToken = common.GetTokenValue(refresh_token);
                     if (!string.IsNullOrEmpty(accessToken) && accessToken.ToString().ToLower() != invalidToken && accessToken.ToString().ToLower() != invalidCode)
                     {
-                        return tenantBL.GetTenantDetails(tenantGroupName,deploymentUrl, accessToken,tenantName);
+                        return tenantBL.GetTenantDetails(tenantGroupName, deploymentUrl, accessToken, tenantName);
                     }
                     else
                     {
-                       return new JObject()
+                        return Request.CreateResponse(HttpStatusCode.OK, new JObject()
                         {
                             {"code",  Constants.invalidToken}
-                        };
-                       // rdMgmtTenant.code = Constants.invalidToken;
+                        });
+                        // rdMgmtTenant.code = Constants.invalidToken;
                     }
                 }
                 else
@@ -65,11 +65,11 @@ namespace MSFT.RDMISaaS.API.Controllers
                     return null;
                 }
             }
-            catch 
+            catch
             {
                 return null;
             }
-          //  return rdMgmtTenant;
+            //  return rdMgmtTenant;
         }
 
         /// <summary>
@@ -77,7 +77,7 @@ namespace MSFT.RDMISaaS.API.Controllers
         /// </summary>
         /// <param name="refresh_token">effsh token to get access token</param>
         /// <returns></returns>
-        public JArray GetTenantList(string tenantGroupName, string refresh_token, int pageSize, string sortField, bool isDescending = false, int initialSkip = 0, string lastEntry = "")
+        public HttpResponseMessage GetTenantList(string tenantGroupName, string refresh_token, int pageSize, string sortField, bool isDescending = false, int initialSkip = 0, string lastEntry = "")
         {
             //get deployment url
             deploymentUrl = configurations.rdBrokerUrl;
@@ -91,7 +91,7 @@ namespace MSFT.RDMISaaS.API.Controllers
                     accessToken = common.GetTokenValue(refresh_token);
                     if (!string.IsNullOrEmpty(accessToken) && accessToken.ToString().ToLower() != invalidToken && accessToken.ToString().ToLower() != invalidCode)
                     {
-                       return tenantBL.GetTenantList(tenantGroupName,deploymentUrl, accessToken, pageSize, sortField, isDescending, initialSkip, lastEntry);
+                        return tenantBL.GetTenantList(tenantGroupName, deploymentUrl, accessToken, pageSize, sortField, isDescending, initialSkip, lastEntry);
                         //tenants = tenantBL.GetTenantList(tenantGroupName,deploymentUrl, accessToken, pageSize, sortField, isDescending, initialSkip, lastEntry);
                     }
                     else
@@ -101,12 +101,13 @@ namespace MSFT.RDMISaaS.API.Controllers
                         //rdMgmtTenant.code = Constants.invalidToken;
                         //rdMgmtTenants.Add(rdMgmtTenant);
                         //tenants.rdMgmtTenants = rdMgmtTenants;
-                        return new JArray() {
+                      
+                        return Request.CreateResponse(HttpStatusCode.OK, new JArray() {
                             new JObject()
                             {
                                 {"code", Constants.invalidToken }
                             }
-                        };
+                        });
                     }
                 }
                 else
@@ -160,7 +161,7 @@ namespace MSFT.RDMISaaS.API.Controllers
             catch (Exception ex)
             {
                 tenantResult.isSuccess = false;
-                tenantResult.message = "Tenant '"+ rdMgmtTenant.tenantName + "' has not been created."+ex.Message.ToString()+ " Please try again later.";
+                tenantResult.message = "Tenant '" + rdMgmtTenant.tenantName + "' has not been created." + ex.Message.ToString() + " Please try again later.";
             }
             return Ok(tenantResult);
         }
@@ -209,7 +210,7 @@ namespace MSFT.RDMISaaS.API.Controllers
             catch (Exception ex)
             {
                 tenantResult.isSuccess = false;
-                tenantResult.message = "Tenant '"+ rdMgmtTenant.tenantName + "' has not been updated."+ex.Message.ToString()+"Please try again later.";
+                tenantResult.message = "Tenant '" + rdMgmtTenant.tenantName + "' has not been updated." + ex.Message.ToString() + "Please try again later.";
             }
             return Ok(tenantResult);
         }
@@ -220,7 +221,7 @@ namespace MSFT.RDMISaaS.API.Controllers
         /// <param name="tenantName"></param>
         /// <param name="refresh_token">Refrsh token to get access token</param>
         /// <returns></returns>
-        public IHttpActionResult Delete([FromUri] string tenantGroupName,string tenantName, string refresh_token)
+        public IHttpActionResult Delete([FromUri] string tenantGroupName, string tenantName, string refresh_token)
         {
             //get deployment url
             deploymentUrl = configurations.rdBrokerUrl;
@@ -233,7 +234,7 @@ namespace MSFT.RDMISaaS.API.Controllers
                     accessToken = common.GetTokenValue(refresh_token);
                     if (!string.IsNullOrEmpty(accessToken) && accessToken.ToString().ToLower() != invalidToken && accessToken.ToString().ToLower() != invalidCode)
                     {
-                        tenantResult = tenantBL.DeleteTenant(tenantGroupName,deploymentUrl, accessToken, tenantName);
+                        tenantResult = tenantBL.DeleteTenant(tenantGroupName, deploymentUrl, accessToken, tenantName);
                     }
                     else
                     {
@@ -250,11 +251,11 @@ namespace MSFT.RDMISaaS.API.Controllers
             catch (Exception ex)
             {
                 tenantResult.isSuccess = false;
-                tenantResult.message = "Tenant "+ tenantName + " has not been deleted."+ ex.Message.ToString() + " and try again later."; ;
+                tenantResult.message = "Tenant " + tenantName + " has not been deleted." + ex.Message.ToString() + " and try again later."; ;
             }
             return Ok(tenantResult);
         }
-        public JArray GetAllTenants(string tenantGroupName,string refresh_token)
+        public HttpResponseMessage GetAllTenants(string tenantGroupName, string refresh_token)
         {
             //get deployment url
             deploymentUrl = configurations.rdBrokerUrl;
@@ -269,18 +270,25 @@ namespace MSFT.RDMISaaS.API.Controllers
                     accessToken = common.GetTokenValue(refresh_token);
                     if (!string.IsNullOrEmpty(accessToken) && accessToken.ToString().ToLower() != invalidToken && accessToken.ToString().ToLower() != invalidCode)
                     {
-                        return tenantBL.GetAllTenantList(tenantGroupName,deploymentUrl, accessToken);
+                        return tenantBL.GetAllTenantList(tenantGroupName, deploymentUrl, accessToken);
                     }
                     else
                     {
-                        JArray newarray = new JArray();
-                        newarray.Add(new JObject() {
-                            { "code",Constants.invalidToken },
-                        });
-                        return newarray;
+                        //JArray newarray = new JArray();
+                        //newarray.Add(new JObject() {
+                        //    { "code",Constants.invalidToken },
+                        //});
+                        //return newarray;
                         //RdMgmtTenant rdMgmtTenant = new RdMgmtTenant();
                         //rdMgmtTenant.code = Constants.invalidToken;
                         //rdMgmtTenants.Add(rdMgmtTenant);
+                     
+                        return Request.CreateResponse(HttpStatusCode.OK, new JArray() {
+                            new JObject()
+                            {
+                                {"code", Constants.invalidToken }
+                            }
+                        });
                     }
                 }
                 else
@@ -292,7 +300,7 @@ namespace MSFT.RDMISaaS.API.Controllers
             {
                 return null;
             }
-           // return rdMgmtTenants;
+            // return rdMgmtTenants;
         }
     }
 

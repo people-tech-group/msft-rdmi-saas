@@ -39,11 +39,11 @@ namespace MSFT.RDMISaaS.API.Controllers
         /// <param name="appGroupName">Name of App Group</param>
         /// <returns></returns>
         [HttpGet]
-        public RdMgmtUser GetUserDetails(string tenantGroupName,string userPrincipalName, string tenantName, string hostPoolName, string appGroupName, string refresh_token)
+        public HttpResponseMessage GetUserDetails(string tenantGroupName,string userPrincipalName, string tenantName, string hostPoolName, string appGroupName, string refresh_token)
         {
             //get deployment url
             deploymentUrl = configurations.rdBrokerUrl;
-            RdMgmtUser rdMgmtUser = new RdMgmtUser();
+           // RdMgmtUser rdMgmtUser = new RdMgmtUser();
             try
             {
                 if (!string.IsNullOrEmpty(refresh_token))
@@ -54,19 +54,25 @@ namespace MSFT.RDMISaaS.API.Controllers
 
                     if (!string.IsNullOrEmpty(accessToken) && accessToken.ToString().ToLower() != invalidToken && accessToken.ToString().ToLower() != invalidCode)
                     {
-                        rdMgmtUser = appGroupBL.GetUserDetails(tenantGroupName,deploymentUrl, accessToken, tenantName, hostPoolName, appGroupName, userPrincipalName);
+                       return appGroupBL.GetUserDetails(tenantGroupName,deploymentUrl, accessToken, tenantName, hostPoolName, appGroupName, userPrincipalName);
                     }
                     else
                     {
-                        rdMgmtUser.code = Constants.invalidToken;
+                        return Request.CreateResponse(HttpStatusCode.OK, 
+                           new JObject() {"code",  Constants.invalidToken}
+                        );
                     }
+                }
+                else
+                {
+                    return null;
                 }
             }
             catch 
             {
                 return null;
             }
-            return rdMgmtUser;
+           // return rdMgmtUser;
         }
 
         /// <summary>
@@ -77,11 +83,11 @@ namespace MSFT.RDMISaaS.API.Controllers
         /// <param name="appGroupName"> name of app group</param>
         /// <returns></returns>
         [HttpGet]
-        public List<RdMgmtUser> GetUsersList(string tenantGroupName,string tenantName, string hostPoolName, string appGroupName, string refresh_token, int pageSize, string sortField, bool isDescending = false, int initialSkip = 0, string lastEntry = null)
+        public HttpResponseMessage GetUsersList(string tenantGroupName,string tenantName, string hostPoolName, string appGroupName, string refresh_token, int pageSize, string sortField, bool isDescending = false, int initialSkip = 0, string lastEntry = null)
         {
             //get deployment url
             deploymentUrl = configurations.rdBrokerUrl;
-            List<RdMgmtUser> rdMgmtUsers = new List<RdMgmtUser>();
+            //List<RdMgmtUser> rdMgmtUsers = new List<RdMgmtUser>();
             try
             {
                 if (!string.IsNullOrEmpty(refresh_token))
@@ -91,21 +97,24 @@ namespace MSFT.RDMISaaS.API.Controllers
                     accessToken = common.GetTokenValue(refresh_token);
                     if (!string.IsNullOrEmpty(accessToken) && accessToken.ToString().ToLower() != invalidToken && accessToken.ToString().ToLower() != invalidCode)
                     {
-                        rdMgmtUsers = appGroupBL.GetUsersList(tenantGroupName,deploymentUrl, accessToken, tenantName, hostPoolName, appGroupName, false,false, pageSize, sortField, isDescending, initialSkip, lastEntry);
+                       return appGroupBL.GetUsersList(tenantGroupName,deploymentUrl, accessToken, tenantName, hostPoolName, appGroupName, false,false, pageSize, sortField, isDescending, initialSkip, lastEntry);
                     }
                     else
                     {
-                        RdMgmtUser rdMgmtUser = new RdMgmtUser();
-                        rdMgmtUser.code = Constants.invalidToken;
-                        rdMgmtUsers.Add(rdMgmtUser);
+                        return Request.CreateResponse(HttpStatusCode.OK, new JArray()
+                        {
+                           new JObject() {"code",  Constants.invalidToken}
+                        });
                     }
                 }
+                else
+                { return null; }
             }
             catch 
             {
                 return null;
             }
-            return rdMgmtUsers;
+           // return rdMgmtUsers;
         }
 
         /// <summary>
@@ -116,7 +125,7 @@ namespace MSFT.RDMISaaS.API.Controllers
         /// <param name="appGroupName">Name of app group</param>
         /// <returns></returns>
         [HttpGet]
-        public JObject GetAppGroupDetails(string tenantGroupName, string tenantName, string hostPoolName, string appGroupName, string refresh_token)
+        public HttpResponseMessage GetAppGroupDetails(string tenantGroupName, string tenantName, string hostPoolName, string appGroupName, string refresh_token)
         {
             //get deployment url
             deploymentUrl = configurations.rdBrokerUrl;
@@ -135,11 +144,10 @@ namespace MSFT.RDMISaaS.API.Controllers
                     }
                     else
                     {
-                        return new JObject()
-                        {
-                            { "code",Constants.invalidToken }
-                        };
-                      //  rdMgmtAppGroup.code = Constants.invalidToken;
+                        return Request.CreateResponse(HttpStatusCode.OK,
+                           new JObject() {"code",  Constants.invalidToken}
+                        );
+                        //  rdMgmtAppGroup.code = Constants.invalidToken;
                     }
                 }
                 else
@@ -161,11 +169,11 @@ namespace MSFT.RDMISaaS.API.Controllers
         /// <param name="hostPoolName"> Name of Hostpool</param>
         /// <returns></returns>
         [HttpGet]
-        public JArray GetAppGroupsList(string tenantGroupName,string tenantName, string hostPoolName, string refresh_token, int pageSize, string sortField, bool isDescending = false, int initialSkip = 0, string lastEntry = null)
+        public HttpResponseMessage GetAppGroupsList(string tenantGroupName,string tenantName, string hostPoolName, string refresh_token, int pageSize, string sortField, bool isDescending = false, int initialSkip = 0, string lastEntry = null)
         {
             //get deployment url
             deploymentUrl = configurations.rdBrokerUrl;
-            List<RdMgmtAppGroup> rdMgmtAppGroups = new List<RdMgmtAppGroup>();
+           // List<RdMgmtAppGroup> rdMgmtAppGroups = new List<RdMgmtAppGroup>();
             try
             {
                 if (!string.IsNullOrEmpty(refresh_token))
@@ -179,14 +187,7 @@ namespace MSFT.RDMISaaS.API.Controllers
                     }
                     else
                     {
-                        JArray newarray = new JArray();
-                        newarray.Add(new JObject() {
-                            { "code",Constants.invalidToken },
-                        });
-                        return newarray;
-                        //RdMgmtAppGroup rdMgmtAppGroup = new RdMgmtAppGroup();
-                        //rdMgmtAppGroup.code = Constants.invalidToken;
-                        //rdMgmtAppGroups.Add(rdMgmtAppGroup);
+                        return Request.CreateResponse(HttpStatusCode.OK, new JArray() { new JObject() { { "code", Constants.invalidToken } } });
                     }
                 }
                 else
@@ -210,7 +211,7 @@ namespace MSFT.RDMISaaS.API.Controllers
         /// <param name="hostPoolName">Name of host pool</param>
         /// <returns></returns>
         [HttpGet]
-        public List<RdMgmtStartMenuApp> GetStartMenuAppsList(string tenantGroupName,string tenantName, string appGroupName, string hostPoolName, string refresh_token, int pageSize, string sortField, bool isDescending = false, int initialSkip = 0, string lastEntry = null)
+        public HttpResponseMessage GetStartMenuAppsList(string tenantGroupName,string tenantName, string appGroupName, string hostPoolName, string refresh_token, int pageSize, string sortField, bool isDescending = false, int initialSkip = 0, string lastEntry = null)
         {
             //get deployment url
             deploymentUrl = configurations.rdBrokerUrl;
@@ -224,21 +225,24 @@ namespace MSFT.RDMISaaS.API.Controllers
                     accessToken = common.GetTokenValue(refresh_token);
                     if (!string.IsNullOrEmpty(accessToken) && accessToken.ToString().ToLower() != invalidToken && accessToken.ToString().ToLower() != invalidCode)
                     {
-                        rdMgmtStartMenuApps = appGroupBL.GetStartMenuAppsList(tenantGroupName,deploymentUrl, accessToken, tenantName, hostPoolName, appGroupName, pageSize, sortField, isDescending, initialSkip, lastEntry);
+                        return appGroupBL.GetStartMenuAppsList(tenantGroupName, deploymentUrl, accessToken, tenantName, hostPoolName, appGroupName, pageSize, sortField, isDescending, initialSkip, lastEntry);
                     }
                     else
                     {
-                        RdMgmtStartMenuApp rdMgmtStartMenuApp = new RdMgmtStartMenuApp();
-                        rdMgmtStartMenuApp.code = Constants.invalidToken;
-                        rdMgmtStartMenuApps.Add(rdMgmtStartMenuApp);
+                        return Request.CreateResponse(HttpStatusCode.OK, new JArray() { new JObject() { { "code", Constants.invalidToken } } });
+
                     }
+                }
+                else
+                {
+                    return null;
                 }
             }
             catch
             {
                 return null;
             }
-            return rdMgmtStartMenuApps;
+           
         }
 
         /// <summary>

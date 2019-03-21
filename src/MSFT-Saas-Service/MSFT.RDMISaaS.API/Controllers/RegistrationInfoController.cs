@@ -8,6 +8,7 @@ using System.Net.Http;
 using System.Web.Http;
 using MSFT.RDMISaaS.API.BLL;
 using System.Web.Http.Cors;
+using Newtonsoft.Json.Linq;
 #endregion "Import Namespaces"
 
 #region "MSFT.RDMISaaS.API.Controllers"
@@ -37,11 +38,11 @@ namespace MSFT.RDMISaaS.API.Controllers
         /// <param name="hostPoolName">Name of Hostpool</param>
         /// <param name="refresh_token">Reffesh token to get access token</param>
         /// <returns></returns>
-        public RdMgmtRegistrationInfo GetRegistrationInfo(string tenantGroupName,string tenantName, string hostPoolName, string refresh_token)
+        public HttpResponseMessage GetRegistrationInfo(string tenantGroupName,string tenantName, string hostPoolName, string refresh_token)
         {
             //get deployment url
             deploymentUrl = configurations.rdBrokerUrl;
-            RdMgmtRegistrationInfo registrationInfo = new RdMgmtRegistrationInfo();
+            //RdMgmtRegistrationInfo registrationInfo = new RdMgmtRegistrationInfo();
             try
             {
                 if (!string.IsNullOrEmpty(refresh_token))
@@ -51,19 +52,24 @@ namespace MSFT.RDMISaaS.API.Controllers
                     accessToken = common.GetTokenValue(refresh_token);
                     if (!string.IsNullOrEmpty(accessToken) && accessToken.ToString().ToLower() != invalidToken && accessToken.ToString().ToLower() != invalidCode)
                     {
-                        registrationInfo = registrationInfobl.GetRegistrationInfo(tenantGroupName,deploymentUrl, accessToken, tenantName, hostPoolName);
+                       return registrationInfobl.GetRegistrationInfo(tenantGroupName,deploymentUrl, accessToken, tenantName, hostPoolName);
                     }
                     else
                     {
-                        registrationInfo.code = Constants.invalidToken;
+                        return Request.CreateResponse(HttpStatusCode.OK,  new JObject() { { "code", Constants.invalidToken } } );
+
                     }
+                }
+                else
+                {
+                    return null;
                 }
             }
             catch 
             {
                 return null;
             }
-            return registrationInfo;
+            //return registrationInfo;
         }
 
         /// <summary>

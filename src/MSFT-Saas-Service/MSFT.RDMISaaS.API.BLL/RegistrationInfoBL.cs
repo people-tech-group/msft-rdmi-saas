@@ -26,27 +26,27 @@ namespace MSFT.RDMISaaS.API.BLL
         /// <param name="tenantName"></param>
         /// <param name="hostPoolName"></param>
         /// <returns></returns>
-        public RdMgmtRegistrationInfo GetRegistrationInfo(string tenantGroupName,string deploymentUrl, string accessToken, string tenantName, string hostPoolName)
+        public HttpResponseMessage GetRegistrationInfo(string tenantGroupName,string deploymentUrl, string accessToken, string tenantName, string hostPoolName)
         {
-            RdMgmtRegistrationInfo rdMgmtRegistrationInfo = new RdMgmtRegistrationInfo();
+            //RdMgmtRegistrationInfo rdMgmtRegistrationInfo = new RdMgmtRegistrationInfo();
             try
             {
                 //call rest api to get RegistrationInfo -- july code bit
                 HttpResponseMessage response = CommonBL.InitializeHttpClient(deploymentUrl, accessToken).GetAsync("/RdsManagement/V1/TenantGroups/" + tenantGroupName + "/Tenants/" + tenantName + "/HostPools/" + hostPoolName + "/RegistrationInfos/actions/export").Result;
-
-                string strJson = response.Content.ReadAsStringAsync().Result;
-                if (response.IsSuccessStatusCode)
-                {
-                    //Deserialize the string to JSON object
-                    rdMgmtRegistrationInfo = JsonConvert.DeserializeObject<RdMgmtRegistrationInfo>(strJson);
-                }
+                return response;
+                //string strJson = response.Content.ReadAsStringAsync().Result;
+                //if (response.IsSuccessStatusCode)
+                //{
+                //    //Deserialize the string to JSON object
+                //    rdMgmtRegistrationInfo = JsonConvert.DeserializeObject<RdMgmtRegistrationInfo>(strJson);
+                //}
 
             }
             catch 
             {
                 return null;
             }
-            return rdMgmtRegistrationInfo;
+            //return rdMgmtRegistrationInfo;
         }
 
         /// <summary>

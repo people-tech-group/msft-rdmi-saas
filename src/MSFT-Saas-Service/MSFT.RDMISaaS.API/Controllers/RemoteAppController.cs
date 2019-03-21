@@ -8,6 +8,7 @@ using System.Net.Http;
 using System.Web.Http;
 using MSFT.RDMISaaS.API.BLL;
 using System.Web.Http.Cors;
+using Newtonsoft.Json.Linq;
 #endregion "Import Namespaces"
 
 #region "MSFT.RDMISaaS.API.Controllers"
@@ -39,11 +40,11 @@ namespace MSFT.RDMISaaS.API.Controllers
         /// <param name="remoteAppName">Name of Remote App</param>
         /// <param name="refresh_token">Refresh token to get access token</param>
         /// <returns></returns>
-        public RdMgmtRemoteApp GetRemoteAppDetails(string tenantGroupName, string tenantName, string hostPoolName, string appGroupName, string remoteAppName, string refresh_token)
+        public HttpResponseMessage GetRemoteAppDetails(string tenantGroupName, string tenantName, string hostPoolName, string appGroupName, string remoteAppName, string refresh_token)
         {
             //get deployment url
             deploymentUrl = configurations.rdBrokerUrl;
-            RdMgmtRemoteApp remoteapp = new RdMgmtRemoteApp();
+            //RdMgmtRemoteApp remoteapp = new RdMgmtRemoteApp();
             try
             {
                 if (!string.IsNullOrEmpty(refresh_token))
@@ -53,19 +54,25 @@ namespace MSFT.RDMISaaS.API.Controllers
                     accessToken = common.GetTokenValue(refresh_token);
                     if (!string.IsNullOrEmpty(accessToken) && accessToken.ToString().ToLower() != invalidToken && accessToken.ToString().ToLower() != invalidCode)
                     {
-                        remoteapp = remoteAppBL.GetRemoteAppDetails(tenantGroupName,deploymentUrl, accessToken, tenantName, hostPoolName, appGroupName, remoteAppName);
+                        return remoteAppBL.GetRemoteAppDetails(tenantGroupName,deploymentUrl, accessToken, tenantName, hostPoolName, appGroupName, remoteAppName);
                     }
                     else
                     {
-                        remoteapp.code = Constants.invalidToken;
+                        return Request.CreateResponse(HttpStatusCode.OK, new JObject() { { "code", Constants.invalidToken } });
+
                     }
+                }
+                else
+                {
+                    return null;
+
                 }
             }
             catch
             {
                 return null;
             }
-            return remoteapp;
+           // return remoteapp;
         }
 
         /// <summary>
@@ -210,7 +217,7 @@ namespace MSFT.RDMISaaS.API.Controllers
         /// <param name="remoteAppName">Name of Remote App</param>
         /// <param name="refresh_token">Refresh token to get access token</param>
         /// <returns></returns>
-        public List<RdMgmtRemoteApp> GetRemoteAppList(string tenantGroupName, string tenantName, string hostPoolName, string appGroupName, string refresh_token, int pageSize, string sortField, bool isDescending = false, int initialSkip = 0, string lastEntry = null)
+        public HttpResponseMessage GetRemoteAppList(string tenantGroupName, string tenantName, string hostPoolName, string appGroupName, string refresh_token, int pageSize, string sortField, bool isDescending = false, int initialSkip = 0, string lastEntry = null)
         {
             //get deployment url
             deploymentUrl = configurations.rdBrokerUrl;
@@ -224,21 +231,27 @@ namespace MSFT.RDMISaaS.API.Controllers
                     accessToken = common.GetTokenValue(refresh_token);
                     if (!string.IsNullOrEmpty(accessToken) && accessToken.ToString().ToLower() != invalidToken && accessToken.ToString().ToLower() != invalidCode)
                     {
-                        rdMgmtRemoteApps = remoteAppBL.GetRemoteAppList(tenantGroupName, deploymentUrl, accessToken, tenantName, hostPoolName, appGroupName, false,false, pageSize, sortField, isDescending, initialSkip, lastEntry);
+                       return remoteAppBL.GetRemoteAppList(tenantGroupName, deploymentUrl, accessToken, tenantName, hostPoolName, appGroupName, false,false, pageSize, sortField, isDescending, initialSkip, lastEntry);
                     }
                     else
                     {
-                        RdMgmtRemoteApp rdMgmtRemoteApp = new RdMgmtRemoteApp();
-                        rdMgmtRemoteApp.code = Constants.invalidToken;
-                        rdMgmtRemoteApps.Add(rdMgmtRemoteApp);
+                        //RdMgmtRemoteApp rdMgmtRemoteApp = new RdMgmtRemoteApp();
+                        //rdMgmtRemoteApp.code = Constants.invalidToken;
+                        //rdMgmtRemoteApps.Add(rdMgmtRemoteApp);
+                        return Request.CreateResponse(HttpStatusCode.OK, new JArray(){ new JObject() { { "code", Constants.invalidToken } } });
+
                     }
+                }
+                else
+                {
+                    return null;
                 }
             }
             catch 
             {
                 return null;
             }
-            return rdMgmtRemoteApps;
+            //return rdMgmtRemoteApps;
         }
         #endregion
 

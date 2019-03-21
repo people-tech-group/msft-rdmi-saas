@@ -28,9 +28,9 @@ namespace MSFT.RDMISaaS.API.BLL
         /// <param name="hostPoolName">Name of hostpool</param>
         /// <param name="isSessionHostNameOnly">To Get only HostName</param>
         /// <returns></returns>
-        public List<RdMgmtSessionHost> GetSessionhostList(string deploymentUrl, string accessToken,string tenantGroup, string tenantName, string hostPoolName, bool isSessionHostNameOnly,bool isAll, int pageSize, string sortField, bool isDescending, int initialSkip, string lastEntry)
+        public HttpResponseMessage GetSessionhostList(string deploymentUrl, string accessToken,string tenantGroup, string tenantName, string hostPoolName, bool isSessionHostNameOnly,bool isAll, int pageSize, string sortField, bool isDescending, int initialSkip, string lastEntry)
         {
-            List<RdMgmtSessionHost> rdMgmtSessionHosts = new List<RdMgmtSessionHost>();
+            //List<RdMgmtSessionHost> rdMgmtSessionHosts = new List<RdMgmtSessionHost>();
             HttpResponseMessage response; 
            
             try
@@ -44,44 +44,45 @@ namespace MSFT.RDMISaaS.API.BLL
 
                     response = CommonBL.InitializeHttpClient(deploymentUrl, accessToken).GetAsync("/RdsManagement/V1/TenantGroups/" + tenantGroup + "/Tenants/" + tenantName + "/HostPools/" + hostPoolName + "/SessionHosts?PageSize=" + pageSize + "&LastEntry=" + lastEntry + "&SortField=" + sortField + "&IsDescending=" + isDescending + "&InitialSkip=" + initialSkip).Result;
                 }
-                //call rest api to get all Session hosts asscociated with selected  hostpool -- july code bit
-                string strJson = response.Content.ReadAsStringAsync().Result;
-                if (response.IsSuccessStatusCode)
-                {
-                    //Deserialize the string to JSON object
-                    var jObj = (JArray)JsonConvert.DeserializeObject(strJson);
-                    if (jObj.Count > 0)
-                    {
-                        if (isSessionHostNameOnly)
-                        {
-                            rdMgmtSessionHosts = jObj.Select(item => new RdMgmtSessionHost
-                            {
-                                tenantName = (string)item["tenantName"],
-                                hostPoolName = (string)item["hostPoolName"],
-                                sessionHostName = (string)item["sessionHostName"]
-                            }).ToList();
-                        }
-                        else
-                        {
-                            rdMgmtSessionHosts = jObj.Select(item => new RdMgmtSessionHost
-                            {
-                                tenantName = (string)item["tenantName"],
-                                hostPoolName = (string)item["hostPoolName"],
-                                sessionHostName = (string)item["sessionHostName"],
-                                allowNewSession = (bool)item["allowNewSession"],
-                                sessions = (int)item["sessions"],
-                                lastHeartBeat = (DateTime)item["lastHeartBeat"],
-                                agentVersion = (string)item["agentVersion"]
-                            }).ToList();
-                        }
-                    }
-                }
+                return response;
+                ////call rest api to get all Session hosts asscociated with selected  hostpool -- july code bit
+                //string strJson = response.Content.ReadAsStringAsync().Result;
+                //if (response.IsSuccessStatusCode)
+                //{
+                //    //Deserialize the string to JSON object
+                //    var jObj = (JArray)JsonConvert.DeserializeObject(strJson);
+                //    if (jObj.Count > 0)
+                //    {
+                //        if (isSessionHostNameOnly)
+                //        {
+                //            rdMgmtSessionHosts = jObj.Select(item => new RdMgmtSessionHost
+                //            {
+                //                tenantName = (string)item["tenantName"],
+                //                hostPoolName = (string)item["hostPoolName"],
+                //                sessionHostName = (string)item["sessionHostName"]
+                //            }).ToList();
+                //        }
+                //        else
+                //        {
+                //            rdMgmtSessionHosts = jObj.Select(item => new RdMgmtSessionHost
+                //            {
+                //                tenantName = (string)item["tenantName"],
+                //                hostPoolName = (string)item["hostPoolName"],
+                //                sessionHostName = (string)item["sessionHostName"],
+                //                allowNewSession = (bool)item["allowNewSession"],
+                //                sessions = (int)item["sessions"],
+                //                lastHeartBeat = (DateTime)item["lastHeartBeat"],
+                //                agentVersion = (string)item["agentVersion"]
+                //            }).ToList();
+                //        }
+                //    }
+                //}
             }
             catch 
             {
                 return null;
             }
-            return rdMgmtSessionHosts;
+            
         }
 
         /// <summary>
@@ -93,26 +94,26 @@ namespace MSFT.RDMISaaS.API.BLL
         /// <param name="hostPoolName">Name of Hostpool</param>
         /// <param name="sessionHostName">Name of Session Host</param>
         /// <returns></returns>
-        public RdMgmtSessionHost GetSessionHostDetails(string deploymentUrl, string accessToken,string tenantGroup,  string tenantName, string hostPoolName, string sessionHostName)
+        public HttpResponseMessage GetSessionHostDetails(string deploymentUrl, string accessToken,string tenantGroup,  string tenantName, string hostPoolName, string sessionHostName)
         {
-            RdMgmtSessionHost rdMgmtSessionHost = new RdMgmtSessionHost();
+          //  RdMgmtSessionHost rdMgmtSessionHost = new RdMgmtSessionHost();
             try
             {
                 //call rest api to get session host details -- july code bit
                 HttpResponseMessage response = CommonBL.InitializeHttpClient(deploymentUrl, accessToken).GetAsync("/RdsManagement/V1/TenantGroups/" + tenantGroup + "/Tenants/" + tenantName + "/HostPools/" + hostPoolName + "/SessionHosts/" + sessionHostName).Result;
-                string strJson = response.Content.ReadAsStringAsync().Result;
-                if (response.IsSuccessStatusCode)
-                {
-                    //Deserialize the string to JSON object
-                    rdMgmtSessionHost = JsonConvert.DeserializeObject<RdMgmtSessionHost>(strJson);
-                }
+                return response;
+                //string strJson = response.Content.ReadAsStringAsync().Result;
+                //if (response.IsSuccessStatusCode)
+                //{
+                //    //Deserialize the string to JSON object
+                //    rdMgmtSessionHost = JsonConvert.DeserializeObject<RdMgmtSessionHost>(strJson);
+                //}
 
             }
             catch 
             {
                 return null;
             }
-            return rdMgmtSessionHost;
         }
 
         /// <summary>

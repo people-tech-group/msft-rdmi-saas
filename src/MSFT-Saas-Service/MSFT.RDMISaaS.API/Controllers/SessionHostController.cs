@@ -8,6 +8,7 @@ using System.Net.Http;
 using System.Web.Http;
 using MSFT.RDMISaaS.API.BLL;
 using System.Web.Http.Cors;
+using Newtonsoft.Json.Linq;
 #endregion "Import Namespaces"
 
 #region "MSFT.RDMISaaS.API.Controllers"
@@ -37,12 +38,11 @@ namespace MSFT.RDMISaaS.API.Controllers
         /// <param name="hostPoolName">Name of Hostpool</param>
         /// <param name="refresh_token">Refresh token to get access token</param>
         /// <returns></returns>
-        public List<RdMgmtSessionHost> GetSessionhostList(string tenantGroupName, string tenantName, string hostPoolName, string refresh_token, int pageSize, string sortField, bool isDescending = false, int initialSkip = 0, string lastEntry = null)
+        public HttpResponseMessage GetSessionhostList(string tenantGroupName, string tenantName, string hostPoolName, string refresh_token, int pageSize, string sortField, bool isDescending = false, int initialSkip = 0, string lastEntry = null)
         {
-
             //get deployment url
             deploymentUrl = configurations.rdBrokerUrl;
-            List<RdMgmtSessionHost> rdMgmtSessionHosts = new List<RdMgmtSessionHost>();
+           // List<RdMgmtSessionHost> rdMgmtSessionHosts = new List<RdMgmtSessionHost>();
             try
             {
                 if (!string.IsNullOrEmpty(refresh_token))
@@ -52,21 +52,21 @@ namespace MSFT.RDMISaaS.API.Controllers
                     accessToken = common.GetTokenValue(refresh_token);
                     if (!string.IsNullOrEmpty(accessToken) && accessToken.ToString().ToLower() != invalidToken && accessToken.ToString().ToLower() != invalidCode)
                     {
-                        rdMgmtSessionHosts = sessionHostBL.GetSessionhostList(deploymentUrl, accessToken, tenantGroupName, tenantName, hostPoolName, false,false, pageSize, sortField, isDescending, initialSkip, lastEntry);
+                       return sessionHostBL.GetSessionhostList(deploymentUrl, accessToken, tenantGroupName, tenantName, hostPoolName, false,false, pageSize, sortField, isDescending, initialSkip, lastEntry);
                     }
                     else
                     {
-                        RdMgmtSessionHost rdMgmtSessionHost = new RdMgmtSessionHost();
-                        rdMgmtSessionHost.code = Constants.invalidToken;
-                        rdMgmtSessionHosts.Add(rdMgmtSessionHost);
+                        return Request.CreateResponse(HttpStatusCode.OK, new JArray() { new JObject() { { "code", Constants.invalidToken } } });
                     }
                 }
+                else
+                { return null; }
             }
             catch 
             {
                 return null;
             }
-            return rdMgmtSessionHosts;
+          
         }
 
         /// <summary>
@@ -77,11 +77,11 @@ namespace MSFT.RDMISaaS.API.Controllers
         /// <param name="sessionHostName">Name of Session Host</param>
         /// <param name="refresh_token">Refresh token to get access token</param>
         /// <returns></returns>
-        public RdMgmtSessionHost GetSessionHostDetails(string tenantGroupName,string  tenantName, string hostPoolName, string sessionHostName, string refresh_token)
+        public HttpResponseMessage GetSessionHostDetails(string tenantGroupName,string  tenantName, string hostPoolName, string sessionHostName, string refresh_token)
         {
             //get deployment url
             deploymentUrl = configurations.rdBrokerUrl;
-            RdMgmtSessionHost rdMgmtSessionHost = new RdMgmtSessionHost();
+          //  RdMgmtSessionHost rdMgmtSessionHost = new RdMgmtSessionHost();
             try
             {
                 if (!string.IsNullOrEmpty(refresh_token))
@@ -91,19 +91,22 @@ namespace MSFT.RDMISaaS.API.Controllers
                     accessToken = common.GetTokenValue(refresh_token);
                     if (!string.IsNullOrEmpty(accessToken) && accessToken.ToString().ToLower() != invalidToken && accessToken.ToString().ToLower() != invalidCode)
                     {
-                        rdMgmtSessionHost = sessionHostBL.GetSessionHostDetails(deploymentUrl, accessToken, tenantGroupName, tenantName, hostPoolName, sessionHostName);
+                        return sessionHostBL.GetSessionHostDetails(deploymentUrl, accessToken, tenantGroupName, tenantName, hostPoolName, sessionHostName);
                     }
                     else
                     {
-                        rdMgmtSessionHost.code = Constants.invalidToken;
+                        return Request.CreateResponse(HttpStatusCode.OK, new JObject() { { "code", Constants.invalidToken } } );
                     }
+                }
+                else
+                {
+                    return null;
                 }
             }
             catch 
             {
                 return null;
             }
-            return rdMgmtSessionHost;
         }
 
         /// <summary>
