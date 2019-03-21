@@ -496,7 +496,7 @@ export class HostpoolDashboardComponent implements OnInit {
           }
         )
         AppComponent.GetNotification('icon icon-fail angular-NotifyFail', 'Failed To Generate Registration Key', 'Problem with server, Please try again', new Date());
-        this.RefreshData();
+        this.RefreshHost();
       }
     );
   }
@@ -511,12 +511,20 @@ export class HostpoolDashboardComponent implements OnInit {
   /*
    * This function is used to check the AppGroup Access and refresh Hostpool Details, Host List, Appgroup Lsit
    */
-  public RefreshData() {
+  public RefreshHost() {
+    this.sessionHostListsSearch = [];
+    sessionStorage.removeItem('Hosts');
+    this.CheckAppGroupAccess(this.hostPoolName);
+    this.GetAllSessionHost();
+  }
+
+  public RefreshAppgroups(){
     this.checked = [];
     this.checkedMainAppGroup = false;
     this.state = "down";
+    this.appGroupsListSearch = [];
+    sessionStorage.removeItem('Appgroups');
     this.CheckAppGroupAccess(this.hostPoolName);
-    this.GetAllSessionHost();
   }
 
   /*
@@ -530,8 +538,6 @@ export class HostpoolDashboardComponent implements OnInit {
     let Hostpools = JSON.parse(sessionStorage.getItem('Hostpools'));
     let data = Hostpools.filter(item => item.hostPoolName == hostPoolName);
     this.hostPoolDetails = data[0];
-    this.GetcurrentNoOfPagesCountAppgroup();
-    this.GetcurrentNoOfPagesCountHost();
     this.GetAllAppGroupsList(hostPoolName);
     // this.refreshHostpoolLoading = true;
     // this.hostpoolDetailsErrorFound = false;
@@ -933,10 +939,11 @@ export class HostpoolDashboardComponent implements OnInit {
     this.sessionHostchecked = [];
     this.hostListErrorFound = false;
     let hosts = JSON.parse(sessionStorage.getItem('Hosts'));
-    if (sessionStorage.getItem('Hosts') && hosts.length != 0 && hosts != null) {
+    if (sessionStorage.getItem('Hosts') && hosts.length != 0 && hosts != null && sessionStorage.getItem('SelectedHostpool') == this.hostPoolName) {
       this.gettingHosts();
     }
     else {
+      sessionStorage.setItem('SelectedHostpool', this.hostPoolName);
       this.getAllSessionHostUrl = this._AppService.ApiUrl + '/api/SessionHost/GetSessionhostList?tenantGroupName=' + this.tenantGroupName + '&tenantName=' + this.tenantName + '&hostPoolName=' + this.hostPoolName + '&refresh_token=' + sessionStorage.getItem("Refresh_Token") + '&pageSize=' + this.HostpageSize + '&sortField=SessionHostName&isDescending=false&initialSkip=' + this.hostinitialSkip + '&lastEntry=%22%20%22';
       this._AppService.GetData(this.getAllSessionHostUrl).subscribe(response => {
         this.sessionHostLists = JSON.parse(response['_body']);
@@ -1005,6 +1012,7 @@ export class HostpoolDashboardComponent implements OnInit {
         this.edited = false;
       }
     }
+    this.refreshHostpoolLoading = false;
   }
 
   /*
@@ -1040,7 +1048,6 @@ export class HostpoolDashboardComponent implements OnInit {
             }
           )
           AppComponent.GetNotification('icon icon-check angular-Notify', 'Host Deleted Successfully', responseData.message, new Date());
-          this.RefreshData();
         }
         /* If response data is success then it enters into else and this block of code will execute to show the 'Failed To Delete Host' notification */
         else {
@@ -1060,8 +1067,8 @@ export class HostpoolDashboardComponent implements OnInit {
             }
           )
           AppComponent.GetNotification('icon icon-fail angular-NotifyFail', 'Failed To Delete Host', responseData.message, new Date());
-          this.RefreshData();
         }
+        this.RefreshHost();
       },
         /*
          * If Any Error (or) Problem With Services (or) Problem in internet this Error Block Will Exequte
@@ -1085,7 +1092,7 @@ export class HostpoolDashboardComponent implements OnInit {
           AppComponent.GetNotification('icon icon-fail angular-NotifyFail', 'Failed To Delete Host', 'Problem with server, Please try again', new Date());
         }
       );
-      this.RefreshData();
+      this.RefreshHost();
     }
   }
 
@@ -1175,7 +1182,7 @@ export class HostpoolDashboardComponent implements OnInit {
         )
         AppComponent.GetNotification('icon icon-check angular-Notify', 'Host Updated Successfully', responseData.message, new Date());
         $("#editHostModal .icon-close").trigger('click');
-        this.RefreshData();
+        this.RefreshHost();
       }
       /* If response data is success then it enters into else and this block of code will execute to show the 'Failed To Update Host' notification */
       else {
@@ -1195,7 +1202,7 @@ export class HostpoolDashboardComponent implements OnInit {
           }
         )
         AppComponent.GetNotification('icon icon-fail angular-NotifyFail', 'Failed To Update Host', responseData.message, new Date());
-        this.RefreshData();
+        this.RefreshHost();
       }
     },
       /*
@@ -1475,7 +1482,8 @@ export class HostpoolDashboardComponent implements OnInit {
 
   /* This function is used to  divide the number of pages based on Tenants Count */
   public GetcurrentNoOfPagesCountAppgroup() {
-    this.appgroupsCount = this.hostPoolDetails.noOfAppgroups;
+    this.appGroupsList = JSON.parse(sessionStorage.getItem('Appgroups'));
+    this.appgroupsCount = this.appGroupsList.length;
     let currentNoOfPagesCountCount = Math.floor(this.appgroupsCount / this.pageSize);
     let remaingCount = this.appgroupsCount % this.pageSize;
     if (remaingCount > 0) {
@@ -1630,8 +1638,9 @@ export class HostpoolDashboardComponent implements OnInit {
     this.editedBodyAppGroup = false;
     this.checkedMainAppGroup = false;
     let appGroups = JSON.parse(sessionStorage.getItem('Appgroups'));
-    if (sessionStorage.getItem('Appgroups') && appGroups.length != 0 && appGroups != null) {
+    if (sessionStorage.getItem('Appgroups') && appGroups.length != 0 && appGroups != null && sessionStorage.getItem('SelectedHostpool') == this.hostPoolName) {
       this.gettingAppgroups();
+      this.refreshHostpoolLoading = false;
     } else {
       this.getAllAppGroupsListUrl = this._AppService.ApiUrl + '/api/AppGroup/GetAppGroupsList?tenantGroupName=' + this.tenantGroupName + '&tenantName=' + this.tenantName + '&hostPoolName=' + hostPoolName + '&refresh_token=' + sessionStorage.getItem("Refresh_Token") + ' &pageSize=' + this.pageSize + '&sortField=AppGroupName&isDescending=false&initialSkip=' + this.initialSkip + '&lastEntry=%22%20%22';
       this._AppService.GetData(this.getAllAppGroupsListUrl).subscribe(response => {
@@ -1671,6 +1680,8 @@ export class HostpoolDashboardComponent implements OnInit {
         this.editedBodyAppGroup = false;
       }
     }
+    this.GetcurrentNoOfPagesCountAppgroup();
+    this.GetcurrentNoOfPagesCountHost();
   }
 
   /*
@@ -1898,7 +1909,7 @@ export class HostpoolDashboardComponent implements OnInit {
           )
           AppComponent.GetNotification('icon icon-check angular-Notify', 'App Group Created Successfully', responseData.message, new Date());
           this.HideNewAppGroup();
-          this.RefreshData();
+          this.RefreshAppgroups();
         }
         /* If response data is success then it enters into else and this block of code will execute to show the 'Failed To Create App Group' notification */
         else {
@@ -1919,7 +1930,7 @@ export class HostpoolDashboardComponent implements OnInit {
           )
           AppComponent.GetNotification('icon icon-fail angular-NotifyFail', 'Failed To Create App Group', responseData.message, new Date());
           this.HideNewAppGroup();
-          this.RefreshData();
+          this.RefreshAppgroups();
         }
       },
         /*
@@ -1943,7 +1954,7 @@ export class HostpoolDashboardComponent implements OnInit {
           )
           AppComponent.GetNotification('icon icon-fail angular-NotifyFail', 'Failed To Create App Group', 'Problem with server, Please try again', new Date());
           this.HideNewAppGroup();
-          this.RefreshData();
+          this.RefreshAppgroups();
         }
       );
     }
@@ -1996,7 +2007,7 @@ export class HostpoolDashboardComponent implements OnInit {
         AppComponent.GetNotification('icon icon-check angular-Notify', 'App Group Updated Successfully', responseData.message, new Date());
         this.AppGroupsUpdateClose();
         this.state = 'down';
-        this.RefreshData();
+        this.RefreshAppgroups();
       }
       /* If response data is success then it enters into else and this block of code will execute to show the 'Failed To Update App Group' notification */
       else {
@@ -2017,7 +2028,7 @@ export class HostpoolDashboardComponent implements OnInit {
         )
         AppComponent.GetNotification('icon icon-fail angular-NotifyFail', 'Failed To Update App Group', responseData.message, new Date());
         this.AppGroupsUpdateClose();
-        this.RefreshData();
+        this.RefreshAppgroups();
       }
     },
       /*
@@ -2041,7 +2052,7 @@ export class HostpoolDashboardComponent implements OnInit {
         )
         AppComponent.GetNotification('icon icon-fail angular-NotifyFail', 'Failed To Update App Group', 'Problem with server, Please try again', new Date());
         this.AppGroupsUpdateClose();
-        this.RefreshData();
+        this.RefreshAppgroups();
       }
     );
   }
@@ -2082,7 +2093,7 @@ export class HostpoolDashboardComponent implements OnInit {
           this.selectedClassMax = true;
           this.selectedClassMin = false;
           this.state = 'down';
-          this.RefreshData();
+          this.RefreshAppgroups();
         }
         /* If response data is success then it enters into else and this block of code will execute to show the 'Failed To Delete App Group' notification */
         else {
@@ -2102,7 +2113,7 @@ export class HostpoolDashboardComponent implements OnInit {
             }
           )
           AppComponent.GetNotification('icon icon-fail angular-NotifyFail', 'Failed To Delete App Group', responseData.message, new Date());
-          this.RefreshData();
+          this.RefreshAppgroups();
         }
       },
         /*
@@ -2125,7 +2136,7 @@ export class HostpoolDashboardComponent implements OnInit {
             }
           )
           AppComponent.GetNotification('icon icon-fail angular-NotifyFail', 'Failed To Delete App Group', 'Problem with server, Please try again', new Date());
-          this.RefreshData();
+          this.RefreshAppgroups();
         }
       );
     }
@@ -2135,28 +2146,32 @@ export class HostpoolDashboardComponent implements OnInit {
    * This function is used to get the selected AppGroup details
    */
   public GetAppGroupDetails() {
-    this.detailsErrorFound = false;
-    this.refreshHostpoolLoading = true;
-    this.getAppGroupDetailsUrl = this._AppService.ApiUrl + '/api/AppGroup/GetAppGroupDetails?tenantGroupName=' + this.tenantGroupName + '&tenantName=' + this.tenantName + '&hostPoolName=' + this.hostPoolName + '&appGroupName=' + this.selectedAppGroupName + '&refresh_token=' + sessionStorage.getItem("Refresh_Token");
-    this._AppService.GetData(this.getAppGroupDetailsUrl).subscribe(response => {
-      this.appGroupDetails = JSON.parse(response['_body']);
-      this.appsCount = this.appGroupDetails.noOfApps;
-      this.usersCount = this.appGroupDetails.noOfusers;
-      if (this.appGroupDetails) {
-        if (this.appGroupDetails.code == "Invalid Token") {
-          sessionStorage.clear();
-          this.router.navigate(['/invalidtokenmessage']);
-        }
-      }
-    },
-      /*
-       * If Any Error (or) Problem With Services (or) Problem in internet this Error Block Will Exequte
-       */
-      (error) => {
-        this.detailsErrorFound = true;
-        this.refreshHostpoolLoading = false;
-      }
-    );
+    let Appgroups = JSON.parse(sessionStorage.getItem('Appgroups'));
+    let data = Appgroups.filter(item => item.appGroupName == this.selectedAppGroupName);
+    this.appGroupDetails = data[0];
+    // this.detailsErrorFound = false;
+    // this.refreshHostpoolLoading = true;
+    // this.getAppGroupDetailsUrl = this._AppService.ApiUrl + '/api/AppGroup/GetAppGroupDetails?tenantGroupName=' + this.tenantGroupName + '&tenantName=' + this.tenantName + '&hostPoolName=' + this.hostPoolName + '&appGroupName=' + this.selectedAppGroupName + '&refresh_token=' + sessionStorage.getItem("Refresh_Token");
+    // this._AppService.GetData(this.getAppGroupDetailsUrl).subscribe(response => {
+    //   this.refreshHostpoolLoading = false;
+    //   this.appGroupDetails = JSON.parse(response['_body']);
+    //   this.appsCount = this.appGroupDetails.noOfApps;
+    //   this.usersCount = this.appGroupDetails.noOfusers;
+    //   if (this.appGroupDetails) {
+    //     if (this.appGroupDetails.code == "Invalid Token") {
+    //       sessionStorage.clear();
+    //       this.router.navigate(['/invalidtokenmessage']);
+    //     }
+    //   }
+    // },
+    //   /*
+    //    * If Any Error (or) Problem With Services (or) Problem in internet this Error Block Will Exequte
+    //    */
+    //   (error) => {
+    //     this.detailsErrorFound = true;
+    //     this.refreshHostpoolLoading = false;
+    //   }
+    // );
     this.GetAllAppGroupApps();
   }
 
@@ -2171,6 +2186,7 @@ export class HostpoolDashboardComponent implements OnInit {
     this.getAppGroupUserUrl = this._AppService.ApiUrl + '/api/AppGroup/GetUsersList?tenantGroupName=' + this.tenantGroupName + '&tenantName=' + this.tenantName + '&hostPoolName=' + this.hostPoolName + '&appGroupName=' + this.selectedAppGroupName + '&refresh_token=' + sessionStorage.getItem("Refresh_Token") + '&pageSize=' + this.pageSize + '&sortField=UserPrincipalName&isDescending=false&initialSkip=' + this.usersInitialSkip + '&lastEntry=' + this.usersLastEntry;
     this._AppService.GetData(this.getAppGroupUserUrl).subscribe(response => {
       this.appUsersList = JSON.parse(response['_body']);
+      this.usersCount = this.appUsersList.length;
       if (this.appUsersList) {
         if (this.appUsersList.code == "Invalid Token") {
           sessionStorage.clear();
@@ -2871,6 +2887,7 @@ export class HostpoolDashboardComponent implements OnInit {
     this.getAppGroupAppsUrl = this._AppService.ApiUrl + '/api/RemoteApp/GetRemoteAppList?tenantGroupName=' + this.tenantGroupName + '&tenantName=' + this.tenantName + '&hostPoolName=' + this.hostPoolName + '&appGroupName=' + this.selectedAppGroupName + '&refresh_token=' + sessionStorage.getItem("Refresh_Token") + '&pageSize=' + this.pageSize + '&sortField=RemoteAppName&isDescending=false&initialSkip=' + this.appsInitialSkip + '&lastEntry=' + this.appsLastEntry;
     this._AppService.GetData(this.getAppGroupAppsUrl).subscribe(response => {
       this.appGroupAppList = JSON.parse(response['_body']);
+      this.appsCount = this.appGroupAppList.length;
       if (this.appGroupAppList) {
         if (this.appGroupAppList.code == "Invalid Token") {
           sessionStorage.clear();

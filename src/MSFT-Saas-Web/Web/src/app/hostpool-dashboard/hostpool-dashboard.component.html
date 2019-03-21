@@ -123,7 +123,7 @@
                   <li><button type="button" id="linkHostpoolDashboard" (click)="OpenAddHostDialog()"><i class="icon icon-plus" aria-hidden="true"></i> Add Host</button></li>
                   <li><button type="button" id="btnEditHosts" [disabled]="editHostDisabled" data-toggle="modal" data-target="#editHostModal"><i class="icon icon-edit" aria-hidden="true"></i> Edit</button></li>
                   <li><button type="button" id="btnDeleteHosts" [disabled]="deleteHostDisabled" data-toggle="modal" data-target="#deleteModal"><i class="icon icon-delete" aria-hidden="true"></i> Delete</button></li>
-                  <li><button type="button" (click)="RefreshData()"><i class="icon icon-refresh" aria-hidden="true"></i> Refresh</button></li>
+                  <li><button type="button" (click)="RefreshHost()"><i class="icon icon-refresh" aria-hidden="true"></i> Refresh</button></li>
                 </ul>
               </div>
               <div class="col-md-3 pull-right">
@@ -209,7 +209,7 @@
                     <img src="../../assets/Images/sad-cloud.png" class="img img-responsive" style="position: relative; width: 10%; left: 44%;" />
                     <h5 style="color:#808080;font-weight:400;">Error</h5>
                     <p style="color:#808080"> Problem with server, Please try again </p>
-                    <button class="btn btn-sm btn-primary" style="border-radius:0px;" id="" (click)="RefreshData()">Refresh</button>
+                    <button class="btn btn-sm btn-primary" style="border-radius:0px;" id="" (click)="RefreshHost()">Refresh</button>
                   </div>
                 </div>
               </div>
@@ -222,7 +222,7 @@
                   <li><button type="button" (click)="OpenNewAppGroup()"><i class="icon icon-plus" aria-hidden="true"></i> Create App Group</button></li>
                   <li><button type="button" [disabled]="isEditAppgroupDisabled" data-toggle="modal" data-target="#editModal"><i class="icon icon-edit" aria-hidden="true"></i> Edit App Group</button></li>
                   <li><button type="button" id="btnDeleteAppGroup" [disabled]="isDeleteAppgroupDisabled" data-toggle="modal" data-target="#deleteModalAppGroups"><i class="icon icon-delete" aria-hidden="true"></i> Delete App Group</button></li>
-                  <li><button type="button" (click)="RefreshData()"><i class="icon icon-refresh" aria-hidden="true"></i> Refresh</button></li>
+                  <li><button type="button" (click)="RefreshAppgroups()"><i class="icon icon-refresh" aria-hidden="true"></i> Refresh</button></li>
                 </ul>
               </div>
               <div class="col-md-3 pull-right">
@@ -250,10 +250,10 @@
                         </div>
                       </th>
                       <th style="width:18%;text-align:left;">App Group Name</th>
+                      <th style="width:18%;text-align:center;">Friendly Name</th>
                       <th style="width:18%;text-align:center;">Type</th>
-                      <th style="width:18%;text-align:center;">Apps</th>
-                      <th style="width:18%;text-align:center;">Active Users</th>
-                      <th style="width:18%;text-align:center;">Users</th>
+                      <th style="width:18%;text-align:center;">Description</th>
+                      <!-- <th style="width:18%;text-align:center;">Users</th> -->
                     </tr>
                   </thead>
                   <tbody *ngIf="!(appGroupListErrorFound || editedBodyAppGroup)">
@@ -267,10 +267,10 @@
                         </div>
                       </td>
                       <td style="width:18%;text-align:left;">{{List.appGroupName}}<span *ngIf="List.friendlyName != ''"> ({{List.friendlyName}})</span></td>
-                      <td style="width:18%;text-align:center;"><span>{{List.resourceType}}</span></td>
-                      <td style="width:18%;text-align:center;">{{List.noOfApps}}</td>
-                      <td style="width:18%;text-align:center;">{{List.noOfusers}}</td>
-                      <td style="width:18%;text-align:center;">{{List.noOfusers}}</td>
+                      <td style="width:18%;text-align:center;"><span>{{List.friendlyName}}</span></td>
+                      <td style="width:18%;text-align:center;">{{List.resourceType == 0 ? "Remote App Group" : "Desktop App Group"}}</td>
+                      <td style="width:18%;text-align:center;">{{List.description}}</td>
+                      <!-- <td style="width:18%;text-align:center;">{{List.noOfusers}}</td> -->
                     </tr>
                   </tbody>
                 </table>
@@ -356,20 +356,20 @@
                           <div class="col-md-3">
                           </div>
                           <div class="col-md-3">
-                            <label>Active Users</label>
-                            <p>{{appGroupDetails.noOfusers}}</p>
+                            <label>Apps</label>
+                            <p>{{appsCount}}</p>
                           </div>
                         </div>
                         <div class="row">
                           <div class="col-md-5">
                             <label>Type</label>
-                            <p>{{appGroupDetails.resourceType}}</p>
+                            <p>{{appGroupDetails.resourceType == 0 ? "Remote App Group" : "Desktop App Group"}}</p>
                           </div>
                           <div class="col-md-3">
                           </div>
                           <div class="col-md-3">
                             <label>Users</label>
-                            <p>{{appGroupDetails.noOfusers}}</p>
+                            <p>{{usersCount}}</p>
                           </div>
                         </div>
                         <div class="row">

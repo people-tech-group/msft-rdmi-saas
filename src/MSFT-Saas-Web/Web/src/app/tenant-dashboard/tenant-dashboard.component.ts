@@ -152,16 +152,10 @@ export class TenantDashboardComponent implements OnInit {
         "includeFolderPath": "",
         "customRdpProperty": "",
         "maxSessionLimit": "",
-        "useReverseConnect": "",
         "persistent": "",
-        "autoAssignUser": "",
-        "grantAdministrativePrivilege": "",
-        "noOfActivehosts": "",
-        "noOfAppgroups": "",
-        "noOfUsers": "",
-        "noOfSessions": "",
-        "code": null,
-        "refresh_token": null
+        "loadBalancerType": 1,
+        "validationEnv": "",
+        "ring": null
       }];
       this.searchHostPools = this.hostPoolsList;
       this.tenantInfo = {
@@ -725,6 +719,7 @@ export class TenantDashboardComponent implements OnInit {
   }
 
   public GetHostpoolsList(tenantName: any) {
+    this.adminMenuComponent.GetHostpools(tenantName);
     let headers = new Headers({ 'Accept': 'application/json', 'Access-Control-Allow-Origin': '*' });
     /*
      * This block of code is used to check the Access level of Tenant
@@ -802,7 +797,10 @@ export class TenantDashboardComponent implements OnInit {
 
   /* This function is used to check Hostpool Access and refresh the hostpools list */
   public RefreshHostpools() {
+    this.hostPoolsList = [];
+    this.searchHostPools = [];
     sessionStorage.removeItem('Hostpools');
+    sessionStorage.removeItem('sideMenuHostpools');
     this.CheckHostpoolAccess(this.tenantName);
   }
 
