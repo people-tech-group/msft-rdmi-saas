@@ -15,7 +15,7 @@ namespace MSFT.RDMISaaS.API.BLL
     #region "UserSessionBL"
     public class UserSessionBL
     {
-       // string tenantGroup = Constants.tenantGroupName;
+        // string tenantGroup = Constants.tenantGroupName;
 
         #region "Functions/Methods"
         /// <summary>
@@ -25,49 +25,45 @@ namespace MSFT.RDMISaaS.API.BLL
         /// <param name="accessToken"></param>
         /// <param name="tenantName"></param>
         /// <param name="hostPoolName"></param>
+        /// old parameters-- , bool isAll, int pageSize, string sortField, bool isDescending, int initialSkip, string lastEntry
         /// <returns></returns>
-        public List<RdMgmtUserSession> GetListOfUserSessioons(string deploymentUrl, string accessToken, string tenantGroup, string tenantName, string hostPoolName, bool isAll, int pageSize, string sortField, bool isDescending, int initialSkip, string lastEntry)
+        public HttpResponseMessage GetListOfUserSessioons(string deploymentUrl, string accessToken, string tenantGroup, string tenantName, string hostPoolName)
         {
-            List<RdMgmtUserSession> rdMgmtUserSessions = new List<RdMgmtUserSession>();
-            HttpResponseMessage response;
+            //List<RdMgmtUserSession> rdMgmtUserSessions = new List<RdMgmtUserSession>();
             try
             {
-                if(isAll == true)
-                {
-                    response = CommonBL.InitializeHttpClient(deploymentUrl, accessToken).GetAsync("/RdsManagement/V1/TenantGroups/" + tenantGroup + "/Tenants/" + tenantName + "/HostPools/" + hostPoolName + "/Sessions").Result;
+                HttpResponseMessage response = CommonBL.InitializeHttpClient(deploymentUrl, accessToken).GetAsync("/RdsManagement/V1/TenantGroups/" + tenantGroup + "/Tenants/" + tenantName + "/HostPools/" + hostPoolName + "/Sessions").Result;
+                return response;
+                //api call included pagination
+                //response = CommonBL.InitializeHttpClient(deploymentUrl, accessToken).GetAsync("/RdsManagement/V1/TenantGroups/" + tenantGroup + "/Tenants/" + tenantName + "/HostPools/" + hostPoolName + "/Sessions?PageSize=" + pageSize + "&LastEntry=" + lastEntry + "&SortField=" + sortField + "&IsDescending=" + isDescending + "&InitialSkip=" + initialSkip).Result;
 
-                }
-                else
-                {
-                    response = CommonBL.InitializeHttpClient(deploymentUrl, accessToken).GetAsync("/RdsManagement/V1/TenantGroups/" + tenantGroup + "/Tenants/" + tenantName + "/HostPools/" + hostPoolName + "/Sessions?PageSize=" + pageSize + "&LastEntry=" + lastEntry + "&SortField=" + sortField + "&IsDescending=" + isDescending + "&InitialSkip=" + initialSkip).Result;
 
-                }
-                //call rest api to get all user sessions -- july code bit
-                string strJson = response.Content.ReadAsStringAsync().Result;
-                if (response.IsSuccessStatusCode)
-                {
-                    //Deserialize the string to JSON object
-                    var jObj = (JArray)JsonConvert.DeserializeObject(strJson);
-                    if(jObj.Count>0)
-                    {
-                        rdMgmtUserSessions = jObj.Select(item => new RdMgmtUserSession
-                        {
-                            tenantName = (string)item["tenantName"],
-                            hostPoolName = (string)item["hostPoolName"],
-                            sessionHostName = (string)item["sessionHostName"],
-                            userPrincipalName = (string)item["userPrincipalName"],
-                            sessionId = (int)item["sessionId"],
-                            applicationType = (string)item["applicationType"]
-                        }).ToList();
-                    }
-                }
+                ////call rest api to get all user sessions -- july code bit
+                //string strJson = response.Content.ReadAsStringAsync().Result;
+                //if (response.IsSuccessStatusCode)
+                //{
+                //    //Deserialize the string to JSON object
+                //    var jObj = (JArray)JsonConvert.DeserializeObject(strJson);
+                //    if(jObj.Count>0)
+                //    {
+                //        rdMgmtUserSessions = jObj.Select(item => new RdMgmtUserSession
+                //        {
+                //            tenantName = (string)item["tenantName"],
+                //            hostPoolName = (string)item["hostPoolName"],
+                //            sessionHostName = (string)item["sessionHostName"],
+                //            userPrincipalName = (string)item["userPrincipalName"],
+                //            sessionId = (int)item["sessionId"],
+                //            applicationType = (string)item["applicationType"]
+                //        }).ToList();
+                //    }
+                //}
             }
-            catch 
+            catch
             {
                 return null;
             }
 
-            return rdMgmtUserSessions;
+            //return rdMgmtUserSessions;
         }
         #endregion
 

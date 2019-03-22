@@ -76,8 +76,9 @@ namespace MSFT.RDMISaaS.API.Controllers
         /// Description - Gets a list of Rds tenants.
         /// </summary>
         /// <param name="refresh_token">effsh token to get access token</param>
+        /// //old parameters for pagination -  int pageSize, string sortField, bool isDescending = false, int initialSkip = 0, string lastEntry = ""
         /// <returns></returns>
-        public HttpResponseMessage GetTenantList(string tenantGroupName, string refresh_token, int pageSize, string sortField, bool isDescending = false, int initialSkip = 0, string lastEntry = "")
+        public HttpResponseMessage GetTenantList(string tenantGroupName, string refresh_token)
         {
             //get deployment url
             deploymentUrl = configurations.rdBrokerUrl;
@@ -91,7 +92,7 @@ namespace MSFT.RDMISaaS.API.Controllers
                     accessToken = common.GetTokenValue(refresh_token);
                     if (!string.IsNullOrEmpty(accessToken) && accessToken.ToString().ToLower() != invalidToken && accessToken.ToString().ToLower() != invalidCode)
                     {
-                        return tenantBL.GetTenantList(tenantGroupName, deploymentUrl, accessToken, pageSize, sortField, isDescending, initialSkip, lastEntry);
+                        return tenantBL.GetTenantList(tenantGroupName, deploymentUrl, accessToken);
                         //tenants = tenantBL.GetTenantList(tenantGroupName,deploymentUrl, accessToken, pageSize, sortField, isDescending, initialSkip, lastEntry);
                     }
                     else
@@ -101,7 +102,7 @@ namespace MSFT.RDMISaaS.API.Controllers
                         //rdMgmtTenant.code = Constants.invalidToken;
                         //rdMgmtTenants.Add(rdMgmtTenant);
                         //tenants.rdMgmtTenants = rdMgmtTenants;
-                      
+
                         return Request.CreateResponse(HttpStatusCode.OK, new JArray() {
                             new JObject()
                             {
@@ -150,6 +151,9 @@ namespace MSFT.RDMISaaS.API.Controllers
                             tenantResult.message = Constants.invalidToken;
                         }
                     }
+
+
+
                 }
                 else
                 {
@@ -282,7 +286,7 @@ namespace MSFT.RDMISaaS.API.Controllers
                         //RdMgmtTenant rdMgmtTenant = new RdMgmtTenant();
                         //rdMgmtTenant.code = Constants.invalidToken;
                         //rdMgmtTenants.Add(rdMgmtTenant);
-                     
+
                         return Request.CreateResponse(HttpStatusCode.OK, new JArray() {
                             new JObject()
                             {

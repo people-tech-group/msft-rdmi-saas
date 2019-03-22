@@ -53,7 +53,7 @@ namespace MSFT.RDMISaaS.API.BLL
 
         public HttpResponseMessage GetRoleAssignments(string deploymentUrl, string accessToken, string upn)
         {
-           // List<RdMgmtRoleAssignment> rdMgmtRoleAssignments = new List<RdMgmtRoleAssignment>();
+            // List<RdMgmtRoleAssignment> rdMgmtRoleAssignments = new List<RdMgmtRoleAssignment>();
             try
             {
                 HttpResponseMessage response = CommonBL.InitializeHttpClient(deploymentUrl, accessToken).GetAsync("RdsManagement/V1/Rds.Authorization/roleAssignments?upn=" + upn).Result;
@@ -86,7 +86,7 @@ namespace MSFT.RDMISaaS.API.BLL
                 //}
 
             }
-            catch 
+            catch
             {
                 return null;
             }
@@ -109,7 +109,6 @@ namespace MSFT.RDMISaaS.API.BLL
                     var jObj = (JArray)JsonConvert.DeserializeObject(strJson);
                     if (jObj.Count > 0 && jObj.Select(x => (string)x["signInName"] == loginUserName).Count() > 0)
                     {
-                        
                         rdMgmtRoleAssignments = jObj.Select(item => new RdMgmtRoleAssignment
                         {
                             roleAssignmentId = (string)item["roleAssignmentId"],

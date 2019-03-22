@@ -18,7 +18,7 @@ namespace MSFT.RDMISaaS.API.BLL
     public class AppGroupBL
     {
         AppGroupResult groupResult = new AppGroupResult();
-       // string tenantGroup = Constants.tenantGroupName;
+        // string tenantGroup = Constants.tenantGroupName;
 
 
         /// <summary>
@@ -31,7 +31,7 @@ namespace MSFT.RDMISaaS.API.BLL
         /// <param name="hostPoolName"> Name of Hostpool</param>
         /// <param name="appGroupName">Name of App group</param>
         /// <returns></returns>
-        public HttpResponseMessage GetUserDetails(string tenantGroupName,string deploymentUrl, string accessToken, string tenantName, string hostPoolName, string appGroupName, string userPrincipalName)
+        public HttpResponseMessage GetUserDetails(string tenantGroupName, string deploymentUrl, string accessToken, string tenantName, string hostPoolName, string appGroupName, string userPrincipalName)
         {
             //RdMgmtUser rdMgmtUser = new RdMgmtUser();
             try
@@ -47,7 +47,7 @@ namespace MSFT.RDMISaaS.API.BLL
                 //}
 
             }
-            catch 
+            catch
             {
                 return null;
             }
@@ -62,25 +62,21 @@ namespace MSFT.RDMISaaS.API.BLL
         /// <param name="tenantName">Name of Tenant</param>
         /// <param name="hostPoolName">Name of Hostpool</param>
         /// <param name="appGroupName">Name of App Group</param>
+        /// //old parametewrs for pagination - bool isUserNameOnly,bool isAll, int pageSize, string sortField, bool isDescending, int initialSkip, string lastEntry
         /// <returns></returns>
-        public HttpResponseMessage GetUsersList(string tenantGroupName,string deploymentUrl, string accessToken, string tenantName, string hostPoolName, string appGroupName, bool isUserNameOnly,bool isAll, int pageSize, string sortField, bool isDescending, int initialSkip, string lastEntry)
+        public HttpResponseMessage GetUsersList(string tenantGroupName, string deploymentUrl, string accessToken, string tenantName, string hostPoolName, string appGroupName)
         {
-           // List<RdMgmtUser> rdMgmtUsers = new List<RdMgmtUser>();
+            // List<RdMgmtUser> rdMgmtUsers = new List<RdMgmtUser>();
             HttpResponseMessage response;
             try
             {
-                if(isAll==true)
-                {
-                     response = CommonBL.InitializeHttpClient(deploymentUrl, accessToken).GetAsync("/RdsManagement/V1/TenantGroups/" + tenantGroupName + "/Tenants/" + tenantName + "/HostPools/" + hostPoolName + "/AppGroups/" + appGroupName + "/AssignedUsers").Result;
-
-                }
-                else
-                {
-                     response = CommonBL.InitializeHttpClient(deploymentUrl, accessToken).GetAsync("/RdsManagement/V1/TenantGroups/" + tenantGroupName + "/Tenants/" + tenantName + "/HostPools/" + hostPoolName + "/AppGroups/" + appGroupName + "/AssignedUsers?PageSize=" + pageSize + "&LastEntry=" + lastEntry + "&SortField=" + sortField + "&IsDescending=" + isDescending + "&InitialSkip=" + initialSkip).Result;
-
-                }
-
+                response = CommonBL.InitializeHttpClient(deploymentUrl, accessToken).GetAsync("/RdsManagement/V1/TenantGroups/" + tenantGroupName + "/Tenants/" + tenantName + "/HostPools/" + hostPoolName + "/AppGroups/" + appGroupName + "/AssignedUsers").Result;
                 return response;
+
+
+                //folllowing api call is included pagination
+                //response = CommonBL.InitializeHttpClient(deploymentUrl, accessToken).GetAsync("/RdsManagement/V1/TenantGroups/" + tenantGroupName + "/Tenants/" + tenantName + "/HostPools/" + hostPoolName + "/AppGroups/" + appGroupName + "/AssignedUsers?PageSize=" + pageSize + "&LastEntry=" + lastEntry + "&SortField=" + sortField + "&IsDescending=" + isDescending + "&InitialSkip=" + initialSkip).Result;
+
 
                 ////call rest api to get list of app groups users --july code bit
                 //string strJson = response.Content.ReadAsStringAsync().Result;
@@ -115,7 +111,7 @@ namespace MSFT.RDMISaaS.API.BLL
             {
                 return null;
             }
-           // return rdMgmtUsers;
+            // return rdMgmtUsers;
         }
 
         /// <summary>
@@ -168,7 +164,7 @@ namespace MSFT.RDMISaaS.API.BLL
                 //    return null;
                 //}
             }
-            catch 
+            catch
             {
                 return null;
             }
@@ -183,53 +179,49 @@ namespace MSFT.RDMISaaS.API.BLL
         /// <param name="tenantName">Name of Tenant</param>
         /// <param name="hostPoolName">Name of Hostpool</param>
         /// <param name="isAppGroupNameOnly">used to get Only App Group Name</param>
+        /// // old parameters -- , bool isAppGroupNameOnly,bool isAll, int pageSize, string sortField, bool isDescending, int initialSkip, string lastEntry
         /// <returns></returns>
-        public HttpResponseMessage GetAppGroupsList(string tenantGroupName, string deploymentUrl, string accessToken, string tenantName, string hostPoolName, bool isAppGroupNameOnly,bool isAll, int pageSize, string sortField, bool isDescending, int initialSkip, string lastEntry)
+        public HttpResponseMessage GetAppGroupsList(string tenantGroupName, string deploymentUrl, string accessToken, string tenantName, string hostPoolName)
         {
             try
             {
-                HttpResponseMessage response;
-                if (isAll == true)
-                {
-                    response = CommonBL.InitializeHttpClient(deploymentUrl, accessToken).GetAsync("/RdsManagement/V1/TenantGroups/" + tenantGroupName + "/Tenants/" + tenantName + "/HostPools/" + hostPoolName + "/AppGroups").Result;
-                }
-                else
-                {
-                     response = CommonBL.InitializeHttpClient(deploymentUrl, accessToken).GetAsync("/RdsManagement/V1/TenantGroups/" + tenantGroupName + "/Tenants/" + tenantName + "/HostPools/" + hostPoolName + "/AppGroups?PageSize=" + pageSize + "&LastEntry=" + lastEntry + "&SortField=" + sortField + "&IsDescending=" + isDescending + "&InitialSkip=" + initialSkip).Result;
-                }
-
+                HttpResponseMessage response = CommonBL.InitializeHttpClient(deploymentUrl, accessToken).GetAsync("/RdsManagement/V1/TenantGroups/" + tenantGroupName + "/Tenants/" + tenantName + "/HostPools/" + hostPoolName + "/AppGroups").Result;
                 return response;
 
-                //call rest api to get list of app groups -- july code bit
-               // string strJson = response.Content.ReadAsStringAsync().Result;
-               // if (response.IsSuccessStatusCode)
-               // {
-                    ////Deserialize the string to JSON object
-                   // var jObj = (JArray)JsonConvert.DeserializeObject(strJson);
-                    //return jObj;
-                    //if (jObj.Count > 0)
-                    //{
+                //folllowing api call is included pagination
+                // response = CommonBL.InitializeHttpClient(deploymentUrl, accessToken).GetAsync("/RdsManagement/V1/TenantGroups/" + tenantGroupName + "/Tenants/" + tenantName + "/HostPools/" + hostPoolName + "/AppGroups?PageSize=" + pageSize + "&LastEntry=" + lastEntry + "&SortField=" + sortField + "&IsDescending=" + isDescending + "&InitialSkip=" + initialSkip).Result;
 
-                    //    if (isAppGroupNameOnly)
-                    //    {
-                    //        rdMgmtAppGroups = jObj.Select(item => new RdMgmtAppGroup
-                    //        {
-                    //            appGroupName = (string)item["appGroupName"]
-                    //        }).ToList();
-                    //    }
-                    //    else
-                    //    {
-                    //        rdMgmtAppGroups = jObj.Select(item => new RdMgmtAppGroup
-                    //        {
-                    //            tenantName = (string)item["tenantName"],
-                    //            hostPoolName = (string)item["hostPoolName"],
-                    //            appGroupName = (string)item["appGroupName"],
-                    //            description = (string)item["description"],
-                    //            friendlyName = (string)item["friendlyName"],
-                    //            resourceType = item["resourceType"].ToString() == "0" ? "Remote App Group" : "Desktop App Group"
-                    //        }).ToList();
-                    //    }
-                    //}
+
+                //call rest api to get list of app groups -- july code bit
+                // string strJson = response.Content.ReadAsStringAsync().Result;
+                // if (response.IsSuccessStatusCode)
+                // {
+                ////Deserialize the string to JSON object
+                // var jObj = (JArray)JsonConvert.DeserializeObject(strJson);
+                //return jObj;
+                //if (jObj.Count > 0)
+                //{
+
+                //    if (isAppGroupNameOnly)
+                //    {
+                //        rdMgmtAppGroups = jObj.Select(item => new RdMgmtAppGroup
+                //        {
+                //            appGroupName = (string)item["appGroupName"]
+                //        }).ToList();
+                //    }
+                //    else
+                //    {
+                //        rdMgmtAppGroups = jObj.Select(item => new RdMgmtAppGroup
+                //        {
+                //            tenantName = (string)item["tenantName"],
+                //            hostPoolName = (string)item["hostPoolName"],
+                //            appGroupName = (string)item["appGroupName"],
+                //            description = (string)item["description"],
+                //            friendlyName = (string)item["friendlyName"],
+                //            resourceType = item["resourceType"].ToString() == "0" ? "Remote App Group" : "Desktop App Group"
+                //        }).ToList();
+                //    }
+                //}
                 //}
                 //else
                 //{
@@ -251,11 +243,11 @@ namespace MSFT.RDMISaaS.API.BLL
                 //    }
                 //}
             }
-            catch 
+            catch
             {
                 return null;
             }
-           // return rdMgmtAppGroups;
+            // return rdMgmtAppGroups;
         }
 
         /// <summary>
@@ -266,14 +258,18 @@ namespace MSFT.RDMISaaS.API.BLL
         /// <param name="tenantName"> Name of Tenant</param>
         /// <param name="hostPoolName">Name of Hostpool</param>
         /// <param name="appGroupName">Name of App group</param>
+        /// old parameters --  int pageSize, string sortField, bool isDescending, int initialSkip, string lastEntry
         /// <returns></returns>
-        public HttpResponseMessage GetStartMenuAppsList(string tenantGroupName, string deploymentUrl, string accessToken, string tenantName, string hostPoolName, string appGroupName, int pageSize, string sortField, bool isDescending, int initialSkip, string lastEntry)
+        public HttpResponseMessage GetStartMenuAppsList(string tenantGroupName, string deploymentUrl, string accessToken, string tenantName, string hostPoolName, string appGroupName)
         {
             List<RdMgmtStartMenuApp> rdMgmtStartMenuApps = new List<RdMgmtStartMenuApp>();
             try
             {
                 //call rest api to get all startmenu apps in app group -- july code bit
-                HttpResponseMessage response = CommonBL.InitializeHttpClient(deploymentUrl, accessToken).GetAsync("/RdsManagement/V1/TenantGroups/" + tenantGroupName + "/Tenants/" + tenantName + "/HostPools/" + hostPoolName + "/AppGroups/" + appGroupName + "/StartMenuApps?PageSize=" + pageSize + "&LastEntry=" + lastEntry + "&SortField=" + sortField + "&IsDescending=" + isDescending + "&InitialSkip=" + initialSkip).Result;
+                HttpResponseMessage response = CommonBL.InitializeHttpClient(deploymentUrl, accessToken).GetAsync("/RdsManagement/V1/TenantGroups/" + tenantGroupName + "/Tenants/" + tenantName + "/HostPools/" + hostPoolName + "/AppGroups/" + appGroupName + "/StartMenuApps").Result;
+
+                //folllowing api call is included pagination
+                //HttpResponseMessage response = CommonBL.InitializeHttpClient(deploymentUrl, accessToken).GetAsync("/RdsManagement/V1/TenantGroups/" + tenantGroupName + "/Tenants/" + tenantName + "/HostPools/" + hostPoolName + "/AppGroups/" + appGroupName + "/StartMenuApps?PageSize=" + pageSize + "&LastEntry=" + lastEntry + "&SortField=" + sortField + "&IsDescending=" + isDescending + "&InitialSkip=" + initialSkip).Result;
                 return response;
                 //string strJson = response.Content.ReadAsStringAsync().Result;
                 //if (response.IsSuccessStatusCode)
@@ -301,7 +297,7 @@ namespace MSFT.RDMISaaS.API.BLL
             {
                 return null;
             }
-          //  return rdMgmtStartMenuApps;
+            //  return rdMgmtStartMenuApps;
         }
 
         /// <summary>
@@ -334,6 +330,11 @@ namespace MSFT.RDMISaaS.API.BLL
                     groupResult.isSuccess = true;
                     groupResult.message = "App group '" + appGroupDTO.appGroupName + "' has been created successfully.";
                 }
+                else if ((int)response.StatusCode == 429)
+                {
+                    groupResult.isSuccess = false;
+                    groupResult.message = strJson + " Please try again later.";
+                }
                 else
                 {
 
@@ -345,14 +346,14 @@ namespace MSFT.RDMISaaS.API.BLL
                     else
                     {
                         groupResult.isSuccess = false;
-                        groupResult.message = "AppGroup '"+ rdMgmtAppGroup.appGroupName + "' has not been created. Please try it later again.";
+                        groupResult.message = "AppGroup '" + rdMgmtAppGroup.appGroupName + "' has not been created. Please try it later again.";
                     }
                 }
             }
             catch (Exception ex)
             {
                 groupResult.isSuccess = false;
-                groupResult.message = "AppGroup '" + rdMgmtAppGroup.appGroupName + "' has not been created."+ex.Message.ToString()+" Please try it later again.";
+                groupResult.message = "AppGroup '" + rdMgmtAppGroup.appGroupName + "' has not been created." + ex.Message.ToString() + " Please try it later again.";
             }
             return groupResult;
         }
@@ -387,6 +388,11 @@ namespace MSFT.RDMISaaS.API.BLL
                     groupResult.isSuccess = true;
                     groupResult.message = "App group '" + appGroupDTO.appGroupName + "' has been updated successfully.";
                 }
+                else if ((int)response.StatusCode == 429)
+                {
+                    groupResult.isSuccess = false;
+                    groupResult.message = strJson + " Please try again later.";
+                }
                 else
                 {
                     if (!string.IsNullOrEmpty(strJson))
@@ -397,14 +403,14 @@ namespace MSFT.RDMISaaS.API.BLL
                     else
                     {
                         groupResult.isSuccess = false;
-                        groupResult.message = "AppGroup '"+ rdMgmtAppGroup.appGroupName+"' has not been updated. Please try it later again.";
+                        groupResult.message = "AppGroup '" + rdMgmtAppGroup.appGroupName + "' has not been updated. Please try it later again.";
                     }
                 }
             }
             catch (Exception ex)
             {
                 groupResult.isSuccess = false;
-                groupResult.message = "AppGroup '"+ rdMgmtAppGroup.appGroupName+"' has not been updated."+ex.Message.ToString()+" Please try it later again.";
+                groupResult.message = "AppGroup '" + rdMgmtAppGroup.appGroupName + "' has not been updated." + ex.Message.ToString() + " Please try it later again.";
             }
             return groupResult;
         }
@@ -431,6 +437,11 @@ namespace MSFT.RDMISaaS.API.BLL
                     groupResult.isSuccess = true;
                     groupResult.message = "User '" + appGroupUser + "' has been removed from app group " + appGroupName + " successfully.";
                 }
+                else if ((int)response.StatusCode == 429)
+                {
+                    groupResult.isSuccess = false;
+                    groupResult.message = strJson + " Please try again later.";
+                }
                 else
                 {
                     if (!string.IsNullOrEmpty(strJson))
@@ -441,14 +452,14 @@ namespace MSFT.RDMISaaS.API.BLL
                     else
                     {
                         groupResult.isSuccess = false;
-                        groupResult.message = "User '"+ appGroupUser + "' has not been removed. Please try it later again.";
+                        groupResult.message = "User '" + appGroupUser + "' has not been removed. Please try it later again.";
                     }
                 }
             }
             catch (Exception ex)
             {
                 groupResult.isSuccess = false;
-                groupResult.message = "User '" + appGroupUser + "' has not been removed." + ex.Message.ToString()+ " and try again later.";
+                groupResult.message = "User '" + appGroupUser + "' has not been removed." + ex.Message.ToString() + " and try again later.";
             }
             return groupResult;
         }
@@ -482,6 +493,11 @@ namespace MSFT.RDMISaaS.API.BLL
                     groupResult.isSuccess = true;
                     groupResult.message = "User '" + rdMgmtUser.userPrincipalName + "' has been added to app group " + rdMgmtUser.appGroupName + " successfully.";
                 }
+                else if ((int)response.StatusCode == 429)
+                {
+                    groupResult.isSuccess = false;
+                    groupResult.message = strJson + " Please try again later.";
+                }
                 else
                 {
                     if (!string.IsNullOrEmpty(strJson))
@@ -499,7 +515,7 @@ namespace MSFT.RDMISaaS.API.BLL
             catch (Exception ex)
             {
                 groupResult.isSuccess = false;
-                groupResult.message = "User '" + rdMgmtUser.userPrincipalName + "' has not been added to app group "+ex.Message.ToString()+" Please try again later.";
+                groupResult.message = "User '" + rdMgmtUser.userPrincipalName + "' has not been added to app group " + ex.Message.ToString() + " Please try again later.";
             }
             return groupResult;
         }
@@ -525,6 +541,11 @@ namespace MSFT.RDMISaaS.API.BLL
                     groupResult.isSuccess = true;
                     groupResult.message = "App group '" + appGroupName + "' has been deleted successfully.";
                 }
+                else if ((int)response.StatusCode == 429)
+                {
+                    groupResult.isSuccess = false;
+                    groupResult.message = strJson + " Please try again later.";
+                }
                 else
                 {
                     if (!string.IsNullOrEmpty(strJson))
@@ -535,14 +556,14 @@ namespace MSFT.RDMISaaS.API.BLL
                     else
                     {
                         groupResult.isSuccess = false;
-                        groupResult.message = "AppGroup '"+ appGroupName + "' has not been deleted . Please try it again later.";
+                        groupResult.message = "AppGroup '" + appGroupName + "' has not been deleted . Please try it again later.";
                     }
                 }
             }
             catch (Exception ex)
             {
                 groupResult.isSuccess = false;
-                groupResult.message = "AppGroup '" + appGroupName + "' has not been deleted."+ex.Message.ToString()+ "Please try it again later.";
+                groupResult.message = "AppGroup '" + appGroupName + "' has not been deleted." + ex.Message.ToString() + "Please try it again later.";
             }
             return groupResult;
         }
