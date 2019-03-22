@@ -285,7 +285,7 @@ export class TenantDashboardComponent implements OnInit {
    */
   public GetTenantDetails(tenantName: any) {
     let Tenants = JSON.parse(sessionStorage.getItem('Tenants'));
-    let data = Tenants.rdMgmtTenants.filter(item => item.tenantName == tenantName);
+    let data = Tenants.filter(item => item.tenantName == tenantName);
     this.tenantInfo = data[0];
     // this.refreshHostpoolLoading = true;
     // this.getTenantlistErrorFound = false;
@@ -742,7 +742,8 @@ export class TenantDashboardComponent implements OnInit {
       /*
        * Access level of Tenant block End
        */
-      this.getHostpoolsUrl = this._AppService.ApiUrl + '/api/HostPool/GetHostPoolList?tenantGroupName=' + this.tenantGroupName + '&tenantName=' + tenantName + '&refresh_token=' + sessionStorage.getItem("Refresh_Token") + '&pageSize=100&sortField=HostPoolName&isDescending=false&initialSkip=0&lastEntry=""';
+      // this.getHostpoolsUrl = this._AppService.ApiUrl + '/api/HostPool/GetHostPoolList?tenantGroupName=' + this.tenantGroupName + '&tenantName=' + tenantName + '&refresh_token=' + sessionStorage.getItem("Refresh_Token") + '&pageSize=100&sortField=HostPoolName&isDescending=false&initialSkip=0&lastEntry=""';
+      this.getHostpoolsUrl = this._AppService.ApiUrl + '/api/HostPool/GetHostPoolList?tenantGroupName=' + this.tenantGroupName + '&tenantName=' + tenantName + '&refresh_token=' + sessionStorage.getItem("Refresh_Token");
       this._AppService.GetTenantDetails(this.getHostpoolsUrl).subscribe(response => {
         var list = JSON.parse(response['_body']);
         sessionStorage.setItem('sideMenuHostpools', JSON.stringify(list));
@@ -778,7 +779,8 @@ export class TenantDashboardComponent implements OnInit {
       /*
        * Access level of Tenant block End
        */
-      this.getHostpoolsUrl = this._AppService.ApiUrl + '/api/HostPool/GetHostPoolList?tenantGroupName=' + this.tenantGroupName + '&tenantName=' + tenantName + '&refresh_token=' + sessionStorage.getItem("Refresh_Token") + '&pageSize=' + this.pageSize + '&sortField=HostPoolName&isDescending=false&initialSkip=' + this.initialSkip + ' &lastEntry=' + this.lastEntry;
+      // this.getHostpoolsUrl = this._AppService.ApiUrl + '/api/HostPool/GetHostPoolList?tenantGroupName=' + this.tenantGroupName + '&tenantName=' + tenantName + '&refresh_token=' + sessionStorage.getItem("Refresh_Token") + '&pageSize=' + this.pageSize + '&sortField=HostPoolName&isDescending=false&initialSkip=' + this.initialSkip + ' &lastEntry=' + this.lastEntry;
+      this.getHostpoolsUrl = this._AppService.ApiUrl + '/api/HostPool/GetHostPoolList?tenantGroupName=' + this.tenantGroupName + '&tenantName=' + tenantName + '&refresh_token=' + sessionStorage.getItem("Refresh_Token");
       this._AppService.GetTenantDetails(this.getHostpoolsUrl).subscribe(response => {
         this.hostPoolsList = JSON.parse(response['_body']);
         sessionStorage.setItem('Hostpools', JSON.stringify(this.hostPoolsList));
