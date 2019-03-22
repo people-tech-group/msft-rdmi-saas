@@ -14,6 +14,7 @@ using System.Web;
 using System.Web.Configuration;
 using System.IdentityModel.Tokens.Jwt;
 using MSFT.RDMISaaS.API.BLL;
+using System.Threading.Tasks;
 
 #endregion "Import Namespaces"
 
@@ -112,96 +113,109 @@ namespace MSFT.RDMISaaS.API.Common
         /// </summary>
         /// <param name="userName"></param>
         /// <returns></returns>
-        public Login Login(string Code)
+        public async Task<Login> Login(string Code)
         {
-
-
-            string token = GetAccessToken(Code);
-            Login loginDetails = JsonConvert.DeserializeObject<Login>(token);
-            var handler = new JwtSecurityTokenHandler();
-            var tokenS = handler.ReadToken(loginDetails.Access_Token) as JwtSecurityToken;
-            loginDetails.UserName = tokenS.Claims.First(claim => claim.Type.Equals("name")).Value.ToString();
-            loginDetails.Email = tokenS.Claims.First(claim => claim.Type.Equals("unique_name")).Value;
-            loginDetails.Code = "";
-
-            //get rele definition
-            //if (loginDetails != null && loginDetails.Access_Token != null)
-            //{
-            //    string deploymentUrl = configurations.rdBrokerUrl;
-            //    List<RdMgmtRoleAssignment> rdMgmtRoleAssignments = new List<RdMgmtRoleAssignment>();
-            //    List<string> list = new List<string>();
-
-            //    rdMgmtRoleAssignments = authorizationBL.GetRoleAssignments(deploymentUrl, loginDetails.Access_Token, loginDetails.Email.ToString());
-            //    for (int i = 0; i < rdMgmtRoleAssignments.Count; i++)
-            //    {
-            //        if (rdMgmtRoleAssignments[i].signInName != null && rdMgmtRoleAssignments[i].signInName.ToString().ToLower() == loginDetails.Email.ToString().ToLower())
-            //        {
-            //loginDetails.RoleAssignment = rdMgmtRoleAssignments[i];
-            //            if (loginDetails.RoleAssignment.scope.Split('/').Length > 1)
-            //            {
-            //                list.Add(loginDetails.RoleAssignment.scope.Split('/')[1].ToString());
-            //            }
-            //            else
-            //            {
-            //                list.Add(Constants.tenantGroupName);
-            //            }
-            //            //string TenantGroupName = "";
-            //            //if (loginDetails.RoleAssignment.scope.Split('/').Length > 1)
-            //            //{
-            //            //    TenantGroupName = loginDetails.RoleAssignment.scope.Split('/')[1].ToString();
-            //            //}
-            //            //else
-            //            //{
-            //            //    TenantGroupName = Constants.tenantGroupName;
-            //            //}
-            //            //loginDetails.TenantGroupName = TenantGroupName;
-            //            // break;
-            //        }
-            //    }
-            //    loginDetails.TenantGroups = list.ToArray();
-
-            //}
-
-            ////new way to get role assignment
-
-            if (loginDetails != null && loginDetails.Access_Token != null)
+            Login loginDetails = new Login();
+            try
             {
-                string deploymentUrl = configurations.rdBrokerUrl;
-                List<string> list = new List<string>();
-                HttpResponseMessage httpResponse = authorizationBL.GetRoleAssignments(deploymentUrl, loginDetails.Access_Token, loginDetails.Email.ToString());
-                string strJson = httpResponse.Content.ReadAsStringAsync().Result;
-
-                if (httpResponse.IsSuccessStatusCode)
+                string token = GetAccessToken(Code);
+                if(token!=Constants.invalidCode && token != Constants.invalidToken)
                 {
-                    var rdMgmtRoleAssignments = (JArray)JsonConvert.DeserializeObject(strJson);
-                    for (int i = 0; i < rdMgmtRoleAssignments.Count; i++)
+                    loginDetails = JsonConvert.DeserializeObject<Login>(token);
+                    var handler = new JwtSecurityTokenHandler();
+                    var tokenS = handler.ReadToken(loginDetails.Access_Token) as JwtSecurityToken;
+                    loginDetails.UserName = tokenS.Claims.First(claim => claim.Type.Equals("name")).Value.ToString();
+                    loginDetails.Email = tokenS.Claims.First(claim => claim.Type.Equals("unique_name")).Value;
+                    loginDetails.Code = "";
+
+                    //get rele definition
+                    //if (loginDetails != null && loginDetails.Access_Token != null)
+                    //{
+                    //    string deploymentUrl = configurations.rdBrokerUrl;
+                    //    List<RdMgmtRoleAssignment> rdMgmtRoleAssignments = new List<RdMgmtRoleAssignment>();
+                    //    List<string> list = new List<string>();
+
+                    //    rdMgmtRoleAssignments = authorizationBL.GetRoleAssignments(deploymentUrl, loginDetails.Access_Token, loginDetails.Email.ToString());
+                    //    for (int i = 0; i < rdMgmtRoleAssignments.Count; i++)
+                    //    {
+                    //        if (rdMgmtRoleAssignments[i].signInName != null && rdMgmtRoleAssignments[i].signInName.ToString().ToLower() == loginDetails.Email.ToString().ToLower())
+                    //        {
+                    //loginDetails.RoleAssignment = rdMgmtRoleAssignments[i];
+                    //            if (loginDetails.RoleAssignment.scope.Split('/').Length > 1)
+                    //            {
+                    //                list.Add(loginDetails.RoleAssignment.scope.Split('/')[1].ToString());
+                    //            }
+                    //            else
+                    //            {
+                    //                list.Add(Constants.tenantGroupName);
+                    //            }
+                    //            //string TenantGroupName = "";
+                    //            //if (loginDetails.RoleAssignment.scope.Split('/').Length > 1)
+                    //            //{
+                    //            //    TenantGroupName = loginDetails.RoleAssignment.scope.Split('/')[1].ToString();
+                    //            //}
+                    //            //else
+                    //            //{
+                    //            //    TenantGroupName = Constants.tenantGroupName;
+                    //            //}
+                    //            //loginDetails.TenantGroupName = TenantGroupName;
+                    //            // break;
+                    //        }
+                    //    }
+                    //    loginDetails.TenantGroups = list.ToArray();
+
+                    //}
+
+                    ////new way to get role assignment
+                    if (loginDetails != null && loginDetails.Access_Token != null)
                     {
-                        loginDetails.RoleAssignment = new JObject() { { "roleDefinitionName", rdMgmtRoleAssignments[i]["roleDefinitionName"].ToString() }, { "scope", rdMgmtRoleAssignments[i]["scope"].ToString() } };
-                        if (rdMgmtRoleAssignments[i]["signInName"] != null && rdMgmtRoleAssignments[i]["signInName"].ToString().ToLower() == loginDetails.Email.ToString().ToLower())
+                        string deploymentUrl = configurations.rdBrokerUrl;
+                        List<string> list = new List<string>();
+                        HttpResponseMessage httpResponse = await authorizationBL.GetRoleAssignments(deploymentUrl, loginDetails.Access_Token, loginDetails.Email.ToString());
+                        string strJson = httpResponse.Content.ReadAsStringAsync().Result;
+
+                        if (httpResponse.IsSuccessStatusCode)
                         {
-                            if (rdMgmtRoleAssignments[i]["scope"].ToString().Split('/').Length > 1)
+                            var rdMgmtRoleAssignments = (JArray)JsonConvert.DeserializeObject(strJson);
+                            for (int i = 0; i < rdMgmtRoleAssignments.Count; i++)
                             {
-                                list.Add(rdMgmtRoleAssignments[i]["scope"].ToString().Split('/')[1].ToString());
+                                loginDetails.RoleAssignment = new JObject() { { "roleDefinitionName", rdMgmtRoleAssignments[i]["roleDefinitionName"].ToString() }, { "scope", rdMgmtRoleAssignments[i]["scope"].ToString() } };
+                                if (rdMgmtRoleAssignments[i]["signInName"] != null && rdMgmtRoleAssignments[i]["signInName"].ToString().ToLower() == loginDetails.Email.ToString().ToLower())
+                                {
+                                    if (rdMgmtRoleAssignments[i]["scope"].ToString().Split('/').Length > 1)
+                                    {
+                                        list.Add(rdMgmtRoleAssignments[i]["scope"].ToString().Split('/')[1].ToString());
+                                    }
+                                    else
+                                    {
+                                        list.Add(Constants.tenantGroupName);
+                                    }
+                                }
                             }
-                            else
-                            {
-                                list.Add(Constants.tenantGroupName);
-                            }
+                            loginDetails.TenantGroups = list.ToArray();
+                            //return loginDetails;
+                        }
+                        else if ((int)httpResponse.StatusCode == 429)
+                        {
+                            loginDetails.Error = new JObject() { { "StatusCode", httpResponse.StatusCode.ToString() }, { "Message", strJson } };
                         }
                     }
-                    loginDetails.TenantGroups = list.ToArray();
-                    //return loginDetails;
+                    else
+                    {
+                        return null;
+                    }
                 }
-                else if ((int)httpResponse.StatusCode == 429)
+                else
                 {
-                    loginDetails.Error = new JObject() { { "StatusCode", httpResponse.StatusCode.ToString() }, { "Message", strJson } };
+                    loginDetails.Error = new JObject() { { "StatusCode", (int)HttpStatusCode.BadRequest }, { "Message", Constants.invalidCode } };
                 }
+                return loginDetails;
             }
-            else
+            catch (Exception ex)
             {
-                return null;
+                loginDetails.Error = new JObject() { { "StatusCode", (int)HttpStatusCode.BadRequest }, { "Message", Constants.invalidCode } };
+                return loginDetails;
             }
-            return loginDetails;
         }
 
         /// <summary>

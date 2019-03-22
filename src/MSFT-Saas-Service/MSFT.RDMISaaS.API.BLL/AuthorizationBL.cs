@@ -7,6 +7,7 @@ using System.Linq;
 using System.Net.Http;
 using System.Text;
 using System.Net.Http.Headers;
+using System.Threading.Tasks;
 
 namespace MSFT.RDMISaaS.API.BLL
 {
@@ -51,13 +52,13 @@ namespace MSFT.RDMISaaS.API.BLL
         //    return rdMgmtRoleAssignments;
         //}
 
-        public HttpResponseMessage GetRoleAssignments(string deploymentUrl, string accessToken, string upn)
+        public Task<HttpResponseMessage> GetRoleAssignments(string deploymentUrl, string accessToken, string upn)
         {
             // List<RdMgmtRoleAssignment> rdMgmtRoleAssignments = new List<RdMgmtRoleAssignment>();
             try
             {
-                HttpResponseMessage response = CommonBL.InitializeHttpClient(deploymentUrl, accessToken).GetAsync("RdsManagement/V1/Rds.Authorization/roleAssignments?upn=" + upn).Result;
-                return response;
+                HttpResponseMessage response =  CommonBL.InitializeHttpClient(deploymentUrl, accessToken).GetAsync("RdsManagement/V1/Rds.Authorization/roleAssignments?upn=" + upn).Result;
+                return Task.FromResult(response);
 
                 //string strJson = response.Content.ReadAsStringAsync().Result;
                 //if (response.IsSuccessStatusCode)
@@ -86,7 +87,7 @@ namespace MSFT.RDMISaaS.API.BLL
                 //}
 
             }
-            catch
+            catch(Exception ex)
             {
                 return null;
             }

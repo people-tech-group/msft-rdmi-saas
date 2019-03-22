@@ -498,7 +498,8 @@ export class DeploymentDashboardComponent implements OnInit {
     else {
       this.refreshToken = sessionStorage.getItem("Refresh_Token");
       this.tenantlistErrorFound = false;
-      this.getTenantsUrl = this._AppService.ApiUrl + '/api/Tenant/GetTenantList?tenantGroupName=' + this.tenantGroupName + '&refresh_token=' + this.refreshToken + '&pageSize=' + this.pageSize + '&sortField=TenantName&isDescending=false&initialSkip=' + this.initialSkip + '&lastEntry=' + this.lastEntry;
+      // this.getTenantsUrl = this._AppService.ApiUrl + '/api/Tenant/GetTenantList?tenantGroupName=' + this.tenantGroupName + '&refresh_token=' + this.refreshToken + '&pageSize=' + this.pageSize + '&sortField=TenantName&isDescending=false&initialSkip=' + this.initialSkip + '&lastEntry=' + this.lastEntry;
+      this.getTenantsUrl = this._AppService.ApiUrl + '/api/Tenant/GetTenantList?tenantGroupName=' + this.tenantGroupName + '&refresh_token=' + this.refreshToken;
       this._AppService.GetTenants(this.getTenantsUrl).subscribe(response => {
         let responseObject = JSON.parse(response['_body']);
         sessionStorage.setItem('Tenants', JSON.stringify(responseObject));

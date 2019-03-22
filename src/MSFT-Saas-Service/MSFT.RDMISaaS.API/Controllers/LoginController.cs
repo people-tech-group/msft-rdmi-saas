@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
+using System.Threading.Tasks;
 using System.Web;
 using System.Web.Http;
 using System.Web.Http.Cors;
@@ -28,14 +29,14 @@ namespace MSFT.RDMISaaS.API.Controllers
         /// <param name="data"></param>
         /// <returns></returns>
         [HttpPost]
-        public IHttpActionResult PostLogin([FromBody] Login data)
+        public async Task<IHttpActionResult> PostLogin([FromBody] Login data)
         {
             Login login = new Login();
             try
             {
                 Common.Common obj = new Common.Common();
                 List<Login> lst = new List<Login>();
-                login = obj.Login(data.Code);
+                login =await obj.Login(data.Code);
             }
             catch (Exception ex)
             {
