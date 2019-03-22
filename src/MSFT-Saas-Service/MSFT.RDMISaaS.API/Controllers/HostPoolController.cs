@@ -23,7 +23,7 @@ namespace MSFT.RDMISaaS.API.Controllers
         HostPoolBL hostPoolBL = new HostPoolBL();
         HostPoolResult poolResult = new HostPoolResult();
         Common.Common common = new Common.Common();
-        Common.Configurations configurations= new Common.Configurations();
+        Common.Configurations configurations = new Common.Configurations();
         string deploymentUrl = "";
         string invalidToken = Constants.invalidToken.ToString().ToLower();
         string invalidCode = Constants.invalidCode.ToString().ToLower();
@@ -38,7 +38,7 @@ namespace MSFT.RDMISaaS.API.Controllers
         /// <param name="hostPoolName">Name of Hostpool</param>
         /// <param name="refresh_token">Refresh token to get access token</param>
         /// <returns></returns>
-        public HttpResponseMessage GetHostPoolDetails(string tenantGroupName,string tenantName, string hostPoolName, string refresh_token)
+        public HttpResponseMessage GetHostPoolDetails(string tenantGroupName, string tenantName, string hostPoolName, string refresh_token)
         {
 
             //get deployment url
@@ -53,8 +53,8 @@ namespace MSFT.RDMISaaS.API.Controllers
                     accessToken = common.GetTokenValue(refresh_token);
                     if (!string.IsNullOrEmpty(accessToken) && accessToken.ToString().ToLower() != invalidToken && accessToken.ToString().ToLower() != invalidCode)
                     {
-                      return hostPoolBL.GetHostPoolDetails(tenantGroupName,deploymentUrl, accessToken, tenantName, hostPoolName);
-                       // rdMgmtHostPool = hostPoolBL.GetHostPoolDetails(tenantGroupName,deploymentUrl, accessToken, tenantName, hostPoolName);
+                        return hostPoolBL.GetHostPoolDetails(tenantGroupName, deploymentUrl, accessToken, tenantName, hostPoolName);
+                        // rdMgmtHostPool = hostPoolBL.GetHostPoolDetails(tenantGroupName,deploymentUrl, accessToken, tenantName, hostPoolName);
                     }
                     else
                     {
@@ -70,11 +70,11 @@ namespace MSFT.RDMISaaS.API.Controllers
                     return null;
                 }
             }
-            catch 
+            catch
             {
                 return null;
             }
-           // return rdMgmtHostPool;
+            // return rdMgmtHostPool;
         }
 
         /// <summary>
@@ -115,7 +115,7 @@ namespace MSFT.RDMISaaS.API.Controllers
             catch (Exception ex)
             {
                 poolResult.isSuccess = false;
-                poolResult.message = "Hostpool '"+ rdMgmthostpool.hostPoolName + "' has not been created." + ex.Message.ToString() + "Please try again later";
+                poolResult.message = "Hostpool '" + rdMgmthostpool.hostPoolName + "' has not been created." + ex.Message.ToString() + "Please try again later.";
             }
             return Ok(poolResult);
         }
@@ -157,7 +157,7 @@ namespace MSFT.RDMISaaS.API.Controllers
             catch (Exception ex)
             {
                 poolResult.isSuccess = false;
-                poolResult.message = "Hostpool '"+ hostPoolName + "' has not been deleted."+ex.Message.ToString()+" Please try again later.";
+                poolResult.message = "Hostpool '" + hostPoolName + "' has not been deleted." + ex.Message.ToString() + " Please try again later.";
             }
             return Ok(poolResult);
         }
@@ -167,12 +167,13 @@ namespace MSFT.RDMISaaS.API.Controllers
         /// </summary>
         /// <param name="tenantName">Name of Tenant</param>
         /// <param name="refresh_token">Refresh token to get access token</param>
+        /// // old parameters for pagination -  int pageSize, string sortField, bool isDescending = false, int initialSkip = 0, string lastEntry = null
         /// <returns></returns>
-        public HttpResponseMessage GetHostPoolList(string tenantGroupName, string tenantName, string refresh_token, int pageSize, string sortField, bool isDescending = false, int initialSkip = 0, string lastEntry = null)
+        public HttpResponseMessage GetHostPoolList(string tenantGroupName, string tenantName, string refresh_token)
         {
             //get deployment url
             deploymentUrl = configurations.rdBrokerUrl;
-           // List<RdMgmtHostPool> lsthostpool = new List<RdMgmtHostPool>();
+            // List<RdMgmtHostPool> lsthostpool = new List<RdMgmtHostPool>();
             try
             {
                 if (!string.IsNullOrEmpty(refresh_token))
@@ -182,7 +183,7 @@ namespace MSFT.RDMISaaS.API.Controllers
                     accessToken = common.GetTokenValue(refresh_token);
                     if (!string.IsNullOrEmpty(accessToken) && accessToken.ToString().ToLower() != invalidToken && accessToken.ToString().ToLower() != invalidCode)
                     {
-                        return hostPoolBL.GetHostPoolList(tenantGroupName, deploymentUrl, accessToken, tenantName, false, false, pageSize, sortField, isDescending, initialSkip, lastEntry);
+                        return hostPoolBL.GetHostPoolList(tenantGroupName, deploymentUrl, accessToken, tenantName);
                     }
                     else
                     {
@@ -200,11 +201,11 @@ namespace MSFT.RDMISaaS.API.Controllers
                     return null;
                 }
             }
-            catch 
+            catch
             {
                 return null;
             }
-          //  return lsthostpool;
+            //  return lsthostpool;
         }
 
         /// <summary>
@@ -251,7 +252,7 @@ namespace MSFT.RDMISaaS.API.Controllers
             catch (Exception ex)
             {
                 poolResult.isSuccess = false;
-                poolResult.message = "Hostpool '"+ rdMgmthostpool .hostPoolName+ "' has not been updated."+ex.Message.ToString()+" Please try again later.";
+                poolResult.message = "Hostpool '" + rdMgmthostpool.hostPoolName + "' has not been updated." + ex.Message.ToString() + " Please try again later.";
             }
             return Ok(poolResult);
         }

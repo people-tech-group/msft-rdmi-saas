@@ -21,7 +21,7 @@ using MSFT.RDMISaaS.API.BLL;
 namespace MSFT.RDMISaaS.API.Common
 
 {
-   
+
     #region "Common"
     public class Common
     {
@@ -34,7 +34,7 @@ namespace MSFT.RDMISaaS.API.Common
 
 
         #region "Functions/Methods"
-       
+
 
         /// <summary>
         /// Description - Get access token from code
@@ -47,7 +47,7 @@ namespace MSFT.RDMISaaS.API.Common
             try
             {
                 string OAUTH_2_0_TOKEN_ENDPOINT = "https://login.microsoftonline.com/common/oauth2/token";// //https://login.windows.net/common/oauth2/token
-                string client_ID = configurations.applicationId; 
+                string client_ID = configurations.applicationId;
                 var request = (HttpWebRequest)WebRequest.Create(OAUTH_2_0_TOKEN_ENDPOINT);
                 var postData = "redirect_uri=" + HttpUtility.UrlEncode(configurations.redirectUrl);
                 postData += "&grant_type=authorization_code";
@@ -83,7 +83,7 @@ namespace MSFT.RDMISaaS.API.Common
             try
             {
                 string OAUTH_2_0_TOKEN_ENDPOINT = "https://login.windows.net/common/oauth2/token";
-                string client_ID = configurations.applicationId; 
+                string client_ID = configurations.applicationId;
                 var request = (HttpWebRequest)WebRequest.Create(OAUTH_2_0_TOKEN_ENDPOINT);
                 var postData = "redirect_uri=" + configurations.redirectUrl;
                 postData += "&grant_type=refresh_token";
@@ -101,7 +101,7 @@ namespace MSFT.RDMISaaS.API.Common
                 var response = (HttpWebResponse)request.GetResponse();
                 responseString = new StreamReader(response.GetResponseStream()).ReadToEnd();
             }
-            catch 
+            catch
             {
                 return Constants.invalidCode.ToString();
             }
@@ -114,7 +114,7 @@ namespace MSFT.RDMISaaS.API.Common
         /// <returns></returns>
         public Login Login(string Code)
         {
-           
+
 
             string token = GetAccessToken(Code);
             Login loginDetails = JsonConvert.DeserializeObject<Login>(token);
@@ -136,7 +136,7 @@ namespace MSFT.RDMISaaS.API.Common
             //    {
             //        if (rdMgmtRoleAssignments[i].signInName != null && rdMgmtRoleAssignments[i].signInName.ToString().ToLower() == loginDetails.Email.ToString().ToLower())
             //        {
-                      //loginDetails.RoleAssignment = rdMgmtRoleAssignments[i];
+            //loginDetails.RoleAssignment = rdMgmtRoleAssignments[i];
             //            if (loginDetails.RoleAssignment.scope.Split('/').Length > 1)
             //            {
             //                list.Add(loginDetails.RoleAssignment.scope.Split('/')[1].ToString());
@@ -176,7 +176,7 @@ namespace MSFT.RDMISaaS.API.Common
                     var rdMgmtRoleAssignments = (JArray)JsonConvert.DeserializeObject(strJson);
                     for (int i = 0; i < rdMgmtRoleAssignments.Count; i++)
                     {
-                        loginDetails.RoleAssignment = new JObject() { { "roleDefinitionName", rdMgmtRoleAssignments[i]["roleDefinitionName"].ToString() },{ "scope", rdMgmtRoleAssignments[i]["scope"].ToString() } } ;
+                        loginDetails.RoleAssignment = new JObject() { { "roleDefinitionName", rdMgmtRoleAssignments[i]["roleDefinitionName"].ToString() }, { "scope", rdMgmtRoleAssignments[i]["scope"].ToString() } };
                         if (rdMgmtRoleAssignments[i]["signInName"] != null && rdMgmtRoleAssignments[i]["signInName"].ToString().ToLower() == loginDetails.Email.ToString().ToLower())
                         {
                             if (rdMgmtRoleAssignments[i]["scope"].ToString().Split('/').Length > 1)
@@ -192,7 +192,7 @@ namespace MSFT.RDMISaaS.API.Common
                     loginDetails.TenantGroups = list.ToArray();
                     //return loginDetails;
                 }
-                else if(httpResponse.StatusCode.ToString()=="429")
+                else if ((int)httpResponse.StatusCode == 429)
                 {
                     loginDetails.Error = new JObject() { { "StatusCode", httpResponse.StatusCode.ToString() }, { "Message", strJson } };
                 }
@@ -213,7 +213,7 @@ namespace MSFT.RDMISaaS.API.Common
         {
             string refresh_token = "";
             string token = GetAccessToken(code);
-            if(!string.IsNullOrEmpty(token))
+            if (!string.IsNullOrEmpty(token))
             {
                 if (token.ToString().ToLower() == Constants.invalidCode.ToString().ToLower())
                 {
@@ -274,8 +274,8 @@ namespace MSFT.RDMISaaS.API.Common
             }
             return access_token;
         }
-       
-        #endregion 
+
+        #endregion
 
     }
     #endregion "Common"

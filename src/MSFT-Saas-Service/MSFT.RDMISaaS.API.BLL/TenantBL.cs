@@ -16,7 +16,7 @@ namespace MSFT.RDMISaaS.API.BLL
     public class TenantBL
     {
         TenantResult tenantResult = new TenantResult();
-      // string tenantGroup = Constants.tenantGroupName;
+        // string tenantGroup = Constants.tenantGroupName;
 
         /// <summary>
         /// Description-Gets a specific Rds tenant.
@@ -25,13 +25,13 @@ namespace MSFT.RDMISaaS.API.BLL
         /// <param name="accessToken">Access Token</param>
         /// <param name="tenantName">Anme of Tenant</param>
         /// <returns></returns>
-        public HttpResponseMessage GetTenantDetails(string tenantGroupName, string deploymentUrl, string accessToken , string tenantName)
+        public HttpResponseMessage GetTenantDetails(string tenantGroupName, string deploymentUrl, string accessToken, string tenantName)
         {
             //RdMgmtTenant rdMgmtTenant = new RdMgmtTenant();
             try
             {
                 //call rest api to get tenant details -- july code bit
-                HttpResponseMessage response = CommonBL.InitializeHttpClient(deploymentUrl, accessToken).GetAsync("/RdsManagement/V1/TenantGroups/"+ tenantGroupName + "/Tenants/" + tenantName).Result;
+                HttpResponseMessage response = CommonBL.InitializeHttpClient(deploymentUrl, accessToken).GetAsync("/RdsManagement/V1/TenantGroups/" + tenantGroupName + "/Tenants/" + tenantName).Result;
 
                 return response;
                 //string strJson = response.Content.ReadAsStringAsync().Result;
@@ -66,24 +66,25 @@ namespace MSFT.RDMISaaS.API.BLL
                 //   // }
                 //}
             }
-            catch 
+            catch
             {
                 return null;
             }
-           //return rdMgmtTenant;
+            //return rdMgmtTenant;
         }
-      
+
         /// <summary>
         /// Description-Gets a list of Rds tenants.
         /// </summary>
         /// <param name="deploymentUrl">RD Broker Url</param>
         /// <param name="accessToken"> Access token</param>
+        /// //old parameters for pagination - int pageSize, string sortField, bool isDescending, int initialSkip, string lastEntry
         /// <returns></returns>
-        public HttpResponseMessage GetTenantList(string tenantGroupName,string deploymenturl, string accessToken,int pageSize, string sortField, bool isDescending, int initialSkip, string lastEntry)
+        public HttpResponseMessage GetTenantList(string tenantGroupName, string deploymenturl, string accessToken)
         {
-           // Tenants tenants = new Tenants();
-           // List<RdMgmtTenant> lstTenants = new List<RdMgmtTenant>();
-            
+            // Tenants tenants = new Tenants();
+            // List<RdMgmtTenant> lstTenants = new List<RdMgmtTenant>();
+
             try
             {
                 //call rest api to get all tenants -- sept code bit
@@ -122,7 +123,7 @@ namespace MSFT.RDMISaaS.API.BLL
                 //lstTenants= null;
                 return null;
             }
-           // tenants.rdMgmtTenants = lstTenants;
+            // tenants.rdMgmtTenants = lstTenants;
             //return tenants;
         }
 
@@ -227,25 +228,30 @@ namespace MSFT.RDMISaaS.API.BLL
                 TenantDataDTO tenantDataDTO = new TenantDataDTO();
                 tenantDataDTO.tenantName = rdMgmtTenant.tenantName;
                 tenantDataDTO.friendlyName = rdMgmtTenant.friendlyName;
-                tenantDataDTO.description = rdMgmtTenant.description;               
+                tenantDataDTO.description = rdMgmtTenant.description;
                 tenantDataDTO.aadTenantId = rdMgmtTenant.aadTenantId;
-                tenantDataDTO.id=rdMgmtTenant.id;
+                tenantDataDTO.id = rdMgmtTenant.id;
                 tenantDataDTO.tenantGroupName = rdMgmtTenant.tenantGroupName;
 
-               
+
 
 
                 //call rest api to create tenant-- july code bit
                 var content = new StringContent(JsonConvert.SerializeObject(tenantDataDTO), Encoding.UTF8, "application/json");
-                HttpResponseMessage response = CommonBL.InitializeHttpClient(deploymenturl, accessToken).PostAsync("/RdsManagement/V1/TenantGroups/"+ rdMgmtTenant.tenantGroupName + "/Tenants/" + rdMgmtTenant.tenantName,content).Result;
+                HttpResponseMessage response = CommonBL.InitializeHttpClient(deploymenturl, accessToken).PostAsync("/RdsManagement/V1/TenantGroups/" + rdMgmtTenant.tenantGroupName + "/Tenants/" + rdMgmtTenant.tenantName, content).Result;
                 string strJson = response.Content.ReadAsStringAsync().Result;
-                if(response.IsSuccessStatusCode)
+                if (response.IsSuccessStatusCode)
                 {
-                    if(response.StatusCode.ToString().ToLower()=="created" || response.StatusCode.ToString().ToLower()=="ok")
+                    if (response.StatusCode.ToString().ToLower() == "created" || response.StatusCode.ToString().ToLower() == "ok")
                     {
                         tenantResult.isSuccess = true;
-                        tenantResult.message = "Tenant '"+tenantDataDTO.tenantName+ "' has been created successfully.";
+                        tenantResult.message = "Tenant '" + tenantDataDTO.tenantName + "' has been created successfully.";
                     }
+                }
+                else if ((int)response.StatusCode == 429)
+                {
+                    tenantResult.isSuccess = false;
+                    tenantResult.message = strJson + " Please try again later.";
                 }
                 else
                 {
@@ -257,14 +263,14 @@ namespace MSFT.RDMISaaS.API.BLL
                     else
                     {
                         tenantResult.isSuccess = false;
-                        tenantResult.message = "Tenant '"+rdMgmtTenant.tenantName+"' has not been created. Please try it again later.";
+                        tenantResult.message = "Tenant '" + rdMgmtTenant.tenantName + "' has not been created. Please try it again later.";
                     }
                 }
             }
             catch (Exception ex)
             {
                 tenantResult.isSuccess = false;
-                tenantResult.message = "Tenant '" + rdMgmtTenant.tenantName + "' has not been created."+ex.Message.ToString()+" and please try again later.";
+                tenantResult.message = "Tenant '" + rdMgmtTenant.tenantName + "' has not been created." + ex.Message.ToString() + " and please try again later.";
             }
             return tenantResult;
         }
@@ -294,12 +300,17 @@ namespace MSFT.RDMISaaS.API.BLL
 
                 //call rest api to update tenant -- july code bit
                 var content = new StringContent(JsonConvert.SerializeObject(tenantDataDTO), Encoding.UTF8, "application/json");
-                HttpResponseMessage response = CommonBL.PatchAsync(deploymenturl, accessToken, "/RdsManagement/V1/TenantGroups/"+ rdMgmtTenant.tenantGroupName + "/Tenants/" + tenantDataDTO.tenantName, content).Result;
+                HttpResponseMessage response = CommonBL.PatchAsync(deploymenturl, accessToken, "/RdsManagement/V1/TenantGroups/" + rdMgmtTenant.tenantGroupName + "/Tenants/" + tenantDataDTO.tenantName, content).Result;
                 string strJson = response.Content.ReadAsStringAsync().Result;
                 if (response.IsSuccessStatusCode)
                 {
                     tenantResult.isSuccess = true;
-                    tenantResult.message = "Tenant '"+ rdMgmtTenant.tenantName + "' has been updated successfully.";
+                    tenantResult.message = "Tenant '" + rdMgmtTenant.tenantName + "' has been updated successfully.";
+                }
+                else if ((int)response.StatusCode == 429)
+                {
+                    tenantResult.isSuccess = false;
+                    tenantResult.message = strJson + " Please try again later.";
                 }
                 else
                 {
@@ -318,7 +329,7 @@ namespace MSFT.RDMISaaS.API.BLL
             catch (Exception ex)
             {
                 tenantResult.isSuccess = false;
-                tenantResult.message = "Tenant " + rdMgmtTenant.tenantName + " has not been updated."+ex.Message.ToString()+" Please try again later.";
+                tenantResult.message = "Tenant " + rdMgmtTenant.tenantName + " has not been updated." + ex.Message.ToString() + " Please try again later.";
             }
             return tenantResult;
         }
@@ -330,18 +341,23 @@ namespace MSFT.RDMISaaS.API.BLL
         /// <param name="accessToken">access Token</param>
         /// <param name="tenantName">tenantName</param>
         /// <returns></returns>
-        public TenantResult DeleteTenant(string tenantGroupName,string deploymenturl, string accessToken, string tenantName)
+        public TenantResult DeleteTenant(string tenantGroupName, string deploymenturl, string accessToken, string tenantName)
         {
             try
             {
-               
+
                 //call rest api to delete tenant -- july code bit
-                HttpResponseMessage response = CommonBL.InitializeHttpClient(deploymenturl, accessToken).DeleteAsync("/RdsManagement/V1/TenantGroups/"+ tenantGroupName + "/Tenants/" + tenantName).Result;
+                HttpResponseMessage response = CommonBL.InitializeHttpClient(deploymenturl, accessToken).DeleteAsync("/RdsManagement/V1/TenantGroups/" + tenantGroupName + "/Tenants/" + tenantName).Result;
                 string strJson = response.Content.ReadAsStringAsync().Result;
                 if (response.IsSuccessStatusCode)
                 {
                     tenantResult.isSuccess = true;
-                    tenantResult.message = "Tenant '"+ tenantName + "' has been deleted successfully.";
+                    tenantResult.message = "Tenant '" + tenantName + "' has been deleted successfully.";
+                }
+                else if ((int)response.StatusCode == 429)
+                {
+                    tenantResult.isSuccess = false;
+                    tenantResult.message = strJson + " Please try again later.";
                 }
                 else
                 {
@@ -360,7 +376,7 @@ namespace MSFT.RDMISaaS.API.BLL
             catch (Exception ex)
             {
                 tenantResult.isSuccess = false;
-                tenantResult.message = "Tenant '" + tenantName + "' has not been deleted."+ex.Message.ToString()+ " and try again later.";
+                tenantResult.message = "Tenant '" + tenantName + "' has not been deleted." + ex.Message.ToString() + " and try again later.";
             }
             return tenantResult;
         }

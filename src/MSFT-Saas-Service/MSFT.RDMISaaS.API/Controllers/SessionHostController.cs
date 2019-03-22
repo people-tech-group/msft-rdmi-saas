@@ -37,12 +37,13 @@ namespace MSFT.RDMISaaS.API.Controllers
         /// <param name="tenantName">Name of Tenant</param>
         /// <param name="hostPoolName">Name of Hostpool</param>
         /// <param name="refresh_token">Refresh token to get access token</param>
+        /// //old parameters -- , int pageSize, string sortField, bool isDescending = false, int initialSkip = 0, string lastEntry = null
         /// <returns></returns>
-        public HttpResponseMessage GetSessionhostList(string tenantGroupName, string tenantName, string hostPoolName, string refresh_token, int pageSize, string sortField, bool isDescending = false, int initialSkip = 0, string lastEntry = null)
+        public HttpResponseMessage GetSessionhostList(string tenantGroupName, string tenantName, string hostPoolName, string refresh_token)
         {
             //get deployment url
             deploymentUrl = configurations.rdBrokerUrl;
-           // List<RdMgmtSessionHost> rdMgmtSessionHosts = new List<RdMgmtSessionHost>();
+            // List<RdMgmtSessionHost> rdMgmtSessionHosts = new List<RdMgmtSessionHost>();
             try
             {
                 if (!string.IsNullOrEmpty(refresh_token))
@@ -52,7 +53,7 @@ namespace MSFT.RDMISaaS.API.Controllers
                     accessToken = common.GetTokenValue(refresh_token);
                     if (!string.IsNullOrEmpty(accessToken) && accessToken.ToString().ToLower() != invalidToken && accessToken.ToString().ToLower() != invalidCode)
                     {
-                       return sessionHostBL.GetSessionhostList(deploymentUrl, accessToken, tenantGroupName, tenantName, hostPoolName, false,false, pageSize, sortField, isDescending, initialSkip, lastEntry);
+                        return sessionHostBL.GetSessionhostList(deploymentUrl, accessToken, tenantGroupName, tenantName, hostPoolName);
                     }
                     else
                     {
@@ -62,11 +63,11 @@ namespace MSFT.RDMISaaS.API.Controllers
                 else
                 { return null; }
             }
-            catch 
+            catch
             {
                 return null;
             }
-          
+
         }
 
         /// <summary>
@@ -77,11 +78,11 @@ namespace MSFT.RDMISaaS.API.Controllers
         /// <param name="sessionHostName">Name of Session Host</param>
         /// <param name="refresh_token">Refresh token to get access token</param>
         /// <returns></returns>
-        public HttpResponseMessage GetSessionHostDetails(string tenantGroupName,string  tenantName, string hostPoolName, string sessionHostName, string refresh_token)
+        public HttpResponseMessage GetSessionHostDetails(string tenantGroupName, string tenantName, string hostPoolName, string sessionHostName, string refresh_token)
         {
             //get deployment url
             deploymentUrl = configurations.rdBrokerUrl;
-          //  RdMgmtSessionHost rdMgmtSessionHost = new RdMgmtSessionHost();
+            //  RdMgmtSessionHost rdMgmtSessionHost = new RdMgmtSessionHost();
             try
             {
                 if (!string.IsNullOrEmpty(refresh_token))
@@ -95,7 +96,7 @@ namespace MSFT.RDMISaaS.API.Controllers
                     }
                     else
                     {
-                        return Request.CreateResponse(HttpStatusCode.OK, new JObject() { { "code", Constants.invalidToken } } );
+                        return Request.CreateResponse(HttpStatusCode.OK, new JObject() { { "code", Constants.invalidToken } });
                     }
                 }
                 else
@@ -103,7 +104,7 @@ namespace MSFT.RDMISaaS.API.Controllers
                     return null;
                 }
             }
-            catch 
+            catch
             {
                 return null;
             }
@@ -129,7 +130,7 @@ namespace MSFT.RDMISaaS.API.Controllers
                         accessToken = common.GetTokenValue(rdMgmtSessionHost.refresh_token);
                         if (!string.IsNullOrEmpty(accessToken) && accessToken.ToString().ToLower() != invalidToken && accessToken.ToString().ToLower() != invalidCode)
                         {
-                            hostResult = sessionHostBL.UpdateSessionHost(deploymentUrl, accessToken,   rdMgmtSessionHost);
+                            hostResult = sessionHostBL.UpdateSessionHost(deploymentUrl, accessToken, rdMgmtSessionHost);
                         }
                         else
                         {
@@ -147,7 +148,7 @@ namespace MSFT.RDMISaaS.API.Controllers
             catch (Exception ex)
             {
                 hostResult.isSuccess = false;
-                hostResult.message = "Host '"+ rdMgmtSessionHost.sessionHostName + "' has not been updated."+ex.Message.ToString()+" Please try again later.";
+                hostResult.message = "Host '" + rdMgmtSessionHost.sessionHostName + "' has not been updated." + ex.Message.ToString() + " Please try again later.";
             }
             return Ok(hostResult);
         }
@@ -160,7 +161,7 @@ namespace MSFT.RDMISaaS.API.Controllers
         /// <param name="sessionHostName">Name of Session Host</param>
         /// <param name="refresh_token">refresh token to get access token</param>
         /// <returns></returns>
-        public IHttpActionResult DeleteSessionHost(string tenantGroup,string tenantName, string hostPoolName, string sessionHostName, string refresh_token)
+        public IHttpActionResult DeleteSessionHost(string tenantGroup, string tenantName, string hostPoolName, string sessionHostName, string refresh_token)
         {
             //get deployment url
             deploymentUrl = configurations.rdBrokerUrl;
@@ -174,7 +175,7 @@ namespace MSFT.RDMISaaS.API.Controllers
                     accessToken = common.GetTokenValue(refresh_token);
                     if (!string.IsNullOrEmpty(accessToken) && accessToken.ToString().ToLower() != invalidToken && accessToken.ToString().ToLower() != invalidCode)
                     {
-                        sessionHostResult = sessionHostBL.DeletesessionHost(deploymentUrl, accessToken,tenantGroup, tenantName, hostPoolName, sessionHostName);
+                        sessionHostResult = sessionHostBL.DeletesessionHost(deploymentUrl, accessToken, tenantGroup, tenantName, hostPoolName, sessionHostName);
                     }
                     else
                     {
@@ -185,7 +186,7 @@ namespace MSFT.RDMISaaS.API.Controllers
             }
             catch (Exception ex)
             {
-                sessionHostResult.message = "Session Host '"+ sessionHostName + "' has not neen deleted."+ex.Message.ToString()+" Please try it later again.";
+                sessionHostResult.message = "Session Host '" + sessionHostName + "' has not neen deleted." + ex.Message.ToString() + " Please try it later again.";
                 sessionHostResult.isSuccess = false;
             }
             return Ok(sessionHostResult);
