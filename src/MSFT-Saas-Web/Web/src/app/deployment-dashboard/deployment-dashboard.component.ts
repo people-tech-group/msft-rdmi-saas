@@ -521,20 +521,13 @@ export class DeploymentDashboardComponent implements OnInit {
   gettingTenants() {
     this.adminMenuComponent.GetAllTenants();
     let responseObject = JSON.parse(sessionStorage.getItem('Tenants'));
-    this.tenants = responseObject;
-    this.tenantsCount = responseObject.length;
+    this.tenants = responseObject.rdMgmtTenants;
+    this.tenantsCount = responseObject.rdMgmtTenants.length;
     this.searchTenants = this.tenants;
     if (this.searchTenants.length == 0) {
       this.editedBody = true;
       this.showCreateTenant = true;
       this.tenantlistErrorFound = false;
-    }
-    else {
-      if (this.searchTenants[0].Message == null) {
-        this.editedBody = false;
-        this.showCreateTenant = false;
-        this.tenantlistErrorFound = false;
-      }
     }
     this.isEditDisabled = true;
     this.isDeleteDisabled = true;
@@ -556,7 +549,7 @@ export class DeploymentDashboardComponent implements OnInit {
     this._AppService.GetTenants(this.getTenantsUrl).subscribe(response => {
       let responseObject = JSON.parse(response['_body']);
       this.tenants = responseObject.rdMgmtTenants.reverse();
-      this.tenantsCount = responseObject.length;
+      this.tenantsCount = responseObject.rdMgmtTenants.length;
       this.previousPageNo = this.currentPageNo;
       this.currentPageNo = this.currentPageNo - 1;
       if (this.tenants[0]) {
@@ -624,7 +617,7 @@ export class DeploymentDashboardComponent implements OnInit {
     this._AppService.GetTenants(this.getTenantsUrl).subscribe(response => {
       let responseObject = JSON.parse(response['_body']);
       this.tenants = responseObject.rdMgmtTenants; //.splice(0, 3)
-      this.tenantsCount = responseObject.length;
+      this.tenantsCount = responseObject.rdMgmtTenants.length;
       if (this.tenants[0]) {
         if (this.tenants[0].code == "Invalid Token") {
           sessionStorage.clear();
@@ -674,7 +667,7 @@ export class DeploymentDashboardComponent implements OnInit {
     this._AppService.GetTenants(this.getTenantsUrl).subscribe(response => {
       let responseObject = JSON.parse(response['_body']);
       this.tenants = responseObject.rdMgmtTenants;
-      this.tenantsCount = responseObject.length;
+      this.tenantsCount = responseObject.rdMgmtTenants.length;
       this.previousPageNo = this.currentPageNo;
       this.currentPageNo = this.currentPageNo + 1;
       if (this.tenants[0]) {

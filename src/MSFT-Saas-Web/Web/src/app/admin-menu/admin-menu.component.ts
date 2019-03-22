@@ -94,7 +94,7 @@ export class AdminMenuComponent {
   public GetAllTenants() {
     this.displayTenantList = [];
     let tenants = sessionStorage.getItem('Tenants') ? JSON.parse(sessionStorage.getItem('Tenants')) : [];
-    let data = tenants;
+    let data = tenants.rdMgmtTenants;
     this.tenantList = [];
     this.hostPoolList = [];
     if (data == undefined || data == null) {
