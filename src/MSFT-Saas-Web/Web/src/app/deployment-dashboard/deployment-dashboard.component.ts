@@ -529,13 +529,6 @@ export class DeploymentDashboardComponent implements OnInit {
       this.showCreateTenant = true;
       this.tenantlistErrorFound = false;
     }
-    else {
-      if (this.searchTenants[0].Message == null) {
-        this.editedBody = false;
-        this.showCreateTenant = false;
-        this.tenantlistErrorFound = false;
-      }
-    }
     this.isEditDisabled = true;
     this.isDeleteDisabled = true;
     for (let i = 0; i < this.searchTenants.length; i++) {
@@ -555,7 +548,7 @@ export class DeploymentDashboardComponent implements OnInit {
     this.getTenantsUrl = this._AppService.ApiUrl + '/api/Tenant/GetTenantList?tenantGroupName=' + this.tenantGroupName + '&refresh_token=' + this.refreshToken + '&pageSize=' + this.pageSize + '&sortField=TenantName&isDescending=true&initialSkip=' + this.initialSkip + '&lastEntry=' + this.searchTenants[0].tenantName;
     this._AppService.GetTenants(this.getTenantsUrl).subscribe(response => {
       let responseObject = JSON.parse(response['_body']);
-      this.tenants = responseObject.rdMgmtTenants.reverse();
+      this.tenants = responseObject.reverse();
       this.tenantsCount = responseObject.length;
       this.previousPageNo = this.currentPageNo;
       this.currentPageNo = this.currentPageNo - 1;
@@ -623,7 +616,7 @@ export class DeploymentDashboardComponent implements OnInit {
     this.getTenantsUrl = this._AppService.ApiUrl + '/api/Tenant/GetTenantList?tenantGroupName=' + this.tenantGroupName + '&refresh_token=' + this.refreshToken + '&pageSize=' + this.pageSize + '&sortField=TenantName&isDescending=' + this.isDescending + '&initialSkip=' + this.initialSkip + '&lastEntry=' + this.lastEntry;
     this._AppService.GetTenants(this.getTenantsUrl).subscribe(response => {
       let responseObject = JSON.parse(response['_body']);
-      this.tenants = responseObject.rdMgmtTenants; //.splice(0, 3)
+      this.tenants = responseObject; //.splice(0, 3)
       this.tenantsCount = responseObject.length;
       if (this.tenants[0]) {
         if (this.tenants[0].code == "Invalid Token") {
@@ -673,7 +666,7 @@ export class DeploymentDashboardComponent implements OnInit {
     this.getTenantsUrl = this._AppService.ApiUrl + '/api/Tenant/GetTenantList?tenantGroupName=' + this.tenantGroupName + '&refresh_token=' + this.refreshToken + '&pageSize=' + this.pageSize + '&sortField=TenantName&isDescending=false&initialSkip=' + this.initialSkip + '&lastEntry=' + this.lastEntry;
     this._AppService.GetTenants(this.getTenantsUrl).subscribe(response => {
       let responseObject = JSON.parse(response['_body']);
-      this.tenants = responseObject.rdMgmtTenants;
+      this.tenants = responseObject;
       this.tenantsCount = responseObject.length;
       this.previousPageNo = this.currentPageNo;
       this.currentPageNo = this.currentPageNo + 1;

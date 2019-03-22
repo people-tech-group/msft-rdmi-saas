@@ -318,11 +318,11 @@ export class HostpoolDashboardComponent implements OnInit {
       this.hostPoolDetails = {
         "hostPoolName": this.scopeArray[2],
       };
-      this.GetAllAppGroupsList(hostPoolName);
     }
     else {
       this.GetHostPoolDetails(hostPoolName);
     }
+    this.GetAllAppGroupsList(hostPoolName);
     this.GetAllSessionHost();
   }
 
@@ -538,7 +538,7 @@ export class HostpoolDashboardComponent implements OnInit {
     let Hostpools = JSON.parse(sessionStorage.getItem('Hostpools'));
     let data = Hostpools.filter(item => item.hostPoolName == hostPoolName);
     this.hostPoolDetails = data[0];
-    this.GetAllAppGroupsList(hostPoolName);
+    //this.GetAllAppGroupsList(hostPoolName);
     // this.refreshHostpoolLoading = true;
     // this.hostpoolDetailsErrorFound = false;
     // this.hostpoolDetailsUrl = this._AppService.ApiUrl + '/api/HostPool/GetHostPoolDetails?tenantGroupName=' + this.tenantGroupName + '&tenantName=' + this.tenantName + '&hostPoolName=' + hostPoolName + '&refresh_token=' + sessionStorage.getItem("Refresh_Token");
