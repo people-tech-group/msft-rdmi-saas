@@ -399,7 +399,7 @@
                               <li><button type="button" id="linkAddAppGallery" (click)="OpenAddAppsFromGallery()"><i class="icon icon-plus" aria-hidden="true"></i> Publish Apps from the Start menu</button></li>
                               <li><button type="button" id="linkAddAppPath" (click)="OpenAddAppsFromPath($event)"><i class="icon icon-plus" aria-hidden="true"></i> Publish App from Path</button></li>
                               <li><button type="button" data-toggle="modal" [disabled]="isDeleteAppsDisabled" data-target="#deleteModalApps" id="btnDeleteAppPath"><i class="icon icon-delete" aria-hidden="true"></i> Remove Apps</button></li>
-                              <li><button type="button" (click)="RefreshBtnClick()"><i class="icon icon-refresh" aria-hidden="true"></i> Refresh</button></li>
+                              <li><button type="button" (click)="RefreshApps()"><i class="icon icon-refresh" aria-hidden="true"></i> Refresh</button></li>
                             </ul>
                           </div>
                           <div class="col-md-3 pull-right">
@@ -478,7 +478,7 @@
                                   <img src="../../assets/Images/sad-cloud.png" class="img img-responsive" style="position: relative; width: 10%; left: 44%;" />
                                   <h5 style="color:#808080;font-weight:400;"> Error</h5>
                                   <p style="color:#808080"> Problem with serve, Please try again </p>
-                                  <button class="btn btn-sm btn-primary" (click)="RefreshBtnClick()">Refresh</button>
+                                  <button class="btn btn-sm btn-primary" (click)="RefreshApps()">Refresh</button>
                                 </div>
                               </div>
                             <!--</div>-->
@@ -493,7 +493,7 @@
                         <ul>
                           <li><button type="button" id="linkAddADSUser" (click)="OpenAddUser()"><i class="icon icon-plus" aria-hidden="true"></i> Add User</button></li>
                           <li><button type="button" id="btndeleteUser" [disabled]="isDeleteUserDisabled" data-target="#deleteModalAppUser" data-toggle="modal"><i class="icon icon-delete" aria-hidden="true"></i> Remove Users</button></li>
-                          <li><button type="button" (click)="RefreshBtnClick()"><i class="icon icon-refresh" aria-hidden="true"></i> Refresh</button></li>
+                          <li><button type="button" (click)="RefreshUsers()"><i class="icon icon-refresh" aria-hidden="true"></i> Refresh</button></li>
                         </ul>
                       </div>
                       <div class="col-md-3 pull-right">
@@ -583,7 +583,7 @@
                               <img src="../../assets/Images/sad-cloud.png" class="img img-responsive" style="position: relative; width: 10%; left: 44%;" />
                               <h5 style="color:#808080;font-weight:400;"> Error</h5>
                               <p style="color:#808080"> Problem with serve, Please try again </p>
-                              <button class="btn btn-sm btn-primary" (click)="RefreshBtnClick()">Refresh</button>
+                              <button class="btn btn-sm btn-primary" (click)="RefreshUsers()">Refresh</button>
                             </div>
                           </div>
                         </div>

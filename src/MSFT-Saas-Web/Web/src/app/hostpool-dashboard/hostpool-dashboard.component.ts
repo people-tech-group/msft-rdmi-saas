@@ -868,7 +868,7 @@ export class HostpoolDashboardComponent implements OnInit {
     this.sessionHostCheckedMain = false;
     this.sessionHostchecked = [];
     this.hostListErrorFound = false;
-    this.getAllSessionHostUrl = this._AppService.ApiUrl + '/api/SessionHost/GetSessionhostList?tenantGroupName=' + this.tenantGroupName + '&tenantName=' + this.tenantName + '&hostPoolName=' + this.hostPoolName + '&refresh_token=' + sessionStorage.getItem("Refresh_Token") + '&pageSize=' + this.HostpageSize + '&sortField=SessionHostName&isDescending=false&initialSkip=' + this.hostinitialSkip + '&lastEntry=' + this.HostlastEntry;
+   this.getAllSessionHostUrl = this._AppService.ApiUrl + '/api/SessionHost/GetSessionhostList?tenantGroupName=' + this.tenantGroupName + '&tenantName=' + this.tenantName + '&hostPoolName=' + this.hostPoolName + '&refresh_token=' + sessionStorage.getItem("Refresh_Token") + '&pageSize=' + this.HostpageSize + '&sortField=SessionHostName&isDescending=false&initialSkip=' + this.hostinitialSkip + '&lastEntry=' + this.HostlastEntry;
     this._AppService.GetData(this.getAllSessionHostUrl).subscribe(response => {
       this.sessionHostLists = JSON.parse(response['_body']);
       this.HostpreviousPageNo = this.HostCurrentPageNo;
@@ -944,7 +944,8 @@ export class HostpoolDashboardComponent implements OnInit {
     }
     else {
       sessionStorage.setItem('SelectedHostpool', this.hostPoolName);
-      this.getAllSessionHostUrl = this._AppService.ApiUrl + '/api/SessionHost/GetSessionhostList?tenantGroupName=' + this.tenantGroupName + '&tenantName=' + this.tenantName + '&hostPoolName=' + this.hostPoolName + '&refresh_token=' + sessionStorage.getItem("Refresh_Token") + '&pageSize=' + this.HostpageSize + '&sortField=SessionHostName&isDescending=false&initialSkip=' + this.hostinitialSkip + '&lastEntry=%22%20%22';
+     // this.getAllSessionHostUrl = this._AppService.ApiUrl + '/api/SessionHost/GetSessionhostList?tenantGroupName=' + this.tenantGroupName + '&tenantName=' + this.tenantName + '&hostPoolName=' + this.hostPoolName + '&refresh_token=' + sessionStorage.getItem("Refresh_Token") + '&pageSize=' + this.HostpageSize + '&sortField=SessionHostName&isDescending=false&initialSkip=' + this.hostinitialSkip + '&lastEntry=%22%20%22';
+      this.getAllSessionHostUrl = this._AppService.ApiUrl + '/api/SessionHost/GetSessionhostList?tenantGroupName=' + this.tenantGroupName + '&tenantName=' + this.tenantName + '&hostPoolName=' + this.hostPoolName + '&refresh_token=' + sessionStorage.getItem("Refresh_Token") ;//+ '&pageSize=' + this.HostpageSize + '&sortField=SessionHostName&isDescending=false&initialSkip=' + this.hostinitialSkip + '&lastEntry=%22%20%22';
       this._AppService.GetData(this.getAllSessionHostUrl).subscribe(response => {
         this.sessionHostLists = JSON.parse(response['_body']);
         sessionStorage.setItem('Hosts', JSON.stringify(this.sessionHostLists));
@@ -1469,13 +1470,23 @@ export class HostpoolDashboardComponent implements OnInit {
   /*
    * This function is used to refresh the AppGroup Details
    */
-  public RefreshBtnClick() {
-    this.isDeleteAppsDisabled = true;
-    // this.appUsersList=[];
-    this.GetAppGroupDetails();
-    this.GetAllAppGroupsList(this.hostPoolName);
-  }
+  // public RefreshBtnClick() {
+  //   this.isDeleteAppsDisabled = true;
 
+  //this.GetAppGroupDetails();
+  //   this.GetAllAppGroupsList(this.hostPoolName);
+  // }
+  public RefreshApps() {
+    this.isDeleteAppsDisabled = true;
+    this.appGroupsAppListSearch = [];
+    sessionStorage.removeItem('Apps');
+    this.GetAllAppGroupApps();
+  }
+  public RefreshUsers() {
+    this.appUsersListSearch = [];
+    sessionStorage.removeItem('Users');
+    this.GetAppGroupUsers();
+  }
   /* This function is used to create an  array of current page numbers */
   public counter(i: number) {
     return new Array(i);
@@ -1643,7 +1654,8 @@ export class HostpoolDashboardComponent implements OnInit {
       this.gettingAppgroups();
       this.refreshHostpoolLoading = false;
     } else {
-      this.getAllAppGroupsListUrl = this._AppService.ApiUrl + '/api/AppGroup/GetAppGroupsList?tenantGroupName=' + this.tenantGroupName + '&tenantName=' + this.tenantName + '&hostPoolName=' + hostPoolName + '&refresh_token=' + sessionStorage.getItem("Refresh_Token") + ' &pageSize=' + this.pageSize + '&sortField=AppGroupName&isDescending=false&initialSkip=' + this.initialSkip + '&lastEntry=%22%20%22';
+      //this.getAllAppGroupsListUrl = this._AppService.ApiUrl + '/api/AppGroup/GetAppGroupsList?tenantGroupName=' + this.tenantGroupName + '&tenantName=' + this.tenantName + '&hostPoolName=' + hostPoolName + '&refresh_token=' + sessionStorage.getItem("Refresh_Token") + ' &pageSize=' + this.pageSize + '&sortField=AppGroupName&isDescending=false&initialSkip=' + this.initialSkip + '&lastEntry=%22%20%22';
+      this.getAllAppGroupsListUrl = this._AppService.ApiUrl + '/api/AppGroup/GetAppGroupsList?tenantGroupName=' + this.tenantGroupName + '&tenantName=' + this.tenantName + '&hostPoolName=' + hostPoolName + '&refresh_token=' + sessionStorage.getItem("Refresh_Token");// + ' &pageSize=' + this.pageSize + '&sortField=AppGroupName&isDescending=false&initialSkip=' + this.initialSkip + '&lastEntry=%22%20%22';
       this._AppService.GetData(this.getAllAppGroupsListUrl).subscribe(response => {
         this.appGroupsList = JSON.parse(response['_body']);
         sessionStorage.setItem('Appgroups', JSON.stringify(this.appGroupsList));
@@ -2190,7 +2202,8 @@ export class HostpoolDashboardComponent implements OnInit {
       this.checkedMainUser = false;
       this.usersListErrorFound = false;
       this.refreshHostpoolLoading = true;
-      this.getAppGroupUserUrl = this._AppService.ApiUrl + '/api/AppGroup/GetUsersList?tenantGroupName=' + this.tenantGroupName + '&tenantName=' + this.tenantName + '&hostPoolName=' + this.hostPoolName + '&appGroupName=' + this.selectedAppGroupName + '&refresh_token=' + sessionStorage.getItem("Refresh_Token") + '&pageSize=' + this.pageSize + '&sortField=UserPrincipalName&isDescending=false&initialSkip=' + this.usersInitialSkip + '&lastEntry=' + this.usersLastEntry;
+     // this.getAppGroupUserUrl = this._AppService.ApiUrl + '/api/AppGroup/GetUsersList?tenantGroupName=' + this.tenantGroupName + '&tenantName=' + this.tenantName + '&hostPoolName=' + this.hostPoolName + '&appGroupName=' + this.selectedAppGroupName + '&refresh_token=' + sessionStorage.getItem("Refresh_Token") + '&pageSize=' + this.pageSize + '&sortField=UserPrincipalName&isDescending=false&initialSkip=' + this.usersInitialSkip + '&lastEntry=' + this.usersLastEntry;
+      this.getAppGroupUserUrl = this._AppService.ApiUrl + '/api/AppGroup/GetUsersList?tenantGroupName=' + this.tenantGroupName + '&tenantName=' + this.tenantName + '&hostPoolName=' + this.hostPoolName + '&appGroupName=' + this.selectedAppGroupName + '&refresh_token=' + sessionStorage.getItem("Refresh_Token") ;//+ '&pageSize=' + this.pageSize + '&sortField=UserPrincipalName&isDescending=false&initialSkip=' + this.usersInitialSkip + '&lastEntry=' + this.usersLastEntry;
       this._AppService.GetData(this.getAppGroupUserUrl).subscribe(response => {
         this.appUsersList = JSON.parse(response['_body']);
         this.usersCount = this.appUsersList.length;
@@ -2571,7 +2584,7 @@ export class HostpoolDashboardComponent implements OnInit {
         )
         AppComponent.GetNotification('icon icon-check angular-Notify', 'User Added Successfully', responseData.message, new Date());
         this.HideAppUserDialog();
-        this.RefreshBtnClick();
+        this.RefreshUsers();
       }
       /* If response data is success then it enters into else and this block of code will execute to show the 'Failed To Add User' notification */
       else {
@@ -2592,7 +2605,7 @@ export class HostpoolDashboardComponent implements OnInit {
         )
         AppComponent.GetNotification('icon icon-fail angular-NotifyFail', 'Failed To Add User', responseData.message, new Date());
         this.HideAppUserDialog();
-        this.RefreshBtnClick();
+        this.RefreshUsers();
       }
     },
       /*
@@ -2617,7 +2630,7 @@ export class HostpoolDashboardComponent implements OnInit {
         )
         AppComponent.GetNotification('icon icon-fail angular-NotifyFail', 'Failed To Add User', 'Problem with server, Please try again', new Date());
         this.HideAppUserDialog();
-        this.RefreshBtnClick();
+        this.RefreshUsers();
       }
     );
   }
@@ -2656,7 +2669,7 @@ export class HostpoolDashboardComponent implements OnInit {
             }
           )
           AppComponent.GetNotification('icon icon-check angular-Notify', 'User Removed Successfully', responseData.message, new Date());
-          this.RefreshBtnClick();
+          this.RefreshUsers();
         }
         /* If response data is success then it enters into else and this block of code will execute to show the 'Failed To Remove User' notification */
         else {
@@ -2676,7 +2689,7 @@ export class HostpoolDashboardComponent implements OnInit {
             }
           )
           AppComponent.GetNotification('icon icon-fail angular-NotifyFail', 'Failed To Remove User', responseData.message, new Date());
-          this.RefreshBtnClick();
+          this.RefreshUsers();
         }
       },
         /*
@@ -2699,7 +2712,7 @@ export class HostpoolDashboardComponent implements OnInit {
             }
           )
           AppComponent.GetNotification('icon icon-fail angular-NotifyFail', 'Failed To Remove User', 'Problem with server, Please try again', new Date());
-          this.RefreshBtnClick();
+          this.RefreshUsers();
         }
       );
     }
@@ -2902,7 +2915,8 @@ export class HostpoolDashboardComponent implements OnInit {
       this.checkedMainApp = false;
       this.appListErrorFound = false;
       this.refreshHostpoolLoading = true;
-      this.getAppGroupAppsUrl = this._AppService.ApiUrl + '/api/RemoteApp/GetRemoteAppList?tenantGroupName=' + this.tenantGroupName + '&tenantName=' + this.tenantName + '&hostPoolName=' + this.hostPoolName + '&appGroupName=' + this.selectedAppGroupName + '&refresh_token=' + sessionStorage.getItem("Refresh_Token") + '&pageSize=' + this.pageSize + '&sortField=RemoteAppName&isDescending=false&initialSkip=' + this.appsInitialSkip + '&lastEntry=' + this.appsLastEntry;
+      //this.getAppGroupAppsUrl = this._AppService.ApiUrl + '/api/RemoteApp/GetRemoteAppList?tenantGroupName=' + this.tenantGroupName + '&tenantName=' + this.tenantName + '&hostPoolName=' + this.hostPoolName + '&appGroupName=' + this.selectedAppGroupName + '&refresh_token=' + sessionStorage.getItem("Refresh_Token") + '&pageSize=' + this.pageSize + '&sortField=RemoteAppName&isDescending=false&initialSkip=' + this.appsInitialSkip + '&lastEntry=' + this.appsLastEntry;
+      this.getAppGroupAppsUrl = this._AppService.ApiUrl + '/api/RemoteApp/GetRemoteAppList?tenantGroupName=' + this.tenantGroupName + '&tenantName=' + this.tenantName + '&hostPoolName=' + this.hostPoolName + '&appGroupName=' + this.selectedAppGroupName + '&refresh_token=' + sessionStorage.getItem("Refresh_Token") ;//+ '&pageSize=' + this.pageSize + '&sortField=RemoteAppName&isDescending=false&initialSkip=' + this.appsInitialSkip + '&lastEntry=' + this.appsLastEntry;
       this._AppService.GetData(this.getAppGroupAppsUrl).subscribe(response => {
         this.appGroupAppList = JSON.parse(response['_body']);
         this.appsCount = this.appGroupAppList.length;
@@ -2957,7 +2971,8 @@ export class HostpoolDashboardComponent implements OnInit {
     }
     else {
       this.galleryAppLoader = true;
-      this.getAllAppGroupAppsGalleryUrl = this._AppService.ApiUrl + '/api/AppGroup/GetStartMenuAppsList?tenantGroupName=' + this.tenantGroupName + '&tenantName=' + this.tenantName + '&appGroupName=' + this.selectedAppGroupName + '&hostPoolName=' + this.hostPoolName + '&refresh_token=' + sessionStorage.getItem("Refresh_Token") + '&pageSize=10&sortField=AppAlias&isDescending=false&initialSkip=0';
+      //this.getAllAppGroupAppsGalleryUrl = this._AppService.ApiUrl + '/api/AppGroup/GetStartMenuAppsList?tenantGroupName=' + this.tenantGroupName + '&tenantName=' + this.tenantName + '&appGroupName=' + this.selectedAppGroupName + '&hostPoolName=' + this.hostPoolName + '&refresh_token=' + sessionStorage.getItem("Refresh_Token") + '&pageSize=10&sortField=AppAlias&isDescending=false&initialSkip=0';
+      this.getAllAppGroupAppsGalleryUrl = this._AppService.ApiUrl + '/api/AppGroup/GetStartMenuAppsList?tenantGroupName=' + this.tenantGroupName + '&tenantName=' + this.tenantName + '&appGroupName=' + this.selectedAppGroupName + '&hostPoolName=' + this.hostPoolName + '&refresh_token=' + sessionStorage.getItem("Refresh_Token");// + '&pageSize=10&sortField=AppAlias&isDescending=false&initialSkip=0';
       this._AppService.GetData(this.getAllAppGroupAppsGalleryUrl).subscribe(response => {
         this.GAppslist = false;
         this.appGroupAppListGallery = JSON.parse(response['_body']);
@@ -3310,7 +3325,7 @@ export class HostpoolDashboardComponent implements OnInit {
         )
         AppComponent.GetNotification('icon icon-check angular-Notify', 'Remote App Published Successfully', responseData.message, new Date());
         this.HideAppPathDialog();
-        this.RefreshBtnClick();
+        this.RefreshApps();
       }
       /* If response data is success then it enters into else and this block of code will execute to show the 'Failed To Publish Remote App' notification */
       else {
@@ -3331,7 +3346,7 @@ export class HostpoolDashboardComponent implements OnInit {
         )
         AppComponent.GetNotification('icon icon-fail angular-NotifyFail', 'Failed To Publish Remote App', responseData.message, new Date());
         this.HideAppPathDialog();
-        this.RefreshBtnClick();
+        this.RefreshApps();
       }
     },
       /*
@@ -3355,7 +3370,7 @@ export class HostpoolDashboardComponent implements OnInit {
         )
         AppComponent.GetNotification('icon icon-fail angular-NotifyFail', 'Failed To Publish Remote App', 'Problem with server, Please try again', new Date());
         this.HideAppPathDialog();
-        this.RefreshBtnClick();
+        this.RefreshApps();
       }
     );
   }
@@ -3412,7 +3427,7 @@ export class HostpoolDashboardComponent implements OnInit {
           AppComponent.GetNotification('icon icon-check angular-Notify', 'Remote App Published Successfully', responseData.message, new Date());
           this.showAddAppGalleryDialog = false;
           this.refreshHostpoolLoading = false;
-          this.RefreshBtnClick();
+          this.RefreshApps();
         }
         /* If response data is success then it enters into else and this block of code will execute to show the 'Failed To Publish Remote App' notification */
         else {
@@ -3433,7 +3448,7 @@ export class HostpoolDashboardComponent implements OnInit {
           )
           AppComponent.GetNotification('icon icon-fail angular-NotifyFail', 'Failed To Publish Remote App', responseData.message, new Date());
           this.showAddAppGalleryDialog = false;
-          this.RefreshBtnClick();
+          this.RefreshApps();
         }
       },
         /*
@@ -3458,7 +3473,7 @@ export class HostpoolDashboardComponent implements OnInit {
           AppComponent.GetNotification('icon icon-fail angular-NotifyFail', 'Failed To Publish Remote App', 'Problem with server, Please try again', new Date());
           this.showAddAppGalleryDialog = false;
           this.refreshHostpoolLoading = false;
-          this.RefreshBtnClick();
+          this.RefreshApps();
         }
       );
     }
@@ -3497,7 +3512,7 @@ export class HostpoolDashboardComponent implements OnInit {
             }
           )
           AppComponent.GetNotification('icon icon-check angular-Notify', ' Remote App Removed Successfully', responseData.message, new Date());
-          this.RefreshBtnClick();
+          this.RefreshApps();
         }
         /* If response data is success then it enters into else and this block of code will execute to show the 'Failed To Remove Remote App' notification */
         else {
@@ -3517,7 +3532,7 @@ export class HostpoolDashboardComponent implements OnInit {
             }
           )
           AppComponent.GetNotification('icon icon-fail angular-NotifyFail', 'Failed To Remove Remote App', responseData.message, new Date());
-          this.RefreshBtnClick();
+          this.RefreshApps();
         }
       },
         /*
@@ -3540,7 +3555,7 @@ export class HostpoolDashboardComponent implements OnInit {
             }
           )
           AppComponent.GetNotification('icon icon-fail angular-NotifyFail', 'Failed To Remove Remote App', 'Problem with server, Please try again', new Date());
-          this.RefreshBtnClick();
+          this.RefreshApps();
         }
       );
     }
