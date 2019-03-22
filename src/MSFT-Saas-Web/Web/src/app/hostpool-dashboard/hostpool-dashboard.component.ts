@@ -518,7 +518,7 @@ export class HostpoolDashboardComponent implements OnInit {
     this.GetAllSessionHost();
   }
 
-  public RefreshAppgroups(){
+  public RefreshAppgroups() {
     this.checked = [];
     this.checkedMainAppGroup = false;
     this.state = "down";
@@ -1801,7 +1801,7 @@ export class HostpoolDashboardComponent implements OnInit {
       this.state = 'up';
       this.isEditAppgroupDisabled = false;
       this.isDeleteAppgroupDisabled = false;
-      if (this.appGroupsListSearch[index].resourceType == "Desktop App Group") {
+      if (this.appGroupsListSearch[index].resourceType == 1) {
         this.removeAppsTab = false;
         this.selectedRadioBtn = 'Desktop'
       } else {
@@ -2181,7 +2181,8 @@ export class HostpoolDashboardComponent implements OnInit {
    */
   public GetAppGroupUsers() {
     let Users = JSON.parse(sessionStorage.getItem('Users'));
-    if (sessionStorage.getItem('Users') && Users.length != 0 && Users != null) {
+    let selectedApproup = sessionStorage.getItem('SelectedAppGroup');
+    if (sessionStorage.getItem('Users') && Users.length != 0 && Users != null && selectedApproup == this.selectedAppGroupName) {
       this.getusers()
     }
     else {
@@ -2194,6 +2195,7 @@ export class HostpoolDashboardComponent implements OnInit {
         this.appUsersList = JSON.parse(response['_body']);
         this.usersCount = this.appUsersList.length;
         sessionStorage.setItem('Users', JSON.stringify(this.appUsersList));
+        sessionStorage.setItem('SelectedAppGroup', this.selectedAppGroupName);
         this.getusers();
       },
         /*
@@ -2208,7 +2210,7 @@ export class HostpoolDashboardComponent implements OnInit {
     this.isDeleteUserDisabled = true;
   }
 
-  getusers() {
+  public getusers() {
     let appUsersList = JSON.parse(sessionStorage.getItem('Users'));
     if (this.appUsersList) {
       if (this.appUsersList.code == "Invalid Token") {
@@ -2895,7 +2897,7 @@ export class HostpoolDashboardComponent implements OnInit {
     let Apps = JSON.parse(sessionStorage.getItem('Apps'));
     if (sessionStorage.getItem('Apps') && Apps.length != 0 && Apps != null) {
       this.getapps()
-    } else{
+    } else {
       this.checkedApps = [];
       this.checkedMainApp = false;
       this.appListErrorFound = false;
@@ -2906,8 +2908,6 @@ export class HostpoolDashboardComponent implements OnInit {
         this.appsCount = this.appGroupAppList.length;
         sessionStorage.setItem('Apps', JSON.stringify(this.appGroupAppList));
         this.getapps();
-  
-    
       },
         /*
          * If Any Error (or) Problem With Services (or) Problem in internet this Error Block Will Exequte
@@ -2918,11 +2918,11 @@ export class HostpoolDashboardComponent implements OnInit {
         }
       );
     }
-   
     this.GetAppGroupUsers();
   }
-  getapps()
-  {
+
+
+  public getapps() {
     let appGroupAppList = JSON.parse(sessionStorage.getItem('Apps'));
     if (this.appGroupAppList) {
       if (this.appGroupAppList.code == "Invalid Token") {
@@ -2951,40 +2951,51 @@ export class HostpoolDashboardComponent implements OnInit {
    * This function is used to get All AppGroup RemoteApps from Gallery
    */
   public GetAllAppGroupAppsGallery() {
-    this.galleryAppLoader = true;
-    this.getAllAppGroupAppsGalleryUrl = this._AppService.ApiUrl + '/api/AppGroup/GetStartMenuAppsList?tenantGroupName=' + this.tenantGroupName + '&tenantName=' + this.tenantName + '&appGroupName=' + this.selectedAppGroupName + '&hostPoolName=' + this.hostPoolName + '&refresh_token=' + sessionStorage.getItem("Refresh_Token") + '&pageSize=10&sortField=AppAlias&isDescending=false&initialSkip=0';
-    this._AppService.GetData(this.getAllAppGroupAppsGalleryUrl).subscribe(response => {
-      this.GAppslist = false;
-      this.appGroupAppListGallery = JSON.parse(response['_body']);
-      if (this.appGroupAppListGallery) {
-        if (this.appGroupAppListGallery.code == "Invalid Token") {
-          sessionStorage.clear();
-          this.router.navigate(['/invalidtokenmessage']);
-        }
-        else if (this.appGroupAppListGallery.length == 0) {
-          this.GAppslist = true;
-          this.appGalleryErrorFound = false;
-        }
-        else {
-          this.GAppslist = false;
-          this.appGalleryErrorFound = false;
-        }
-        this.galleryAppLoader = false;
-      }
-      this.refreshHostpoolLoading = false;
-    },
-      /*
-       * If Any Error (or) Problem With Services (or) Problem in internet this Error Block Will Exequte
-       */
-      (error) => {
-        this.galleryAppLoader = false;
-        this.refreshHostpoolLoading = false;
-        this.appGalleryErrorFound = true;
+    let Appsfromgallery = JSON.parse(sessionStorage.getItem('Appsfromgallery'));
+    if (sessionStorage.getItem('Appsfromgallery') && Appsfromgallery.length != 0 && Appsfromgallery != null) {
+      this.gettingappsFromGallery();
+    }
+    else {
+      this.galleryAppLoader = true;
+      this.getAllAppGroupAppsGalleryUrl = this._AppService.ApiUrl + '/api/AppGroup/GetStartMenuAppsList?tenantGroupName=' + this.tenantGroupName + '&tenantName=' + this.tenantName + '&appGroupName=' + this.selectedAppGroupName + '&hostPoolName=' + this.hostPoolName + '&refresh_token=' + sessionStorage.getItem("Refresh_Token") + '&pageSize=10&sortField=AppAlias&isDescending=false&initialSkip=0';
+      this._AppService.GetData(this.getAllAppGroupAppsGalleryUrl).subscribe(response => {
         this.GAppslist = false;
-      }
-    );
+        this.appGroupAppListGallery = JSON.parse(response['_body']);
+        sessionStorage.setItem('Appsfromgallery', JSON.stringify(this.appGroupAppListGallery));
+        this.gettingappsFromGallery();
+      },
+        /*
+         * If Any Error (or) Problem With Services (or) Problem in internet this Error Block Will Exequte
+         */
+        (error) => {
+          this.galleryAppLoader = false;
+          this.refreshHostpoolLoading = false;
+          this.appGalleryErrorFound = true;
+          this.GAppslist = false;
+        }
+      );
+    }
   }
 
+  public gettingappsFromGallery() {
+    let responseObject = JSON.parse(sessionStorage.getItem('Appsfromgallery'));
+    if (this.appGroupAppListGallery) {
+      if (this.appGroupAppListGallery.code == "Invalid Token") {
+        sessionStorage.clear();
+        this.router.navigate(['/invalidtokenmessage']);
+      }
+      else if (this.appGroupAppListGallery.length == 0) {
+        this.GAppslist = true;
+        this.appGalleryErrorFound = false;
+      }
+      else {
+        this.GAppslist = false;
+        this.appGalleryErrorFound = false;
+      }
+      this.galleryAppLoader = false;
+    }
+    this.refreshHostpoolLoading = false;
+  }
   /*
    * This function is used to select all the single App(App from Gallery)
    * ----------
