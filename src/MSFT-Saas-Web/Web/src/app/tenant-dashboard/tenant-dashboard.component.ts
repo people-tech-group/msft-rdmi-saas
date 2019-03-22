@@ -285,7 +285,7 @@ export class TenantDashboardComponent implements OnInit {
    */
   public GetTenantDetails(tenantName: any) {
     let Tenants = JSON.parse(sessionStorage.getItem('Tenants'));
-    let data = Tenants.filter(item => item.tenantName == tenantName);
+    let data = Tenants.rdMgmtTenants.filter(item => item.tenantName == tenantName);
     this.tenantInfo = data[0];
     // this.refreshHostpoolLoading = true;
     // this.getTenantlistErrorFound = false;

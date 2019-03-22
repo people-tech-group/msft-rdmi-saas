@@ -318,11 +318,11 @@ export class HostpoolDashboardComponent implements OnInit {
       this.hostPoolDetails = {
         "hostPoolName": this.scopeArray[2],
       };
-      this.GetAllAppGroupsList(hostPoolName);
     }
     else {
       this.GetHostPoolDetails(hostPoolName);
     }
+    this.GetAllAppGroupsList(hostPoolName);
     this.GetAllSessionHost();
   }
 
@@ -518,7 +518,7 @@ export class HostpoolDashboardComponent implements OnInit {
     this.GetAllSessionHost();
   }
 
-  public RefreshAppgroups(){
+  public RefreshAppgroups() {
     this.checked = [];
     this.checkedMainAppGroup = false;
     this.state = "down";
@@ -538,7 +538,7 @@ export class HostpoolDashboardComponent implements OnInit {
     let Hostpools = JSON.parse(sessionStorage.getItem('Hostpools'));
     let data = Hostpools.filter(item => item.hostPoolName == hostPoolName);
     this.hostPoolDetails = data[0];
-    this.GetAllAppGroupsList(hostPoolName);
+    //this.GetAllAppGroupsList(hostPoolName);
     // this.refreshHostpoolLoading = true;
     // this.hostpoolDetailsErrorFound = false;
     // this.hostpoolDetailsUrl = this._AppService.ApiUrl + '/api/HostPool/GetHostPoolDetails?tenantGroupName=' + this.tenantGroupName + '&tenantName=' + this.tenantName + '&hostPoolName=' + hostPoolName + '&refresh_token=' + sessionStorage.getItem("Refresh_Token");
@@ -1471,6 +1471,7 @@ export class HostpoolDashboardComponent implements OnInit {
    */
   public RefreshBtnClick() {
     this.isDeleteAppsDisabled = true;
+    // this.appUsersList=[];
     this.GetAppGroupDetails();
     this.GetAllAppGroupsList(this.hostPoolName);
   }
@@ -1800,7 +1801,7 @@ export class HostpoolDashboardComponent implements OnInit {
       this.state = 'up';
       this.isEditAppgroupDisabled = false;
       this.isDeleteAppgroupDisabled = false;
-      if (this.appGroupsListSearch[index].resourceType == "Desktop App Group") {
+      if (this.appGroupsListSearch[index].resourceType == 1) {
         this.removeAppsTab = false;
         this.selectedRadioBtn = 'Desktop'
       } else {
@@ -2179,45 +2180,58 @@ export class HostpoolDashboardComponent implements OnInit {
    * This function is used to get the Appgroup users list and load into table
    */
   public GetAppGroupUsers() {
-    this.checkedUsers = [];
-    this.checkedMainUser = false;
-    this.usersListErrorFound = false;
-    this.refreshHostpoolLoading = true;
-    this.getAppGroupUserUrl = this._AppService.ApiUrl + '/api/AppGroup/GetUsersList?tenantGroupName=' + this.tenantGroupName + '&tenantName=' + this.tenantName + '&hostPoolName=' + this.hostPoolName + '&appGroupName=' + this.selectedAppGroupName + '&refresh_token=' + sessionStorage.getItem("Refresh_Token") + '&pageSize=' + this.pageSize + '&sortField=UserPrincipalName&isDescending=false&initialSkip=' + this.usersInitialSkip + '&lastEntry=' + this.usersLastEntry;
-    this._AppService.GetData(this.getAppGroupUserUrl).subscribe(response => {
-      this.appUsersList = JSON.parse(response['_body']);
-      this.usersCount = this.appUsersList.length;
-      if (this.appUsersList) {
-        if (this.appUsersList.code == "Invalid Token") {
-          sessionStorage.clear();
-          this.router.navigate(['/invalidtokenmessage']);
+    let Users = JSON.parse(sessionStorage.getItem('Users'));
+    let selectedApproup = sessionStorage.getItem('SelectedAppGroup');
+    if (sessionStorage.getItem('Users') && Users.length != 0 && Users != null && selectedApproup == this.selectedAppGroupName) {
+      this.getusers()
+    }
+    else {
+      this.checkedUsers = [];
+      this.checkedMainUser = false;
+      this.usersListErrorFound = false;
+      this.refreshHostpoolLoading = true;
+      this.getAppGroupUserUrl = this._AppService.ApiUrl + '/api/AppGroup/GetUsersList?tenantGroupName=' + this.tenantGroupName + '&tenantName=' + this.tenantName + '&hostPoolName=' + this.hostPoolName + '&appGroupName=' + this.selectedAppGroupName + '&refresh_token=' + sessionStorage.getItem("Refresh_Token") + '&pageSize=' + this.pageSize + '&sortField=UserPrincipalName&isDescending=false&initialSkip=' + this.usersInitialSkip + '&lastEntry=' + this.usersLastEntry;
+      this._AppService.GetData(this.getAppGroupUserUrl).subscribe(response => {
+        this.appUsersList = JSON.parse(response['_body']);
+        this.usersCount = this.appUsersList.length;
+        sessionStorage.setItem('Users', JSON.stringify(this.appUsersList));
+        sessionStorage.setItem('SelectedAppGroup', this.selectedAppGroupName);
+        this.getusers();
+      },
+        /*
+         * If Any Error (or) Problem With Services (or) Problem in internet this Error Block Will Exequte
+         */
+        (error) => {
+          this.usersListErrorFound = true;
+          this.refreshHostpoolLoading = false;
         }
-      }
-      this.GetcurrentNoOfUsersPagesCount(this.usersCount);
-      this.appUsersListSearch = JSON.parse(response['_body']);
-      if (this.appUsersListSearch.length == 0) {
-        this.editedLbodyUsers = true;
-        this.editedBodyUsers = false;
-      }
-      else {
-        if (this.appUsersListSearch[0].Message == null) {
-          this.editedBodyUsers = true;
-          this.editedLbodyUsers = false;
-        }
-      }
-      this.refreshHostpoolLoading = false;
-    },
-      /*
-       * If Any Error (or) Problem With Services (or) Problem in internet this Error Block Will Exequte
-       */
-      (error) => {
-        this.usersListErrorFound = true;
-        this.refreshHostpoolLoading = false;
-      }
-    );
+      );
+    }
     this.isDeleteUserDisabled = true;
   }
 
+  public getusers() {
+    let appUsersList = JSON.parse(sessionStorage.getItem('Users'));
+    if (this.appUsersList) {
+      if (this.appUsersList.code == "Invalid Token") {
+        sessionStorage.clear();
+        this.router.navigate(['/invalidtokenmessage']);
+      }
+    }
+    this.GetcurrentNoOfUsersPagesCount(this.usersCount);
+    this.appUsersListSearch = appUsersList;
+    if (this.appUsersListSearch.length == 0) {
+      this.editedLbodyUsers = true;
+      this.editedBodyUsers = false;
+    }
+    else {
+      if (this.appUsersListSearch[0].Message == null) {
+        this.editedBodyUsers = true;
+        this.editedLbodyUsers = false;
+      }
+    }
+    this.refreshHostpoolLoading = false;
+  }
 
   /* This function is used to  loads all the Users into table on click of Previous button in the table */
   public usersPreviousPage() {
@@ -2880,85 +2894,108 @@ export class HostpoolDashboardComponent implements OnInit {
    * This function is used to get All AppGroup RemoteApps
    */
   public GetAllAppGroupApps() {
-    this.checkedApps = [];
-    this.checkedMainApp = false;
-    this.appListErrorFound = false;
-    this.refreshHostpoolLoading = true;
-    this.getAppGroupAppsUrl = this._AppService.ApiUrl + '/api/RemoteApp/GetRemoteAppList?tenantGroupName=' + this.tenantGroupName + '&tenantName=' + this.tenantName + '&hostPoolName=' + this.hostPoolName + '&appGroupName=' + this.selectedAppGroupName + '&refresh_token=' + sessionStorage.getItem("Refresh_Token") + '&pageSize=' + this.pageSize + '&sortField=RemoteAppName&isDescending=false&initialSkip=' + this.appsInitialSkip + '&lastEntry=' + this.appsLastEntry;
-    this._AppService.GetData(this.getAppGroupAppsUrl).subscribe(response => {
-      this.appGroupAppList = JSON.parse(response['_body']);
-      this.appsCount = this.appGroupAppList.length;
-      if (this.appGroupAppList) {
-        if (this.appGroupAppList.code == "Invalid Token") {
-          sessionStorage.clear();
-          this.router.navigate(['/invalidtokenmessage']);
+    let Apps = JSON.parse(sessionStorage.getItem('Apps'));
+    if (sessionStorage.getItem('Apps') && Apps.length != 0 && Apps != null) {
+      this.getapps()
+    } else {
+      this.checkedApps = [];
+      this.checkedMainApp = false;
+      this.appListErrorFound = false;
+      this.refreshHostpoolLoading = true;
+      this.getAppGroupAppsUrl = this._AppService.ApiUrl + '/api/RemoteApp/GetRemoteAppList?tenantGroupName=' + this.tenantGroupName + '&tenantName=' + this.tenantName + '&hostPoolName=' + this.hostPoolName + '&appGroupName=' + this.selectedAppGroupName + '&refresh_token=' + sessionStorage.getItem("Refresh_Token") + '&pageSize=' + this.pageSize + '&sortField=RemoteAppName&isDescending=false&initialSkip=' + this.appsInitialSkip + '&lastEntry=' + this.appsLastEntry;
+      this._AppService.GetData(this.getAppGroupAppsUrl).subscribe(response => {
+        this.appGroupAppList = JSON.parse(response['_body']);
+        this.appsCount = this.appGroupAppList.length;
+        sessionStorage.setItem('Apps', JSON.stringify(this.appGroupAppList));
+        this.getapps();
+      },
+        /*
+         * If Any Error (or) Problem With Services (or) Problem in internet this Error Block Will Exequte
+         */
+        (error) => {
+          this.appListErrorFound = true;
+          this.refreshHostpoolLoading = false;
         }
-      }
-      this.GetcurrentNoOfAppsPagesCount(this.appsCount);
-      this.appGroupsAppListSearch = JSON.parse(response['_body']);
-      if (this.appGroupsAppListSearch.length == 0) {
-        this.editedBodyApp = true;
-        this.editedLBodyApp = false;
-      }
-      else {
-        if (this.appGroupsAppListSearch[0].Message == null) {
-          this.editedLBodyApp = true;
-          this.editedBodyApp = false;
-        }
-        else if (this.appGroupsAppListSearch[0].Message == "Unauthorized") {
-          sessionStorage.clear();
-        }
-      }
-    },
-      /*
-       * If Any Error (or) Problem With Services (or) Problem in internet this Error Block Will Exequte
-       */
-      (error) => {
-        this.appListErrorFound = true;
-        this.refreshHostpoolLoading = false;
-      }
-    );
+      );
+    }
     this.GetAppGroupUsers();
+  }
+
+
+  public getapps() {
+    let appGroupAppList = JSON.parse(sessionStorage.getItem('Apps'));
+    if (this.appGroupAppList) {
+      if (this.appGroupAppList.code == "Invalid Token") {
+        sessionStorage.clear();
+        this.router.navigate(['/invalidtokenmessage']);
+      }
+    }
+    this.GetcurrentNoOfAppsPagesCount(this.appsCount);
+    this.appGroupsAppListSearch = appGroupAppList;
+    if (this.appGroupsAppListSearch.length == 0) {
+      this.editedBodyApp = true;
+      this.editedLBodyApp = false;
+    }
+    else {
+      if (this.appGroupsAppListSearch[0].Message == null) {
+        this.editedLBodyApp = true;
+        this.editedBodyApp = false;
+      }
+      else if (this.appGroupsAppListSearch[0].Message == "Unauthorized") {
+        sessionStorage.clear();
+      }
+    }
   }
 
   /*
    * This function is used to get All AppGroup RemoteApps from Gallery
    */
   public GetAllAppGroupAppsGallery() {
-    this.galleryAppLoader = true;
-    this.getAllAppGroupAppsGalleryUrl = this._AppService.ApiUrl + '/api/AppGroup/GetStartMenuAppsList?tenantGroupName=' + this.tenantGroupName + '&tenantName=' + this.tenantName + '&appGroupName=' + this.selectedAppGroupName + '&hostPoolName=' + this.hostPoolName + '&refresh_token=' + sessionStorage.getItem("Refresh_Token") + '&pageSize=10&sortField=AppAlias&isDescending=false&initialSkip=0';
-    this._AppService.GetData(this.getAllAppGroupAppsGalleryUrl).subscribe(response => {
-      this.GAppslist = false;
-      this.appGroupAppListGallery = JSON.parse(response['_body']);
-      if (this.appGroupAppListGallery) {
-        if (this.appGroupAppListGallery.code == "Invalid Token") {
-          sessionStorage.clear();
-          this.router.navigate(['/invalidtokenmessage']);
-        }
-        else if (this.appGroupAppListGallery.length == 0) {
-          this.GAppslist = true;
-          this.appGalleryErrorFound = false;
-        }
-        else {
-          this.GAppslist = false;
-          this.appGalleryErrorFound = false;
-        }
-        this.galleryAppLoader = false;
-      }
-      this.refreshHostpoolLoading = false;
-    },
-      /*
-       * If Any Error (or) Problem With Services (or) Problem in internet this Error Block Will Exequte
-       */
-      (error) => {
-        this.galleryAppLoader = false;
-        this.refreshHostpoolLoading = false;
-        this.appGalleryErrorFound = true;
+    let Appsfromgallery = JSON.parse(sessionStorage.getItem('Appsfromgallery'));
+    if (sessionStorage.getItem('Appsfromgallery') && Appsfromgallery.length != 0 && Appsfromgallery != null) {
+      this.gettingappsFromGallery();
+    }
+    else {
+      this.galleryAppLoader = true;
+      this.getAllAppGroupAppsGalleryUrl = this._AppService.ApiUrl + '/api/AppGroup/GetStartMenuAppsList?tenantGroupName=' + this.tenantGroupName + '&tenantName=' + this.tenantName + '&appGroupName=' + this.selectedAppGroupName + '&hostPoolName=' + this.hostPoolName + '&refresh_token=' + sessionStorage.getItem("Refresh_Token") + '&pageSize=10&sortField=AppAlias&isDescending=false&initialSkip=0';
+      this._AppService.GetData(this.getAllAppGroupAppsGalleryUrl).subscribe(response => {
         this.GAppslist = false;
-      }
-    );
+        this.appGroupAppListGallery = JSON.parse(response['_body']);
+        sessionStorage.setItem('Appsfromgallery', JSON.stringify(this.appGroupAppListGallery));
+        this.gettingappsFromGallery();
+      },
+        /*
+         * If Any Error (or) Problem With Services (or) Problem in internet this Error Block Will Exequte
+         */
+        (error) => {
+          this.galleryAppLoader = false;
+          this.refreshHostpoolLoading = false;
+          this.appGalleryErrorFound = true;
+          this.GAppslist = false;
+        }
+      );
+    }
   }
 
+  public gettingappsFromGallery() {
+    let responseObject = JSON.parse(sessionStorage.getItem('Appsfromgallery'));
+    if (this.appGroupAppListGallery) {
+      if (this.appGroupAppListGallery.code == "Invalid Token") {
+        sessionStorage.clear();
+        this.router.navigate(['/invalidtokenmessage']);
+      }
+      else if (this.appGroupAppListGallery.length == 0) {
+        this.GAppslist = true;
+        this.appGalleryErrorFound = false;
+      }
+      else {
+        this.GAppslist = false;
+        this.appGalleryErrorFound = false;
+      }
+      this.galleryAppLoader = false;
+    }
+    this.refreshHostpoolLoading = false;
+  }
   /*
    * This function is used to select all the single App(App from Gallery)
    * ----------
