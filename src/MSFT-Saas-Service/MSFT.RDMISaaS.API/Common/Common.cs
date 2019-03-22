@@ -114,6 +114,8 @@ namespace MSFT.RDMISaaS.API.Common
         /// <returns></returns>
         public Login Login(string Code)
         {
+           
+
             string token = GetAccessToken(Code);
             Login loginDetails = JsonConvert.DeserializeObject<Login>(token);
             var handler = new JwtSecurityTokenHandler();
@@ -123,41 +125,81 @@ namespace MSFT.RDMISaaS.API.Common
             loginDetails.Code = "";
 
             //get rele definition
+            //if (loginDetails != null && loginDetails.Access_Token != null)
+            //{
+            //    string deploymentUrl = configurations.rdBrokerUrl;
+            //    List<RdMgmtRoleAssignment> rdMgmtRoleAssignments = new List<RdMgmtRoleAssignment>();
+            //    List<string> list = new List<string>();
+
+            //    rdMgmtRoleAssignments = authorizationBL.GetRoleAssignments(deploymentUrl, loginDetails.Access_Token, loginDetails.Email.ToString());
+            //    for (int i = 0; i < rdMgmtRoleAssignments.Count; i++)
+            //    {
+            //        if (rdMgmtRoleAssignments[i].signInName != null && rdMgmtRoleAssignments[i].signInName.ToString().ToLower() == loginDetails.Email.ToString().ToLower())
+            //        {
+                      //loginDetails.RoleAssignment = rdMgmtRoleAssignments[i];
+            //            if (loginDetails.RoleAssignment.scope.Split('/').Length > 1)
+            //            {
+            //                list.Add(loginDetails.RoleAssignment.scope.Split('/')[1].ToString());
+            //            }
+            //            else
+            //            {
+            //                list.Add(Constants.tenantGroupName);
+            //            }
+            //            //string TenantGroupName = "";
+            //            //if (loginDetails.RoleAssignment.scope.Split('/').Length > 1)
+            //            //{
+            //            //    TenantGroupName = loginDetails.RoleAssignment.scope.Split('/')[1].ToString();
+            //            //}
+            //            //else
+            //            //{
+            //            //    TenantGroupName = Constants.tenantGroupName;
+            //            //}
+            //            //loginDetails.TenantGroupName = TenantGroupName;
+            //            // break;
+            //        }
+            //    }
+            //    loginDetails.TenantGroups = list.ToArray();
+
+            //}
+
+            ////new way to get role assignment
+
             if (loginDetails != null && loginDetails.Access_Token != null)
             {
                 string deploymentUrl = configurations.rdBrokerUrl;
-                List<RdMgmtRoleAssignment> rdMgmtRoleAssignments = new List<RdMgmtRoleAssignment>();
                 List<string> list = new List<string>();
+                HttpResponseMessage httpResponse = authorizationBL.GetRoleAssignments(deploymentUrl, loginDetails.Access_Token, loginDetails.Email.ToString());
+                string strJson = httpResponse.Content.ReadAsStringAsync().Result;
 
-                rdMgmtRoleAssignments = authorizationBL.GetRoleAssignments(deploymentUrl, loginDetails.Access_Token, loginDetails.Email.ToString());
-                for (int i = 0; i < rdMgmtRoleAssignments.Count; i++)
+                if (httpResponse.IsSuccessStatusCode)
                 {
-                    if (rdMgmtRoleAssignments[i].signInName != null && rdMgmtRoleAssignments[i].signInName.ToString().ToLower() == loginDetails.Email.ToString().ToLower())
+                    var rdMgmtRoleAssignments = (JArray)JsonConvert.DeserializeObject(strJson);
+                    for (int i = 0; i < rdMgmtRoleAssignments.Count; i++)
                     {
-                        loginDetails.RoleAssignment = rdMgmtRoleAssignments[i];
-                        if (loginDetails.RoleAssignment.scope.Split('/').Length > 1)
+                        loginDetails.RoleAssignment = new JObject() { { "roleDefinitionName", rdMgmtRoleAssignments[i]["roleDefinitionName"].ToString() },{ "scope", rdMgmtRoleAssignments[i]["scope"].ToString() } } ;
+                        if (rdMgmtRoleAssignments[i]["signInName"] != null && rdMgmtRoleAssignments[i]["signInName"].ToString().ToLower() == loginDetails.Email.ToString().ToLower())
                         {
-                            list.Add(loginDetails.RoleAssignment.scope.Split('/')[1].ToString());
+                            if (rdMgmtRoleAssignments[i]["scope"].ToString().Split('/').Length > 1)
+                            {
+                                list.Add(rdMgmtRoleAssignments[i]["scope"].ToString().Split('/')[1].ToString());
+                            }
+                            else
+                            {
+                                list.Add(Constants.tenantGroupName);
+                            }
                         }
-                        else
-                        {
-                            list.Add(Constants.tenantGroupName);
-                        }
-                        //string TenantGroupName = "";
-                        //if (loginDetails.RoleAssignment.scope.Split('/').Length > 1)
-                        //{
-                        //    TenantGroupName = loginDetails.RoleAssignment.scope.Split('/')[1].ToString();
-                        //}
-                        //else
-                        //{
-                        //    TenantGroupName = Constants.tenantGroupName;
-                        //}
-                        //loginDetails.TenantGroupName = TenantGroupName;
-                        // break;
                     }
+                    loginDetails.TenantGroups = list.ToArray();
+                    //return loginDetails;
                 }
-                loginDetails.TenantGroups = list.ToArray();
-
+                else if(httpResponse.StatusCode.ToString()=="429")
+                {
+                    loginDetails.Error = new JObject() { { "StatusCode", httpResponse.StatusCode.ToString() }, { "Message", strJson } };
+                }
+            }
+            else
+            {
+                return null;
             }
             return loginDetails;
         }
