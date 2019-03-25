@@ -15,7 +15,7 @@ namespace MSFT.RDMISaaS.API.BLL
     #region "RegistrationInfoBL"
     public class RegistrationInfoBL
     {
-        RegistrationInfoResult infoResult = new RegistrationInfoResult();
+        JObject infoResult = new JObject();
        // string tenantGroup = Constants.tenantGroupName;
 
         /// <summary>
@@ -56,47 +56,47 @@ namespace MSFT.RDMISaaS.API.BLL
         /// <param name="accessToken"></param>
         /// <param name="rdMgmtRegistrationInfo"></param>
         /// <returns></returns>
-        public RegistrationInfoResult CreateRegistrationInfo(string deploymentUrl, string accessToken, RdMgmtRegistrationInfo rdMgmtRegistrationInfo)
+        public JObject CreateRegistrationInfo(string deploymentUrl, string accessToken, JObject rdMgmtRegistrationInfo)
         {
             try
             {
-                RegistrationInfoDTO registrationInfoDTO = new RegistrationInfoDTO();
-                registrationInfoDTO.tenantName = rdMgmtRegistrationInfo.tenantName;
-                registrationInfoDTO.hostPoolName = rdMgmtRegistrationInfo.hostPoolName;
-                registrationInfoDTO.expirationTime = rdMgmtRegistrationInfo.expirationUtc;
-                registrationInfoDTO.tenantGroupName = rdMgmtRegistrationInfo.tenantGroupName;
+                //RegistrationInfoDTO registrationInfoDTO = new RegistrationInfoDTO();
+                //registrationInfoDTO.tenantName = rdMgmtRegistrationInfo.tenantName;
+                //registrationInfoDTO.hostPoolName = rdMgmtRegistrationInfo.hostPoolName;
+                //registrationInfoDTO.expirationTime = rdMgmtRegistrationInfo.expirationUtc;
+                //registrationInfoDTO.tenantGroupName = rdMgmtRegistrationInfo.tenantGroupName;
 
                 //call rest api to generate registration key -- july code bit
-                var content = new StringContent(JsonConvert.SerializeObject(registrationInfoDTO), Encoding.UTF8, "application/json");
-                HttpResponseMessage response = CommonBL.InitializeHttpClient(deploymentUrl, accessToken).PostAsync("/RdsManagement/V1/TenantGroups/" + rdMgmtRegistrationInfo.tenantGroupName + "/Tenants/" + rdMgmtRegistrationInfo.tenantName + "/HostPools/" + rdMgmtRegistrationInfo.hostPoolName + "/RegistrationInfos/", content).Result;
+                var content = new StringContent(JsonConvert.SerializeObject(rdMgmtRegistrationInfo), Encoding.UTF8, "application/json");
+                HttpResponseMessage response = CommonBL.InitializeHttpClient(deploymentUrl, accessToken).PostAsync("/RdsManagement/V1/TenantGroups/" + rdMgmtRegistrationInfo["tenantGroupName"].ToString() + "/Tenants/" + rdMgmtRegistrationInfo["tenantName"].ToString() + "/HostPools/" + rdMgmtRegistrationInfo["hostPoolName"].ToString() + "/RegistrationInfos/", content).Result;
 
                 string strJson = response.Content.ReadAsStringAsync().Result;
                 if (response.IsSuccessStatusCode)
                 {
                     if (response.StatusCode.ToString().ToLower() == "created")
                     {
-                        infoResult.isSuccess = true;
-                        infoResult.message = "Registration Key has been generated for hostpool '" + rdMgmtRegistrationInfo.hostPoolName + "' successfully.";
+                        infoResult.Add("isSuccess", true);
+                        infoResult.Add("message", "Registration Key has been generated for hostpool '" + rdMgmtRegistrationInfo["hostPoolName"].ToString() + "' successfully.");
                     }
                 }
                 else
                 {
                     if (!string.IsNullOrEmpty(strJson))
                     {
-                        infoResult.isSuccess = false;
-                        infoResult.message = CommonBL.GetErrorMessage(strJson);
+                        infoResult.Add("isSuccess", false);
+                        infoResult.Add("message", CommonBL.GetErrorMessage(strJson));
                     }
                     else
                     {
-                        infoResult.isSuccess = false;
-                        infoResult.message = "Registration Key has not been generated. Please try again later.";
+                        infoResult.Add("isSuccess", false);
+                        infoResult.Add("message", "Registration Key has not been generated. Please try again later.");
                     }
                 }
             }
             catch (Exception ex)
             {
-                infoResult.isSuccess = false;
-                infoResult.message = "Registration Key has not been generated."+ex.Message.ToString()+" Please try it later again.";
+                infoResult.Add("isSuccess", false);
+                infoResult.Add("message", "Registration Key has not been generated." +ex.Message.ToString()+" Please try it later again.");
             }
             return infoResult;
         }
@@ -109,7 +109,7 @@ namespace MSFT.RDMISaaS.API.BLL
         /// <param name="tenantName">Name of Tenant</param>
         /// <param name="hostPoolName">Name of hostpool</param>
         /// <returns></returns>
-        public RegistrationInfoResult DeleteRegistrationInfo(string tenantGroupName,string deploymentUrl, string accessToken, string tenantName, string hostPoolName)
+        public JObject DeleteRegistrationInfo(string tenantGroupName,string deploymentUrl, string accessToken, string tenantName, string hostPoolName)
         {
             try
             {
@@ -119,27 +119,27 @@ namespace MSFT.RDMISaaS.API.BLL
                 string strJson = response.Content.ReadAsStringAsync().Result;
                 if (response.IsSuccessStatusCode)
                 {
-                    infoResult.isSuccess = true;
-                    infoResult.message = "Registration Key has been deleted successully.";
+                    infoResult.Add("isSuccess", true);
+                    infoResult.Add("message", "Registration Key has been deleted successully.");
                 }
                 else
                 {
                     if (!string.IsNullOrEmpty(strJson))
                     {
-                        infoResult.isSuccess = false;
-                        infoResult.message = CommonBL.GetErrorMessage(strJson);
+                        infoResult.Add("isSuccess", false);
+                        infoResult.Add("message", CommonBL.GetErrorMessage(strJson));
                     }
                     else
                     {
-                        infoResult.isSuccess = false;
-                        infoResult.message = "Registration Key has not been deleted. Please try it later again.";
+                        infoResult.Add("isSuccess", false);
+                        infoResult.Add("message", "Registration Key has not been deleted. Please try it later again.");
                     }
                 }
             }
             catch (Exception ex)
             {
-                infoResult.isSuccess = false;
-                infoResult.message = "Registration Key has been deleted."+ex.Message.ToString()+" Please try again later.";
+                infoResult.Add("isSuccess", false);
+                infoResult.Add("message", "Registration Key has been deleted." +ex.Message.ToString()+" Please try again later.");
             }
             return infoResult;
         }

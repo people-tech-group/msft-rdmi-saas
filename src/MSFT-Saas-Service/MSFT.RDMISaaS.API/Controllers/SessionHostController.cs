@@ -21,7 +21,7 @@ namespace MSFT.RDMISaaS.API.Controllers
     {
         #region "Class level Declaration"
         SessionHostBL sessionHostBL = new SessionHostBL();
-        SessionHostResult hostResult = new SessionHostResult();
+        JObject hostResult = new JObject();
         Common.Common common = new Common.Common();
         Common.Configurations configurations = new Common.Configurations();
         string deploymentUrl = "";
@@ -115,7 +115,7 @@ namespace MSFT.RDMISaaS.API.Controllers
         /// </summary>
         /// <param name="rdMgmtSessionHost"> Session  Host class</param>
         /// <returns></returns>
-        public IHttpActionResult Put(RdMgmtSessionHost rdMgmtSessionHost)
+        public IHttpActionResult Put(JObject rdMgmtSessionHost)
         {
             //get deployment url
             deploymentUrl = configurations.rdBrokerUrl;
@@ -123,32 +123,32 @@ namespace MSFT.RDMISaaS.API.Controllers
             {
                 if (rdMgmtSessionHost != null)
                 {
-                    if (!string.IsNullOrEmpty(rdMgmtSessionHost.refresh_token))
+                    if (!string.IsNullOrEmpty(rdMgmtSessionHost["refresh_token"].ToString()))
                     {
                         string accessToken = "";
                         //get token value
-                        accessToken = common.GetTokenValue(rdMgmtSessionHost.refresh_token);
+                        accessToken = common.GetTokenValue(rdMgmtSessionHost["refresh_token"].ToString());
                         if (!string.IsNullOrEmpty(accessToken) && accessToken.ToString().ToLower() != invalidToken && accessToken.ToString().ToLower() != invalidCode)
                         {
                             hostResult = sessionHostBL.UpdateSessionHost(deploymentUrl, accessToken, rdMgmtSessionHost);
                         }
                         else
                         {
-                            hostResult.isSuccess = false;
-                            hostResult.message = Constants.invalidToken;
+                            hostResult.Add("isSuccess", false);
+                            hostResult.Add("message", Constants.invalidToken);
                         }
                     }
                 }
                 else
                 {
-                    hostResult.isSuccess = false;
-                    hostResult.message = Constants.invalidDataMessage;
+                    hostResult.Add("isSuccess", false);
+                    hostResult.Add("message", Constants.invalidDataMessage);
                 }
             }
             catch (Exception ex)
             {
-                hostResult.isSuccess = false;
-                hostResult.message = "Host '" + rdMgmtSessionHost.sessionHostName + "' has not been updated." + ex.Message.ToString() + " Please try again later.";
+                hostResult.Add("isSuccess", false);
+                hostResult.Add("message", "Host '" + rdMgmtSessionHost["sessionHostName"].ToString() + "' has not been updated." + ex.Message.ToString() + " Please try again later.");
             }
             return Ok(hostResult);
         }

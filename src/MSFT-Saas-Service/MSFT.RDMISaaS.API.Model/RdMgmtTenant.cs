@@ -53,6 +53,7 @@ namespace MSFT.RDMISaaS.API.Model
         public string ssoAdfsAuthority { get; set; }
         public string ssoClientId { get; set; }
         public string ssoClientSecret { get; set; }
+        public string azureSubscriptionId { get; set; }
     }
     #endregion  "Class - TenantDataDTO"
 
