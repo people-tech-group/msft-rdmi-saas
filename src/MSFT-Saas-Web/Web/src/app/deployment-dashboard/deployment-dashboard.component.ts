@@ -44,7 +44,7 @@ export class DeploymentDashboardComponent implements OnInit {
   public searchTenants: any = [];
   private sub: any;
   public editedBody: boolean = false;
-  public tenantsList: any;
+  public tenantsList: number = 1;
   public tenants: any;
   public tenantDeleteUrl: any;
   public tenantUrl: any;
@@ -74,6 +74,8 @@ export class DeploymentDashboardComponent implements OnInit {
     timeOut: 2000,
     position: ["top", "right"]
   };
+  public errorMessage: string;
+  public error: boolean = false;
   tenantForm;
   tenantFormEdit;
   deploymentID = 0;
@@ -380,6 +382,16 @@ export class DeploymentDashboardComponent implements OnInit {
     }
   }
 
+  /**
+   * This function will calculate and return absolute index of gallery apps.
+   * -------------------
+   * @param indexOnPage - Accepts App Index from gallery Apps
+   * -------------------
+   */
+  absoluteIndex(indexOnPage: number): number {
+    return this.listItems * (this.tenantsList - 1) + indexOnPage;
+  }
+
   /* This function that triggers on click of  Tenants table row click
    * --------------
    * Parameters
@@ -492,7 +504,8 @@ export class DeploymentDashboardComponent implements OnInit {
     this.adminMenuComponent.GetAllTenants();
     this.refreshTenantLoading = true;
     let Tenants = JSON.parse(sessionStorage.getItem('Tenants'));
-    if (sessionStorage.getItem('Tenants') && Tenants.length != 0 && Tenants != null) {
+    let TenantGroupName = localStorage.getItem('TenantGroupName');
+    if (sessionStorage.getItem('Tenants') && Tenants.length != 0 && Tenants != null && TenantGroupName == this.tenantGroupName) {
       this.gettingTenants();
     }
     else {
@@ -501,11 +514,18 @@ export class DeploymentDashboardComponent implements OnInit {
       // this.getTenantsUrl = this._AppService.ApiUrl + '/api/Tenant/GetTenantList?tenantGroupName=' + this.tenantGroupName + '&refresh_token=' + this.refreshToken + '&pageSize=' + this.pageSize + '&sortField=TenantName&isDescending=false&initialSkip=' + this.initialSkip + '&lastEntry=' + this.lastEntry;
       this.getTenantsUrl = this._AppService.ApiUrl + '/api/Tenant/GetTenantList?tenantGroupName=' + this.tenantGroupName + '&refresh_token=' + this.refreshToken;
       this._AppService.GetTenants(this.getTenantsUrl).subscribe(response => {
-        let responseObject = JSON.parse(response['_body']);
-        sessionStorage.setItem('Tenants', JSON.stringify(responseObject));
-        this.ShowTenantgroupError = false;
-        this.gettingTenants();
-        this.GetcurrentNoOfPagesCount();
+        if(response.status == 429){
+          this.error = true;
+          this.errorMessage = response.statusText;
+        }
+        else{
+          this.error = false;
+          let responseObject = JSON.parse(response['_body']);
+          sessionStorage.setItem('Tenants', JSON.stringify(responseObject));
+          this.ShowTenantgroupError = false;
+          this.gettingTenants();
+          this.GetcurrentNoOfPagesCount();
+        }
       },
         /*
          * If Any Error (or) Problem With Services (or) Problem in internet this Error Block Will Execute
