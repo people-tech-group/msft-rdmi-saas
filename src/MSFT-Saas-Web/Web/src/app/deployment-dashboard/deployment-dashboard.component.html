@@ -99,7 +99,7 @@
                 </tbody>
               </table>
               <!-- pagination code -->
-              <ul class="pagination  pull-right" *ngIf="!(editedBody || tenantlistErrorFound)">
+              <!-- <ul class="pagination  pull-right" *ngIf="!(editedBody || tenantlistErrorFound)">
                 <li [ngClass]="{disabled:currentPageNo === 1 ,  link:currentPageNo === 1}">
                   <a (click)="previousPage()">Previous</a>
                 </li>
@@ -109,7 +109,11 @@
                 <li [ngClass]="{disabled:currentNoOfPagesCount === currentPageNo ,  link:currentNoOfPagesCount === currentPageNo}">
                   <a (click)="NextPage()">Next</a>
                 </li>
-              </ul>
+              </ul> -->
+              <!-- pagination code -->
+              <div class="row" style="margin: 0;" *ngIf="!(editedBody || tenantlistErrorFound)">
+                <pagination-controls (pageChange)="tenantslist = $event" class="pagination pull-right" id="tenants"></pagination-controls>
+              </div>
               <!-- displays "No tenants to display" message  when there are no tenants in the table -->
               <div class="EmptyTableMsg" *ngIf="editedBody">
                 <div style="text-align:center">

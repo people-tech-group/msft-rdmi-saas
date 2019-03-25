@@ -175,7 +175,7 @@
                 </tbody>
               </table>
               <!-- pagination code -->
-              <ul class="pagination  pull-right" *ngIf="!(editedBody || hostpoollistErrorFound)">
+              <!-- <ul class="pagination  pull-right" *ngIf="!(editedBody || hostpoollistErrorFound)">
                 <li [ngClass]="{disabled:currentPageNo === 1 ,  link:currentPageNo === 1}">
                   <a (click)="previousPage()">Previous</a>
                 </li>
@@ -185,12 +185,12 @@
                 <li [ngClass]="{disabled:currentNoOfPagesCountHostpool === currentPageNo ,  link:currentNoOfPagesCountHostpool === currentPageNo}">
                   <a (click)="NextPage()">Next</a>
                 </li>
-              </ul>
+              </ul> -->
               <!-- pagination code -->
-              <!--<div class="row" style="margin: 0;" *ngIf="!(editedBody || hostpoollistErrorFound)">
+              <div class="row" style="margin: 0;" *ngIf="!(editedBody || hostpoollistErrorFound)">
                 <pagination-controls (pageChange)="Hostpoollist = $event" class="pagination pull-right" id="Hostpool"></pagination-controls>
               </div>
-              <div>-->
+              <div>
               <div>
                 <!-- displays "No Hostpool to display" message  when there are no hostpools in the table -->
                 <div class="EmptyTableMsg" *ngIf="editedBody">
