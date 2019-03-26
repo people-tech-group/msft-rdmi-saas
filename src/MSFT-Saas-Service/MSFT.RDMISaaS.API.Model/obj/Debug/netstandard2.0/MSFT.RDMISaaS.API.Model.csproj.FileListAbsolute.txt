@@ -1,0 +1,16 @@
+E:\Repos\msft-rdmi-saas\src\MSFT-Saas-Service\MSFT.RDMISaaS.API.Model\bin\Debug\netstandard2.0\MSFT.RDMISaaS.API.Model.deps.json
+E:\Repos\msft-rdmi-saas\src\MSFT-Saas-Service\MSFT.RDMISaaS.API.Model\bin\Debug\netstandard2.0\MSFT.RDMISaaS.API.Model.dll
+E:\Repos\msft-rdmi-saas\src\MSFT-Saas-Service\MSFT.RDMISaaS.API.Model\bin\Debug\netstandard2.0\MSFT.RDMISaaS.API.Model.pdb
+E:\Repos\msft-rdmi-saas\src\MSFT-Saas-Service\MSFT.RDMISaaS.API.Model\bin\Debug\netstandard2.0\System.ComponentModel.DataAnnotations.dll
+E:\Repos\msft-rdmi-saas\src\MSFT-Saas-Service\MSFT.RDMISaaS.API.Model\bin\Debug\netstandard2.0\System.Configuration.dll
+E:\Repos\msft-rdmi-saas\src\MSFT-Saas-Service\MSFT.RDMISaaS.API.Model\bin\Debug\netstandard2.0\System.Security.dll
+E:\Repos\msft-rdmi-saas\src\MSFT-Saas-Service\MSFT.RDMISaaS.API.Model\bin\Debug\netstandard2.0\System.ComponentModel.DataAnnotations.xml
+E:\Repos\msft-rdmi-saas\src\MSFT-Saas-Service\MSFT.RDMISaaS.API.Model\bin\Debug\netstandard2.0\System.Configuration.xml
+E:\Repos\msft-rdmi-saas\src\MSFT-Saas-Service\MSFT.RDMISaaS.API.Model\bin\Debug\netstandard2.0\System.Security.xml
+E:\Repos\msft-rdmi-saas\src\MSFT-Saas-Service\MSFT.RDMISaaS.API.Model\obj\Debug\netstandard2.0\MSFT.RDMISaaS.API.Model.csprojAssemblyReference.cache
+E:\Repos\msft-rdmi-saas\src\MSFT-Saas-Service\MSFT.RDMISaaS.API.Model\obj\Debug\netstandard2.0\MSFT.RDMISaaS.API.Model.csproj.CoreCompileInputs.cache
+E:\Repos\msft-rdmi-saas\src\MSFT-Saas-Service\MSFT.RDMISaaS.API.Model\obj\Debug\netstandard2.0\MSFT.RDMISaaS.API.Model.AssemblyInfoInputs.cache
+E:\Repos\msft-rdmi-saas\src\MSFT-Saas-Service\MSFT.RDMISaaS.API.Model\obj\Debug\netstandard2.0\MSFT.RDMISaaS.API.Model.AssemblyInfo.cs
+E:\Repos\msft-rdmi-saas\src\MSFT-Saas-Service\MSFT.RDMISaaS.API.Model\obj\Debug\netstandard2.0\MSFT.RDMISaaS.API.Model.csproj.CopyComplete
+E:\Repos\msft-rdmi-saas\src\MSFT-Saas-Service\MSFT.RDMISaaS.API.Model\obj\Debug\netstandard2.0\MSFT.RDMISaaS.API.Model.dll
+E:\Repos\msft-rdmi-saas\src\MSFT-Saas-Service\MSFT.RDMISaaS.API.Model\obj\Debug\netstandard2.0\MSFT.RDMISaaS.API.Model.pdb
