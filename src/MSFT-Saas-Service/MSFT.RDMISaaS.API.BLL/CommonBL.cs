@@ -31,6 +31,7 @@ namespace MSFT.WVDSaaS.API.BLL
             client.BaseAddress = new Uri(deploymentUrl);
             client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", accessToken);
             client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+            client.Timeout = TimeSpan.FromMinutes(10);
             return client;
         }
 
