@@ -2220,7 +2220,11 @@ export class HostpoolDashboardComponent implements OnInit {
     //     this.refreshHostpoolLoading = false;
     //   }
     // );
-    this.GetAllAppGroupApps();
+    if(this.selectedRadioBtn == 'RemoteApp'){
+      this.GetAllAppGroupApps();
+    }else{
+      this.GetAppGroupUsers();
+    }
   }
 
   /*

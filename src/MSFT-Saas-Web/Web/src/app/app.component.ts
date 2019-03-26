@@ -155,6 +155,7 @@ export class AppComponent implements OnInit {
             sessionStorage.setItem('Scope', this.scope);
             this.profileEmail = respdata.Email;
             sessionStorage.setItem("Refresh_Token", respdata.Refresh_Token);
+            sessionStorage.setItem("redirectUri", this.redirectUri);
             var roleDef = respdata.RoleAssignment.scope.substring(1).split("/");
             sessionStorage.setItem('profileEmail', this.profileEmail);
             sessionStorage.setItem('gotCode', 'no');
@@ -176,6 +177,7 @@ export class AppComponent implements OnInit {
         var loginUrl = values.json();
         sessionStorage.setItem("redirectUri", loginUrl.split('&')[2].split('=')[1]);
         sessionStorage.setItem('gotCode', 'yes');
+        this.redirectUri = loginUrl.split('&')[2].split('=')[1];
         window.location.replace(loginUrl);
       });
     }
