@@ -3018,12 +3018,8 @@ export class HostpoolDashboardComponent implements OnInit {
    * This function is used to get All AppGroup RemoteApps from Gallery
    */
   public GetAllAppGroupAppsGallery() {
-    let Appsfromgallery = JSON.parse(sessionStorage.getItem('Appsfromgallery'));
-    if (sessionStorage.getItem('Appsfromgallery') && Appsfromgallery.length != 0 && Appsfromgallery != null) {
-      this.gettingappsFromGallery();
-    }
-    else {
       this.galleryAppLoader = true;
+      this.appGroupAppListGallery = [];
       //this.getAllAppGroupAppsGalleryUrl = this._AppService.ApiUrl + '/api/AppGroup/GetStartMenuAppsList?tenantGroupName=' + this.tenantGroupName + '&tenantName=' + this.tenantName + '&appGroupName=' + this.selectedAppGroupName + '&hostPoolName=' + this.hostPoolName + '&refresh_token=' + sessionStorage.getItem("Refresh_Token") + '&pageSize=10&sortField=AppAlias&isDescending=false&initialSkip=0';
       this.getAllAppGroupAppsGalleryUrl = this._AppService.ApiUrl + '/api/AppGroup/GetStartMenuAppsList?tenantGroupName=' + this.tenantGroupName + '&tenantName=' + this.tenantName + '&appGroupName=' + this.selectedAppGroupName + '&hostPoolName=' + this.hostPoolName + '&refresh_token=' + sessionStorage.getItem("Refresh_Token");// + '&pageSize=10&sortField=AppAlias&isDescending=false&initialSkip=0';
       this._AppService.GetData(this.getAllAppGroupAppsGalleryUrl).subscribe(response => {
@@ -3035,8 +3031,22 @@ export class HostpoolDashboardComponent implements OnInit {
           this.error = false;
           this.GAppslist = false;
           this.appGroupAppListGallery = JSON.parse(response['_body']);
-          sessionStorage.setItem('Appsfromgallery', JSON.stringify(this.appGroupAppListGallery));
-          this.gettingappsFromGallery();
+          if (this.appGroupAppListGallery) {
+            if (this.appGroupAppListGallery.code == "Invalid Token") {
+              sessionStorage.clear();
+              this.router.navigate(['/invalidtokenmessage']);
+            }
+            else if (this.appGroupAppListGallery.length == 0) {
+              this.GAppslist = true;
+              this.appGalleryErrorFound = false;
+            }
+            else {
+              this.GAppslist = false;
+              this.appGalleryErrorFound = false;
+            }
+            this.galleryAppLoader = false;
+          }
+          this.refreshHostpoolLoading = false;
         }
       },
         /*
@@ -3052,28 +3062,8 @@ export class HostpoolDashboardComponent implements OnInit {
           this.GAppslist = false;
         }
       );
-    }
   }
 
-  public gettingappsFromGallery() {
-    let responseObject = JSON.parse(sessionStorage.getItem('Appsfromgallery'));
-    if (this.appGroupAppListGallery) {
-      if (this.appGroupAppListGallery.code == "Invalid Token") {
-        sessionStorage.clear();
-        this.router.navigate(['/invalidtokenmessage']);
-      }
-      else if (this.appGroupAppListGallery.length == 0) {
-        this.GAppslist = true;
-        this.appGalleryErrorFound = false;
-      }
-      else {
-        this.GAppslist = false;
-        this.appGalleryErrorFound = false;
-      }
-      this.galleryAppLoader = false;
-    }
-    this.refreshHostpoolLoading = false;
-  }
   /*
    * This function is used to select all the single App(App from Gallery)
    * ----------
