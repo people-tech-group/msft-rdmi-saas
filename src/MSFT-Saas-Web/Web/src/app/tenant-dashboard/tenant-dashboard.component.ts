@@ -774,11 +774,9 @@ export class TenantDashboardComponent implements OnInit {
         }
       },
         error => {
-          if (error.status == 404) {
-            this.error = true;
-            let errorBody = JSON.parse(error['_body']);
-            this.errorMessage = errorBody.error.target;
-          }
+          this.error = true;
+          let errorBody = JSON.parse(error['_body']);
+          this.errorMessage = errorBody.error.target;
         }
       );
     }
@@ -830,11 +828,9 @@ export class TenantDashboardComponent implements OnInit {
          * If Any Error (or) Problem With Services (or) Problem in internet this Error Block Will Exequte
          */
         error => {
-          if (error.status == 404) {
-            this.error = true;
-            let errorBody = JSON.parse(error['_body']);
-            this.errorMessage = errorBody.error.target;
-          }
+          this.error = true;
+          let errorBody = JSON.parse(error['_body']);
+          this.errorMessage = errorBody.error.target;
           this.refreshHostpoolLoading = false;
           this.hostpoollistErrorFound = true;
         }
