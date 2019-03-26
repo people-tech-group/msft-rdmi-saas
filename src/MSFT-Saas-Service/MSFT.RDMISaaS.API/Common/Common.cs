@@ -208,7 +208,6 @@ namespace MSFT.WVDSaaS.API.Common
                     {
                         return null;
                     }
-
                     /*** use following code for temporary*****/
                     //loginDetails.RoleAssignment = new JObject() { { "roleDefinitionName", "RDS Owner" }, { "scope", "/Ptg" } };
                     //loginDetails.TenantGroups = new string[] { "Default Tenant Group", "Ptg" };
