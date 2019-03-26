@@ -17,7 +17,7 @@ namespace MSFT.RDMISaaS.API.BLL
     #region "class-AppGroupBL"
     public class AppGroupBL
     {
-        AppGroupResult groupResult = new AppGroupResult();
+        JObject groupResult = new JObject();
         // string tenantGroup = Constants.tenantGroupName;
 
 
@@ -307,53 +307,53 @@ namespace MSFT.RDMISaaS.API.BLL
         /// <param name="accessToken"> Access Token</param>
         /// <param name="rdMgmtAppGroup"> App Group Class </param>
         /// <returns></returns>
-        public AppGroupResult CreateAppGroup(string deploymentUrl, string accessToken, RdMgmtAppGroup rdMgmtAppGroup)
+        public JObject CreateAppGroup(string deploymentUrl, string accessToken, JObject rdMgmtAppGroup)
         {
             try
             {
-                AppGroupDTO appGroupDTO = new AppGroupDTO();
-                appGroupDTO.tenantGroupName = rdMgmtAppGroup.tenantGroupName;
-                appGroupDTO.appGroupName = rdMgmtAppGroup.appGroupName;
-                appGroupDTO.description = rdMgmtAppGroup.description;
-                appGroupDTO.friendlyName = rdMgmtAppGroup.friendlyName;
-                appGroupDTO.hostPoolName = rdMgmtAppGroup.hostPoolName;
-                appGroupDTO.resourceType = Convert.ToInt32(rdMgmtAppGroup.resourceType);
-                appGroupDTO.tenantName = rdMgmtAppGroup.tenantName;
+                //AppGroupDTO appGroupDTO = new AppGroupDTO();
+                //appGroupDTO.tenantGroupName = rdMgmtAppGroup.tenantGroupName;
+                //appGroupDTO.appGroupName = rdMgmtAppGroup.appGroupName;
+                //appGroupDTO.description = rdMgmtAppGroup.description;
+                //appGroupDTO.friendlyName = rdMgmtAppGroup.friendlyName;
+                //appGroupDTO.hostPoolName = rdMgmtAppGroup.hostPoolName;
+                //appGroupDTO.resourceType = Convert.ToInt32(rdMgmtAppGroup.resourceType);
+                //appGroupDTO.tenantName = rdMgmtAppGroup.tenantName;
 
 
                 //call rest service to create app group -- july code bit
-                var content = new StringContent(JsonConvert.SerializeObject(appGroupDTO), Encoding.UTF8, "application/json");
-                HttpResponseMessage response = CommonBL.InitializeHttpClient(deploymentUrl, accessToken).PostAsync("/RdsManagement/V1/TenantGroups/" + rdMgmtAppGroup.tenantGroupName + "/Tenants/" + appGroupDTO.tenantName + "/HostPools/" + appGroupDTO.hostPoolName + "/AppGroups/" + appGroupDTO.appGroupName, content).Result;
+                var content = new StringContent(JsonConvert.SerializeObject(rdMgmtAppGroup), Encoding.UTF8, "application/json");
+                HttpResponseMessage response = CommonBL.InitializeHttpClient(deploymentUrl, accessToken).PostAsync("/RdsManagement/V1/TenantGroups/" + rdMgmtAppGroup["tenantGroupName"].ToString() + "/Tenants/" + rdMgmtAppGroup["tenantName"].ToString() + "/HostPools/" + rdMgmtAppGroup["hostPoolName"].ToString() + "/AppGroups/" + rdMgmtAppGroup["appGroupName"].ToString(), content).Result;
                 string strJson = response.Content.ReadAsStringAsync().Result;
                 if (response.IsSuccessStatusCode)
                 {
-                    groupResult.isSuccess = true;
-                    groupResult.message = "App group '" + appGroupDTO.appGroupName + "' has been created successfully.";
+                    groupResult.Add("isSuccess", true);
+                    groupResult.Add("message", "App group '" + rdMgmtAppGroup["appGroupName"].ToString() + "' has been created successfully.");
                 }
                 else if ((int)response.StatusCode == 429)
                 {
-                    groupResult.isSuccess = false;
-                    groupResult.message = strJson + " Please try again later.";
+                    groupResult.Add("isSuccess", false);
+                    groupResult.Add("message", strJson + " Please try again later.");
                 }
                 else
                 {
 
                     if (!string.IsNullOrEmpty(strJson))
                     {
-                        groupResult.isSuccess = false;
-                        groupResult.message = CommonBL.GetErrorMessage(strJson);
+                        groupResult.Add("isSuccess", false);
+                        groupResult.Add("message", CommonBL.GetErrorMessage(strJson));
                     }
                     else
                     {
-                        groupResult.isSuccess = false;
-                        groupResult.message = "AppGroup '" + rdMgmtAppGroup.appGroupName + "' has not been created. Please try it later again.";
+                        groupResult.Add("isSuccess", false);
+                        groupResult.Add("message", "AppGroup '" + rdMgmtAppGroup["appGroupName"].ToString() + "' has not been created. Please try it later again.");
                     }
                 }
             }
             catch (Exception ex)
             {
-                groupResult.isSuccess = false;
-                groupResult.message = "AppGroup '" + rdMgmtAppGroup.appGroupName + "' has not been created." + ex.Message.ToString() + " Please try it later again.";
+                groupResult.Add("isSuccess", false);
+                groupResult.Add("message", "AppGroup '" + rdMgmtAppGroup["appGroupName"].ToString() + "' has not been created." + ex.Message.ToString() + " Please try it later again.");
             }
             return groupResult;
         }
@@ -365,52 +365,52 @@ namespace MSFT.RDMISaaS.API.BLL
         /// <param name="accessToken">Access Token</param>
         /// <param name="rdMgmtAppGroup">App Group Class </param>
         /// <returns></returns>
-        public AppGroupResult UpdateAppGroup(string deploymentUrl, string accessToken, RdMgmtAppGroup rdMgmtAppGroup)
+        public JObject UpdateAppGroup(string deploymentUrl, string accessToken, JObject rdMgmtAppGroup)
         {
             try
             {
-                AppGroupDTO appGroupDTO = new AppGroupDTO();
-                appGroupDTO.tenantGroupName = rdMgmtAppGroup.tenantGroupName;
-                appGroupDTO.appGroupName = rdMgmtAppGroup.appGroupName;
-                appGroupDTO.description = rdMgmtAppGroup.description;
-                appGroupDTO.friendlyName = rdMgmtAppGroup.friendlyName;
-                appGroupDTO.hostPoolName = rdMgmtAppGroup.hostPoolName;
-                appGroupDTO.resourceType = Convert.ToInt32(rdMgmtAppGroup.resourceType);
-                appGroupDTO.tenantName = rdMgmtAppGroup.tenantName;
+                //AppGroupDTO appGroupDTO = new AppGroupDTO();
+                //appGroupDTO.tenantGroupName = rdMgmtAppGroup.tenantGroupName;
+                //appGroupDTO.appGroupName = rdMgmtAppGroup.appGroupName;
+                //appGroupDTO.description = rdMgmtAppGroup.description;
+                //appGroupDTO.friendlyName = rdMgmtAppGroup.friendlyName;
+                //appGroupDTO.hostPoolName = rdMgmtAppGroup.hostPoolName;
+                //appGroupDTO.resourceType = Convert.ToInt32(rdMgmtAppGroup.resourceType);
+                //appGroupDTO.tenantName = rdMgmtAppGroup.tenantName;
 
                 //call rest service to update app group details 
-                var content = new StringContent(JsonConvert.SerializeObject(appGroupDTO), Encoding.UTF8, "application/json");
-                HttpResponseMessage response = CommonBL.PatchAsync(deploymentUrl, accessToken, "/RdsManagement/V1/TenantGroups/" + rdMgmtAppGroup.tenantGroupName + "/Tenants/" + appGroupDTO.tenantName + "/HostPools/" + appGroupDTO.hostPoolName + "/AppGroups/" + appGroupDTO.appGroupName, content).Result;
+                var content = new StringContent(JsonConvert.SerializeObject(rdMgmtAppGroup), Encoding.UTF8, "application/json");
+                HttpResponseMessage response = CommonBL.PatchAsync(deploymentUrl, accessToken, "/RdsManagement/V1/TenantGroups/" + rdMgmtAppGroup["tenantGroupName"].ToString() + "/Tenants/" + rdMgmtAppGroup["tenantName"].ToString() + "/HostPools/" + rdMgmtAppGroup["hostPoolName"].ToString() + "/AppGroups/" + rdMgmtAppGroup["appGroupName"].ToString(), content).Result;
                 string strJson = response.Content.ReadAsStringAsync().Result;
                 if (response.IsSuccessStatusCode)
                 {
                     //Deserialize the string to JSON object
-                    groupResult.isSuccess = true;
-                    groupResult.message = "App group '" + appGroupDTO.appGroupName + "' has been updated successfully.";
+                    groupResult.Add("isSuccess", true);
+                    groupResult.Add("message", "App group '" + rdMgmtAppGroup["appGroupName"].ToString() + "' has been updated successfully.");
                 }
                 else if ((int)response.StatusCode == 429)
                 {
-                    groupResult.isSuccess = false;
-                    groupResult.message = strJson + " Please try again later.";
+                    groupResult.Add("isSuccess", false);
+                    groupResult.Add("message", strJson + " Please try again later.");
                 }
                 else
                 {
                     if (!string.IsNullOrEmpty(strJson))
                     {
-                        groupResult.isSuccess = false;
-                        groupResult.message = CommonBL.GetErrorMessage(strJson);
+                        groupResult.Add("isSuccess", false);
+                        groupResult.Add("message", CommonBL.GetErrorMessage(strJson));
                     }
                     else
                     {
-                        groupResult.isSuccess = false;
-                        groupResult.message = "AppGroup '" + rdMgmtAppGroup.appGroupName + "' has not been updated. Please try it later again.";
+                        groupResult.Add("isSuccess", false);
+                        groupResult.Add("message", "AppGroup '" + rdMgmtAppGroup["appGroupName"].ToString() + "' has not been updated. Please try it later again.");
                     }
                 }
             }
             catch (Exception ex)
             {
-                groupResult.isSuccess = false;
-                groupResult.message = "AppGroup '" + rdMgmtAppGroup.appGroupName + "' has not been updated." + ex.Message.ToString() + " Please try it later again.";
+                groupResult.Add("isSuccess", false);
+                groupResult.Add("message", "AppGroup '" + rdMgmtAppGroup["appGroupName"].ToString() + "' has not been updated." + ex.Message.ToString() + " Please try it later again.");
             }
             return groupResult;
         }
@@ -425,7 +425,7 @@ namespace MSFT.RDMISaaS.API.BLL
         /// <param name="appGroupName">Name of App Group</param>
         /// <param name="appGroupUser">Login ID of AAD User</param>
         /// <returns></returns>
-        public AppGroupResult DeleteAppGroupUser(string tenantGroupName, string deploymentUrl, string accessToken, string tenantName, string hostPoolName, string appGroupName, string appGroupUser)
+        public JObject DeleteAppGroupUser(string tenantGroupName, string deploymentUrl, string accessToken, string tenantName, string hostPoolName, string appGroupName, string appGroupUser)
         {
             try
             {
@@ -434,32 +434,32 @@ namespace MSFT.RDMISaaS.API.BLL
                 string strJson = response.Content.ReadAsStringAsync().Result;
                 if (response.IsSuccessStatusCode)
                 {
-                    groupResult.isSuccess = true;
-                    groupResult.message = "User '" + appGroupUser + "' has been removed from app group " + appGroupName + " successfully.";
+                    groupResult.Add("isSuccess", true);
+                    groupResult.Add("message", "User '" + appGroupUser + "' has been removed from app group " + appGroupName + " successfully.");
                 }
                 else if ((int)response.StatusCode == 429)
                 {
-                    groupResult.isSuccess = false;
-                    groupResult.message = strJson + " Please try again later.";
+                    groupResult.Add("isSuccess", false);
+                    groupResult.Add("message", strJson + " Please try again later.");
                 }
                 else
                 {
                     if (!string.IsNullOrEmpty(strJson))
                     {
-                        groupResult.isSuccess = false;
-                        groupResult.message = CommonBL.GetErrorMessage(strJson);
+                        groupResult.Add("isSuccess", false);
+                        groupResult.Add("message", CommonBL.GetErrorMessage(strJson));
                     }
                     else
                     {
-                        groupResult.isSuccess = false;
-                        groupResult.message = "User '" + appGroupUser + "' has not been removed. Please try it later again.";
+                        groupResult.Add("isSuccess", false);
+                        groupResult.Add("message", "User '" + appGroupUser + "' has not been removed. Please try it later again.");
                     }
                 }
             }
             catch (Exception ex)
             {
-                groupResult.isSuccess = false;
-                groupResult.message = "User '" + appGroupUser + "' has not been removed." + ex.Message.ToString() + " and try again later.";
+                groupResult.Add("isSuccess", false);
+                groupResult.Add("message", "User '" + appGroupUser + "' has not been removed." + ex.Message.ToString() + " and try again later.");
             }
             return groupResult;
         }
@@ -471,51 +471,51 @@ namespace MSFT.RDMISaaS.API.BLL
         /// <param name="accessToken"> Access Token</param>
         /// <param name="rdMgmtUser"> App Group user claass</param>
         /// <returns></returns>
-        public AppGroupResult CreateAppGroupUser(string deploymentUrl, string accessToken, RdMgmtUser rdMgmtUser)
+        public JObject CreateAppGroupUser(string deploymentUrl, string accessToken, JObject rdMgmtUser)
         {
             try
             {
-                AppGroupUserDTO appGroupUserDTO = new AppGroupUserDTO();
-                appGroupUserDTO.appGroupName = rdMgmtUser.appGroupName;
-                appGroupUserDTO.appGroupUser = rdMgmtUser.appGroupUser;
-                appGroupUserDTO.hostPoolName = rdMgmtUser.hostPoolName;
-                appGroupUserDTO.tenantName = rdMgmtUser.tenantName;
-                appGroupUserDTO.userPrincipalName = rdMgmtUser.userPrincipalName;
-                appGroupUserDTO.tenantGroupName = rdMgmtUser.tenantGroupName;
+                //AppGroupUserDTO appGroupUserDTO = new AppGroupUserDTO();
+                //appGroupUserDTO.appGroupName = rdMgmtUser.appGroupName;
+                //appGroupUserDTO.appGroupUser = rdMgmtUser.appGroupUser;
+                //appGroupUserDTO.hostPoolName = rdMgmtUser.hostPoolName;
+                //appGroupUserDTO.tenantName = rdMgmtUser.tenantName;
+                //appGroupUserDTO.userPrincipalName = rdMgmtUser.userPrincipalName;
+                //appGroupUserDTO.tenantGroupName = rdMgmtUser.tenantGroupName;
 
 
                 //call rest service to add user to app group - july code bit
-                var content = new StringContent(JsonConvert.SerializeObject(appGroupUserDTO), Encoding.UTF8, "application/json");
-                HttpResponseMessage response = CommonBL.InitializeHttpClient(deploymentUrl, accessToken).PostAsync("/RdsManagement/V1/TenantGroups/" + rdMgmtUser.tenantGroupName + "/Tenants/" + appGroupUserDTO.tenantName + "/HostPools/" + appGroupUserDTO.hostPoolName + "/AppGroups/" + appGroupUserDTO.appGroupName + "/AssignedUsers/" + appGroupUserDTO.userPrincipalName, content).Result;
+                var content = new StringContent(JsonConvert.SerializeObject(rdMgmtUser), Encoding.UTF8, "application/json");
+                HttpResponseMessage response = CommonBL.InitializeHttpClient(deploymentUrl, accessToken).PostAsync("/RdsManagement/V1/TenantGroups/" + rdMgmtUser["tenantGroupName"].ToString() + "/Tenants/" + rdMgmtUser["tenantName"].ToString() + "/HostPools/" + rdMgmtUser["hostPoolName"].ToString() + "/AppGroups/" + rdMgmtUser["appGroupName"].ToString() + "/AssignedUsers/" + rdMgmtUser["userPrincipalName"].ToString(), content).Result;
                 string strJson = response.Content.ReadAsStringAsync().Result;
                 if (response.IsSuccessStatusCode)
                 {
-                    groupResult.isSuccess = true;
-                    groupResult.message = "User '" + rdMgmtUser.userPrincipalName + "' has been added to app group " + rdMgmtUser.appGroupName + " successfully.";
+                    groupResult.Add("isSuccess", true);
+                    groupResult.Add("message", "User '" + rdMgmtUser["userPrincipalName"].ToString() + "' has been added to app group " + rdMgmtUser["appGroupName"].ToString() + " successfully.");
                 }
                 else if ((int)response.StatusCode == 429)
                 {
-                    groupResult.isSuccess = false;
-                    groupResult.message = strJson + " Please try again later.";
+                    groupResult.Add("isSuccess", false);
+                    groupResult.Add("message", strJson + " Please try again later.");
                 }
                 else
                 {
                     if (!string.IsNullOrEmpty(strJson))
                     {
-                        groupResult.isSuccess = false;
-                        groupResult.message = CommonBL.GetErrorMessage(strJson);
+                        groupResult.Add("isSuccess", false);
+                        groupResult.Add("message", CommonBL.GetErrorMessage(strJson));
                     }
                     else
                     {
-                        groupResult.isSuccess = false;
-                        groupResult.message = "User '" + rdMgmtUser.userPrincipalName + "' has not been added to app group. Please try it later again. ";
+                        groupResult.Add("isSuccess", false);
+                        groupResult.Add("message", "User '" + rdMgmtUser["userPrincipalName"].ToString() + "' has not been added to app group. Please try it later again. ");
                     }
                 }
             }
             catch (Exception ex)
             {
-                groupResult.isSuccess = false;
-                groupResult.message = "User '" + rdMgmtUser.userPrincipalName + "' has not been added to app group " + ex.Message.ToString() + " Please try again later.";
+                groupResult.Add("isSuccess", false);
+                groupResult.Add("message", "User '" + rdMgmtUser["userPrincipalName"].ToString() + "' has not been added to app group " + ex.Message.ToString() + " Please try again later.");
             }
             return groupResult;
         }
@@ -529,7 +529,7 @@ namespace MSFT.RDMISaaS.API.BLL
         /// <param name="hostpoolName">Name of Hostpool</param>
         /// <param name="appGroupName">Name of AppGroup</param>
         /// <returns></returns>
-        public AppGroupResult DeleteAppGroup(string tenantGroupName, string deploymentURL, string accessToken, string tenantName, string hostpoolName, string appGroupName)
+        public JObject DeleteAppGroup(string tenantGroupName, string deploymentURL, string accessToken, string tenantName, string hostpoolName, string appGroupName)
         {
             try
             {
@@ -538,32 +538,32 @@ namespace MSFT.RDMISaaS.API.BLL
                 string strJson = response.Content.ReadAsStringAsync().Result;
                 if (response.IsSuccessStatusCode)
                 {
-                    groupResult.isSuccess = true;
-                    groupResult.message = "App group '" + appGroupName + "' has been deleted successfully.";
+                    groupResult.Add("isSuccess", true);
+                    groupResult.Add("message", "App group '" + appGroupName + "' has been deleted successfully.");
                 }
                 else if ((int)response.StatusCode == 429)
                 {
-                    groupResult.isSuccess = false;
-                    groupResult.message = strJson + " Please try again later.";
+                    groupResult.Add("isSuccess", false);
+                    groupResult.Add("message", strJson + " Please try again later.");
                 }
                 else
                 {
                     if (!string.IsNullOrEmpty(strJson))
                     {
-                        groupResult.isSuccess = false;
-                        groupResult.message = CommonBL.GetErrorMessage(strJson);
+                        groupResult.Add("isSuccess", false);
+                        groupResult.Add("message", CommonBL.GetErrorMessage(strJson));
                     }
                     else
                     {
-                        groupResult.isSuccess = false;
-                        groupResult.message = "AppGroup '" + appGroupName + "' has not been deleted . Please try it again later.";
+                        groupResult.Add("isSuccess", false);
+                        groupResult.Add("message", "AppGroup '" + appGroupName + "' has not been deleted . Please try it again later.");
                     }
                 }
             }
             catch (Exception ex)
             {
-                groupResult.isSuccess = false;
-                groupResult.message = "AppGroup '" + appGroupName + "' has not been deleted." + ex.Message.ToString() + "Please try it again later.";
+                groupResult.Add("isSuccess", false);
+                groupResult.Add("message", "AppGroup '" + appGroupName + "' has not been deleted." + ex.Message.ToString() + "Please try it again later.");
             }
             return groupResult;
         }

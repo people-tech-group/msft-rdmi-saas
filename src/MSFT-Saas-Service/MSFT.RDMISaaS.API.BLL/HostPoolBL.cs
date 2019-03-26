@@ -17,7 +17,7 @@ namespace MSFT.RDMISaaS.API.BLL
     #region "HostPoolBL"
     public class HostPoolBL
     {
-        HostPoolResult poolResult = new HostPoolResult();
+        JObject poolResult = new JObject();
         // string tenantGroup = Constants.tenantGroupName;
 
         /// <summary>
@@ -203,56 +203,66 @@ namespace MSFT.RDMISaaS.API.BLL
         /// <param name="accessToken">Access Token</param>
         /// <param name="rdMgmtHostPool">Hostpool class</param>
         /// <returns></returns>
-        public HostPoolResult CreateHostPool(string deploymentUrl, string accessToken, RdMgmtHostPool rdMgmtHostPool)
+        public JObject CreateHostPool(string deploymentUrl, string accessToken, JObject rdMgmtHostPool)
         {
             try
             {
-                HostPoolDataDTO hostpoolDataDTO = new HostPoolDataDTO();
-                hostpoolDataDTO.tenantGroupName = rdMgmtHostPool.tenantGroupName;
-                hostpoolDataDTO.tenantName = rdMgmtHostPool.tenantName;
-                hostpoolDataDTO.hostpoolName = rdMgmtHostPool.hostPoolName;
-                hostpoolDataDTO.friendlyName = rdMgmtHostPool.friendlyName;
-                hostpoolDataDTO.description = rdMgmtHostPool.description;
-                if (rdMgmtHostPool.persistent == false)
-                    rdMgmtHostPool.loadBalancerType = rdMgmtHostPool.loadBalancerTypeName == "BreadthFirst" ? Convert.ToInt32(Enums.loadBalancer.BreadthFirst) : Convert.ToInt32(Enums.loadBalancer.DepthFirst);
+                //HostPoolDataDTO hostpoolDataDTO = new HostPoolDataDTO();
+                //hostpoolDataDTO.tenantGroupName = rdMgmtHostPool.tenantGroupName;
+                //hostpoolDataDTO.tenantName = rdMgmtHostPool.tenantName;
+                //hostpoolDataDTO.hostpoolName = rdMgmtHostPool.hostPoolName;
+                //hostpoolDataDTO.friendlyName = rdMgmtHostPool.friendlyName;
+                //hostpoolDataDTO.description = rdMgmtHostPool.description;
+                //if (Convert.ToBoolean(rdMgmtHostPool["persistent"]) == false)
+                //    rdMgmtHostPool["loadBalancerType"] = rdMgmtHostPool["loadBalancerTypeName"].ToString() == "BreadthFirst" ? Convert.ToInt32(Enums.loadBalancer.BreadthFirst) : Convert.ToInt32(Enums.loadBalancer.DepthFirst);
+                //else
+                //    rdMgmtHostPool["loadBalancerType"] = Convert.ToInt32(Enums.loadBalancer.Persistent);
+
+                if (Convert.ToBoolean(rdMgmtHostPool["persistent"]) == false)
+                {
+                    rdMgmtHostPool.Add("loadBalancerType", Convert.ToInt32(Enums.loadBalancer.BreadthFirst));
+                }
                 else
-                    rdMgmtHostPool.loadBalancerType = Convert.ToInt32(Enums.loadBalancer.Persistent);
+                {
+                    rdMgmtHostPool.Add("loadBalancerType", Convert.ToInt32(Enums.loadBalancer.Persistent));
+
+                }
 
                 //call rest api to create host pool -- july code bit
-                var content = new StringContent(JsonConvert.SerializeObject(hostpoolDataDTO), Encoding.UTF8, "application/json");
-                HttpResponseMessage response = CommonBL.InitializeHttpClient(deploymentUrl, accessToken).PostAsync("/RdsManagement/V1/TenantGroups/" + rdMgmtHostPool.tenantGroupName + "/Tenants/" + rdMgmtHostPool.tenantName + "/HostPools/" + rdMgmtHostPool.hostPoolName, content).Result;
+                var content = new StringContent(JsonConvert.SerializeObject(rdMgmtHostPool), Encoding.UTF8, "application/json");
+                HttpResponseMessage response = CommonBL.InitializeHttpClient(deploymentUrl, accessToken).PostAsync("/RdsManagement/V1/TenantGroups/" + rdMgmtHostPool["tenantGroupName"].ToString() + "/Tenants/" + rdMgmtHostPool["tenantName"].ToString() + "/HostPools/" + rdMgmtHostPool["hostPoolName"].ToString(), content).Result;
                 string strJson = response.Content.ReadAsStringAsync().Result;
                 if (response.IsSuccessStatusCode)
                 {
                     if (response.StatusCode.ToString().ToLower() == "created")
                     {
-                        poolResult.isSuccess = true;
-                        poolResult.message = "Hostpool '" + rdMgmtHostPool.hostPoolName + "' has been created successfully.";
+                        poolResult.Add("isSuccess", true);
+                        poolResult.Add("message","Hostpool '" + rdMgmtHostPool["hostPoolName"].ToString() + "' has been created successfully.");
                     }
                 }
                 else if ((int)response.StatusCode == 429)
                 {
-                    poolResult.isSuccess = false;
-                    poolResult.message = strJson + " Please try again later.";
+                    poolResult.Add("isSuccess", false);
+                    poolResult.Add("message", strJson + " Please try again later.");
                 }
                 else
                 {
                     if (!string.IsNullOrEmpty(strJson))
                     {
-                        poolResult.isSuccess = false;
-                        poolResult.message = CommonBL.GetErrorMessage(strJson);
+                        poolResult.Add("isSuccess", false);
+                        poolResult.Add("message", CommonBL.GetErrorMessage(strJson));
                     }
                     else
                     {
-                        poolResult.isSuccess = false;
-                        poolResult.message = "Hostpool '" + rdMgmtHostPool.hostPoolName + "' has not been created. Please try again later. ";
+                        poolResult.Add("isSuccess", false);
+                        poolResult.Add("message", "Hostpool '" + rdMgmtHostPool["hostPoolName"].ToString() + "' has not been created. Please try again later. ");
                     }
                 }
             }
             catch (Exception ex)
             {
-                poolResult.isSuccess = false;
-                poolResult.message = "Hostpool '" + rdMgmtHostPool.hostPoolName + "' has not been created." + ex.Message.ToString() + " Please try again later. ";
+                poolResult.Add("isSuccess", false);
+                poolResult.Add("message", "Hostpool '" + rdMgmtHostPool["hostPoolName"].ToString() + "' has not been created." + ex.Message.ToString() + " Please try again later. ");
             }
             return poolResult;
         }
@@ -264,59 +274,59 @@ namespace MSFT.RDMISaaS.API.BLL
         /// <param name="accessToken"> Access Token</param>
         /// <param name="rdMgmtHostPool">Hostpool Class</param>
         /// <returns></returns>
-        public HostPoolResult UpdateHostPool(string deploymentUrl, string accessToken, RdMgmtHostPool rdMgmtHostPool)
+        public JObject UpdateHostPool(string deploymentUrl, string accessToken, JObject rdMgmtHostPool)
         {
             try
             {
-                //assigning values to Host pool class
-                HostPoolDataDTO hostpoolDataDTO = new HostPoolDataDTO();
-                hostpoolDataDTO.tenantName = rdMgmtHostPool.tenantName;
-                hostpoolDataDTO.hostpoolName = rdMgmtHostPool.hostPoolName;
-                hostpoolDataDTO.tenantGroupName = rdMgmtHostPool.tenantGroupName;
-                if ((!string.IsNullOrEmpty(rdMgmtHostPool.diskPath)) && rdMgmtHostPool.enableUserProfileDisk == true)
-                {
-                    hostpoolDataDTO.diskPath = rdMgmtHostPool.diskPath;
-                    hostpoolDataDTO.enableUserProfileDisk = rdMgmtHostPool.enableUserProfileDisk.ToString();
-                }
-                else
-                {
+                ////assigning values to Host pool class
+                //HostPoolDataDTO hostpoolDataDTO = new HostPoolDataDTO();
+                //hostpoolDataDTO.tenantName = rdMgmtHostPool.tenantName;
+                //hostpoolDataDTO.hostpoolName = rdMgmtHostPool.hostPoolName;
+                //hostpoolDataDTO.tenantGroupName = rdMgmtHostPool.tenantGroupName;
+                //if ((!string.IsNullOrEmpty(rdMgmtHostPool.diskPath)) && rdMgmtHostPool.enableUserProfileDisk == true)
+                //{
+                //    hostpoolDataDTO.diskPath = rdMgmtHostPool.diskPath;
+                //    hostpoolDataDTO.enableUserProfileDisk = rdMgmtHostPool.enableUserProfileDisk.ToString();
+                //}
+                //else
+                //{
 
-                    hostpoolDataDTO.friendlyName = rdMgmtHostPool.friendlyName;
-                    hostpoolDataDTO.description = rdMgmtHostPool.description;
-                }
+                //    hostpoolDataDTO.friendlyName = rdMgmtHostPool.friendlyName;
+                //    hostpoolDataDTO.description = rdMgmtHostPool.description;
+                //}
 
                 //call rest api to update hostpool -- july code bit
-                var content = new StringContent(JsonConvert.SerializeObject(hostpoolDataDTO), Encoding.UTF8, "application/json");
-                HttpResponseMessage response = CommonBL.PatchAsync(deploymentUrl, accessToken, "/RdsManagement/V1/TenantGroups/" + rdMgmtHostPool.tenantGroupName + "/Tenants/" + hostpoolDataDTO.tenantName + "/HostPools/" + hostpoolDataDTO.hostpoolName, content).Result;
+                var content = new StringContent(JsonConvert.SerializeObject(rdMgmtHostPool), Encoding.UTF8, "application/json");
+                HttpResponseMessage response = CommonBL.PatchAsync(deploymentUrl, accessToken, "/RdsManagement/V1/TenantGroups/" + rdMgmtHostPool["tenantGroupName"].ToString() + "/Tenants/" + rdMgmtHostPool["tenantName"].ToString() + "/HostPools/" + rdMgmtHostPool["hostPoolName"].ToString(), content).Result;
                 string strJson = response.Content.ReadAsStringAsync().Result;
                 if (response.IsSuccessStatusCode)
                 {
-                    poolResult.isSuccess = true;
-                    poolResult.message = "Hostpool '" + rdMgmtHostPool.hostPoolName + "' has been updated successfully.";
+                    poolResult.Add("isSuccess",  true);
+                    poolResult.Add("message", "Hostpool '" + rdMgmtHostPool["hostPoolName"] + "' has been updated successfully.");
                 }
                 else if ((int)response.StatusCode == 429)
                 {
-                    poolResult.isSuccess = false;
-                    poolResult.message = strJson + " Please try again later.";
+                    poolResult.Add("isSuccess", false);
+                    poolResult.Add("message",  strJson + " Please try again later.");
                 }
                 else
                 {
                     if (!string.IsNullOrEmpty(strJson))
                     {
-                        poolResult.isSuccess = false;
-                        poolResult.message = CommonBL.GetErrorMessage(strJson);
+                        poolResult.Add("isSuccess",  false);
+                        poolResult.Add("message", CommonBL.GetErrorMessage(strJson));
                     }
                     else
                     {
-                        poolResult.isSuccess = false;
-                        poolResult.message = "Hostpool '" + rdMgmtHostPool.hostPoolName + "' has not been updated. Please try it later again.";
+                        poolResult.Add("isSuccess", false);
+                        poolResult.Add("message", "Hostpool '" + rdMgmtHostPool["hostPoolName"].ToString() + "' has not been updated. Please try it later again.");
                     }
                 }
             }
             catch (Exception ex)
             {
-                poolResult.isSuccess = false;
-                poolResult.message = "Hostpool '" + rdMgmtHostPool.hostPoolName + "' has not been updated." + ex.Message.ToString() + " Please try it later again.";
+                poolResult.Add("isSuccess", false);
+                poolResult.Add("message", "Hostpool '" + rdMgmtHostPool["hostPoolName"].ToString() + "' has not been updated." + ex.Message.ToString() + " Please try it later again.");
             }
             return poolResult;
         }
@@ -328,7 +338,7 @@ namespace MSFT.RDMISaaS.API.BLL
         /// <param name="tenantName">Name of Tenant</param>
         /// <param name="hostPoolName">Name of Hostpool</param>
         /// <returns></returns>
-        public HostPoolResult DeleteHostPool(string tenantGroupName, string deploymentUrl, string accessToken, string tenantName, string hostPoolName)
+        public JObject DeleteHostPool(string tenantGroupName, string deploymentUrl, string accessToken, string tenantName, string hostPoolName)
         {
             try
             {
@@ -337,32 +347,32 @@ namespace MSFT.RDMISaaS.API.BLL
                 string strJson = response.Content.ReadAsStringAsync().Result;
                 if (response.IsSuccessStatusCode)
                 {
-                    poolResult.isSuccess = true;
-                    poolResult.message = "Hostpool '" + hostPoolName + "' has been deleted successfully.";
+                    poolResult.Add("isSuccess", true);
+                    poolResult.Add("message", "Hostpool '" + hostPoolName + "' has been deleted successfully.");
                 }
                 else if ((int)response.StatusCode == 429)
                 {
-                    poolResult.isSuccess = false;
-                    poolResult.message = strJson + " Please try again later.";
+                    poolResult.Add("isSuccess", false);
+                    poolResult.Add("message", strJson + " Please try again later.");
                 }
                 else
                 {
                     if (!string.IsNullOrEmpty(strJson))
                     {
-                        poolResult.isSuccess = false;
-                        poolResult.message = CommonBL.GetErrorMessage(strJson);
+                        poolResult.Add("isSuccess", false);
+                        poolResult.Add("message", CommonBL.GetErrorMessage(strJson));
                     }
                     else
                     {
-                        poolResult.isSuccess = false;
-                        poolResult.message = "Hostpool '" + hostPoolName + "' has not been deleted. Please try again later.";
+                        poolResult.Add("isSuccess", false);
+                        poolResult.Add("message", "Hostpool '" + hostPoolName + "' has not been deleted. Please try again later.");
                     }
                 }
             }
             catch (Exception ex)
             {
-                poolResult.isSuccess = false;
-                poolResult.message = "Hostpool '" + hostPoolName + "' has not been deleted." + ex.Message.ToString() + " Please try again later.";
+                poolResult.Add("isSuccess", false);
+                poolResult.Add("message", "Hostpool '" + hostPoolName + "' has not been deleted." + ex.Message.ToString() + " Please try again later.");
             }
             return poolResult;
         }

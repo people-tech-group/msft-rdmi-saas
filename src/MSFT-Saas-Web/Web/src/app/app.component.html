@@ -7,7 +7,8 @@
 <nav class="navbar navbar-inverse headerNav" *ngIf="isInvalidToken">
   <div>
     <div class="navbar-header">
-      <a class="navbar-brand"><img src="../assets/Images/Microsoft_logo.png" class="logo" /><span>&nbsp;&nbsp;Microsoft</span></a>
+      <a class="navbar-brand"><img src="../assets/Images/Microsoft_logo.png"
+          class="logo" /><span>&nbsp;&nbsp;Microsoft</span></a>
     </div>
     <ul class="nav navbar-nav">
       <li class="active"><a>Windows Virtual Desktop</a></li>
@@ -17,14 +18,16 @@
     </ul>
     <div class="profile">
       <ul class="nav navbar-nav pull-right" style="margin-top: -1px;">
-        <li  style="width:50px;"  [ngClass]="{  'login-details-active': NotificationHighlight, 'login-details-inactive': !NotificationHighlight }">
-          <a  (click)="OpenMainNotification($event)" >
+        <li style="width:50px;"
+          [ngClass]="{  'login-details-active': NotificationHighlight, 'login-details-inactive': !NotificationHighlight }">
+          <a (click)="OpenMainNotification($event)">
             <span class="icon icon-bell-outline"></span>
             <span class="notification" *ngIf="NotificationList.length!=0">{{NotificationList.length}}</span>
           </a>
           <div class="notificationpopup" *ngIf="showNotificationDialog">
             <h4>Notification</h4>
-            <a class="close" (click)="CloseMainNotification($event)" style="margin-top: 40px;position: fixed !important"><i aria-hidden="true" class="icon icon-close"></i></a>
+            <a class="close" (click)="CloseMainNotification($event)"
+              style="margin-top: 40px;position: fixed !important"><i aria-hidden="true" class="icon icon-close"></i></a>
             <div class="col-xs-12 no-Notify" *ngIf="NotificationList.length==0">
               <span>
                 No new notifications from this session
@@ -32,7 +35,8 @@
             </div>
             <ul class="notification-list">
               <li *ngFor="let data of NotificationList">
-                <div class="col-xs-1 no-pad"><i class="{{data.icon}}"></i></div><div class="col-xs-11 no-pad">
+                <div class="col-xs-1 no-pad"><i class="{{data.icon}}"></i></div>
+                <div class="col-xs-11 no-pad">
                   <p class="notification-text">
                     {{data.title}}
                   </p>
@@ -47,26 +51,30 @@
           </div>
         </li>
         <li (clickOutside)="OnClickedOutside()" class="login-details" (click)="OpenSignOut()"
-            [ngClass]="{ 'login-details-active': isSingoutButton, 'login-details-inactive': !isSingoutButton  }">
+          [ngClass]="{ 'login-details-active': isSingoutButton, 'login-details-inactive': !isSingoutButton  }">
           <div>
             <div style="overflow: hidden; float:left; padding-top:10px; cursor:pointer;">
-              <span style="padding-left:35px;">{{profileName}}<br /><span style="font-size:10px;float: right;">{{roleDefinitionName}}</span>&nbsp;</span>&nbsp;<br />
+              <span style="padding-left:35px;">{{profileName}}<br /><span
+                  style="font-size:10px;float: right;">{{roleDefinitionName}}</span>&nbsp;</span>&nbsp;<br />
             </div>
             <div class="profile_icon">
               <span>{{profileIcon}}</span>
             </div>
           </div>
-          <div style="background-color:#484848; height:180px;width:350px; position:fixed; top:53px; right:0px; float:right;"
-               id="signoutTray" [@slidetoggle]="state">
+          <div
+            style="background-color:#484848; height:180px;width:350px; position:fixed; top:53px; right:0px; float:right;"
+            id="signoutTray" [@slidetoggle]="state">
             <div style="padding:10px 20px 10px 20px;" class="row">
               <div class="profile_icon">
                 <span>{{profileIcon}}</span>
               </div>
             </div>
             <div style="padding:5px 20px 0px 20px; color:#fff;">
-              <p style="margin-top:0px; margin-bottom:0px"><span style="font-weight:bold; font-size:15px;">{{profileName}}   </span><span>({{roleDefinitionName}})</span></p>
+              <p style="margin-top:0px; margin-bottom:0px"><span
+                  style="font-weight:bold; font-size:15px;">{{profileName}} </span><span>({{roleDefinitionName}})</span>
+              </p>
               <p><span>{{profileEmail}}</span></p>
-             
+
               <p style="border-bottom:1px solid #666666; margin:0px"></p>
               <p><span><b>Infrastructure Permission</b></span><br /><span>{{tenantGroupName}}</span></p>
               <!--<p><span><b>Infrastructure Permission</b></span><br /><span>{{scope}}</span></p>-->

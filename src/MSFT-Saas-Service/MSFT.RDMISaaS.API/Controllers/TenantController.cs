@@ -21,7 +21,7 @@ namespace MSFT.RDMISaaS.API.Controllers
     {
         #region "Class level Declaration"
         TenantBL tenantBL = new TenantBL();
-        TenantResult tenantResult = new TenantResult();
+        JObject tenantResult = new JObject();
         Common.Common common = new Common.Common();
         Common.Configurations configurations = new Common.Configurations();
         string deploymentUrl = "";
@@ -128,7 +128,7 @@ namespace MSFT.RDMISaaS.API.Controllers
         /// </summary>
         /// <param name="rdMgmtTenant">Tenant class</param>
         /// <returns></returns>
-        public IHttpActionResult Post([FromBody] RdMgmtTenant rdMgmtTenant)
+        public IHttpActionResult Post([FromBody] JObject rdMgmtTenant)
         {
             //get deployment url
             deploymentUrl = configurations.rdBrokerUrl;
@@ -136,19 +136,19 @@ namespace MSFT.RDMISaaS.API.Controllers
             {
                 if (rdMgmtTenant != null)
                 {
-                    if (!string.IsNullOrEmpty(rdMgmtTenant.refresh_token))
+                    if (!string.IsNullOrEmpty(rdMgmtTenant["refresh_token"].ToString()))
                     {
                         string accessToken = "";
                         //get token value
-                        accessToken = common.GetTokenValue(rdMgmtTenant.refresh_token);
+                        accessToken = common.GetTokenValue(rdMgmtTenant["refresh_token"].ToString());
                         if (!string.IsNullOrEmpty(accessToken) && accessToken.ToString().ToLower() != invalidToken && accessToken.ToString().ToLower() != invalidCode)
                         {
                             tenantResult = tenantBL.CreateTenant(deploymentUrl, accessToken, rdMgmtTenant);
                         }
                         else
                         {
-                            tenantResult.isSuccess = false;
-                            tenantResult.message = Constants.invalidToken;
+                            tenantResult.Add("isSuccess", false);
+                            tenantResult.Add("message", Constants.invalidToken);
                         }
                     }
 
@@ -157,15 +157,15 @@ namespace MSFT.RDMISaaS.API.Controllers
                 }
                 else
                 {
-                    tenantResult.isSuccess = false;
-                    tenantResult.message = Constants.invalidDataMessage;
+                    tenantResult.Add("isSuccess", false);
+                    tenantResult.Add("message", Constants.invalidDataMessage);
                 }
 
             }
             catch (Exception ex)
             {
-                tenantResult.isSuccess = false;
-                tenantResult.message = "Tenant '" + rdMgmtTenant.tenantName + "' has not been created." + ex.Message.ToString() + " Please try again later.";
+                tenantResult.Add("isSuccess", false);
+                tenantResult.Add("message", "Tenant '" + rdMgmtTenant["tenantName"] + "' has not been created." + ex.Message.ToString() + " Please try again later.");
             }
             return Ok(tenantResult);
         }
@@ -175,7 +175,7 @@ namespace MSFT.RDMISaaS.API.Controllers
         /// </summary>
         /// <param name="rdMgmtTenant"></param>
         /// <returns></returns>
-        public IHttpActionResult Put([FromBody] RdMgmtTenant rdMgmtTenant)
+        public IHttpActionResult Put([FromBody] JObject rdMgmtTenant)
         {
             //get deployment url
             deploymentUrl = configurations.rdBrokerUrl;
@@ -183,38 +183,38 @@ namespace MSFT.RDMISaaS.API.Controllers
             {
                 if (rdMgmtTenant != null)
                 {
-                    if (!string.IsNullOrEmpty(rdMgmtTenant.refresh_token) && !string.IsNullOrEmpty(rdMgmtTenant.tenantName))
+                    if (!string.IsNullOrEmpty(rdMgmtTenant["refresh_token"].ToString()) && !string.IsNullOrEmpty(rdMgmtTenant["tenantName"].ToString()))
                     {
                         string accessToken = "";
                         //get token value
-                        accessToken = common.GetTokenValue(rdMgmtTenant.refresh_token);
+                        accessToken = common.GetTokenValue(rdMgmtTenant["refresh_token"].ToString());
                         if (!string.IsNullOrEmpty(accessToken) && accessToken.ToString().ToLower() != invalidToken && accessToken.ToString().ToLower() != invalidCode)
                         {
                             tenantResult = tenantBL.UpdateTenant(deploymentUrl, accessToken, rdMgmtTenant);
                         }
                         else
                         {
-                            tenantResult.isSuccess = false;
-                            tenantResult.message = Constants.invalidToken;
+                            tenantResult.Add("isSuccess", false);
+                            tenantResult.Add("message", Constants.invalidToken);
                         }
                     }
                     else
                     {
-                        tenantResult.isSuccess = false;
-                        tenantResult.message = Constants.invalidDataMessage;
+                        tenantResult.Add("isSuccess", false);
+                        tenantResult.Add("message", Constants.invalidDataMessage);
                     }
                 }
                 else
                 {
-                    tenantResult.isSuccess = false;
-                    tenantResult.message = Constants.invalidDataMessage;
+                    tenantResult.Add("isSuccess", false);
+                    tenantResult.Add("message", Constants.invalidDataMessage);
                 }
 
             }
             catch (Exception ex)
             {
-                tenantResult.isSuccess = false;
-                tenantResult.message = "Tenant '" + rdMgmtTenant.tenantName + "' has not been updated." + ex.Message.ToString() + "Please try again later.";
+                tenantResult.Add("isSuccess", false);
+                tenantResult.Add("message", "Tenant '" + rdMgmtTenant["tenantName"] + "' has not been updated." + ex.Message.ToString() + "Please try again later.");
             }
             return Ok(tenantResult);
         }
@@ -242,20 +242,20 @@ namespace MSFT.RDMISaaS.API.Controllers
                     }
                     else
                     {
-                        tenantResult.isSuccess = false;
-                        tenantResult.message = Constants.invalidToken;
+                        tenantResult.Add("isSuccess", false);
+                        tenantResult.Add("message", Constants.invalidToken);
                     }
                 }
                 else
                 {
-                    tenantResult.isSuccess = false;
-                    tenantResult.message = Constants.invalidDataMessage;
+                    tenantResult.Add("isSuccess", false);
+                    tenantResult.Add("message", Constants.invalidDataMessage);
                 }
             }
             catch (Exception ex)
             {
-                tenantResult.isSuccess = false;
-                tenantResult.message = "Tenant " + tenantName + " has not been deleted." + ex.Message.ToString() + " and try again later."; ;
+                tenantResult.Add("isSuccess", false);
+                tenantResult.Add("message", "Tenant " + tenantName + " has not been deleted." + ex.Message.ToString() + " and try again later.") ;
             }
             return Ok(tenantResult);
         }

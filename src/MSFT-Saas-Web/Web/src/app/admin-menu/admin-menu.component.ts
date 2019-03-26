@@ -208,4 +208,29 @@ export class AdminMenuComponent {
     BreadcrumComponent.GetCurrentPage(data);
     this.selectedAllTenants = false;
   }
+
+  /**
+   * This method is used to get the selected hostpoolName index
+   * @param hostpoolName - Accepts HostpoolName
+   * @param tenantName - Accepts TenantName
+   */
+  public getHostpoolIndex(hostpoolName: string, tenantName: string){
+    this.hostPoolList.forEach((item, index)=>{
+      if(item.hostPoolName == hostpoolName){
+        this.SetSelectedhostPool(index, tenantName, hostpoolName);
+      }
+    });
+  }
+
+  /**
+   * This method is used to get the selected tenantName index
+   * @param tenantName - Accepts TenantName
+   */
+  public getTenantIndex(tenantName: string){
+    this.displayTenantList.forEach((item, index)=>{
+      if(item.tenantName == tenantName){
+        this.SetSelectedTenant(index, tenantName);
+      }
+    });
+  }
 }

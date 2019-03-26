@@ -787,6 +787,16 @@ i.notify-close {
   min-height: calc(100vh - 52px);
 }
 
+.rdsDeploymnt-rightcontent .rdsErrorNotification {
+  /*background: #dfeaf6;*/
+  background: #fbcbcb;
+  padding: 20px;
+  box-sizing: border-box;
+  overflow: hidden;
+  display: block;
+  position: relative;
+}
+
   .rdsDeploymnt-rightcontent .rdsNotification {
     /*background: #dfeaf6;*/
     background: #c4d6ea;

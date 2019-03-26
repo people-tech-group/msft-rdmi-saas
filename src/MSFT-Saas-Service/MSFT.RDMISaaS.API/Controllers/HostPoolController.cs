@@ -21,7 +21,7 @@ namespace MSFT.RDMISaaS.API.Controllers
     {
         #region "Class level declaration"
         HostPoolBL hostPoolBL = new HostPoolBL();
-        HostPoolResult poolResult = new HostPoolResult();
+        JObject poolResult = new JObject();
         Common.Common common = new Common.Common();
         Common.Configurations configurations = new Common.Configurations();
         string deploymentUrl = "";
@@ -82,7 +82,7 @@ namespace MSFT.RDMISaaS.API.Controllers
         /// </summary>
         /// <param name="rdMgmthostpool"> Hostpool Class </param>
         /// <returns></returns>
-        public IHttpActionResult Post([FromBody] RdMgmtHostPool rdMgmthostpool)
+        public IHttpActionResult Post([FromBody] JObject rdMgmthostpool)
         {
             //get deployment url
             deploymentUrl = configurations.rdBrokerUrl;
@@ -90,32 +90,32 @@ namespace MSFT.RDMISaaS.API.Controllers
             {
                 if (rdMgmthostpool != null)
                 {
-                    if (!string.IsNullOrEmpty(rdMgmthostpool.refresh_token))
+                    if (!string.IsNullOrEmpty(rdMgmthostpool["refresh_token"].ToString()))
                     {
                         string accessToken = "";
                         //get token value
-                        accessToken = common.GetTokenValue(rdMgmthostpool.refresh_token);
+                        accessToken = common.GetTokenValue(rdMgmthostpool["refresh_token"].ToString());
                         if (!string.IsNullOrEmpty(accessToken) && accessToken.ToString().ToLower() != invalidToken && accessToken.ToString().ToLower() != invalidCode)
                         {
                             poolResult = hostPoolBL.CreateHostPool(deploymentUrl, accessToken, rdMgmthostpool);
                         }
                         else
                         {
-                            poolResult.isSuccess = false;
-                            poolResult.message = Constants.invalidToken;
+                            poolResult.Add("isSuccess", false);
+                            poolResult.Add("message", Constants.invalidToken);
                         }
                     }
                 }
                 else
                 {
-                    poolResult.isSuccess = false;
-                    poolResult.message = Constants.invalidDataMessage;
+                    poolResult.Add("isSuccess", false);
+                    poolResult.Add("message", Constants.invalidDataMessage);
                 }
             }
             catch (Exception ex)
             {
-                poolResult.isSuccess = false;
-                poolResult.message = "Hostpool '" + rdMgmthostpool.hostPoolName + "' has not been created." + ex.Message.ToString() + "Please try again later.";
+                poolResult.Add("isSuccess",false);
+                poolResult.Add("message", "Hostpool '" + rdMgmthostpool["hostPoolName"] + "' has not been created." + ex.Message.ToString() + "Please try again later.");
             }
             return Ok(poolResult);
         }
@@ -144,20 +144,20 @@ namespace MSFT.RDMISaaS.API.Controllers
                     }
                     else
                     {
-                        poolResult.isSuccess = false;
-                        poolResult.message = Constants.invalidToken;
+                        poolResult.Add("isSuccess",false);
+                        poolResult.Add("message", Constants.invalidToken);
                     }
                 }
                 else
                 {
-                    poolResult.isSuccess = false;
-                    poolResult.message = Constants.invalidDataMessage;
+                    poolResult.Add("isSuccess", false);
+                    poolResult.Add("message", Constants.invalidDataMessage);
                 }
             }
             catch (Exception ex)
             {
-                poolResult.isSuccess = false;
-                poolResult.message = "Hostpool '" + hostPoolName + "' has not been deleted." + ex.Message.ToString() + " Please try again later.";
+                poolResult.Add("isSuccess", false);
+                poolResult.Add("message", "Hostpool '" + hostPoolName + "' has not been deleted." + ex.Message.ToString() + " Please try again later.");
             }
             return Ok(poolResult);
         }
@@ -213,7 +213,7 @@ namespace MSFT.RDMISaaS.API.Controllers
         /// </summary>
         /// <param name="rdMgmthostpool">Hostpool class </param>
         /// <returns></returns>
-        public IHttpActionResult Put([FromBody] RdMgmtHostPool rdMgmthostpool)
+        public IHttpActionResult Put([FromBody] JObject rdMgmthostpool)
         {
             //get deployment url
             deploymentUrl = configurations.rdBrokerUrl;
@@ -221,38 +221,38 @@ namespace MSFT.RDMISaaS.API.Controllers
             {
                 if (rdMgmthostpool != null)
                 {
-                    if (!string.IsNullOrEmpty(rdMgmthostpool.refresh_token))
+                    if (!string.IsNullOrEmpty(rdMgmthostpool["refresh_token"].ToString()))
                     {
                         string token = "";
                         //get token value
-                        token = common.GetTokenValue(rdMgmthostpool.refresh_token);
+                        token = common.GetTokenValue(rdMgmthostpool["refresh_token"].ToString());
                         if (!string.IsNullOrEmpty(token) && token.ToString().ToLower() != invalidToken && token.ToString().ToLower() != invalidCode)
                         {
                             poolResult = hostPoolBL.UpdateHostPool(deploymentUrl, token, rdMgmthostpool);
                         }
                         else
                         {
-                            poolResult.isSuccess = false;
-                            poolResult.message = Constants.invalidToken;
+                            poolResult.Add("isSuccess", false);
+                            poolResult.Add("message", Constants.invalidToken);
                         }
                     }
                     else
                     {
-                        poolResult.isSuccess = false;
-                        poolResult.message = Constants.invalidDataMessage;
+                        poolResult.Add("isSuccess", false);
+                        poolResult.Add("message", Constants.invalidDataMessage);
                     }
                 }
                 else
                 {
-                    poolResult.isSuccess = false;
-                    poolResult.message = Constants.invalidDataMessage;
+                    poolResult.Add("isSuccess", false);
+                    poolResult.Add("message", Constants.invalidDataMessage);
                 }
 
             }
             catch (Exception ex)
             {
-                poolResult.isSuccess = false;
-                poolResult.message = "Hostpool '" + rdMgmthostpool.hostPoolName + "' has not been updated." + ex.Message.ToString() + " Please try again later.";
+                poolResult.Add("isSuccess", false);
+                poolResult.Add("message","Hostpool '" + rdMgmthostpool["hostPoolName"].ToString() + "' has not been updated." + ex.Message.ToString() + " Please try again later.");
             }
             return Ok(poolResult);
         }

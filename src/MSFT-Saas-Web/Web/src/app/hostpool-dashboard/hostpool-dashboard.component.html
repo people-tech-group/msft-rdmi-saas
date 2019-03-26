@@ -19,6 +19,14 @@
           aria-hidden="true"></i> Add Host</a> </div>
     <a class="close" (click)="showHostpoolTab=false;"><i class="icon icon-close" aria-hidden="true"></i></a>
   </div>
+  <!-- A Ribbon Flag that displays Error Message -->
+  <div class="rdsErrorNotification" *ngIf="error">
+    <div class="info">
+      <i class="icon icon-info" aria-hidden="true"></i>
+      <span>{{errorMessage}}</span>
+    </div>
+    <a class="close" (click)="error = false"><i class="icon icon-close" aria-hidden="true"></i></a>
+  </div>
   <div class="addDeploy">
     <h3>Host pool "{{hostPoolName}}"</h3>
     <div class="tabbable-panel">
@@ -174,15 +182,16 @@
                 </thead>
                 <tbody *ngIf="!(hostListErrorFound || showHostEmpty)">
                   <tr
-                    *ngFor="let SHSList of sessionHostListsSearch | paginate: { itemsPerPage: listItem, currentPage: Hostslist, id: 'Hosts' }; let hostIndex=index"
+                    *ngFor="let SHSList of sessionHostListsSearch | paginate: { itemsPerPage: listItems, currentPage: Hostslist, id: 'Hosts' }; let hostIndex=index"
                     class="TableData" id="row-tenant-{{SHSList.sessionHostName}}"
-                    [ngClass]="{'rowSelect':sessionHostchecked[hostIndex]}">
+                    [ngClass]="{'rowSelect':sessionHostchecked[absoluteIndex(hostIndex, listItems, Hostslist)]}"
+                    (click)="HostClicked(absoluteIndex(hostIndex, listItems, Hostslist), SHSList.sessionHostName)">
                     <td style="width: 4%;text-align: left">
                       <div class="control-group">
                         <label class="control control--checkbox">
                           <input type="checkbox" class="solcheckbox"
-                            (click)="HostClicked(hostIndex, SHSList.sessionHostName)"
-                            [checked]="sessionHostchecked[hostIndex]">
+                            (click)="HostClicked(absoluteIndex(hostIndex, listItems, Hostslist), SHSList.sessionHostName)"
+                            [checked]="sessionHostchecked[absoluteIndex(hostIndex, listItems, Hostslist)]">
                           <span class="control__indicator"></span>
                         </label>
                       </div>
@@ -292,14 +301,16 @@
                   </thead>
                   <tbody *ngIf="!(appGroupListErrorFound || editedBodyAppGroup)">
                     <tr
-                      *ngFor="let List of appGroupsListSearch | paginate: { itemsPerPage: listItem, currentPage: appGroupslist, id:'appGroups' }; let AInd=index"
-                      [ngClass]="{'rowSelect':checked[AInd]}" id="row-tenant-{{List.Id}}"
-                      (click)="AppGroupsListRowClicked(AInd)">
+                      *ngFor="let List of appGroupsListSearch | paginate: { itemsPerPage: listItems, currentPage: appGroupsPageNo, id:'appGroups' }; let AInd=index"
+                      [ngClass]="{'rowSelect':checked[absoluteIndex(AInd, listItems, appGroupsPageNo)]}"
+                      id="row-tenant-{{List.Id}}"
+                      (click)="AppGroupsListRowClicked(absoluteIndex(AInd, listItems, appGroupsPageNo))">
                       <td style="width: 4%;text-align: left">
                         <div class="control-group">
                           <label class="control control--checkbox">
                             <input type="checkbox" class="solcheckbox AppGroupbottomBtnClose"
-                              (click)="IsCheckedAppGroup(AInd)" [checked]="checked[AInd]">
+                              (click)="IsCheckedAppGroup(absoluteIndex(AInd, listItems, appGroupsPageNo))"
+                              [checked]="checked[absoluteIndex(AInd, listItems, appGroupsPageNo)]">
                             <span class="control__indicator"></span>
                           </label>
                         </div>
@@ -327,7 +338,7 @@
                   </li>
                 </ul> -->
                 <div class="row" style="margin: 0;" *ngIf="!(editedBodyAppGroup || appGroupListErrorFound)">
-                  <pagination-controls (pageChange)="appGroupslist = $event" class="pagination pull-right"
+                  <pagination-controls (pageChange)="appGroupsPageNo = $event" class="pagination pull-right"
                     id="appGroups"></pagination-controls>
                 </div>
                 <div>
@@ -447,10 +458,16 @@
                         <div class="col-xs-12">
                           <div class="col-md-9">
                             <ul>
-                              <li><button type="button" id="linkAddAppGallery" (click)="OpenAddAppsFromGallery()"><i class="icon icon-plus" aria-hidden="true"></i> Publish Apps from the Start menu</button></li>
-                              <li><button type="button" id="linkAddAppPath" (click)="OpenAddAppsFromPath($event)"><i class="icon icon-plus" aria-hidden="true"></i> Publish App from Path</button></li>
-                              <li><button type="button" data-toggle="modal" [disabled]="isDeleteAppsDisabled" data-target="#deleteModalApps" id="btnDeleteAppPath"><i class="icon icon-delete" aria-hidden="true"></i> Remove Apps</button></li>
-                              <li><button type="button" (click)="RefreshApps()"><i class="icon icon-refresh" aria-hidden="true"></i> Refresh</button></li>
+                              <li><button type="button" id="linkAddAppGallery" (click)="OpenAddAppsFromGallery()"><i
+                                    class="icon icon-plus" aria-hidden="true"></i> Publish Apps from the Start
+                                  menu</button></li>
+                              <li><button type="button" id="linkAddAppPath" (click)="OpenAddAppsFromPath($event)"><i
+                                    class="icon icon-plus" aria-hidden="true"></i> Publish App from Path</button></li>
+                              <li><button type="button" data-toggle="modal" [disabled]="isDeleteAppsDisabled"
+                                  data-target="#deleteModalApps" id="btnDeleteAppPath"><i class="icon icon-delete"
+                                    aria-hidden="true"></i> Remove Apps</button></li>
+                              <li><button type="button" (click)="RefreshApps()"><i class="icon icon-refresh"
+                                    aria-hidden="true"></i> Refresh</button></li>
                             </ul>
                           </div>
                           <div class="col-md-3 pull-right">
@@ -489,14 +506,16 @@
                             </thead>
                             <tbody *ngIf="!(appListErrorFound || editedBodyApp)">
                               <tr
-                                *ngFor="let List of appGroupsAppListSearch | paginate: { itemsPerPage: listItem, currentPage: appslist, id:'apps' }; let AppInd=index"
-                                [ngClass]="{'rowSelect':checkedApps[AppInd]}" id="row-users-{{List.appAlias}}"
-                                (click)="AppListRowClicked(List.remoteAppName, AppInd)">
+                                *ngFor="let List of appGroupsAppListSearch | paginate: { itemsPerPage: listItems, currentPage: appslist, id:'apps' }; let AppInd=index"
+                                [ngClass]="{'rowSelect':checkedApps[absoluteIndex(AppInd, listItems, appslist)]}"
+                                id="row-users-{{List.appAlias}}"
+                                (click)="AppListRowClicked(List.remoteAppName, absoluteIndex(AppInd, listItems, appslist))">
                                 <td style="width: 4%;text-align: left">
                                   <div class="control-group">
                                     <label class="control control--checkbox">
                                       <input type="checkbox" class="solcheckbox appGroupbottomBtnClose"
-                                        (click)="IsCheckedApp(AppInd)" [checked]="checkedApps[AppInd]">
+                                        (click)="IsCheckedApp(absoluteIndex(AppInd, listItems, appslist))"
+                                        [checked]="checkedApps[absoluteIndex(AppInd, listItems, appslist)]">
                                       <span class="control__indicator"></span>
                                     </label>
                                   </div>
@@ -524,7 +543,8 @@
                             </li>
                           </ul> -->
                           <!-- pagination code -->
-                          <div class="row" style="margin: 0;" *ngIf="!(editedBodyApp || appListErrorFound)">
+                          <div class="row" style="margin: 0; position:fixed; right:20px; bottom:0px;"
+                            *ngIf="!(editedBodyApp || appListErrorFound)">
                             <pagination-controls (pageChange)="appslist = $event" class="pagination pull-right"
                               id="apps"></pagination-controls>
                           </div>
@@ -560,9 +580,13 @@
                     <div class="col-xs-12">
                       <div class="col-md-9">
                         <ul>
-                          <li><button type="button" id="linkAddADSUser" (click)="OpenAddUser()"><i class="icon icon-plus" aria-hidden="true"></i> Add User</button></li>
-                          <li><button type="button" id="btndeleteUser" [disabled]="isDeleteUserDisabled" data-target="#deleteModalAppUser" data-toggle="modal"><i class="icon icon-delete" aria-hidden="true"></i> Remove Users</button></li>
-                          <li><button type="button" (click)="RefreshUsers()"><i class="icon icon-refresh" aria-hidden="true"></i> Refresh</button></li>
+                          <li><button type="button" id="linkAddADSUser" (click)="OpenAddUser()"><i
+                                class="icon icon-plus" aria-hidden="true"></i> Add User</button></li>
+                          <li><button type="button" id="btndeleteUser" [disabled]="isDeleteUserDisabled"
+                              data-target="#deleteModalAppUser" data-toggle="modal"><i class="icon icon-delete"
+                                aria-hidden="true"></i> Remove Users</button></li>
+                          <li><button type="button" (click)="RefreshUsers()"><i class="icon icon-refresh"
+                                aria-hidden="true"></i> Refresh</button></li>
                         </ul>
                       </div>
                       <div class="col-md-3 pull-right">
@@ -601,14 +625,16 @@
                           </thead>
                           <tbody *ngIf="!(usersListErrorFound || editedLbodyUsers)">
                             <tr
-                              *ngFor="let UserList of appUsersListSearch | paginate: { itemsPerPage: listItem, currentPage: userslist, id:'users' }; let UserInd=index"
-                              [ngClass]="{'rowSelect':checkedUsers[UserInd]}" id="row-users-{{UserList.Name}}"
-                              (click)="AppUserRowClick(UserList.userPrincipalName,UserInd)">
+                              *ngFor="let UserList of appUsersListSearch | paginate: { itemsPerPage: listItems, currentPage: userslist, id:'users' }; let UserInd=index"
+                              [ngClass]="{'rowSelect':checkedUsers[absoluteIndex(UserInd, listItems, userslist)]}"
+                              id="row-users-{{UserList.Name}}"
+                              (click)="AppUserRowClick(UserList.userPrincipalName, absoluteIndex(UserInd, listItems, userslist))">
                               <td style="width: 4%;text-align: left">
                                 <div class="control-group">
                                   <label class="control control--checkbox">
-                                    <input type="checkbox" class="solcheckbox" (click)="AppUsersIsChecked(UserInd)"
-                                      [checked]="checkedUsers[UserInd]">
+                                    <input type="checkbox" class="solcheckbox"
+                                      (click)="AppUsersIsChecked(absoluteIndex(UserInd, listItems, userslist))"
+                                      [checked]="checkedUsers[absoluteIndex(UserInd, listItems, userslist)]">
                                     <span class="control__indicator"></span>
                                   </label>
                                 </div>
@@ -644,8 +670,9 @@
                             <a (click)="usersNextPage()">Next</a>
                           </li>
                         </ul> -->
-                         <!-- pagination code -->
-                         <div class="row" style="margin: 0;" *ngIf="!(editedLbodyUsers || usersListErrorFound)">
+                        <!-- pagination code -->
+                        <div class="row" style="margin: 0; position:fixed; right:20px; bottom:0px;"
+                          *ngIf="!(editedLbodyUsers || usersListErrorFound)">
                           <pagination-controls (pageChange)="userslist = $event" class="pagination pull-right"
                             id="users"></pagination-controls>
                         </div>
@@ -1127,13 +1154,16 @@
               <tbody *ngIf="!(GAppslist || appGalleryErrorFound)">
                 <tr
                   *ngFor="let Gapps of appGroupAppListGallery | paginate: { itemsPerPage: galleryAppPageSize, currentPage: pageNo, id: 'GalleryApps' }; let AGAInd=index"
-                  class="TableData" [ngClass]="{'rowSelect':checkedGApps[absoluteIndex(AGAInd)]}"
-                  id="row-users-{{Gapps.appAlias}}" (click)="GalleryAppListRowClicked(absoluteIndex(AGAInd))">
+                  class="TableData"
+                  [ngClass]="{'rowSelect':checkedGApps[absoluteIndex(AGAInd, galleryAppPageSize, pageNo)]}"
+                  id="row-users-{{Gapps.appAlias}}"
+                  (click)="GalleryAppListRowClicked(absoluteIndex(AGAInd, galleryAppPageSize, pageNo))">
                   <td style="width: 4%;text-align: left">
                     <div class="control-group">
                       <label class="control control--checkbox">
-                        <input type="checkbox" class="solcheckbox" (click)="GalleryAppIsChecked(absoluteIndex(AGAInd))"
-                          [checked]="checkedGApps[absoluteIndex(AGAInd)]">
+                        <input type="checkbox" class="solcheckbox"
+                          (click)="GalleryAppIsChecked(absoluteIndex(AGAInd, galleryAppPageSize, pageNo))"
+                          [checked]="checkedGApps[absoluteIndex(AGAInd, galleryAppPageSize, pageNo)]">
                         <span class="control__indicator"></span>
                       </label>
                     </div>

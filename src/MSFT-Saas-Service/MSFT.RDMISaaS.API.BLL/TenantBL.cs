@@ -15,7 +15,7 @@ namespace MSFT.RDMISaaS.API.BLL
 {
     public class TenantBL
     {
-        TenantResult tenantResult = new TenantResult();
+        JObject tenantResult = new JObject();
         // string tenantGroup = Constants.tenantGroupName;
 
         /// <summary>
@@ -221,56 +221,70 @@ namespace MSFT.RDMISaaS.API.BLL
         /// <param name="accessToken">Aaccess Token</param>
         /// <param name="rdMgmtTenant">Tenant Class</param>
         /// <returns></returns>
-        public TenantResult CreateTenant(string deploymenturl, string accessToken, RdMgmtTenant rdMgmtTenant)
+        public JObject CreateTenant(string deploymenturl, string accessToken, JObject tenantDataDTO)
         {
             try
             {
-                TenantDataDTO tenantDataDTO = new TenantDataDTO();
-                tenantDataDTO.tenantName = rdMgmtTenant.tenantName;
-                tenantDataDTO.friendlyName = rdMgmtTenant.friendlyName;
-                tenantDataDTO.description = rdMgmtTenant.description;
-                tenantDataDTO.aadTenantId = rdMgmtTenant.aadTenantId;
-                tenantDataDTO.id = rdMgmtTenant.id;
-                tenantDataDTO.tenantGroupName = rdMgmtTenant.tenantGroupName;
-
-
+                // TenantDataDTO tenantDataDTO = new TenantDataDTO();
+                // tenantDataDTO.tenantName = rdMgmtTenant.tenantName;
+                // tenantDataDTO.friendlyName = rdMgmtTenant.friendlyName;
+                // tenantDataDTO.description = rdMgmtTenant.description;
+                // tenantDataDTO.aadTenantId = rdMgmtTenant.aadTenantId;
+                //// tenantDataDTO.id = rdMgmtTenant.id;
+                // tenantDataDTO.tenantGroupName = rdMgmtTenant.tenantGroupName;
+                // tenantDataDTO.azureSubscriptionId= rdMgmtTenant.azureSubscriptionId;
+                //JObject tenantDataDTO1 = new JObject()
+                //{
+                //    { "TenantGroupName",tenantDataDTO["tenantGroupName"]},
+                //    { "AadTenantId",tenantDataDTO["aadTenantId"]},
+                //    {"TenantName", tenantDataDTO["tenantName"]},
+                //    {"Description", tenantDataDTO["description"]},
+                //    {"FriendlyName", tenantDataDTO["friendlyName"]},
+                //    {"AzureSubscriptionId", tenantDataDTO["azureSubscriptionId"]},
+                //    {"SsoAdfsAuthority", tenantDataDTO["ssoAdfsAuthority"]},
+                //    {"SsoClientId", tenantDataDTO["ssoClientId"]},
+                //    {"SsoClientSecret", tenantDataDTO["ssoClientSecret"]}
+                  
+                    
+                //};
 
 
                 //call rest api to create tenant-- july code bit
                 var content = new StringContent(JsonConvert.SerializeObject(tenantDataDTO), Encoding.UTF8, "application/json");
-                HttpResponseMessage response = CommonBL.InitializeHttpClient(deploymenturl, accessToken).PostAsync("/RdsManagement/V1/TenantGroups/" + rdMgmtTenant.tenantGroupName + "/Tenants/" + rdMgmtTenant.tenantName, content).Result;
+                //var content = new StringContent(JsonConvert.SerializeObject(rdMgmtTenant), Encoding.UTF8, "application/json");
+                HttpResponseMessage response = CommonBL.InitializeHttpClient(deploymenturl, accessToken).PostAsync("/RdsManagement/V1/TenantGroups/" + tenantDataDTO["tenantGroupName"].ToString() + "/Tenants/" + tenantDataDTO["tenantName"].ToString(), content).Result;
                 string strJson = response.Content.ReadAsStringAsync().Result;
                 if (response.IsSuccessStatusCode)
                 {
                     if (response.StatusCode.ToString().ToLower() == "created" || response.StatusCode.ToString().ToLower() == "ok")
                     {
-                        tenantResult.isSuccess = true;
-                        tenantResult.message = "Tenant '" + tenantDataDTO.tenantName + "' has been created successfully.";
+                        tenantResult.Add("isSuccess", true);
+                        tenantResult.Add("message", "Tenant '" + tenantDataDTO["tenantName"] + "' has been created successfully.");
                     }
                 }
                 else if ((int)response.StatusCode == 429)
                 {
-                    tenantResult.isSuccess = false;
-                    tenantResult.message = strJson + " Please try again later.";
+                    tenantResult.Add("isSuccess", false);
+                    tenantResult.Add("message", strJson + " Please try again later.");
                 }
                 else
                 {
                     if (!string.IsNullOrEmpty(strJson))
                     {
-                        tenantResult.message = CommonBL.GetErrorMessage(strJson);
-                        tenantResult.isSuccess = false;
+                        tenantResult.Add("message", CommonBL.GetErrorMessage(strJson));
+                        tenantResult.Add("isSuccess", false);
                     }
                     else
                     {
-                        tenantResult.isSuccess = false;
-                        tenantResult.message = "Tenant '" + rdMgmtTenant.tenantName + "' has not been created. Please try it again later.";
+                        tenantResult.Add("isSuccess", false);
+                        tenantResult.Add("message", "Tenant '" + tenantDataDTO["tenantName"] + "' has not been created. Please try it again later.");
                     }
                 }
             }
             catch (Exception ex)
             {
-                tenantResult.isSuccess = false;
-                tenantResult.message = "Tenant '" + rdMgmtTenant.tenantName + "' has not been created." + ex.Message.ToString() + " and please try again later.";
+                tenantResult.Add("isSuccess", false);
+                tenantResult.Add("message", "Tenant '" + tenantDataDTO["tenantName"] + "' has not been created." + ex.Message.ToString() + " and please try again later.");
             }
             return tenantResult;
         }
@@ -282,54 +296,69 @@ namespace MSFT.RDMISaaS.API.BLL
         /// <param name="accessToken">Access Token</param>
         /// <param name="rdMgmtTenant">Tenant Class</param>
         /// <returns></returns>
-        public TenantResult UpdateTenant(string deploymenturl, string accessToken, RdMgmtTenant rdMgmtTenant)
+        public JObject UpdateTenant(string deploymenturl, string accessToken, JObject rdMgmtTenant)
         {
             try
             {
-                TenantDataDTO tenantDataDTO = new TenantDataDTO();
-                tenantDataDTO.tenantName = rdMgmtTenant.tenantName;
-                tenantDataDTO.friendlyName = rdMgmtTenant.friendlyName;
-                tenantDataDTO.description = rdMgmtTenant.description;
-                tenantDataDTO.id = rdMgmtTenant.id;
-                tenantDataDTO.aadTenantId = rdMgmtTenant.aadTenantId;
-                tenantDataDTO.ssoAdfsAuthority = rdMgmtTenant.ssoAdfsAuthority;
-                tenantDataDTO.ssoClientId = rdMgmtTenant.ssoClientId;
-                tenantDataDTO.ssoClientSecret = rdMgmtTenant.ssoClientSecret;
-                tenantDataDTO.tenantGroupName = rdMgmtTenant.tenantGroupName;
+                //TenantDataDTO tenantDataDTO = new TenantDataDTO();
+                //tenantDataDTO.tenantName = rdMgmtTenant.tenantName;
+                //tenantDataDTO.friendlyName = rdMgmtTenant.friendlyName;
+                //tenantDataDTO.description = rdMgmtTenant.description;
+                //tenantDataDTO.id = rdMgmtTenant.id;
+                //tenantDataDTO.aadTenantId = rdMgmtTenant.aadTenantId;
+                //tenantDataDTO.ssoAdfsAuthority = rdMgmtTenant.ssoAdfsAuthority;
+                //tenantDataDTO.ssoClientId = rdMgmtTenant.ssoClientId;
+                //tenantDataDTO.ssoClientSecret = rdMgmtTenant.ssoClientSecret;
+                //tenantDataDTO.tenantGroupName = rdMgmtTenant.tenantGroupName;
+
+                //JObject tenantDataDTO = new JObject()
+                //{
+                //    { "TenantGroupName",rdMgmtTenant["tenantGroupName"]},
+                //    { "AadTenantId",rdMgmtTenant["aadTenantId"]},
+                //    {"TenantName", rdMgmtTenant["tenantName"]},
+                //    {"Description", rdMgmtTenant["description"]},
+                //    {"FriendlyName", rdMgmtTenant["friendlyName"]},
+                //    {"AzureSubscriptionId", rdMgmtTenant["azureSubscriptionId"]},
+                //    {"SsoAdfsAuthority", rdMgmtTenant["ssoAdfsAuthority"]},
+                //    {"SsoClientId", rdMgmtTenant["ssoClientId"]},
+                //    {"SsoClientSecret", rdMgmtTenant["ssoClientSecret"]}
+
+
+                //};
 
 
                 //call rest api to update tenant -- july code bit
-                var content = new StringContent(JsonConvert.SerializeObject(tenantDataDTO), Encoding.UTF8, "application/json");
-                HttpResponseMessage response = CommonBL.PatchAsync(deploymenturl, accessToken, "/RdsManagement/V1/TenantGroups/" + rdMgmtTenant.tenantGroupName + "/Tenants/" + tenantDataDTO.tenantName, content).Result;
+                var content = new StringContent(JsonConvert.SerializeObject(rdMgmtTenant), Encoding.UTF8, "application/json");
+                HttpResponseMessage response = CommonBL.PatchAsync(deploymenturl, accessToken, "/RdsManagement/V1/TenantGroups/" + rdMgmtTenant["tenantGroupName"].ToString() + "/Tenants/" + rdMgmtTenant["tenantName"].ToString(), content).Result;
                 string strJson = response.Content.ReadAsStringAsync().Result;
                 if (response.IsSuccessStatusCode)
                 {
-                    tenantResult.isSuccess = true;
-                    tenantResult.message = "Tenant '" + rdMgmtTenant.tenantName + "' has been updated successfully.";
+                    tenantResult.Add("isSuccess", true);
+                    tenantResult.Add("message", "Tenant '" + rdMgmtTenant["tenantName"] + "' has been updated successfully.");
                 }
                 else if ((int)response.StatusCode == 429)
                 {
-                    tenantResult.isSuccess = false;
-                    tenantResult.message = strJson + " Please try again later.";
+                    tenantResult.Add("isSuccess", false);
+                    tenantResult.Add("message",strJson + " Please try again later.");
                 }
                 else
                 {
                     if (!string.IsNullOrEmpty(strJson))
                     {
-                        tenantResult.isSuccess = false;
-                        tenantResult.message = CommonBL.GetErrorMessage(strJson);
+                        tenantResult.Add("isSuccess", false);
+                        tenantResult.Add("message", CommonBL.GetErrorMessage(strJson));
                     }
                     else
                     {
-                        tenantResult.isSuccess = false;
-                        tenantResult.message = "Tenant '" + rdMgmtTenant.tenantName + "' has not been updated. Please try again later.";
+                        tenantResult.Add("isSuccess", false);
+                        tenantResult.Add("message", "Tenant '" + rdMgmtTenant["tenantName"] + "' has not been updated. Please try again later.");
                     }
                 }
             }
             catch (Exception ex)
             {
-                tenantResult.isSuccess = false;
-                tenantResult.message = "Tenant " + rdMgmtTenant.tenantName + " has not been updated." + ex.Message.ToString() + " Please try again later.";
+                tenantResult.Add("isSuccess", false);
+                tenantResult.Add("message", "Tenant " + rdMgmtTenant["tenantName"] + " has not been updated." + ex.Message.ToString() + " Please try again later.");
             }
             return tenantResult;
         }
@@ -341,7 +370,7 @@ namespace MSFT.RDMISaaS.API.BLL
         /// <param name="accessToken">access Token</param>
         /// <param name="tenantName">tenantName</param>
         /// <returns></returns>
-        public TenantResult DeleteTenant(string tenantGroupName, string deploymenturl, string accessToken, string tenantName)
+        public JObject DeleteTenant(string tenantGroupName, string deploymenturl, string accessToken, string tenantName)
         {
             try
             {
@@ -351,32 +380,32 @@ namespace MSFT.RDMISaaS.API.BLL
                 string strJson = response.Content.ReadAsStringAsync().Result;
                 if (response.IsSuccessStatusCode)
                 {
-                    tenantResult.isSuccess = true;
-                    tenantResult.message = "Tenant '" + tenantName + "' has been deleted successfully.";
+                    tenantResult.Add("isSuccess", true);
+                    tenantResult.Add("message", "Tenant '" + tenantName + "' has been deleted successfully.");
                 }
                 else if ((int)response.StatusCode == 429)
                 {
-                    tenantResult.isSuccess = false;
-                    tenantResult.message = strJson + " Please try again later.";
+                    tenantResult.Add("isSuccess", false);
+                    tenantResult.Add("message", strJson + " Please try again later.");
                 }
                 else
                 {
                     if (!string.IsNullOrEmpty(strJson))
                     {
-                        tenantResult.isSuccess = false;
-                        tenantResult.message = CommonBL.GetErrorMessage(strJson);
+                        tenantResult.Add("isSuccess", false);
+                        tenantResult.Add("message", CommonBL.GetErrorMessage(strJson));
                     }
                     else
                     {
-                        tenantResult.isSuccess = false;
-                        tenantResult.message = "Tenant '" + tenantName + "' has not been deleted. Please try again later.";
+                        tenantResult.Add("isSuccess", false);
+                        tenantResult.Add("message", "Tenant '" + tenantName + "' has not been deleted. Please try again later.");
                     }
                 }
             }
             catch (Exception ex)
             {
-                tenantResult.isSuccess = false;
-                tenantResult.message = "Tenant '" + tenantName + "' has not been deleted." + ex.Message.ToString() + " and try again later.";
+                tenantResult.Add("isSuccess", false);
+                tenantResult.Add("message", "Tenant '" + tenantName + "' has not been deleted." + ex.Message.ToString() + " and try again later.");
             }
             return tenantResult;
         }
