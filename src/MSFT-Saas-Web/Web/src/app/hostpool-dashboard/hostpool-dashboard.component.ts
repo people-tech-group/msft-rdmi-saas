@@ -226,6 +226,9 @@ export class HostpoolDashboardComponent implements OnInit {
   public appslist: number = 1;
   public appGroupsPageNo: number = 1;
   public userslist: number = 1;
+  public SearchByAppUser:any;
+  public searchByAppName:any;
+  public searchBySHSName:any;
   @ViewChild('closeModal') closeModal: ElementRef;
 
   constructor(private _AppService: AppService, private fb: FormBuilder, private http: Http, private route: ActivatedRoute, private _notificationsService: NotificationsService, private router: Router,
@@ -1071,7 +1074,6 @@ export class HostpoolDashboardComponent implements OnInit {
             }
           )
           AppComponent.GetNotification('icon icon-check angular-Notify', 'Host Deleted Successfully', responseData.message, new Date());
-          this.RefreshHost();
         }
         /* If response data is success then it enters into else and this block of code will execute to show the 'Failed To Delete Host' notification */
         else {
@@ -1092,7 +1094,7 @@ export class HostpoolDashboardComponent implements OnInit {
           )
           AppComponent.GetNotification('icon icon-fail angular-NotifyFail', 'Failed To Delete Host', responseData.message, new Date());
         }
-        //this.RefreshHost();
+        this.RefreshHost();
       },
         /*
          * If Any Error (or) Problem With Services (or) Problem in internet this Error Block Will Exequte
@@ -1116,7 +1118,7 @@ export class HostpoolDashboardComponent implements OnInit {
           AppComponent.GetNotification('icon icon-fail angular-NotifyFail', 'Failed To Delete Host', 'Problem with server, Please try again', new Date());
         }
       );
-      //this.RefreshHost();
+      this.RefreshHost();
     }
   }
 
@@ -1226,7 +1228,7 @@ export class HostpoolDashboardComponent implements OnInit {
           }
         )
         AppComponent.GetNotification('icon icon-fail angular-NotifyFail', 'Failed To Update Host', responseData.message, new Date());
-        //this.RefreshHost();
+        this.RefreshHost();
       }
     },
       /*
@@ -1978,7 +1980,7 @@ export class HostpoolDashboardComponent implements OnInit {
           )
           AppComponent.GetNotification('icon icon-fail angular-NotifyFail', 'Failed To Create App Group', responseData.message, new Date());
           this.HideNewAppGroup();
-          //this.RefreshAppgroups();
+          this.RefreshAppgroups();
         }
       },
         /*
@@ -2002,7 +2004,7 @@ export class HostpoolDashboardComponent implements OnInit {
           )
           AppComponent.GetNotification('icon icon-fail angular-NotifyFail', 'Failed To Create App Group', 'Problem with server, Please try again', new Date());
           this.HideNewAppGroup();
-          //this.RefreshAppgroups();
+          this.RefreshAppgroups();
         }
       );
     }
@@ -2076,7 +2078,7 @@ export class HostpoolDashboardComponent implements OnInit {
         )
         AppComponent.GetNotification('icon icon-fail angular-NotifyFail', 'Failed To Update App Group', responseData.message, new Date());
         this.AppGroupsUpdateClose();
-        //this.RefreshAppgroups();
+        this.RefreshAppgroups();
       }
     },
       /*
@@ -2100,7 +2102,7 @@ export class HostpoolDashboardComponent implements OnInit {
         )
         AppComponent.GetNotification('icon icon-fail angular-NotifyFail', 'Failed To Update App Group', 'Problem with server, Please try again', new Date());
         this.AppGroupsUpdateClose();
-        //this.RefreshAppgroups();
+        this.RefreshAppgroups();
       }
     );
   }
@@ -2161,7 +2163,7 @@ export class HostpoolDashboardComponent implements OnInit {
             }
           )
           AppComponent.GetNotification('icon icon-fail angular-NotifyFail', 'Failed To Delete App Group', responseData.message, new Date());
-          //this.RefreshAppgroups();
+          this.RefreshAppgroups();
         }
       },
         /*
@@ -2184,7 +2186,7 @@ export class HostpoolDashboardComponent implements OnInit {
             }
           )
           AppComponent.GetNotification('icon icon-fail angular-NotifyFail', 'Failed To Delete App Group', 'Problem with server, Please try again', new Date());
-          //this.RefreshAppgroups();
+          this.RefreshAppgroups();
         }
       );
     }
@@ -2652,7 +2654,7 @@ export class HostpoolDashboardComponent implements OnInit {
         )
         AppComponent.GetNotification('icon icon-fail angular-NotifyFail', 'Failed To Add User', responseData.message, new Date());
         this.HideAppUserDialog();
-        //this.RefreshUsers();
+        this.RefreshUsers();
       }
     },
       /*
@@ -2677,7 +2679,7 @@ export class HostpoolDashboardComponent implements OnInit {
         )
         AppComponent.GetNotification('icon icon-fail angular-NotifyFail', 'Failed To Add User', 'Problem with server, Please try again', new Date());
         this.HideAppUserDialog();
-        //this.RefreshUsers();
+        this.RefreshUsers();
       }
     );
   }
@@ -2736,7 +2738,7 @@ export class HostpoolDashboardComponent implements OnInit {
             }
           )
           AppComponent.GetNotification('icon icon-fail angular-NotifyFail', 'Failed To Remove User', responseData.message, new Date());
-          //this.RefreshUsers();
+          this.RefreshUsers();
         }
       },
         /*
@@ -2759,7 +2761,7 @@ export class HostpoolDashboardComponent implements OnInit {
             }
           )
           AppComponent.GetNotification('icon icon-fail angular-NotifyFail', 'Failed To Remove User', 'Problem with server, Please try again', new Date());
-          //this.RefreshUsers();
+          this.RefreshUsers();
         }
       );
     }
@@ -3411,7 +3413,7 @@ export class HostpoolDashboardComponent implements OnInit {
         )
         AppComponent.GetNotification('icon icon-fail angular-NotifyFail', 'Failed To Publish Remote App', responseData.message, new Date());
         this.HideAppPathDialog();
-        //this.RefreshApps();
+        this.RefreshApps();
       }
     },
       /*
@@ -3435,7 +3437,7 @@ export class HostpoolDashboardComponent implements OnInit {
         )
         AppComponent.GetNotification('icon icon-fail angular-NotifyFail', 'Failed To Publish Remote App', 'Problem with server, Please try again', new Date());
         this.HideAppPathDialog();
-        //this.RefreshApps();
+        this.RefreshApps();
       }
     );
   }
@@ -3513,7 +3515,7 @@ export class HostpoolDashboardComponent implements OnInit {
           )
           AppComponent.GetNotification('icon icon-fail angular-NotifyFail', 'Failed To Publish Remote App', responseData.message, new Date());
           this.showAddAppGalleryDialog = false;
-          //this.RefreshApps();
+          this.RefreshApps();
         }
       },
         /*
@@ -3538,7 +3540,7 @@ export class HostpoolDashboardComponent implements OnInit {
           AppComponent.GetNotification('icon icon-fail angular-NotifyFail', 'Failed To Publish Remote App', 'Problem with server, Please try again', new Date());
           this.showAddAppGalleryDialog = false;
           this.refreshHostpoolLoading = false;
-          //this.RefreshApps();
+          this.RefreshApps();
         }
       );
     }
@@ -3597,7 +3599,7 @@ export class HostpoolDashboardComponent implements OnInit {
             }
           )
           AppComponent.GetNotification('icon icon-fail angular-NotifyFail', 'Failed To Remove Remote App', responseData.message, new Date());
-          //this.RefreshApps();
+          this.RefreshApps();
         }
       },
         /*
@@ -3620,7 +3622,7 @@ export class HostpoolDashboardComponent implements OnInit {
             }
           )
           AppComponent.GetNotification('icon icon-fail angular-NotifyFail', 'Failed To Remove Remote App', 'Problem with server, Please try again', new Date());
-          //this.RefreshApps();
+          this.RefreshApps();
         }
       );
     }
