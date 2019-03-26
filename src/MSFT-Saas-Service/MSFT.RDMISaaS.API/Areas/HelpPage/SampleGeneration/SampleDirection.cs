@@ -1,4 +1,4 @@
-namespace MSFT.RDMISaaS.API.Areas.HelpPage
+namespace MSFT.WVDSaaS.API.Areas.HelpPage
 {
     /// <summary>
     /// Indicates whether the sample is used for request or response

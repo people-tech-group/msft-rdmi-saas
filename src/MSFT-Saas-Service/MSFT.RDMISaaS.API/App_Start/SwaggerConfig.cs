@@ -1,11 +1,11 @@
 using System.Web.Http;
 using WebActivatorEx;
-using MSFT.RDMISaaS.API;
+using MSFT.WVDSaaS.API;
 using Swashbuckle.Application;
 
 [assembly: PreApplicationStartMethod(typeof(SwaggerConfig), "Register")]
 
-namespace MSFT.RDMISaaS.API
+namespace MSFT.WVDSaaS.API
 {
     public class SwaggerConfig
     {

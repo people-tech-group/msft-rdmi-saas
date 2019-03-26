@@ -1,7 +1,7 @@
 using System.Web.Http;
 using System.Web.Mvc;
 
-namespace MSFT.RDMISaaS.API.Areas.HelpPage
+namespace MSFT.WVDSaaS.API.Areas.HelpPage
 {
     public class HelpPageAreaRegistration : AreaRegistration
     {

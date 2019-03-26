@@ -1,7 +1,7 @@
 ﻿using System.Web;
 using System.Web.Mvc;
 
-namespace MSFT.RDMISaaS.API
+namespace MSFT.WVDSaaS.API
 {
     public class FilterConfig
     {

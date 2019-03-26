@@ -8,12 +8,12 @@ using System.Threading.Tasks;
 using System.Web;
 using System.Web.Http;
 using System.Web.Http.Cors;
-using MSFT.RDMISaaS.API.Common;
-using MSFT.RDMISaaS.API.Model;
+using MSFT.WVDSaaS.API.Common;
+using MSFT.WVDSaaS.API.Model;
 #endregion "Import Namespaces" 
 
 #region "MSFT.RDMISaaS.API.Controllers"
-namespace MSFT.RDMISaaS.API.Controllers
+namespace MSFT.WVDSaaS.API.Controllers
 {
     [EnableCors(origins: "*", headers: "*", methods: "*")]
 

@@ -6,7 +6,7 @@ using System.Text;
 
 #region "MSFT.RDMISaaS.API.Model"
 
-namespace MSFT.RDMISaaS.API.Model
+namespace MSFT.WVDSaaS.API.Model
 {
     #region "RdMgmtRoleAssignment"
 

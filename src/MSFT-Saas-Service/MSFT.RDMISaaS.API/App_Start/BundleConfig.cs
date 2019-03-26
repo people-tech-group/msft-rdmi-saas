@@ -1,7 +1,7 @@
 ﻿using System.Web;
 using System.Web.Optimization;
 
-namespace MSFT.RDMISaaS.API
+namespace MSFT.WVDSaaS.API
 {
     public class BundleConfig
     {

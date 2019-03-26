@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 
-namespace MSFT.RDMISaaS.API.Areas.HelpPage.ModelDescriptions
+namespace MSFT.WVDSaaS.API.Areas.HelpPage.ModelDescriptions
 {
     public class ParameterDescription
     {
