@@ -1,5 +1,5 @@
 ﻿#region "Import Namespaces"
-using MSFT.RDMISaaS.API.Model;
+using MSFT.WVDSaaS.API.Model;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System;
@@ -11,7 +11,7 @@ using System.Net.Http.Headers;
 #endregion "Import Namespaces"
 
 #region "MSFT.RDMISaaS.API.BLL"
-namespace MSFT.RDMISaaS.API.BLL
+namespace MSFT.WVDSaaS.API.BLL
 {
     public class TenantBL
     {

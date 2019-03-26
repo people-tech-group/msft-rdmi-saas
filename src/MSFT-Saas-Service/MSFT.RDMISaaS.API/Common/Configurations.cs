@@ -6,7 +6,7 @@ using System.Web;
 #endregion "Import Namespaces" 
 
 #region "MSFT.RDMISaaS.API.Common"
-namespace MSFT.RDMISaaS.API.Common
+namespace MSFT.WVDSaaS.API.Common
 {
 
     #region "Configurations"

@@ -3,7 +3,7 @@ using System.Globalization;
 using System.Linq;
 using System.Reflection;
 
-namespace MSFT.RDMISaaS.API.Areas.HelpPage.ModelDescriptions
+namespace MSFT.WVDSaaS.API.Areas.HelpPage.ModelDescriptions
 {
     internal static class ModelNameHelper
     {

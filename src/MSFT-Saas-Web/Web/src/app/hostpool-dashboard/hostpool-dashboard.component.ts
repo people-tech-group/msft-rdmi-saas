@@ -492,7 +492,8 @@ export class HostpoolDashboardComponent implements OnInit {
        * If Any Error (or) Problem With Services (or) Problem in internet this Error Block Will Exequte
        */
       (error) => {
-        this.showHostCreate = false;
+        //this.showHostCreate = false;
+        let errorBody = JSON.parse(error['_body']);
         this._notificationsService.html(
           '<i class="icon icon-fail angular-NotifyFail col-xs-1 no-pad"></i>' +
           '<label class="notify-label col-xs-10 no-pad">Failed To Generate Registration Key</label>' +
@@ -509,7 +510,7 @@ export class HostpoolDashboardComponent implements OnInit {
           }
         )
         AppComponent.GetNotification('icon icon-fail angular-NotifyFail', 'Failed To Generate Registration Key', 'Problem with server, Please try again', new Date());
-        this.RefreshHost();
+        //this.RefreshHost();
       }
     );
   }
@@ -957,7 +958,7 @@ export class HostpoolDashboardComponent implements OnInit {
     }
     else {
       sessionStorage.setItem('SelectedHostpool', this.hostPoolName);
-     // this.getAllSessionHostUrl = this._AppService.ApiUrl + '/api/SessionHost/GetSessionhostList?tenantGroupName=' + this.tenantGroupName + '&tenantName=' + this.tenantName + '&hostPoolName=' + this.hostPoolName + '&refresh_token=' + sessionStorage.getItem("Refresh_Token") + '&pageSize=' + this.HostpageSize + '&sortField=SessionHostName&isDescending=false&initialSkip=' + this.hostinitialSkip + '&lastEntry=%22%20%22';
+      // this.getAllSessionHostUrl = this._AppService.ApiUrl + '/api/SessionHost/GetSessionhostList?tenantGroupName=' + this.tenantGroupName + '&tenantName=' + this.tenantName + '&hostPoolName=' + this.hostPoolName + '&refresh_token=' + sessionStorage.getItem("Refresh_Token") + '&pageSize=' + this.HostpageSize + '&sortField=SessionHostName&isDescending=false&initialSkip=' + this.hostinitialSkip + '&lastEntry=%22%20%22';
       this.getAllSessionHostUrl = this._AppService.ApiUrl + '/api/SessionHost/GetSessionhostList?tenantGroupName=' + this.tenantGroupName + '&tenantName=' + this.tenantName + '&hostPoolName=' + this.hostPoolName + '&refresh_token=' + sessionStorage.getItem("Refresh_Token");
       this._AppService.GetData(this.getAllSessionHostUrl).subscribe(response => {
         if (response.status == 429) {
@@ -975,11 +976,9 @@ export class HostpoolDashboardComponent implements OnInit {
          * If Any Error (or) Problem With Services (or) Problem in internet this Error Block Will Exequte
          */
         (error) => {
-          if (error.status == 404) {
-            this.error = true;
-            let errorBody = JSON.parse(error['_body']);
-            this.errorMessage = errorBody.error.target;
-          }
+          this.error = true;
+          let errorBody = JSON.parse(error['_body']);
+          this.errorMessage = errorBody.error.target;
           this.hostListErrorFound = true;
           this.refreshHostpoolLoading = false;
         }
@@ -1303,9 +1302,10 @@ export class HostpoolDashboardComponent implements OnInit {
    */
   public GenerateKeyValue(generateKeyValueData: any) {
     this.refreshHostpoolLoading = true;
-    var expirationUtc = generateKeyValueData.local.formatted;
+    let date = new Date(generateKeyValueData.local.formatted);
+    var expirationTime = date.toISOString();
     var GenerateKeyValueArray = {
-      expirationUtc: expirationUtc,
+      expirationTime: expirationTime,
       tenantGroupName: this.tenantGroupName,
       tenantName: this.tenantName,
       hostPoolName: this.hostPoolName,
@@ -1698,11 +1698,9 @@ export class HostpoolDashboardComponent implements OnInit {
          * If Any Error (or) Problem With Services (or) Problem in internet this Error Block Will Exequte
          */
         (error) => {
-          if (error.status == 404) {
-            this.error = true;
-            let errorBody = JSON.parse(error['_body']);
-            this.errorMessage = errorBody.error.target;
-          }
+          this.error = true;
+          let errorBody = JSON.parse(error['_body']);
+          this.errorMessage = errorBody.error.target;
           this.appGroupListErrorFound = true;
         }
       );
@@ -2259,11 +2257,9 @@ export class HostpoolDashboardComponent implements OnInit {
          * If Any Error (or) Problem With Services (or) Problem in internet this Error Block Will Exequte
          */
         (error) => {
-          if (error.status == 404) {
-            this.error = true;
-            let errorBody = JSON.parse(error['_body']);
-            this.errorMessage = errorBody.error.target;
-          }
+          this.error = true;
+          let errorBody = JSON.parse(error['_body']);
+          this.errorMessage = errorBody.error.target;
           this.usersListErrorFound = true;
           this.refreshHostpoolLoading = false;
         }
@@ -2979,11 +2975,9 @@ export class HostpoolDashboardComponent implements OnInit {
          * If Any Error (or) Problem With Services (or) Problem in internet this Error Block Will Exequte
          */
         (error) => {
-          if (error.status == 404) {
-            this.error = true;
-            let errorBody = JSON.parse(error['_body']);
-            this.errorMessage = errorBody.error.target;
-          }
+          this.error = true;
+          let errorBody = JSON.parse(error['_body']);
+          this.errorMessage = errorBody.error.target;
           this.appListErrorFound = true;
           this.refreshHostpoolLoading = false;
         }
@@ -3045,11 +3039,9 @@ export class HostpoolDashboardComponent implements OnInit {
          * If Any Error (or) Problem With Services (or) Problem in internet this Error Block Will Exequte
          */
         (error) => {
-          if (error.status == 404) {
-            this.error = true;
-            let errorBody = JSON.parse(error['_body']);
-            this.errorMessage = errorBody.error.target;
-          }
+          this.error = true;
+          let errorBody = JSON.parse(error['_body']);
+          this.errorMessage = errorBody.error.target;
           this.galleryAppLoader = false;
           this.refreshHostpoolLoading = false;
           this.appGalleryErrorFound = true;

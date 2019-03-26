@@ -257,9 +257,13 @@ export class DeploymentDashboardComponent implements OnInit {
 * -------------
 */
   public ManageTenant() {
+    this.refreshTenantLoading = true;
     localStorage.removeItem("TenantGroupName");
     this.ManageTenantSlideClose(event);
     localStorage.setItem("TenantGroupName", this.slectedtenantgroupname);
+    this.tenants = [];
+    this.searchTenants = [];
+    sessionStorage.removeItem('Tenants');
     //navigate to appcomponent page
     let url = sessionStorage.getItem("redirectUri");
     window.location.replace(url);
@@ -534,6 +538,9 @@ export class DeploymentDashboardComponent implements OnInit {
           this.editedBody = false;
           this.tenantlistErrorFound = true;
           this.refreshTenantLoading = false;
+          this.error = true;
+          let errorBody = JSON.parse(error['_body']);
+          this.errorMessage = errorBody.error.target;
         }
       );
     }

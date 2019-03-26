@@ -2,9 +2,9 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Net.Http.Headers;
 using System.Web.Http.Description;
-using MSFT.RDMISaaS.API.Areas.HelpPage.ModelDescriptions;
+using MSFT.WVDSaaS.API.Areas.HelpPage.ModelDescriptions;
 
-namespace MSFT.RDMISaaS.API.Areas.HelpPage.Models
+namespace MSFT.WVDSaaS.API.Areas.HelpPage.Models
 {
     /// <summary>
     /// The model that represents an API displayed on the help page.

@@ -1,5 +1,5 @@
 ﻿#region "Import Namespaces"
-using MSFT.RDMISaaS.API.Model;
+using MSFT.WVDSaaS.API.Model;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System;
@@ -13,13 +13,13 @@ using System.Text;
 using System.Web;
 using System.Web.Configuration;
 using System.IdentityModel.Tokens.Jwt;
-using MSFT.RDMISaaS.API.BLL;
+using MSFT.WVDSaaS.API.BLL;
 using System.Threading.Tasks;
 
 #endregion "Import Namespaces"
 
 #region "MSFT.RDMISaaS.API.Common"
-namespace MSFT.RDMISaaS.API.Common
+namespace MSFT.WVDSaaS.API.Common
 
 {
 
@@ -166,7 +166,7 @@ namespace MSFT.RDMISaaS.API.Common
 
                     //}
 
-                    ////new way to get role assignment
+                    //new way to get role assignment
                     if (loginDetails != null && loginDetails.Access_Token != null)
                     {
                         string deploymentUrl = configurations.rdBrokerUrl;
@@ -199,11 +199,18 @@ namespace MSFT.RDMISaaS.API.Common
                         {
                             loginDetails.Error = new JObject() { { "StatusCode", httpResponse.StatusCode.ToString() }, { "Message", strJson } };
                         }
+                        else
+                        {
+                            loginDetails.Error = new JObject() { { "StatusCode", httpResponse.StatusCode.ToString() }, { "Message", strJson } };
+                        }
                     }
                     else
                     {
                         return null;
                     }
+                    /*** use following code for temporary*****/
+                    //loginDetails.RoleAssignment = new JObject() { { "roleDefinitionName", "RDS Owner" }, { "scope", "/Ptg" } };
+                    //loginDetails.TenantGroups = new string[] { "Default Tenant Group", "Ptg" };
                 }
                 else
                 {
