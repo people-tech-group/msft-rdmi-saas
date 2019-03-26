@@ -954,8 +954,8 @@ export class HostpoolDashboardComponent implements OnInit {
     }
     else {
       sessionStorage.setItem('SelectedHostpool', this.hostPoolName);
-      // this.getAllSessionHostUrl = this._AppService.ApiUrl + '/api/SessionHost/GetSessionhostList?tenantGroupName=' + this.tenantGroupName + '&tenantName=' + this.tenantName + '&hostPoolName=' + this.hostPoolName + '&refresh_token=' + sessionStorage.getItem("Refresh_Token") + '&pageSize=' + this.HostpageSize + '&sortField=SessionHostName&isDescending=false&initialSkip=' + this.hostinitialSkip + '&lastEntry=%22%20%22';
-      this.getAllSessionHostUrl = this._AppService.ApiUrl + '/api/SessionHost/GetSessionhostList?tenantGroupName=' + this.tenantGroupName + '&tenantName=' + this.tenantName + '&hostPoolName=' + this.hostPoolName + '&refresh_token=' + sessionStorage.getItem("Refresh_Token");//+ '&pageSize=' + this.HostpageSize + '&sortField=SessionHostName&isDescending=false&initialSkip=' + this.hostinitialSkip + '&lastEntry=%22%20%22';
+     // this.getAllSessionHostUrl = this._AppService.ApiUrl + '/api/SessionHost/GetSessionhostList?tenantGroupName=' + this.tenantGroupName + '&tenantName=' + this.tenantName + '&hostPoolName=' + this.hostPoolName + '&refresh_token=' + sessionStorage.getItem("Refresh_Token") + '&pageSize=' + this.HostpageSize + '&sortField=SessionHostName&isDescending=false&initialSkip=' + this.hostinitialSkip + '&lastEntry=%22%20%22';
+      this.getAllSessionHostUrl = this._AppService.ApiUrl + '/api/SessionHost/GetSessionhostList?tenantGroupName=' + this.tenantGroupName + '&tenantName=' + this.tenantName + '&hostPoolName=' + this.hostPoolName + '&refresh_token=' + sessionStorage.getItem("Refresh_Token");
       this._AppService.GetData(this.getAllSessionHostUrl).subscribe(response => {
         if (response.status == 429) {
           this.error = true;
@@ -2949,7 +2949,8 @@ export class HostpoolDashboardComponent implements OnInit {
    */
   public GetAllAppGroupApps() {
     let Apps = JSON.parse(sessionStorage.getItem('Apps'));
-    if (sessionStorage.getItem('Apps') && Apps.length != 0 && Apps != null) {
+    let selectedApproup = sessionStorage.getItem('SelectedAppGroup');
+    if (sessionStorage.getItem('Apps') && Apps.length != 0 && Apps != null && selectedApproup == this.selectedAppGroupName) {
       this.getapps()
     } else {
       this.checkedApps = [];
@@ -2968,6 +2969,7 @@ export class HostpoolDashboardComponent implements OnInit {
           this.appGroupAppList = JSON.parse(response['_body']);
           this.appsCount = this.appGroupAppList.length;
           sessionStorage.setItem('Apps', JSON.stringify(this.appGroupAppList));
+          sessionStorage.setItem('SelectedAppGroup', this.selectedAppGroupName);
           this.getapps();
         }
       },
