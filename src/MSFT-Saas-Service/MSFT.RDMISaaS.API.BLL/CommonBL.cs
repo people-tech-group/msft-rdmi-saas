@@ -1,5 +1,5 @@
 ﻿#region "Import Namespaces"
-using MSFT.RDMISaaS.API.Model;
+using MSFT.WVDSaaS.API.Model;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System;
@@ -13,7 +13,7 @@ using System.Threading.Tasks;
 #endregion "Import Namespaces" 
 
 #region "MSFT.RDMISaaS.API.BLL"
-namespace MSFT.RDMISaaS.API.BLL
+namespace MSFT.WVDSaaS.API.BLL
 {
     #region "class-CommonBL"
     public static class CommonBL

@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace MSFT.RDMISaaS.API.Model
+namespace MSFT.WVDSaaS.API.Model
 {
    public  class Enums
     {

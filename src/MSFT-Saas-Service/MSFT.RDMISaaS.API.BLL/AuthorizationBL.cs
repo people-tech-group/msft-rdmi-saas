@@ -1,4 +1,4 @@
-﻿using MSFT.RDMISaaS.API.Model;
+﻿using MSFT.WVDSaaS.API.Model;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System;
@@ -9,7 +9,7 @@ using System.Text;
 using System.Net.Http.Headers;
 using System.Threading.Tasks;
 
-namespace MSFT.RDMISaaS.API.BLL
+namespace MSFT.WVDSaaS.API.BLL
 {
     public class AuthorizationBL
     {
@@ -52,13 +52,17 @@ namespace MSFT.RDMISaaS.API.BLL
         //    return rdMgmtRoleAssignments;
         //}
 
-        public Task<HttpResponseMessage> GetRoleAssignments(string deploymentUrl, string accessToken, string upn)
+        public  Task<HttpResponseMessage> GetRoleAssignments(string deploymentUrl, string accessToken, string upn)
         {
             // List<RdMgmtRoleAssignment> rdMgmtRoleAssignments = new List<RdMgmtRoleAssignment>();
             try
             {
-                HttpResponseMessage response =  CommonBL.InitializeHttpClient(deploymentUrl, accessToken).GetAsync("RdsManagement/V1/Rds.Authorization/roleAssignments?upn=" + upn).Result;
+                HttpResponseMessage response = CommonBL.InitializeHttpClient(deploymentUrl, accessToken).GetAsync("/RdsManagement/V1/Rds.Authorization/roleAssignments?upn=" + upn).Result;//.Result; //.ConfigureAwait(true).GetAwaiter().GetResult();
                 return Task.FromResult(response);
+
+                //HttpClient httpClient = CommonBL.InitializeHttpClient(deploymentUrl, accessToken);
+                //HttpResponseMessage httpResponseMessage = await httpClient.GetAsync("/RdsManagement/V1/Rds.Authorization/roleAssignments?upn=" + upn);
+                //return httpResponseMessage;
 
                 //string strJson = response.Content.ReadAsStringAsync().Result;
                 //if (response.IsSuccessStatusCode)
@@ -87,10 +91,15 @@ namespace MSFT.RDMISaaS.API.BLL
                 //}
 
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
-                return null;
+                HttpResponseMessage response=  new HttpResponseMessage(System.Net.HttpStatusCode.RequestTimeout) { Content = new StringContent(ex.InnerException.Message.ToString(), System.Text.Encoding.UTF8, "application/json") };
+                return  Task.FromResult(response);
             }
+            //catch (TaskCanceledException e)
+            //{
+            //    return null;
+            //}
             //return rdMgmtRoleAssignments;
         }
 

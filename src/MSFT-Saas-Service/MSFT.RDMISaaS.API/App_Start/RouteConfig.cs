@@ -5,7 +5,7 @@ using System.Web;
 using System.Web.Mvc;
 using System.Web.Routing;
 
-namespace MSFT.RDMISaaS.API
+namespace MSFT.WVDSaaS.API
 {
     public class RouteConfig
     {

@@ -5,7 +5,7 @@ using System.Text;
 #endregion "Import Namespaces"
 
 #region "MSFT.RDMISaaS.API.Model"
-namespace MSFT.RDMISaaS.API.Model
+namespace MSFT.WVDSaaS.API.Model
 {
     #region "Class - RdMgmtRegistrationInfo"
     public class RdMgmtRegistrationInfo

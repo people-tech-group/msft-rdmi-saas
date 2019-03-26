@@ -5,14 +5,14 @@ using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Text;
-using MSFT.RDMISaaS.API.Model;
+using MSFT.WVDSaaS.API.Model;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System.Web;
 #endregion "Import Namespaces" 
 
 #region "MSFT.RDMISaaS.API.BLL"
-namespace MSFT.RDMISaaS.API.BLL
+namespace MSFT.WVDSaaS.API.BLL
 {
     #region "class-AppGroupBL"
     public class AppGroupBL

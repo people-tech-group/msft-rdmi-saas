@@ -1,7 +1,7 @@
 using System;
 using System.Reflection;
 
-namespace MSFT.RDMISaaS.API.Areas.HelpPage.ModelDescriptions
+namespace MSFT.WVDSaaS.API.Areas.HelpPage.ModelDescriptions
 {
     public interface IModelDocumentationProvider
     {
