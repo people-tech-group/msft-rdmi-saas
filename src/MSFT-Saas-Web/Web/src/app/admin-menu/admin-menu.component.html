@@ -1,6 +1,6 @@
 <div id="main" class="content-main">
   <!-- Loader -->
-  <div *ngIf="refreshTenantLoading" class="ngLoader">
+  <div class="ngLoader">
     <div>
       <img src="assets/Images/loading.gif" />
     </div>
@@ -17,11 +17,11 @@
           <ul class="deployment-accordion_list">
             <li>
               <input id="group-1" type="checkbox" hidden />
-              <label for="group-1" [ngClass]="{'selectedAll':selectedAllTenants === true,'selectedAllparent': selectedTenant !== y && selectedAllTenants !== true }" (click)="RedirectToTenants(displayTenantList)">
+              <label for="group-1" [ngClass]="{'selectedAll':selectedAllTenants === true,'selectedAllparent': selectedAllTenants !== true }" (click)="RedirectToTenants(displayTenantList)">
                 <a class="sub-menu">Tenants</a>
               </label>
               <ul class="sub-group-list-open">
-                <li *ngFor=" let tenants of displayTenantList let y = index">
+                <li *ngFor=" let tenants of displayTenantList; let y = index">
                   <input id="sub-group-{{tenants.tenantName}}" type="checkbox" hidden />
                   <label [ngClass]="{'selectedTenant':selectedTenant === y && selectedAllTenants !== true, 'selectedparentTenant': selectedHostPool !== null && selectedTenant === y && selectedAllTenants !== true }" (click)="SetSelectedTenant(y, tenants.tenantName)" [routerLink]="['tenantDashboard/', tenants.tenantName]" style="padding-left: 24px;">
                     <span [ngClass]="{'icon': true, 'icon-chevron-right' : selectedTenant !== y, 'icon-chevron-down' : selectedTenant === y}"></span>
@@ -32,7 +32,7 @@
                     </a>
                   </label>
                   <ul class="sub-sub-group-list hostPad" *ngIf="selectedTenant === y">
-                    <li *ngFor="let hostpool of hostPoolList let z = index">
+                    <li *ngFor="let hostpool of hostPoolList; let z = index">
                       <a [routerLink]="['hostpoolDashboard/', hostpool.hostPoolName]" (click)="SetSelectedhostPool(z,tenants.tenantName,hostpool.hostPoolName)" [ngClass]="{'selected':selectedHostPool === z && selectedTenant === y && selectedAllTenants !== true}">
                         <span class="marginRight3" [hidden]="true">
                           <i class="icon icon-win-hostserver iconAlignment"></i>

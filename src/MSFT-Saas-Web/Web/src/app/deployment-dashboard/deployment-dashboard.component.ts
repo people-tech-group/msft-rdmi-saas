@@ -76,6 +76,7 @@ export class DeploymentDashboardComponent implements OnInit {
   };
   public errorMessage: string;
   public error: boolean = false;
+  public searchByTenantName: any;
   tenantForm;
   tenantFormEdit;
   deploymentID = 0;

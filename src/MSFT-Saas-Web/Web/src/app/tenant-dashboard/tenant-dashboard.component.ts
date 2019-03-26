@@ -81,6 +81,7 @@ export class TenantDashboardComponent implements OnInit {
   public errorMessage: string;
   public error: boolean = false;
   public Hostpoollist: number = 1;
+  public searchByHostName: any;
 
 
   /*This  is used to close the edit modal popup*/
