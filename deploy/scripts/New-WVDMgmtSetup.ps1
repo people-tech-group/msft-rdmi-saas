@@ -9,10 +9,10 @@ $automationAccountName = Get-AutomationVariable -Name 'accountName'
 $WebApp = Get-AutomationVariable -Name 'webApp'
 $ApiApp = Get-AutomationVariable -Name 'apiApp'
 
-Invoke-WebRequest -Uri $fileURI -OutFile "C:\msft-rdmi-saas-offering.zip"
-New-Item -Path "C:\msft-rdmi-saas-offering" -ItemType directory -Force -ErrorAction SilentlyContinue
-Expand-Archive "C:\msft-rdmi-saas-offering.zip" -DestinationPath "C:\msft-rdmi-saas-offering" -ErrorAction SilentlyContinue
-$AzureModulesPath = Get-ChildItem -Path "C:\msft-rdmi-saas-offering\msft-rdmi-saas-offering"| Where-Object {$_.FullName -match 'AzureModules.zip'}
+Invoke-WebRequest -Uri $fileURI -OutFile "C:\msft-wvd-saas-offering.zip"
+New-Item -Path "C:\msft-wvd-saas-offering" -ItemType directory -Force -ErrorAction SilentlyContinue
+Expand-Archive "C:\msft-wvd-saas-offering.zip" -DestinationPath "C:\msft-wvd-saas-offering" -ErrorAction SilentlyContinue
+$AzureModulesPath = Get-ChildItem -Path "C:\msft-wvd-saas-offering\msft-wvd-saas-offering"| Where-Object {$_.FullName -match 'AzureModules.zip'}
 Expand-Archive $AzureModulesPath.fullname -DestinationPath 'C:\Modules\Global' -ErrorAction SilentlyContinue
 
 Import-Module AzureRM.Resources
@@ -32,11 +32,11 @@ Import-Module AzureAD
     $Cred = Get-AutomationPSCredential -Name $CredentialAssetName
     Add-AzureRmAccount -Environment 'AzureCloud' -Credential $Cred
     Select-AzureRmSubscription -SubscriptionId $subsriptionid
-    $CodeBitPath= "C:\msft-rdmi-saas-offering\msft-rdmi-saas-offering"
-    $WebAppDirectory = ".\msft-rdmi-saas-web"
-    $WebAppExtractionPath = ".\msft-rdmi-saas-web\msft-rdmi-saas-web.zip"
-    $ApiAppDirectory = ".\msft-rdmi-saas-api"
-    $ApiAppExtractionPath = ".\msft-rdmi-saas-api\msft-rdmi-saas-api.zip"
+    $CodeBitPath= "C:\msft-wvd-saas-offering\msft-wvd-saas-offering"
+    $WebAppDirectory = ".\msft-wvd-saas-web"
+    $WebAppExtractionPath = ".\msft-wvd-saas-web\msft-wvd-saas-web.zip"
+    $ApiAppDirectory = ".\msft-wvd-saas-api"
+    $ApiAppExtractionPath = ".\msft-wvd-saas-api\msft-wvd-saas-api.zip"
 try
 {
                 # Get Url of Web-App
@@ -46,20 +46,20 @@ try
                 #$requiredAccessName=$ResourceURL.Split("/")[3]
                 $redirectURL="https://"+"$WebUrl"+"/"
                 
-                #Static value of RDMIInfra web appname
+                #Static value of wvdInfra web appname
                 $wvdinfraWebAppId = "5a0aa725-4958-4b0c-80a9-34562e23f3b7"
                 $serviceIdinfo = Get-AzureRmADServicePrincipal -ApplicationId $wvdinfraWebAppId
-                $rdmiInfraWebAppName = $serviceIdinfo.DisplayName
+                $wvdInfraWebAppName = $serviceIdinfo.DisplayName
                 #generate unique ID based on subscription ID
                 $unique_subscription_id = ($subsriptionid).Replace('-', '').substring(0, 19)
                 
 
                 #generate the display name for native app in AAD
-                $rdmiSaaS_clientapp_display_name = "RdmiSaaS" + $ResourceGroupName.ToLowerInvariant() + $unique_subscription_id.ToLowerInvariant()
+                $wvdSaaS_clientapp_display_name = "wvdSaaS" + $ResourceGroupName.ToLowerInvariant() + $unique_subscription_id.ToLowerInvariant()
                 #Creating Client application in azure ad
                 Connect-AzureAD -Credential $Cred
-                $clientAdApp = New-AzureADApplication -DisplayName $rdmiSaaS_clientapp_display_name -ReplyUrls $redirectURL -PublicClient $true -AvailableToOtherTenants $false -Verbose -ErrorAction Stop
-                $resourceAppId = Get-AzureADServicePrincipal -SearchString $rdmiInfraWebAppName | Where-Object {$_.DisplayName -eq $rdmiInfraWebAppName}
+                $clientAdApp = New-AzureADApplication -DisplayName $wvdSaaS_clientapp_display_name -ReplyUrls $redirectURL -PublicClient $true -AvailableToOtherTenants $false -Verbose -ErrorAction Stop
+                $resourceAppId = Get-AzureADServicePrincipal -SearchString $wvdInfraWebAppName | Where-Object {$_.DisplayName -eq $wvdInfraWebAppName}
                 $clientappreq = New-Object -TypeName "Microsoft.Open.AzureAD.Model.RequiredResourceAccess"
                 $clientappreq.ResourceAppId = $resourceAppId.AppId
                
@@ -101,9 +101,9 @@ try
                 # Publish Api-App Package files recursively
 
                 Write-Output "Uploading the Extracted files to Api-App"
-                Get-ChildItem $ApiAppExtractedPath  | Compress-Archive -update -DestinationPath 'c:\msft-rdmi-saas-Api.zip' -Verbose 
-                test-path -path 'c:\msft-rdmi-saas-Api.zip'
-                $filePath = 'C:\msft-rdmi-saas-Api.zip'
+                Get-ChildItem $ApiAppExtractedPath  | Compress-Archive -update -DestinationPath 'c:\msft-wvd-saas-Api.zip' -Verbose 
+                test-path -path 'c:\msft-wvd-saas-Api.zip'
+                $filePath = 'C:\msft-wvd-saas-Api.zip'
                 $apiUrl = "https://$ApiAppURL/api/zipdeploy"
                 $base64AuthInfo = [Convert]::ToBase64String([Text.Encoding]::ASCII.GetBytes(("{0}:{1}" -f $ApiAppUserName, $ApiAppPassword)))
                 $userAgent = "powershell/1.0"
@@ -173,9 +173,9 @@ try
                 # Publish Web-App Package files recursively
 
                 Write-Output "Uploading the Extracted files to Web-App"
-                Get-ChildItem $WebAppExtractedPath  | Compress-Archive -update  -DestinationPath 'c:\msft-rdmi-saas-web.zip' -Verbose 
-                test-path -path 'c:\msft-rdmi-saas-web.zip'
-                $filePath = 'C:\msft-rdmi-saas-web.zip'
+                Get-ChildItem $WebAppExtractedPath  | Compress-Archive -update  -DestinationPath 'c:\msft-wvd-saas-web.zip' -Verbose 
+                test-path -path 'c:\msft-wvd-saas-web.zip'
+                $filePath = 'C:\msft-wvd-saas-web.zip'
                 $apiUrl = "https://$WebAppUrl/api/zipdeploy"
                 $base64AuthInfo = [Convert]::ToBase64String([Text.Encoding]::ASCII.GetBytes(("{0}:{1}" -f $WebAppUserName, $WebApppassword)))
                 $userAgent = "powershell/1.0"
