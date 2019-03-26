@@ -969,7 +969,7 @@ export class TenantDashboardComponent implements OnInit {
       /* If Any Error (or) Problem With Services (or) Problem in internet this Error Block Will Exequte */
       error => {
         this.refreshHostpoolLoading = false;
-        console.error('catchBlock', error)
+        //console.error('catchBlock', error)
         this._notificationsService.html(
           '<i class="icon icon-close angular-NotifyFail"></i>' +
           '<label class="notify-label padleftright">Failed To Create Host pool</label>' +
@@ -1087,7 +1087,7 @@ export class TenantDashboardComponent implements OnInit {
       /* If Any Error (or) Problem With Services (or) Problem in internet this Error Block Will Exequte */
       error => {
         this.refreshHostpoolLoading = false;
-        console.error('catchBlock', error)
+       // console.error('catchBlock', error)
         this._notificationsService.html(
           '<i class="icon icon-close angular-NotifyFail"></i>' +
           '<label class="notify-label padleftright">Failed To Update Host pool</label>' +
@@ -1165,7 +1165,7 @@ export class TenantDashboardComponent implements OnInit {
         /* If Any Error (or) Problem With Services (or) Problem in internet this Error Block Will Exequte */
         error => {
           this.refreshHostpoolLoading = false;
-          console.error('catchBlock', error)
+          //console.error('catchBlock', error)
           this._notificationsService.html(
             '<i class="icon icon-close angular-NotifyFail"></i>' +
             '<label class="notify-label padleftright">Failed To Delete Host pool</label>' +
