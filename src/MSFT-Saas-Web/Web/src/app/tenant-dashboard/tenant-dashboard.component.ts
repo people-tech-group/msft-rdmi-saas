@@ -962,7 +962,7 @@ export class TenantDashboardComponent implements OnInit {
           }
         )
         AppComponent.GetNotification('icon icon-fail angular-NotifyFail', 'Failed To Create Host pool', responseData.message, new Date());
-        this.RefreshHostpools();
+        //this.RefreshHostpools();
         this.BtnCancel(event);
       }
     },
@@ -1081,7 +1081,7 @@ export class TenantDashboardComponent implements OnInit {
         )
         AppComponent.GetNotification('icon icon-fail angular-NotifyFail', 'Failed To Update Host pool', responseData.message, new Date());
         this.hostpoolUpdateClose();
-        this.RefreshHostpools();
+        //this.RefreshHostpools();
       }
     },
       /* If Any Error (or) Problem With Services (or) Problem in internet this Error Block Will Exequte */
@@ -1159,7 +1159,7 @@ export class TenantDashboardComponent implements OnInit {
             }
           )
           AppComponent.GetNotification('icon icon-fail angular-NotifyFail', 'Failed To Delete Host pool', responseData.message, new Date());
-          this.RefreshHostpools();
+          //this.RefreshHostpools();
         }
       },
         /* If Any Error (or) Problem With Services (or) Problem in internet this Error Block Will Exequte */

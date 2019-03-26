@@ -805,7 +805,7 @@ export class DeploymentDashboardComponent implements OnInit {
           }
         )
         AppComponent.GetNotification('icon icon-fail angular-NotifyFail', 'Failed To Create Tenant', responseData.message, new Date());
-        this.RefreshTenant();
+        //this.RefreshTenant();
       }
     },
       /* If Any Error (or) Problem With Services (or) Problem in internet this Error Block Will Exequte */
@@ -904,7 +904,7 @@ export class DeploymentDashboardComponent implements OnInit {
         )
         AppComponent.GetNotification('icon icon-fail angular-NotifyFail', 'Failed To Update Tenant', responseData.message, new Date());
         this.tenantUpdateClose();
-        this.RefreshTenant();
+        //this.RefreshTenant();
       }
     },
       /* If Any Error (or) Problem With Services (or) Problem in internet this Error Block Will Exequte */
@@ -982,7 +982,7 @@ export class DeploymentDashboardComponent implements OnInit {
             }
           )
           AppComponent.GetNotification('icon icon-fail angular-NotifyFail', 'Failed To Delete Tenant', responseData.message, new Date());
-          this.RefreshTenant();
+          //this.RefreshTenant();
         }
       },
         /* If Any Error (or) Problem With Services (or) Problem in internet this Error Block Will Exequte */
