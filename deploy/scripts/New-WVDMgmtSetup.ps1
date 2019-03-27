@@ -46,9 +46,15 @@ try
                 #$requiredAccessName=$ResourceURL.Split("/")[3]
                 $redirectURL="https://"+"$WebUrl"+"/"
                 
-                #Static value of wvdInfra web appname
+                #Static value of wvdInfra web appname/appid
                 $wvdinfraWebAppId = "5a0aa725-4958-4b0c-80a9-34562e23f3b7"
                 $serviceIdinfo = Get-AzureRmADServicePrincipal -ApplicationId $wvdinfraWebAppId
+                
+                if(!$serviceIdinfo){
+                $wvdinfraWebApp = "Windows Virtual Desktop"
+                $serviceIdinfo = Get-AzureRmADServicePrincipal -ApplicationId $wvdinfraWebApp
+                }
+
                 $wvdInfraWebAppName = $serviceIdinfo.DisplayName
                 #generate unique ID based on subscription ID
                 $unique_subscription_id = ($subsriptionid).Replace('-', '').substring(0, 19)
