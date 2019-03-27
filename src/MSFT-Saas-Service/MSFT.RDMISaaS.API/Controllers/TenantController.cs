@@ -12,7 +12,7 @@ using MSFT.WVDSaaS.API.Common;
 using Newtonsoft.Json.Linq;
 #endregion "Import Namespaces"
 
-#region "MSFT.RDMISaaS.API.Controllers"
+#region "MSFT.WVDSaaS.API.Controllers"
 namespace MSFT.WVDSaaS.API.Controllers
 {
     [EnableCors(origins: "*", headers: "*", methods: "*")]
@@ -57,7 +57,6 @@ namespace MSFT.WVDSaaS.API.Controllers
                         {
                             {"code",  Constants.invalidToken}
                         });
-                        // rdMgmtTenant.code = Constants.invalidToken;
                     }
                 }
                 else
@@ -69,7 +68,6 @@ namespace MSFT.WVDSaaS.API.Controllers
             {
                 return null;
             }
-            //  return rdMgmtTenant;
         }
 
         /// <summary>
@@ -93,16 +91,9 @@ namespace MSFT.WVDSaaS.API.Controllers
                     if (!string.IsNullOrEmpty(accessToken) && accessToken.ToString().ToLower() != invalidToken && accessToken.ToString().ToLower() != invalidCode)
                     {
                         return tenantBL.GetTenantList(tenantGroupName, deploymentUrl, accessToken);
-                        //tenants = tenantBL.GetTenantList(tenantGroupName,deploymentUrl, accessToken, pageSize, sortField, isDescending, initialSkip, lastEntry);
                     }
                     else
                     {
-                        //List<RdMgmtTenant> rdMgmtTenants = new List<RdMgmtTenant>();
-                        //RdMgmtTenant rdMgmtTenant = new RdMgmtTenant();
-                        //rdMgmtTenant.code = Constants.invalidToken;
-                        //rdMgmtTenants.Add(rdMgmtTenant);
-                        //tenants.rdMgmtTenants = rdMgmtTenants;
-
                         return Request.CreateResponse(HttpStatusCode.OK, new JArray() {
                             new JObject()
                             {
@@ -263,8 +254,6 @@ namespace MSFT.WVDSaaS.API.Controllers
         {
             //get deployment url
             deploymentUrl = configurations.rdBrokerUrl;
-            //List<RdMgmtTenant> rdMgmtTenants = new List<RdMgmtTenant>();
-
             try
             {
                 if (!string.IsNullOrEmpty(refresh_token))
@@ -278,15 +267,6 @@ namespace MSFT.WVDSaaS.API.Controllers
                     }
                     else
                     {
-                        //JArray newarray = new JArray();
-                        //newarray.Add(new JObject() {
-                        //    { "code",Constants.invalidToken },
-                        //});
-                        //return newarray;
-                        //RdMgmtTenant rdMgmtTenant = new RdMgmtTenant();
-                        //rdMgmtTenant.code = Constants.invalidToken;
-                        //rdMgmtTenants.Add(rdMgmtTenant);
-
                         return Request.CreateResponse(HttpStatusCode.OK, new JArray() {
                             new JObject()
                             {
@@ -304,7 +284,6 @@ namespace MSFT.WVDSaaS.API.Controllers
             {
                 return null;
             }
-            // return rdMgmtTenants;
         }
     }
 

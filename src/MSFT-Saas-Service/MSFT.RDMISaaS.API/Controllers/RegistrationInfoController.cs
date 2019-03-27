@@ -11,7 +11,7 @@ using System.Web.Http.Cors;
 using Newtonsoft.Json.Linq;
 #endregion "Import Namespaces"
 
-#region "MSFT.RDMISaaS.API.Controllers"
+#region "MSFT.WVDSaaS.API.Controllers"
 namespace MSFT.WVDSaaS.API.Controllers
 {
 
@@ -42,7 +42,6 @@ namespace MSFT.WVDSaaS.API.Controllers
         {
             //get deployment url
             deploymentUrl = configurations.rdBrokerUrl;
-            //RdMgmtRegistrationInfo registrationInfo = new RdMgmtRegistrationInfo();
             try
             {
                 if (!string.IsNullOrEmpty(refresh_token))
@@ -57,7 +56,6 @@ namespace MSFT.WVDSaaS.API.Controllers
                     else
                     {
                         return Request.CreateResponse(HttpStatusCode.OK,  new JObject() { { "code", Constants.invalidToken } } );
-
                     }
                 }
                 else
@@ -69,7 +67,6 @@ namespace MSFT.WVDSaaS.API.Controllers
             {
                 return null;
             }
-            //return registrationInfo;
         }
 
         /// <summary>

@@ -11,7 +11,7 @@ using System.Web.Http.Cors;
 using Newtonsoft.Json.Linq;
 #endregion "Import Namespaces" 
 
-#region "MSFT.RDMISaaS.API.Controllers"
+#region "MSFT.WVDSaaS.API.Controllers"
 namespace MSFT.WVDSaaS.API.Controllers
 {
 
@@ -141,14 +141,12 @@ namespace MSFT.WVDSaaS.API.Controllers
                     if (!string.IsNullOrEmpty(accessToken) && accessToken.ToString().ToLower() != invalidToken && accessToken.ToString().ToLower() != invalidCode)
                     {
                         return appGroupBL.GetAppGroupDetails(tenantGroupName, deploymentUrl, accessToken, tenantName, hostPoolName, appGroupName);
-                        // rdMgmtAppGroup = appGroupBL.GetAppGroupDetails(tenantGroupName,deploymentUrl, accessToken, tenantName, hostPoolName, appGroupName);
                     }
                     else
                     {
                         return Request.CreateResponse(HttpStatusCode.OK,
                            new JObject() { "code", Constants.invalidToken }
                         );
-                        //  rdMgmtAppGroup.code = Constants.invalidToken;
                     }
                 }
                 else
@@ -160,7 +158,6 @@ namespace MSFT.WVDSaaS.API.Controllers
             {
                 return null;
             }
-            //return rdMgmtAppGroup;
         }
 
         /// <summary>
@@ -175,7 +172,6 @@ namespace MSFT.WVDSaaS.API.Controllers
         {
             //get deployment url
             deploymentUrl = configurations.rdBrokerUrl;
-            // List<RdMgmtAppGroup> rdMgmtAppGroups = new List<RdMgmtAppGroup>();
             try
             {
                 if (!string.IsNullOrEmpty(refresh_token))
@@ -195,14 +191,12 @@ namespace MSFT.WVDSaaS.API.Controllers
                 else
                 {
                     return null;
-
                 }
             }
             catch
             {
                 return null;
             }
-            //return rdMgmtAppGroups;
         }
 
         /// <summary>
@@ -233,7 +227,6 @@ namespace MSFT.WVDSaaS.API.Controllers
                     else
                     {
                         return Request.CreateResponse(HttpStatusCode.OK, new JArray() { new JObject() { { "code", Constants.invalidToken } } });
-
                     }
                 }
                 else
@@ -245,7 +238,6 @@ namespace MSFT.WVDSaaS.API.Controllers
             {
                 return null;
             }
-
         }
 
         /// <summary>
@@ -292,7 +284,7 @@ namespace MSFT.WVDSaaS.API.Controllers
             catch (Exception ex)
             {
                 groupResult.Add("isSuccess", false);
-                groupResult.Add("message","AppGroup '" + rdMgmtAppGroup["appGroupName"] + "' has not been created." + ex.Message.ToString() + " Please try again later.");
+                groupResult.Add("message", "AppGroup '" + rdMgmtAppGroup["appGroupName"] + "' has not been created." + ex.Message.ToString() + " Please try again later.");
             }
             return Ok(groupResult);
         }
@@ -470,7 +462,7 @@ namespace MSFT.WVDSaaS.API.Controllers
             catch (Exception ex)
             {
                 groupResult.Add("isSuccess", false);
-                groupResult.Add("message", "User '" + appGroupUser + "' has not been removed." + ex.Message.ToString() + " and try again later.") ;
+                groupResult.Add("message", "User '" + appGroupUser + "' has not been removed." + ex.Message.ToString() + " and try again later.");
             }
             return Ok(groupResult);
         }

@@ -16,7 +16,6 @@ namespace MSFT.WVDSaaS.API.BLL
     public class TenantBL
     {
         JObject tenantResult = new JObject();
-        // string tenantGroup = Constants.tenantGroupName;
 
         /// <summary>
         /// Description-Gets a specific Rds tenant.
@@ -27,50 +26,16 @@ namespace MSFT.WVDSaaS.API.BLL
         /// <returns></returns>
         public HttpResponseMessage GetTenantDetails(string tenantGroupName, string deploymentUrl, string accessToken, string tenantName)
         {
-            //RdMgmtTenant rdMgmtTenant = new RdMgmtTenant();
             try
             {
                 //call rest api to get tenant details -- july code bit
                 HttpResponseMessage response = CommonBL.InitializeHttpClient(deploymentUrl, accessToken).GetAsync("/RdsManagement/V1/TenantGroups/" + tenantGroupName + "/Tenants/" + tenantName).Result;
-
                 return response;
-                //string strJson = response.Content.ReadAsStringAsync().Result;
-                //if (response.IsSuccessStatusCode)
-                //{
-                //    var jObj = (JObject)JsonConvert.DeserializeObject(strJson);
-                //    return jObj;
-                //   // rdMgmtTenant = JsonConvert.DeserializeObject<RdMgmtTenant>(strJson);
-                //}
-                //else
-                //{
-                //    return null;
-                //}
-
-                //if(!string.IsNullOrEmpty(rdMgmtTenant.tenantName))
-                //{
-                //    //count hostpools associated with tenant
-                //    HostPoolBL hostPoolBL = new HostPoolBL();
-                //   // List<RdMgmtHostPool> hostPoolDataDTOs = hostPoolBL.GetHostPoolList(tenantGroupName,deploymentUrl, accessToken, rdMgmtTenant.tenantName,true,true,0,"",false,0,"");
-                //   JArray hostPoolDataDTOs = hostPoolBL.GetHostPoolList(tenantGroupName,deploymentUrl, accessToken, rdMgmtTenant.tenantName,true,true,0,"",false,0,"");
-                //    rdMgmtTenant.noOfHostpool = hostPoolDataDTOs.Count;
-
-                //   //if(hostPoolDataDTOs.Count > 0)
-                //   // {
-                //   //     for (int i = 0; i < hostPoolDataDTOs.Count; i++)
-                //   //     {
-                //   //         rdMgmtTenant.noOfActivehosts = rdMgmtTenant.noOfActivehosts+ hostPoolDataDTOs[i].noOfActivehosts;
-                //   //         rdMgmtTenant.noOfAppgroups = rdMgmtTenant.noOfAppgroups + hostPoolDataDTOs[i].noOfAppgroups;
-                //   //         rdMgmtTenant.noOfSessions = rdMgmtTenant.noOfSessions + hostPoolDataDTOs[i].noOfSessions;
-                //   //         rdMgmtTenant.noOfUsers = rdMgmtTenant.noOfUsers + hostPoolDataDTOs[i].noOfUsers;
-                //   //     }
-                //   // }
-                //}
             }
             catch
             {
                 return null;
             }
-            //return rdMgmtTenant;
         }
 
         /// <summary>
@@ -82,137 +47,20 @@ namespace MSFT.WVDSaaS.API.BLL
         /// <returns></returns>
         public HttpResponseMessage GetTenantList(string tenantGroupName, string deploymenturl, string accessToken)
         {
-            // Tenants tenants = new Tenants();
-            // List<RdMgmtTenant> lstTenants = new List<RdMgmtTenant>();
-
             try
             {
-                //call rest api to get all tenants -- sept code bit
+                //call rest api to get all tenants 
                 HttpResponseMessage response = CommonBL.InitializeHttpClient(deploymenturl, accessToken).GetAsync("/RdsManagement/V1/TenantGroups/" + tenantGroupName + "/Tenants").Result;
                 return response;
-                //string strJson = response.Content.ReadAsStringAsync().Result;
-                //if (response.IsSuccessStatusCode)
-                //{
-                //    //Deserialize the string to JSON object
-                //    var jObj = (JArray)JsonConvert.DeserializeObject(strJson);
-                //    return jObj;
-                //    //if(jObj.Count>0)
-                //    //{
-                //    //    lstTenants = jObj.Select(item => new RdMgmtTenant
-                //    //    {
-                //    //        id = (string)item["id"],
-                //    //        tenantGroupName = (string)item["tenantGroupName"],
-                //    //        aadTenantId = (string)item["aadTenantId"],
-                //    //        tenantName = (string)item["tenantName"],
-                //    //        description = (string)item["description"],
-                //    //        friendlyName = (string)item["friendlyName"],
-                //    //        ssoAdfsAuthority = (string)item["ssoAdfsAuthority"],
-                //    //        ssoClientId = (string)item["ssoClientId"],
-                //    //        ssoClientSecret = (string)item["ssoClientId"],
-                //    //        azureSubscriptionId=(string)item["azureSubscriptionId"]
-                //    //    }).ToList();
-                //    //}
-                //}
-                //else
-                //{
-                //    return null;
-                //}
+                
             }
             catch (Exception ex)
             {
-                //lstTenants= null;
                 return null;
             }
-            // tenants.rdMgmtTenants = lstTenants;
-            //return tenants;
         }
 
-        //public Tenants GetTenantList_old(string tenantGroupName, string deploymenturl, string accessToken, int pageSize, string sortField, bool isDescending, int initialSkip, string lastEntry)
-        //{
-        //    Tenants tenants = new Tenants();
-        //    List<RdMgmtTenant> lstTenants = new List<RdMgmtTenant>();
-
-        //    try
-        //    {
-        //        // get all tennat list --count - septcode bit
-        //        HttpResponseMessage responseTenants = CommonBL.InitializeHttpClient(deploymenturl, accessToken).GetAsync("/RdsManagement/V1/TenantGroups/" + tenantGroupName + "/Tenants").Result;
-        //        if (responseTenants.IsSuccessStatusCode)
-        //        {
-        //            string responseData = responseTenants.Content.ReadAsStringAsync().Result;
-
-        //            var jObj = (JArray)JsonConvert.DeserializeObject(responseData);
-        //            tenants.count = jObj.Count;
-        //        }
-
-        //        //call rest api to get all tenants -- sept code bit
-        //        HttpResponseMessage response = CommonBL.InitializeHttpClient(deploymenturl, accessToken).GetAsync("/RdsManagement/V1/TenantGroups/" + tenantGroupName + "/Tenants").Result;
-
-        //        //HttpResponseMessage response = CommonBL.InitializeHttpClient(deploymenturl, accessToken).GetAsync("/RdsManagement/V1/TenantGroups/" + tenantGroupName + "/Tenants?PageSize="+ pageSize + "&LastEntry="+ lastEntry + "&SortField="+ sortField + "&IsDescending="+ isDescending + "&InitialSkip="+ initialSkip).Result;
-        //        var headers = response.Headers;
-
-        //        if (headers.Contains("next"))
-        //        {
-        //            string defaultPhrase = "/RdsManagement/V1/TenantGroups/Default Tenant Group/Tenants";
-        //            string nextstring = headers.GetValues("next").First().ToString();
-        //            nextstring = nextstring.Substring(defaultPhrase.Length);
-        //            //nextstring.QueryString["LastEntry"]
-        //            tenants.lastEntry = nextstring;
-
-        //        }
-
-
-        //        string strJson = response.Content.ReadAsStringAsync().Result;
-        //        if (response.IsSuccessStatusCode)
-        //        {
-        //            //Deserialize the string to JSON object
-        //            var jObj = (JArray)JsonConvert.DeserializeObject(strJson);
-        //            if (jObj.Count > 0)
-        //            {
-        //                lstTenants = jObj.Select(item => new RdMgmtTenant
-        //                {
-        //                    id = (string)item["id"],
-        //                    tenantGroupName = (string)item["tenantGroupName"],
-        //                    aadTenantId = (string)item["aadTenantId"],
-        //                    tenantName = (string)item["tenantName"],
-        //                    description = (string)item["description"],
-        //                    friendlyName = (string)item["friendlyName"],
-        //                    ssoAdfsAuthority = (string)item["ssoAdfsAuthority"],
-        //                    ssoClientId = (string)item["ssoClientId"],
-        //                    ssoClientSecret = (string)item["ssoClientId"]
-        //                }).ToList();
-        //            }
-
-        //            if (lstTenants.Count > 0)
-        //            {
-        //                for (int i = 0; i < lstTenants.Count; i++)
-        //                {
-        //                    //get list of host pool
-        //                    HostPoolBL hostPoolBL = new HostPoolBL();
-        //                    List<RdMgmtHostPool> rdMgmtHostPools = hostPoolBL.GetHostPoolList(tenantGroupName, deploymenturl, accessToken, lstTenants[i].tenantName, true, true, 0, "", false, 0, "");
-        //                    lstTenants[i].noOfHostpool = rdMgmtHostPools.Count;
-
-        //                    if (rdMgmtHostPools.Count > 0)
-        //                    {
-        //                        for (int j = 0; j < rdMgmtHostPools.Count; j++)
-        //                        {
-        //                            lstTenants[i].noOfActivehosts = lstTenants[i].noOfActivehosts + rdMgmtHostPools[j].noOfActivehosts;
-        //                            lstTenants[i].noOfAppgroups = lstTenants[i].noOfAppgroups + rdMgmtHostPools[j].noOfAppgroups;
-        //                            lstTenants[i].noOfSessions = lstTenants[i].noOfSessions + rdMgmtHostPools[j].noOfSessions;
-        //                            lstTenants[i].noOfUsers = lstTenants[i].noOfUsers + rdMgmtHostPools[j].noOfUsers;
-        //                        }
-        //                    }
-        //                }
-
-        //            }
-        //        }
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        lstTenants = null;
-        //    }
-        //    tenants.rdMgmtTenants = lstTenants;
-        //    return tenants;
-        //}
+        
 
         /// <summary>
         /// Description :  create a RDs tenant
@@ -225,33 +73,8 @@ namespace MSFT.WVDSaaS.API.BLL
         {
             try
             {
-                // TenantDataDTO tenantDataDTO = new TenantDataDTO();
-                // tenantDataDTO.tenantName = rdMgmtTenant.tenantName;
-                // tenantDataDTO.friendlyName = rdMgmtTenant.friendlyName;
-                // tenantDataDTO.description = rdMgmtTenant.description;
-                // tenantDataDTO.aadTenantId = rdMgmtTenant.aadTenantId;
-                //// tenantDataDTO.id = rdMgmtTenant.id;
-                // tenantDataDTO.tenantGroupName = rdMgmtTenant.tenantGroupName;
-                // tenantDataDTO.azureSubscriptionId= rdMgmtTenant.azureSubscriptionId;
-                //JObject tenantDataDTO1 = new JObject()
-                //{
-                //    { "TenantGroupName",tenantDataDTO["tenantGroupName"]},
-                //    { "AadTenantId",tenantDataDTO["aadTenantId"]},
-                //    {"TenantName", tenantDataDTO["tenantName"]},
-                //    {"Description", tenantDataDTO["description"]},
-                //    {"FriendlyName", tenantDataDTO["friendlyName"]},
-                //    {"AzureSubscriptionId", tenantDataDTO["azureSubscriptionId"]},
-                //    {"SsoAdfsAuthority", tenantDataDTO["ssoAdfsAuthority"]},
-                //    {"SsoClientId", tenantDataDTO["ssoClientId"]},
-                //    {"SsoClientSecret", tenantDataDTO["ssoClientSecret"]}
-                  
-                    
-                //};
-
-
                 //call rest api to create tenant-- july code bit
                 var content = new StringContent(JsonConvert.SerializeObject(tenantDataDTO), Encoding.UTF8, "application/json");
-                //var content = new StringContent(JsonConvert.SerializeObject(rdMgmtTenant), Encoding.UTF8, "application/json");
                 HttpResponseMessage response = CommonBL.InitializeHttpClient(deploymenturl, accessToken).PostAsync("/RdsManagement/V1/TenantGroups/" + tenantDataDTO["tenantGroupName"].ToString() + "/Tenants/" + tenantDataDTO["tenantName"].ToString(), content).Result;
                 string strJson = response.Content.ReadAsStringAsync().Result;
                 if (response.IsSuccessStatusCode)
@@ -300,33 +123,6 @@ namespace MSFT.WVDSaaS.API.BLL
         {
             try
             {
-                //TenantDataDTO tenantDataDTO = new TenantDataDTO();
-                //tenantDataDTO.tenantName = rdMgmtTenant.tenantName;
-                //tenantDataDTO.friendlyName = rdMgmtTenant.friendlyName;
-                //tenantDataDTO.description = rdMgmtTenant.description;
-                //tenantDataDTO.id = rdMgmtTenant.id;
-                //tenantDataDTO.aadTenantId = rdMgmtTenant.aadTenantId;
-                //tenantDataDTO.ssoAdfsAuthority = rdMgmtTenant.ssoAdfsAuthority;
-                //tenantDataDTO.ssoClientId = rdMgmtTenant.ssoClientId;
-                //tenantDataDTO.ssoClientSecret = rdMgmtTenant.ssoClientSecret;
-                //tenantDataDTO.tenantGroupName = rdMgmtTenant.tenantGroupName;
-
-                //JObject tenantDataDTO = new JObject()
-                //{
-                //    { "TenantGroupName",rdMgmtTenant["tenantGroupName"]},
-                //    { "AadTenantId",rdMgmtTenant["aadTenantId"]},
-                //    {"TenantName", rdMgmtTenant["tenantName"]},
-                //    {"Description", rdMgmtTenant["description"]},
-                //    {"FriendlyName", rdMgmtTenant["friendlyName"]},
-                //    {"AzureSubscriptionId", rdMgmtTenant["azureSubscriptionId"]},
-                //    {"SsoAdfsAuthority", rdMgmtTenant["ssoAdfsAuthority"]},
-                //    {"SsoClientId", rdMgmtTenant["ssoClientId"]},
-                //    {"SsoClientSecret", rdMgmtTenant["ssoClientSecret"]}
-
-
-                //};
-
-
                 //call rest api to update tenant -- july code bit
                 var content = new StringContent(JsonConvert.SerializeObject(rdMgmtTenant), Encoding.UTF8, "application/json");
                 HttpResponseMessage response = CommonBL.PatchAsync(deploymenturl, accessToken, "/RdsManagement/V1/TenantGroups/" + rdMgmtTenant["tenantGroupName"].ToString() + "/Tenants/" + rdMgmtTenant["tenantName"].ToString(), content).Result;
@@ -374,7 +170,6 @@ namespace MSFT.WVDSaaS.API.BLL
         {
             try
             {
-
                 //call rest api to delete tenant -- july code bit
                 HttpResponseMessage response = CommonBL.InitializeHttpClient(deploymenturl, accessToken).DeleteAsync("/RdsManagement/V1/TenantGroups/" + tenantGroupName + "/Tenants/" + tenantName).Result;
                 string strJson = response.Content.ReadAsStringAsync().Result;
@@ -412,23 +207,11 @@ namespace MSFT.WVDSaaS.API.BLL
 
         public HttpResponseMessage GetAllTenantList(string tenantGroupName, string deploymenturl, string accessToken)
         {
-            //List<RdMgmtTenant> lstTenants = new List<RdMgmtTenant>();
             try
             {
                 //call rest api to get all tenants -- july code bit
                 HttpResponseMessage response = CommonBL.InitializeHttpClient(deploymenturl, accessToken).GetAsync("/RdsManagement/V1/TenantGroups/" + tenantGroupName + "/Tenants").Result;
                 return response;
-                //string strJson = response.Content.ReadAsStringAsync().Result;
-                //if (response.IsSuccessStatusCode)
-                //{
-                //    //Deserialize the string to JSON object
-                //    var jObj = (JArray)JsonConvert.DeserializeObject(strJson);
-                //    return jObj;
-                //}
-                //else
-                //{
-                //    return null;
-                //}
             }
             catch
             {
@@ -436,42 +219,7 @@ namespace MSFT.WVDSaaS.API.BLL
             }
         }
 
-        //public List<RdMgmtTenant> GetAllTenantList_old(string tenantGroupName,string deploymenturl, string accessToken)
-        //{
-        //    List<RdMgmtTenant> lstTenants = new List<RdMgmtTenant>();
-        //    try
-        //    {
-        //        //call rest api to get all tenants -- july code bit
-        //        HttpResponseMessage response = CommonBL.InitializeHttpClient(deploymenturl, accessToken).GetAsync("/RdsManagement/V1/TenantGroups/" + tenantGroupName + "/Tenants").Result;
-        //        string strJson = response.Content.ReadAsStringAsync().Result;
-        //        if (response.IsSuccessStatusCode)
-        //        {
-        //            //Deserialize the string to JSON object
-        //            var jObj = (JArray)JsonConvert.DeserializeObject(strJson);
-        //            if (jObj.Count > 0)
-        //            {
-        //                lstTenants = jObj.Select(item => new RdMgmtTenant
-        //                {
-        //                    id = (string)item["id"],
-        //                    tenantGroupName = (string)item["tenantGroupName"],
-        //                    aadTenantId = (string)item["aadTenantId"],
-        //                    tenantName = (string)item["tenantName"],
-        //                    description = (string)item["description"],
-        //                    friendlyName = (string)item["friendlyName"],
-        //                    ssoAdfsAuthority = (string)item["ssoAdfsAuthority"],
-        //                    ssoClientId = (string)item["ssoClientId"],
-        //                    ssoClientSecret = (string)item["ssoClientId"],
-        //                    azureSubscriptionId = (string)item["azureSubscriptionId"]
-        //                }).ToList();
-        //            }
-        //        }
-        //    }
-        //    catch
-        //    {
-        //        return null;
-        //    }
-        //    return lstTenants;
-        //}
+        
     }
 }
 #endregion "MSFT.RDMISaaS.API.BLL"

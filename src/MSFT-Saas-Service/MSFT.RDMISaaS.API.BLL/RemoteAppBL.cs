@@ -16,7 +16,6 @@ namespace MSFT.WVDSaaS.API.BLL
     public class RemoteAppBL
     {
         JObject appResult = new JObject();
-        //string tenantGroup = Constants.tenantGroupName;
 
         #region "Functions/Methods"
         /// <summary>
@@ -31,24 +30,17 @@ namespace MSFT.WVDSaaS.API.BLL
         /// <returns></returns>
         public HttpResponseMessage GetRemoteAppDetails(string tenantGroupName, string deploymentUrl, string accessToken, string tenantName, string hostPoolName, string appGroupName, string remoteAppName)
         {
-            // RdMgmtRemoteApp rdMgmtRemoteApp = new RdMgmtRemoteApp();
             try
             {
                 //call rest api to get all app groups -- july code bit
                 HttpResponseMessage response = CommonBL.InitializeHttpClient(deploymentUrl, accessToken).GetAsync("/RdsManagement/V1/TenantGroups/" + tenantGroupName + "/Tenants/" + tenantName + "/HostPools/" + hostPoolName + "/AppGroups/" + appGroupName + "/RemoteApps/" + remoteAppName).Result;
                 return response;
-                //string strJson = response.Content.ReadAsStringAsync().Result;
-                //if (response.IsSuccessStatusCode)
-                //{
-                //    //Deserialize the string to JSON object
-                //    rdMgmtRemoteApp = JsonConvert.DeserializeObject<RdMgmtRemoteApp>(strJson);
-                //}
+                
             }
             catch
             {
                 return null;
             }
-            // return rdMgmtRemoteApp;
         }
 
         /// <summary>
@@ -62,21 +54,8 @@ namespace MSFT.WVDSaaS.API.BLL
         {
             try
             {
-                //RemoteAppDTO remoteAppDTO = new RemoteAppDTO();
-                //remoteAppDTO.tenantName = rdMgmtRemoteApp.tenantName;
-                //remoteAppDTO.friendlyName = rdMgmtRemoteApp.friendlyName;
-                //remoteAppDTO.description = rdMgmtRemoteApp.description;
-                //remoteAppDTO.appGroupName = rdMgmtRemoteApp.appGroupName;
-                //remoteAppDTO.hostPoolName = rdMgmtRemoteApp.hostPoolName;
-                //remoteAppDTO.remoteAppName = rdMgmtRemoteApp.remoteAppName;
-                //remoteAppDTO.filePath = rdMgmtRemoteApp.filePath;
-                //remoteAppDTO.commandLineSetting = rdMgmtRemoteApp.commandLineSetting;
-                //remoteAppDTO.iconIndex = rdMgmtRemoteApp.iconIndex;
-                //remoteAppDTO.requiredCommandLine = rdMgmtRemoteApp.requiredCommandLine;
-                //remoteAppDTO.showInWebFeed = rdMgmtRemoteApp.showInWebFeed;
-                //remoteAppDTO.appAlias = rdMgmtRemoteApp.appAlias;
-                //remoteAppDTO.tenantGroupName = rdMgmtRemoteApp.tenantGroupName;
-                //call rest api to publish remote appgroup app -- july code bit
+               
+                //call rest api to publish remote appgroup app 
                 var content = new StringContent(JsonConvert.SerializeObject(rdMgmtRemoteApp), Encoding.UTF8, "application/json");
                 HttpResponseMessage response = CommonBL.InitializeHttpClient(deploymentUrl, accessToken).PostAsync("/RdsManagement/V1/TenantGroups/" + rdMgmtRemoteApp["tenantGroupName"].ToString() + "/Tenants/" + rdMgmtRemoteApp["tenantName"].ToString() + "/HostPools/" + rdMgmtRemoteApp["hostPoolName"].ToString() + "/AppGroups/" + rdMgmtRemoteApp["appGroupName"].ToString() + "/RemoteApps/" + rdMgmtRemoteApp["remoteAppName"].ToString(), content).Result;
                 string strJson = response.Content.ReadAsStringAsync().Result;
@@ -130,7 +109,6 @@ namespace MSFT.WVDSaaS.API.BLL
         /// <returns></returns>
         public HttpResponseMessage GetRemoteAppList(string tenantGroupName, string deploymentUrl, string accessToken, string tenantName, string hostPoolName, string appGroupName)
         {
-            // List<RdMgmtRemoteApp> rdMgmtRemoteApps = new List<RdMgmtRemoteApp>();
             try
             {
                 HttpResponseMessage response = CommonBL.InitializeHttpClient(deploymentUrl, accessToken).GetAsync("/RdsManagement/V1/TenantGroups/" + tenantGroupName + "/Tenants/" + tenantName + "/HostPools/" + hostPoolName + "/AppGroups/" + appGroupName + "/RemoteApps").Result;
@@ -138,50 +116,11 @@ namespace MSFT.WVDSaaS.API.BLL
 
                 //api call included pagination 
                 // response = CommonBL.InitializeHttpClient(deploymentUrl, accessToken).GetAsync("/RdsManagement/V1/TenantGroups/" + tenantGroupName + "/Tenants/" + tenantName + "/HostPools/" + hostPoolName + "/AppGroups/" + appGroupName + "/RemoteApps?PageSize=" + pageSize + "&LastEntry=" + lastEntry + "&SortField=" + sortField + "&IsDescending=" + isDescending + "&InitialSkip=" + initialSkip).Result;
-
-
-                ////call rest api to get  remote app list  -- july code bit
-                //string strJson = response.Content.ReadAsStringAsync().Result;
-                //if (response.IsSuccessStatusCode)
-                //{
-                //    //Deserialize the string to JSON object
-                //    var jObj = (JArray)JsonConvert.DeserializeObject(strJson);
-                //    if (jObj.Count > 0)
-                //    {
-                //        if (isRemoteAppNameOnly)
-                //        {
-                //            rdMgmtRemoteApps = jObj.Select(item => new RdMgmtRemoteApp
-                //            {
-                //                remoteAppName = (string)item["remoteAppName"]
-                //            }).ToList();
-                //        }
-                //        else
-                //        {
-                //            rdMgmtRemoteApps = jObj.Select(item => new RdMgmtRemoteApp
-                //            {
-                //                tenantName = (string)item["tenantName"],
-                //                remoteAppName = (string)item["remoteAppName"],
-                //                appAlias = (string)item["appAlias"],
-                //                hostPoolName = (string)item["hostPoolName"],
-                //                appGroupName = (string)item["appGroupName"],
-                //                description = (string)item["tenantName"],
-                //                filePath = (string)item["filePath"],
-                //                friendlyName = (string)item["friendlyName"],
-                //                commandLineSetting = (string)item["commandLineSetting"],
-                //                iconIndex = (int)item["iconIndex"],
-                //                iconPath = (string)item["iconPath"],
-                //                requiredCommandLine = (string)item["requiredCommandLine"],
-                //                showInWebFeed = (bool)item["showInWebFeed"]
-                //            }).ToList();
-                //        }
-                //    }
-                //}
             }
             catch
             {
                 return null;
             }
-            // return rdMgmtRemoteApps;
         }
         /// <summary>
         /// Description : Remove remote app from associated app group

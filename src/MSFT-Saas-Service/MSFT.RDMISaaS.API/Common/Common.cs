@@ -128,45 +128,7 @@ namespace MSFT.WVDSaaS.API.Common
                     loginDetails.Email = tokenS.Claims.First(claim => claim.Type.Equals("unique_name")).Value;
                     loginDetails.Code = "";
 
-                    //get rele definition
-                    //if (loginDetails != null && loginDetails.Access_Token != null)
-                    //{
-                    //    string deploymentUrl = configurations.rdBrokerUrl;
-                    //    List<RdMgmtRoleAssignment> rdMgmtRoleAssignments = new List<RdMgmtRoleAssignment>();
-                    //    List<string> list = new List<string>();
-
-                    //    rdMgmtRoleAssignments = authorizationBL.GetRoleAssignments(deploymentUrl, loginDetails.Access_Token, loginDetails.Email.ToString());
-                    //    for (int i = 0; i < rdMgmtRoleAssignments.Count; i++)
-                    //    {
-                    //        if (rdMgmtRoleAssignments[i].signInName != null && rdMgmtRoleAssignments[i].signInName.ToString().ToLower() == loginDetails.Email.ToString().ToLower())
-                    //        {
-                    //loginDetails.RoleAssignment = rdMgmtRoleAssignments[i];
-                    //            if (loginDetails.RoleAssignment.scope.Split('/').Length > 1)
-                    //            {
-                    //                list.Add(loginDetails.RoleAssignment.scope.Split('/')[1].ToString());
-                    //            }
-                    //            else
-                    //            {
-                    //                list.Add(Constants.tenantGroupName);
-                    //            }
-                    //            //string TenantGroupName = "";
-                    //            //if (loginDetails.RoleAssignment.scope.Split('/').Length > 1)
-                    //            //{
-                    //            //    TenantGroupName = loginDetails.RoleAssignment.scope.Split('/')[1].ToString();
-                    //            //}
-                    //            //else
-                    //            //{
-                    //            //    TenantGroupName = Constants.tenantGroupName;
-                    //            //}
-                    //            //loginDetails.TenantGroupName = TenantGroupName;
-                    //            // break;
-                    //        }
-                    //    }
-                    //    loginDetails.TenantGroups = list.ToArray();
-
-                    //}
-
-                    //new way to get role assignment
+                    // to get role assignment
                     if (loginDetails != null && loginDetails.Access_Token != null)
                     {
                         string deploymentUrl = configurations.rdBrokerUrl;
@@ -208,9 +170,6 @@ namespace MSFT.WVDSaaS.API.Common
                     {
                         return null;
                     }
-                    /*** use following code for temporary*****/
-                    //loginDetails.RoleAssignment = new JObject() { { "roleDefinitionName", "RDS Owner" }, { "scope", "/Ptg" } };
-                    //loginDetails.TenantGroups = new string[] { "Default Tenant Group", "Ptg" };
                 }
                 else
                 {

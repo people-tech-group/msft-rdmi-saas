@@ -12,7 +12,7 @@ using MSFT.WVDSaaS.API.Common;
 using MSFT.WVDSaaS.API.Model;
 #endregion "Import Namespaces" 
 
-#region "MSFT.RDMISaaS.API.Controllers"
+#region "MSFT.WVDSaaS.API.Controllers"
 namespace MSFT.WVDSaaS.API.Controllers
 {
     [EnableCors(origins: "*", headers: "*", methods: "*")]

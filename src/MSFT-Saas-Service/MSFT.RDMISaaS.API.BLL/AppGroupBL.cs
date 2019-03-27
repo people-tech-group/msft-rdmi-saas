@@ -11,7 +11,7 @@ using Newtonsoft.Json.Linq;
 using System.Web;
 #endregion "Import Namespaces" 
 
-#region "MSFT.RDMISaaS.API.BLL"
+#region "MSFT.WVDSaaS.API.BLL"
 namespace MSFT.WVDSaaS.API.BLL
 {
     #region "class-AppGroupBL"
@@ -39,13 +39,6 @@ namespace MSFT.WVDSaaS.API.BLL
                 //call rest api to get app group user details -- july code bit
                 HttpResponseMessage response = CommonBL.InitializeHttpClient(deploymentUrl, accessToken).GetAsync("/RdsManagement/V1/TenantGroups/" + tenantGroupName + "/Tenants/" + tenantName + "/HostPools/" + hostPoolName + "/AppGroups/" + appGroupName + "/AssignedUsers/" + userPrincipalName).Result;
                 return response;
-                //string strJson = response.Content.ReadAsStringAsync().Result;
-                //if (response.IsSuccessStatusCode)
-                //{
-                //    //Deserialize the string to JSON object
-                //    rdMgmtUser = JsonConvert.DeserializeObject<RdMgmtUser>(strJson);
-                //}
-
             }
             catch
             {
@@ -66,52 +59,16 @@ namespace MSFT.WVDSaaS.API.BLL
         /// <returns></returns>
         public HttpResponseMessage GetUsersList(string tenantGroupName, string deploymentUrl, string accessToken, string tenantName, string hostPoolName, string appGroupName)
         {
-            // List<RdMgmtUser> rdMgmtUsers = new List<RdMgmtUser>();
             HttpResponseMessage response;
             try
             {
                 response = CommonBL.InitializeHttpClient(deploymentUrl, accessToken).GetAsync("/RdsManagement/V1/TenantGroups/" + tenantGroupName + "/Tenants/" + tenantName + "/HostPools/" + hostPoolName + "/AppGroups/" + appGroupName + "/AssignedUsers").Result;
                 return response;
-
-
-                //folllowing api call is included pagination
-                //response = CommonBL.InitializeHttpClient(deploymentUrl, accessToken).GetAsync("/RdsManagement/V1/TenantGroups/" + tenantGroupName + "/Tenants/" + tenantName + "/HostPools/" + hostPoolName + "/AppGroups/" + appGroupName + "/AssignedUsers?PageSize=" + pageSize + "&LastEntry=" + lastEntry + "&SortField=" + sortField + "&IsDescending=" + isDescending + "&InitialSkip=" + initialSkip).Result;
-
-
-                ////call rest api to get list of app groups users --july code bit
-                //string strJson = response.Content.ReadAsStringAsync().Result;
-                //if (response.IsSuccessStatusCode)
-                //{
-                //    //Deserialize the string to JSON object
-                //    var jObj = (JArray)JsonConvert.DeserializeObject(strJson);
-                //    if (jObj.Count > 0)
-                //    {
-                //        if (isUserNameOnly)
-                //        {
-                //            rdMgmtUsers = jObj.Select(item => new RdMgmtUser
-                //            {
-                //                userPrincipalName = (string)item["userPrincipalName"]
-                //            }).ToList();
-                //        }
-                //        else
-                //        {
-                //            rdMgmtUsers = jObj.Select(item => new RdMgmtUser
-                //            {
-                //                userPrincipalName = (string)item["userPrincipalName"],
-                //                tenantName = (string)item["tenantName"],
-                //                hostPoolName = (string)item["hostPoolName"],
-                //                appGroupName = (string)item["appGroupName"]
-                //            }).ToList();
-                //        }
-                //    }
-
-                //}
             }
             catch
             {
                 return null;
             }
-            // return rdMgmtUsers;
         }
 
         /// <summary>
@@ -131,44 +88,12 @@ namespace MSFT.WVDSaaS.API.BLL
                 //call rest api to get  app groups details -- july code bit
                 HttpResponseMessage response = CommonBL.InitializeHttpClient(deploymentUrl, accessToken).GetAsync("/RdsManagement/V1/TenantGroups/" + tenantGroupName + "/Tenants/" + tenantName + "/HostPools/" + hostPoolName + "/AppGroups/" + appGroupName).Result;
                 return response;
-                //string strJson = response.Content.ReadAsStringAsync().Result;
-                //if (response.IsSuccessStatusCode)
-                //{
-                //    ////Deserialize the string to JSON object
-
-                //    var jObj = (JObject)JsonConvert.DeserializeObject(strJson);
-                //    return jObj;
-
-                //    //rdMgmtAppGroup = JsonConvert.DeserializeObject<RdMgmtAppGroup>(strJson);
-
-                //    //if (rdMgmtAppGroup.resourceType == "0")
-                //    //{
-                //    //    rdMgmtAppGroup.resourceType = "Remote App Group";
-                //    //}
-                //    //else if (rdMgmtAppGroup.resourceType == "1")
-                //    //{
-                //    //    rdMgmtAppGroup.resourceType = "Desktop App Group";
-                //    //}
-
-                //    ////get list of Apps associated with this app group
-                //    //RemoteAppBL remoteAppBL = new RemoteAppBL();
-                //    //List<RdMgmtRemoteApp> rdMgmtRemoteApps = remoteAppBL.GetRemoteAppList(tenantGroupName,deploymentUrl, accessToken, tenantName, hostPoolName, rdMgmtAppGroup.appGroupName, true,true, 0, "", false, 0, "");
-                //    //rdMgmtAppGroup.noOfApps = rdMgmtRemoteApps.Count;
-
-                //    ////get list of Users associated with this app group
-                //    //List<RdMgmtUser> rdMgmtUsers = GetUsersList(tenantGroupName,deploymentUrl, accessToken, tenantName, hostPoolName, rdMgmtAppGroup.appGroupName, true,true, 0, "", false, 0, "");
-                //    //rdMgmtAppGroup.noOfusers = rdMgmtUsers.Count;
-                //}
-                //else
-                //{
-                //    return null;
-                //}
+                
             }
             catch
             {
                 return null;
             }
-            //return rdMgmtAppGroup;
         }
 
         /// <summary>
@@ -187,67 +112,11 @@ namespace MSFT.WVDSaaS.API.BLL
             {
                 HttpResponseMessage response = CommonBL.InitializeHttpClient(deploymentUrl, accessToken).GetAsync("/RdsManagement/V1/TenantGroups/" + tenantGroupName + "/Tenants/" + tenantName + "/HostPools/" + hostPoolName + "/AppGroups").Result;
                 return response;
-
-                //folllowing api call is included pagination
-                // response = CommonBL.InitializeHttpClient(deploymentUrl, accessToken).GetAsync("/RdsManagement/V1/TenantGroups/" + tenantGroupName + "/Tenants/" + tenantName + "/HostPools/" + hostPoolName + "/AppGroups?PageSize=" + pageSize + "&LastEntry=" + lastEntry + "&SortField=" + sortField + "&IsDescending=" + isDescending + "&InitialSkip=" + initialSkip).Result;
-
-
-                //call rest api to get list of app groups -- july code bit
-                // string strJson = response.Content.ReadAsStringAsync().Result;
-                // if (response.IsSuccessStatusCode)
-                // {
-                ////Deserialize the string to JSON object
-                // var jObj = (JArray)JsonConvert.DeserializeObject(strJson);
-                //return jObj;
-                //if (jObj.Count > 0)
-                //{
-
-                //    if (isAppGroupNameOnly)
-                //    {
-                //        rdMgmtAppGroups = jObj.Select(item => new RdMgmtAppGroup
-                //        {
-                //            appGroupName = (string)item["appGroupName"]
-                //        }).ToList();
-                //    }
-                //    else
-                //    {
-                //        rdMgmtAppGroups = jObj.Select(item => new RdMgmtAppGroup
-                //        {
-                //            tenantName = (string)item["tenantName"],
-                //            hostPoolName = (string)item["hostPoolName"],
-                //            appGroupName = (string)item["appGroupName"],
-                //            description = (string)item["description"],
-                //            friendlyName = (string)item["friendlyName"],
-                //            resourceType = item["resourceType"].ToString() == "0" ? "Remote App Group" : "Desktop App Group"
-                //        }).ToList();
-                //    }
-                //}
-                //}
-                //else
-                //{
-                //    return null;
-                //}
-
-                //if (rdMgmtAppGroups.Count > 0)
-                //{
-                //    for (int i = 0; i < rdMgmtAppGroups.Count; i++)
-                //    {
-                //        //get list of Apps associated with App group
-                //        RemoteAppBL remoteAppBL = new RemoteAppBL();
-                //        List<RdMgmtRemoteApp> rdMgmtRemoteApps = remoteAppBL.GetRemoteAppList(tenantGroupName,deploymentUrl, accessToken, tenantName, hostPoolName, rdMgmtAppGroups[i].appGroupName, true,true, 0, "", false, 0, "");
-                //        rdMgmtAppGroups[i].noOfApps = rdMgmtRemoteApps.Count;
-
-                //        //get list of Users associsted with app group
-                //        List<RdMgmtUser> rdMgmtUsers = GetUsersList(tenantGroupName,deploymentUrl, accessToken, tenantName, hostPoolName, rdMgmtAppGroups[i].appGroupName, true,true, 0, "", false, 0, "");
-                //        rdMgmtAppGroups[i].noOfusers = rdMgmtUsers.Count;
-                //    }
-                //}
             }
             catch
             {
                 return null;
             }
-            // return rdMgmtAppGroups;
         }
 
         /// <summary>
@@ -271,33 +140,12 @@ namespace MSFT.WVDSaaS.API.BLL
                 //folllowing api call is included pagination
                 //HttpResponseMessage response = CommonBL.InitializeHttpClient(deploymentUrl, accessToken).GetAsync("/RdsManagement/V1/TenantGroups/" + tenantGroupName + "/Tenants/" + tenantName + "/HostPools/" + hostPoolName + "/AppGroups/" + appGroupName + "/StartMenuApps?PageSize=" + pageSize + "&LastEntry=" + lastEntry + "&SortField=" + sortField + "&IsDescending=" + isDescending + "&InitialSkip=" + initialSkip).Result;
                 return response;
-                //string strJson = response.Content.ReadAsStringAsync().Result;
-                //if (response.IsSuccessStatusCode)
-                //{
-                //    //Deserialize the string to JSON object
-                //    var jObj = (JArray)JsonConvert.DeserializeObject(strJson);
-                //    if (jObj.Count > 0)
-                //    {
-                //        rdMgmtStartMenuApps = jObj.Select(item => new RdMgmtStartMenuApp
-                //        {
-                //            hostPoolName = (string)item["hostPoolName"],
-                //            tenantName = (string)item["tenantName"],
-                //            appGroupName = (string)item["appGroupName"],
-                //            appAlias = (string)item["appAlias"],
-                //            friendlyName = (string)item["friendlyName"],
-                //            filePath = (string)item["filePath"],
-                //            commandLineArguments = (string)item["commandLineArguments"],
-                //            iconPath = (string)item["iconPath"],
-                //            iconIndex = (int)item["iconIndex"]
-                //        }).ToList();
-                //    }
-                //}
+               
             }
             catch
             {
                 return null;
             }
-            //  return rdMgmtStartMenuApps;
         }
 
         /// <summary>
@@ -311,16 +159,6 @@ namespace MSFT.WVDSaaS.API.BLL
         {
             try
             {
-                //AppGroupDTO appGroupDTO = new AppGroupDTO();
-                //appGroupDTO.tenantGroupName = rdMgmtAppGroup.tenantGroupName;
-                //appGroupDTO.appGroupName = rdMgmtAppGroup.appGroupName;
-                //appGroupDTO.description = rdMgmtAppGroup.description;
-                //appGroupDTO.friendlyName = rdMgmtAppGroup.friendlyName;
-                //appGroupDTO.hostPoolName = rdMgmtAppGroup.hostPoolName;
-                //appGroupDTO.resourceType = Convert.ToInt32(rdMgmtAppGroup.resourceType);
-                //appGroupDTO.tenantName = rdMgmtAppGroup.tenantName;
-
-
                 //call rest service to create app group -- july code bit
                 var content = new StringContent(JsonConvert.SerializeObject(rdMgmtAppGroup), Encoding.UTF8, "application/json");
                 HttpResponseMessage response = CommonBL.InitializeHttpClient(deploymentUrl, accessToken).PostAsync("/RdsManagement/V1/TenantGroups/" + rdMgmtAppGroup["tenantGroupName"].ToString() + "/Tenants/" + rdMgmtAppGroup["tenantName"].ToString() + "/HostPools/" + rdMgmtAppGroup["hostPoolName"].ToString() + "/AppGroups/" + rdMgmtAppGroup["appGroupName"].ToString(), content).Result;
@@ -369,15 +207,7 @@ namespace MSFT.WVDSaaS.API.BLL
         {
             try
             {
-                //AppGroupDTO appGroupDTO = new AppGroupDTO();
-                //appGroupDTO.tenantGroupName = rdMgmtAppGroup.tenantGroupName;
-                //appGroupDTO.appGroupName = rdMgmtAppGroup.appGroupName;
-                //appGroupDTO.description = rdMgmtAppGroup.description;
-                //appGroupDTO.friendlyName = rdMgmtAppGroup.friendlyName;
-                //appGroupDTO.hostPoolName = rdMgmtAppGroup.hostPoolName;
-                //appGroupDTO.resourceType = Convert.ToInt32(rdMgmtAppGroup.resourceType);
-                //appGroupDTO.tenantName = rdMgmtAppGroup.tenantName;
-
+                
                 //call rest service to update app group details 
                 var content = new StringContent(JsonConvert.SerializeObject(rdMgmtAppGroup), Encoding.UTF8, "application/json");
                 HttpResponseMessage response = CommonBL.PatchAsync(deploymentUrl, accessToken, "/RdsManagement/V1/TenantGroups/" + rdMgmtAppGroup["tenantGroupName"].ToString() + "/Tenants/" + rdMgmtAppGroup["tenantName"].ToString() + "/HostPools/" + rdMgmtAppGroup["hostPoolName"].ToString() + "/AppGroups/" + rdMgmtAppGroup["appGroupName"].ToString(), content).Result;
@@ -475,15 +305,6 @@ namespace MSFT.WVDSaaS.API.BLL
         {
             try
             {
-                //AppGroupUserDTO appGroupUserDTO = new AppGroupUserDTO();
-                //appGroupUserDTO.appGroupName = rdMgmtUser.appGroupName;
-                //appGroupUserDTO.appGroupUser = rdMgmtUser.appGroupUser;
-                //appGroupUserDTO.hostPoolName = rdMgmtUser.hostPoolName;
-                //appGroupUserDTO.tenantName = rdMgmtUser.tenantName;
-                //appGroupUserDTO.userPrincipalName = rdMgmtUser.userPrincipalName;
-                //appGroupUserDTO.tenantGroupName = rdMgmtUser.tenantGroupName;
-
-
                 //call rest service to add user to app group - july code bit
                 var content = new StringContent(JsonConvert.SerializeObject(rdMgmtUser), Encoding.UTF8, "application/json");
                 HttpResponseMessage response = CommonBL.InitializeHttpClient(deploymentUrl, accessToken).PostAsync("/RdsManagement/V1/TenantGroups/" + rdMgmtUser["tenantGroupName"].ToString() + "/Tenants/" + rdMgmtUser["tenantName"].ToString() + "/HostPools/" + rdMgmtUser["hostPoolName"].ToString() + "/AppGroups/" + rdMgmtUser["appGroupName"].ToString() + "/AssignedUsers/" + rdMgmtUser["userPrincipalName"].ToString(), content).Result;

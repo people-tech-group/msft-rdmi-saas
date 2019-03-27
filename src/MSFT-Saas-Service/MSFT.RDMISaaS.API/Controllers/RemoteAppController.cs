@@ -11,7 +11,7 @@ using System.Web.Http.Cors;
 using Newtonsoft.Json.Linq;
 #endregion "Import Namespaces"
 
-#region "MSFT.RDMISaaS.API.Controllers"
+#region "MSFT.WVDSaaS.API.Controllers"
 namespace MSFT.WVDSaaS.API.Controllers
 {
     [EnableCors(origins: "*", headers: "*", methods: "*")]
@@ -44,7 +44,6 @@ namespace MSFT.WVDSaaS.API.Controllers
         {
             //get deployment url
             deploymentUrl = configurations.rdBrokerUrl;
-            //RdMgmtRemoteApp remoteapp = new RdMgmtRemoteApp();
             try
             {
                 if (!string.IsNullOrEmpty(refresh_token))
@@ -59,20 +58,17 @@ namespace MSFT.WVDSaaS.API.Controllers
                     else
                     {
                         return Request.CreateResponse(HttpStatusCode.OK, new JObject() { { "code", Constants.invalidToken } });
-
                     }
                 }
                 else
                 {
                     return null;
-
                 }
             }
             catch
             {
                 return null;
             }
-            // return remoteapp;
         }
 
         /// <summary>
@@ -119,7 +115,7 @@ namespace MSFT.WVDSaaS.API.Controllers
         }
 
         /// <summary>
-        /// Descriptio - punlish multiple aps to app group
+        /// Description - punlish multiple aps to app group
         /// </summary>
         /// <param name="rdMgmtRemoteApps"></param>
         /// <param name="refresh_token">Refresh token to get Access Token</param>
@@ -236,11 +232,7 @@ namespace MSFT.WVDSaaS.API.Controllers
                     }
                     else
                     {
-                        //RdMgmtRemoteApp rdMgmtRemoteApp = new RdMgmtRemoteApp();
-                        //rdMgmtRemoteApp.code = Constants.invalidToken;
-                        //rdMgmtRemoteApps.Add(rdMgmtRemoteApp);
                         return Request.CreateResponse(HttpStatusCode.OK, new JArray() { new JObject() { { "code", Constants.invalidToken } } });
-
                     }
                 }
                 else
@@ -252,12 +244,9 @@ namespace MSFT.WVDSaaS.API.Controllers
             {
                 return null;
             }
-            //return rdMgmtRemoteApps;
         }
         #endregion
-
     }
     #endregion
-
 }
 #endregion

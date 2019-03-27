@@ -14,7 +14,6 @@ namespace MSFT.WVDSaaS.API.BLL
     #region "class-DesktopBL"
     public class DesktopBL
     {
-       // string tenantGroup = Constants.tenantGroupName;
 
         /// <summary>
         /// Description-Gets the published desktop for host pool's application group

@@ -1,4 +1,5 @@
-﻿using MSFT.WVDSaaS.API.Model;
+﻿#region "Import Namespaces"
+using MSFT.WVDSaaS.API.Model;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System;
@@ -8,101 +9,28 @@ using System.Net.Http;
 using System.Text;
 using System.Net.Http.Headers;
 using System.Threading.Tasks;
+#endregion "Import Namespaces"
 
+#region "MSFT.WVDSaaS.API.BLL"
 namespace MSFT.WVDSaaS.API.BLL
 {
+    #region "AuthorizationBL"
     public class AuthorizationBL
     {
 
-        //public List<RdMgmtRoleAssignment> GetRoleAssignments(string deploymentUrl,string accessToken,string upn)
-        //{
-        //    List<RdMgmtRoleAssignment> rdMgmtRoleAssignments = new List<RdMgmtRoleAssignment>();
-        //    try
-        //    {
-        //        HttpResponseMessage response = CommonBL.InitializeHttpClient(deploymentUrl, accessToken).GetAsync("RdsManagement/V1/Rds.Authorization/roleAssignments?upn="+upn).Result;
-
-
-        //        string strJson = response.Content.ReadAsStringAsync().Result;
-        //        if (response.IsSuccessStatusCode)
-        //        {
-        //            //Deserialize the string to JSON object
-        //            var jObj = (JArray)JsonConvert.DeserializeObject(strJson);
-        //            if (jObj.Count > 0)
-        //            {
-        //                rdMgmtRoleAssignments = jObj.Select(item => new RdMgmtRoleAssignment
-        //                {
-        //                    roleAssignmentId = (string)item["roleAssignmentId"],
-        //                    scope = (string)item["scope"],
-        //                    displayName = (string)item["displayName"],
-        //                    signInName = (string)item["signInName"],
-        //                    roleDefinitionName = (string)item["roleDefinitionName"],
-        //                    roleDefinitionId = (string)item["roleDefinitionId"],
-        //                    objectId = (string)item["objectId"],
-        //                    objectType = (string)item["objectType"]
-        //                }).ToList();
-        //            }
-
-        //        }
-
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        return null;
-        //    }
-        //    return rdMgmtRoleAssignments;
-        //}
-
         public  Task<HttpResponseMessage> GetRoleAssignments(string deploymentUrl, string accessToken, string upn)
         {
-            // List<RdMgmtRoleAssignment> rdMgmtRoleAssignments = new List<RdMgmtRoleAssignment>();
             try
             {
                 HttpResponseMessage response = CommonBL.InitializeHttpClient(deploymentUrl, accessToken).GetAsync("/RdsManagement/V1/Rds.Authorization/roleAssignments?upn=" + upn).Result;//.Result; //.ConfigureAwait(true).GetAwaiter().GetResult();
                 return Task.FromResult(response);
-
-                //HttpClient httpClient = CommonBL.InitializeHttpClient(deploymentUrl, accessToken);
-                //HttpResponseMessage httpResponseMessage = await httpClient.GetAsync("/RdsManagement/V1/Rds.Authorization/roleAssignments?upn=" + upn);
-                //return httpResponseMessage;
-
-                //string strJson = response.Content.ReadAsStringAsync().Result;
-                //if (response.IsSuccessStatusCode)
-                //{
-                //    //Deserialize the string to JSON object
-                //    var jObj = (JArray)JsonConvert.DeserializeObject(strJson);
-                //    //if (jObj.Count > 0)
-                //    //{
-                //    //    rdMgmtRoleAssignments = jObj.Select(item => new RdMgmtRoleAssignment
-                //    //    {
-                //    //        roleAssignmentId = (string)item["roleAssignmentId"],
-                //    //        scope = (string)item["scope"],
-                //    //        displayName = (string)item["displayName"],
-                //    //        signInName = (string)item["signInName"],
-                //    //        roleDefinitionName = (string)item["roleDefinitionName"],
-                //    //        roleDefinitionId = (string)item["roleDefinitionId"],
-                //    //        objectId = (string)item["objectId"],
-                //    //        objectType = (string)item["objectType"]
-                //    //    }).ToList();
-                //    //}
-                //    return jObj;
-                //}
-                //else
-                //{
-                //    return null;
-                //}
-
             }
             catch (Exception ex)
             {
                 HttpResponseMessage response=  new HttpResponseMessage(System.Net.HttpStatusCode.RequestTimeout) { Content = new StringContent(ex.InnerException.Message.ToString(), System.Text.Encoding.UTF8, "application/json") };
                 return  Task.FromResult(response);
             }
-            //catch (TaskCanceledException e)
-            //{
-            //    return null;
-            //}
-            //return rdMgmtRoleAssignments;
         }
-
 
         public List<RdMgmtRoleAssignment> GetRoleAssignmentsByUser(string deploymentUrl, string accessToken, string loginUserName)
         {
@@ -133,7 +61,6 @@ namespace MSFT.WVDSaaS.API.BLL
                     }
 
                 }
-
             }
             catch (Exception ex)
             {
@@ -142,4 +69,7 @@ namespace MSFT.WVDSaaS.API.BLL
             return rdMgmtRoleAssignments;
         }
     }
+    #endregion
+
 }
+#endregion 

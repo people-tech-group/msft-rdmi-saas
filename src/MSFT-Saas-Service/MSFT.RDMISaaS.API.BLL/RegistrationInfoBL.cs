@@ -16,7 +16,6 @@ namespace MSFT.WVDSaaS.API.BLL
     public class RegistrationInfoBL
     {
         JObject infoResult = new JObject();
-       // string tenantGroup = Constants.tenantGroupName;
 
         /// <summary>
         /// Description - Exports a Rds RegistrationInfo associated with the TenantGroup, Tenant and HostPool specified in the Rds context.
@@ -28,25 +27,16 @@ namespace MSFT.WVDSaaS.API.BLL
         /// <returns></returns>
         public HttpResponseMessage GetRegistrationInfo(string tenantGroupName,string deploymentUrl, string accessToken, string tenantName, string hostPoolName)
         {
-            //RdMgmtRegistrationInfo rdMgmtRegistrationInfo = new RdMgmtRegistrationInfo();
             try
             {
                 //call rest api to get RegistrationInfo -- july code bit
                 HttpResponseMessage response = CommonBL.InitializeHttpClient(deploymentUrl, accessToken).GetAsync("/RdsManagement/V1/TenantGroups/" + tenantGroupName + "/Tenants/" + tenantName + "/HostPools/" + hostPoolName + "/RegistrationInfos/actions/export").Result;
                 return response;
-                //string strJson = response.Content.ReadAsStringAsync().Result;
-                //if (response.IsSuccessStatusCode)
-                //{
-                //    //Deserialize the string to JSON object
-                //    rdMgmtRegistrationInfo = JsonConvert.DeserializeObject<RdMgmtRegistrationInfo>(strJson);
-                //}
-
             }
             catch 
             {
                 return null;
             }
-            //return rdMgmtRegistrationInfo;
         }
 
         /// <summary>
@@ -60,12 +50,6 @@ namespace MSFT.WVDSaaS.API.BLL
         {
             try
             {
-                //RegistrationInfoDTO registrationInfoDTO = new RegistrationInfoDTO();
-                //registrationInfoDTO.tenantName = rdMgmtRegistrationInfo.tenantName;
-                //registrationInfoDTO.hostPoolName = rdMgmtRegistrationInfo.hostPoolName;
-                //registrationInfoDTO.expirationTime = rdMgmtRegistrationInfo.expirationUtc;
-                //registrationInfoDTO.tenantGroupName = rdMgmtRegistrationInfo.tenantGroupName;
-
                 //call rest api to generate registration key -- july code bit
                 var content = new StringContent(JsonConvert.SerializeObject(rdMgmtRegistrationInfo), Encoding.UTF8, "application/json");
                 HttpResponseMessage response = CommonBL.InitializeHttpClient(deploymentUrl, accessToken).PostAsync("/RdsManagement/V1/TenantGroups/" + rdMgmtRegistrationInfo["tenantGroupName"].ToString() + "/Tenants/" + rdMgmtRegistrationInfo["tenantName"].ToString() + "/HostPools/" + rdMgmtRegistrationInfo["hostPoolName"].ToString() + "/RegistrationInfos/", content).Result;

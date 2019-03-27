@@ -17,7 +17,6 @@ namespace MSFT.WVDSaaS.API.BLL
     public class SessionHostBL
     {
         JObject hostResult = new JObject();
-        //string tenantGroup = Constants.tenantGroupName;
 
         /// <summary>
         /// Description: Gets all Rds SessionHosts associated with the Tenant and Host Pool specified in the Rds context.
@@ -31,10 +30,6 @@ namespace MSFT.WVDSaaS.API.BLL
         /// <returns></returns>
         public HttpResponseMessage GetSessionhostList(string deploymentUrl, string accessToken, string tenantGroup, string tenantName, string hostPoolName)
         {
-            //List<RdMgmtSessionHost> rdMgmtSessionHosts = new List<RdMgmtSessionHost>();
-
-
-
             try
             {
                 HttpResponseMessage response = CommonBL.InitializeHttpClient(deploymentUrl, accessToken).GetAsync("/RdsManagement/V1/TenantGroups/" + tenantGroup + "/Tenants/" + tenantName + "/HostPools/" + hostPoolName + "/SessionHosts").Result;
@@ -42,39 +37,6 @@ namespace MSFT.WVDSaaS.API.BLL
 
                 //api call included pagination
                 //    response = CommonBL.InitializeHttpClient(deploymentUrl, accessToken).GetAsync("/RdsManagement/V1/TenantGroups/" + tenantGroup + "/Tenants/" + tenantName + "/HostPools/" + hostPoolName + "/SessionHosts?PageSize=" + pageSize + "&LastEntry=" + lastEntry + "&SortField=" + sortField + "&IsDescending=" + isDescending + "&InitialSkip=" + initialSkip).Result;
-
-                ////call rest api to get all Session hosts asscociated with selected  hostpool -- july code bit
-                //string strJson = response.Content.ReadAsStringAsync().Result;
-                //if (response.IsSuccessStatusCode)
-                //{
-                //    //Deserialize the string to JSON object
-                //    var jObj = (JArray)JsonConvert.DeserializeObject(strJson);
-                //    if (jObj.Count > 0)
-                //    {
-                //        if (isSessionHostNameOnly)
-                //        {
-                //            rdMgmtSessionHosts = jObj.Select(item => new RdMgmtSessionHost
-                //            {
-                //                tenantName = (string)item["tenantName"],
-                //                hostPoolName = (string)item["hostPoolName"],
-                //                sessionHostName = (string)item["sessionHostName"]
-                //            }).ToList();
-                //        }
-                //        else
-                //        {
-                //            rdMgmtSessionHosts = jObj.Select(item => new RdMgmtSessionHost
-                //            {
-                //                tenantName = (string)item["tenantName"],
-                //                hostPoolName = (string)item["hostPoolName"],
-                //                sessionHostName = (string)item["sessionHostName"],
-                //                allowNewSession = (bool)item["allowNewSession"],
-                //                sessions = (int)item["sessions"],
-                //                lastHeartBeat = (DateTime)item["lastHeartBeat"],
-                //                agentVersion = (string)item["agentVersion"]
-                //            }).ToList();
-                //        }
-                //    }
-                //}
             }
             catch
             {
@@ -94,19 +56,11 @@ namespace MSFT.WVDSaaS.API.BLL
         /// <returns></returns>
         public HttpResponseMessage GetSessionHostDetails(string deploymentUrl, string accessToken, string tenantGroup, string tenantName, string hostPoolName, string sessionHostName)
         {
-            //  RdMgmtSessionHost rdMgmtSessionHost = new RdMgmtSessionHost();
             try
             {
                 //call rest api to get session host details -- july code bit
                 HttpResponseMessage response = CommonBL.InitializeHttpClient(deploymentUrl, accessToken).GetAsync("/RdsManagement/V1/TenantGroups/" + tenantGroup + "/Tenants/" + tenantName + "/HostPools/" + hostPoolName + "/SessionHosts/" + sessionHostName).Result;
                 return response;
-                //string strJson = response.Content.ReadAsStringAsync().Result;
-                //if (response.IsSuccessStatusCode)
-                //{
-                //    //Deserialize the string to JSON object
-                //    rdMgmtSessionHost = JsonConvert.DeserializeObject<RdMgmtSessionHost>(strJson);
-                //}
-
             }
             catch
             {
@@ -125,14 +79,6 @@ namespace MSFT.WVDSaaS.API.BLL
         {
             try
             {
-                ////assigning values to Session host class object
-                //SessionHostDTO sessionHostDTO = new SessionHostDTO();
-                //sessionHostDTO.tenantName = rdMgmtSessionHost.tenantName;
-                //sessionHostDTO.hostPoolName = rdMgmtSessionHost.hostPoolName;
-                //sessionHostDTO.sessionHostName = rdMgmtSessionHost.sessionHostName;
-                //sessionHostDTO.allowNewSession = rdMgmtSessionHost.allowNewSession;
-                //sessionHostDTO.tenantGroupName = rdMgmtSessionHost.tenantGroupName;
-
                 //call rest service to update Sesssion host -- july code bit
                 var content = new StringContent(JsonConvert.SerializeObject(rdMgmtSessionHost), Encoding.UTF8, "application/json");
                 HttpResponseMessage response = CommonBL.PatchAsync(deploymentUrl, accessToken, "/RdsManagement/V1/TenantGroups/" + rdMgmtSessionHost["tenantGroupName"].ToString() + "/Tenants/" + rdMgmtSessionHost["tenantName"].ToString() + "/HostPools/" + rdMgmtSessionHost["hostPoolName"].ToString() + "/SessionHosts/" + rdMgmtSessionHost["sessionHostName"].ToString(), content).Result;

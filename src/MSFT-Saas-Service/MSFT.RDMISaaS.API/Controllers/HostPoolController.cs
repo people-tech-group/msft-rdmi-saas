@@ -11,7 +11,7 @@ using System.Web.Http.Cors;
 using Newtonsoft.Json.Linq;
 #endregion "Import Namespaces"
 
-#region "MSFT.RDMISaaS.API.Controllers"
+#region "MSFT.WVDSaaS.API.Controllers"
 namespace MSFT.WVDSaaS.API.Controllers
 {
     [EnableCors(origins: "*", headers: "*", methods: "*")]
@@ -54,7 +54,6 @@ namespace MSFT.WVDSaaS.API.Controllers
                     if (!string.IsNullOrEmpty(accessToken) && accessToken.ToString().ToLower() != invalidToken && accessToken.ToString().ToLower() != invalidCode)
                     {
                         return hostPoolBL.GetHostPoolDetails(tenantGroupName, deploymentUrl, accessToken, tenantName, hostPoolName);
-                        // rdMgmtHostPool = hostPoolBL.GetHostPoolDetails(tenantGroupName,deploymentUrl, accessToken, tenantName, hostPoolName);
                     }
                     else
                     {
@@ -62,7 +61,6 @@ namespace MSFT.WVDSaaS.API.Controllers
                         {
                             {"code",  Constants.invalidToken}
                         });
-                        // rdMgmtHostPool.code = Constants.invalidToken;
                     }
                 }
                 else
@@ -74,7 +72,6 @@ namespace MSFT.WVDSaaS.API.Controllers
             {
                 return null;
             }
-            // return rdMgmtHostPool;
         }
 
         /// <summary>
@@ -114,7 +111,7 @@ namespace MSFT.WVDSaaS.API.Controllers
             }
             catch (Exception ex)
             {
-                poolResult.Add("isSuccess",false);
+                poolResult.Add("isSuccess", false);
                 poolResult.Add("message", "Hostpool '" + rdMgmthostpool["hostPoolName"] + "' has not been created." + ex.Message.ToString() + "Please try again later.");
             }
             return Ok(poolResult);
@@ -144,7 +141,7 @@ namespace MSFT.WVDSaaS.API.Controllers
                     }
                     else
                     {
-                        poolResult.Add("isSuccess",false);
+                        poolResult.Add("isSuccess", false);
                         poolResult.Add("message", Constants.invalidToken);
                     }
                 }
@@ -252,7 +249,7 @@ namespace MSFT.WVDSaaS.API.Controllers
             catch (Exception ex)
             {
                 poolResult.Add("isSuccess", false);
-                poolResult.Add("message","Hostpool '" + rdMgmthostpool["hostPoolName"].ToString() + "' has not been updated." + ex.Message.ToString() + " Please try again later.");
+                poolResult.Add("message", "Hostpool '" + rdMgmthostpool["hostPoolName"].ToString() + "' has not been updated." + ex.Message.ToString() + " Please try again later.");
             }
             return Ok(poolResult);
         }
