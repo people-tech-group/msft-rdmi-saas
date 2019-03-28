@@ -87,7 +87,7 @@ try
             
                 Write-Output "Extracting the Api-App Zip File"
                 Expand-Archive -Path $ApiAppExtractionPath -DestinationPath $ApiAppDirectory -Force 
-                $ApiAppExtractedPath = Get-ChildItem -Path $ApiAppDirectory| Where-Object {$_.FullName -notmatch '\\*.zip($|\\)'} | Resolve-Path -Verbose
+                $ApiAppExtractedPath = Get-ChildItem -Path $ApiAppDirectory | Where-Object {$_.FullName -notmatch '\\*.zip($|\\)'} | Resolve-Path -Verbose
                 
                 # Get publishing profile from Api-App
 
@@ -143,11 +143,13 @@ try
                 # Extract the Web-App ZIP file content.
 
                 Expand-Archive -Path $WebAppExtractionPath -DestinationPath $WebAppDirectory -Force 
-                $WebAppExtractedPath = Get-ChildItem -Path $WebAppDirectory| Where-Object {$_.FullName -notmatch '\\*.zip($|\\)'} | Resolve-Path -Verbose
+                $WebAppExtractedPath = Get-ChildItem -Path $WebAppDirectory | Where-Object {$_.FullName -notmatch '\\*.zip($|\\)'} | Resolve-Path -Verbose
 
                 # Get the main.bundle.js file Path 
 
-                $MainbundlePath = Get-ChildItem $WebAppExtractedPath -recurse | where {($_.FullName -match "main.bundle.js" ) -and ($_.FullName -notmatch "main.bundle.js.map")} | % {$_.FullName}
+                #$MainbundlePath = Get-ChildItem $WebAppExtractedPath -recurse | where {($_.FullName -match "main.bundle.js" ) -and ($_.FullName -notmatch "main.bundle.js.map")} | % {$_.FullName}
+                $MainbundlePath = Get-ChildItem $WebAppExtractedPath -recurse | where {($_.FullName -match "main\.(\w+).bundle.js$")} | % {$_.FullName}
+
  
                 # Get Url of Api-App 
 
