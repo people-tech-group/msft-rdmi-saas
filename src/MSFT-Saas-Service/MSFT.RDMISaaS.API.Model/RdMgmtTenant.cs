@@ -5,7 +5,7 @@ using System.Text;
 #endregion "Import Namespaces"
 
 #region "MSFT.RDMISaaS.API.Model"
-namespace MSFT.RDMISaaS.API.Model
+namespace MSFT.WVDSaaS.API.Model
 {
     #region "Class - RdMgmtTenant"
     public class RdMgmtTenant
@@ -26,7 +26,10 @@ namespace MSFT.RDMISaaS.API.Model
         public int noOfSessions { get; set; }
         public string code { get; set; }
         public string refresh_token { get; set; }
-         
+
+        public string azureSubscriptionId { get; set; }
+
+
     }
     #endregion "Class - RdMgmtTenant"
 
@@ -50,6 +53,7 @@ namespace MSFT.RDMISaaS.API.Model
         public string ssoAdfsAuthority { get; set; }
         public string ssoClientId { get; set; }
         public string ssoClientSecret { get; set; }
+        public string azureSubscriptionId { get; set; }
     }
     #endregion  "Class - TenantDataDTO"
 

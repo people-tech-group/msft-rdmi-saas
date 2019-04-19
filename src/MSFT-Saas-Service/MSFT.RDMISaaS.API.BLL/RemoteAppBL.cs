@@ -1,5 +1,5 @@
 ﻿#region "Import Namespaces"
-using MSFT.RDMISaaS.API.Model;
+using MSFT.WVDSaaS.API.Model;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System;
@@ -10,13 +10,12 @@ using System.Text;
 #endregion "Import Namespaces"
 
 #region "MSFT.RDMISaaS.API.BLL"
-namespace MSFT.RDMISaaS.API.BLL
+namespace MSFT.WVDSaaS.API.BLL
 {
     #region "RemoteAppBL"
     public class RemoteAppBL
     {
-        RemoteAppResult appResult = new RemoteAppResult();
-        //string tenantGroup = Constants.tenantGroupName;
+        JObject appResult = new JObject();
 
         #region "Functions/Methods"
         /// <summary>
@@ -29,25 +28,19 @@ namespace MSFT.RDMISaaS.API.BLL
         /// <param name="appGroupName">Name of App Group</param>
         /// <param name="remoteAppName">Name of Remote App</param>
         /// <returns></returns>
-        public RdMgmtRemoteApp GetRemoteAppDetails(string tenantGroupName, string deploymentUrl, string accessToken, string tenantName, string hostPoolName, string appGroupName, string remoteAppName)
+        public HttpResponseMessage GetRemoteAppDetails(string tenantGroupName, string deploymentUrl, string accessToken, string tenantName, string hostPoolName, string appGroupName, string remoteAppName)
         {
-            RdMgmtRemoteApp rdMgmtRemoteApp = new RdMgmtRemoteApp();
             try
             {
                 //call rest api to get all app groups -- july code bit
                 HttpResponseMessage response = CommonBL.InitializeHttpClient(deploymentUrl, accessToken).GetAsync("/RdsManagement/V1/TenantGroups/" + tenantGroupName + "/Tenants/" + tenantName + "/HostPools/" + hostPoolName + "/AppGroups/" + appGroupName + "/RemoteApps/" + remoteAppName).Result;
-                string strJson = response.Content.ReadAsStringAsync().Result;
-                if (response.IsSuccessStatusCode)
-                {
-                    //Deserialize the string to JSON object
-                    rdMgmtRemoteApp = JsonConvert.DeserializeObject<RdMgmtRemoteApp>(strJson);
-                }
+                return response;
+                
             }
-            catch 
+            catch
             {
                 return null;
             }
-            return rdMgmtRemoteApp;
         }
 
         /// <summary>
@@ -57,54 +50,46 @@ namespace MSFT.RDMISaaS.API.BLL
         /// <param name="accessToken">Access Token</param>
         /// <param name="rdMgmtRemoteApp">Remote App class</param>
         /// <returns></returns>
-        public RemoteAppResult CreateRemoteApp(string deploymentUrl, string accessToken, RdMgmtRemoteApp rdMgmtRemoteApp)
+        public JObject CreateRemoteApp(string deploymentUrl, string accessToken, JObject rdMgmtRemoteApp)
         {
             try
             {
-                RemoteAppDTO remoteAppDTO = new RemoteAppDTO();
-                remoteAppDTO.tenantName = rdMgmtRemoteApp.tenantName;
-                remoteAppDTO.friendlyName = rdMgmtRemoteApp.friendlyName;
-                remoteAppDTO.description = rdMgmtRemoteApp.description;
-                remoteAppDTO.appGroupName = rdMgmtRemoteApp.appGroupName;
-                remoteAppDTO.hostPoolName = rdMgmtRemoteApp.hostPoolName;
-                remoteAppDTO.remoteAppName = rdMgmtRemoteApp.remoteAppName;
-                remoteAppDTO.filePath = rdMgmtRemoteApp.filePath;
-                remoteAppDTO.commandLineSetting = rdMgmtRemoteApp.commandLineSetting;
-                remoteAppDTO.iconIndex = rdMgmtRemoteApp.iconIndex;
-                remoteAppDTO.requiredCommandLine = rdMgmtRemoteApp.requiredCommandLine;
-                remoteAppDTO.showInWebFeed = rdMgmtRemoteApp.showInWebFeed;
-                remoteAppDTO.appAlias = rdMgmtRemoteApp.appAlias;
-                remoteAppDTO.tenantGroupName = rdMgmtRemoteApp.tenantGroupName;
-                //call rest api to publish remote appgroup app -- july code bit
-                var content = new StringContent(JsonConvert.SerializeObject(remoteAppDTO), Encoding.UTF8, "application/json");
-                HttpResponseMessage response = CommonBL.InitializeHttpClient(deploymentUrl, accessToken).PostAsync("/RdsManagement/V1/TenantGroups/" + rdMgmtRemoteApp.tenantGroupName + "/Tenants/" + rdMgmtRemoteApp.tenantName + "/HostPools/" + rdMgmtRemoteApp.hostPoolName + "/AppGroups/" + rdMgmtRemoteApp.appGroupName + "/RemoteApps/" + rdMgmtRemoteApp.remoteAppName, content).Result;
+               
+                //call rest api to publish remote appgroup app 
+                var content = new StringContent(JsonConvert.SerializeObject(rdMgmtRemoteApp), Encoding.UTF8, "application/json");
+                HttpResponseMessage response = CommonBL.InitializeHttpClient(deploymentUrl, accessToken).PostAsync("/RdsManagement/V1/TenantGroups/" + rdMgmtRemoteApp["tenantGroupName"].ToString() + "/Tenants/" + rdMgmtRemoteApp["tenantName"].ToString() + "/HostPools/" + rdMgmtRemoteApp["hostPoolName"].ToString() + "/AppGroups/" + rdMgmtRemoteApp["appGroupName"].ToString() + "/RemoteApps/" + rdMgmtRemoteApp["remoteAppName"].ToString(), content).Result;
                 string strJson = response.Content.ReadAsStringAsync().Result;
                 if (response.IsSuccessStatusCode)
                 {
                     if (response.StatusCode.ToString().ToLower() == "created")
                     {
-                        appResult.isSuccess = true;
-                        appResult.message = "Remote app '" + rdMgmtRemoteApp.remoteAppName + "' has been published successfully.";
+                        appResult.Add("isSuccess" , true);
+                        appResult.Add("message" , "Remote app '" + rdMgmtRemoteApp["remoteAppName"].ToString() + "' has been published successfully.");
                     }
+                }
+                else if ((int)response.StatusCode == 429)
+                {
+                    appResult.Add("isSuccess", false);
+                    appResult.Add("message" , strJson + " Please try again later.");
                 }
                 else
                 {
                     if (!string.IsNullOrEmpty(strJson))
                     {
-                        appResult.isSuccess = false;
-                        appResult.message = CommonBL.GetErrorMessage(strJson);
+                        appResult.Add("isSuccess", false);
+                        appResult.Add("message", CommonBL.GetErrorMessage(strJson));
                     }
                     else
                     {
-                        appResult.isSuccess = false;
-                        appResult.message = "Remote app '" + rdMgmtRemoteApp.remoteAppName + "' has not been published. Please try it later again.";
+                        appResult.Add("isSuccess", false);
+                        appResult.Add("message", "Remote app '" + rdMgmtRemoteApp["remoteAppName"].ToString() + "' has not been published. Please try it later again.");
                     }
                 }
             }
             catch (Exception ex)
             {
-                appResult.isSuccess = false;
-                appResult.message = "Remote app '" + rdMgmtRemoteApp.remoteAppName + "' has not been published."+ex.Message.ToString()+" Please try it later again.";
+                appResult.Add("isSuccess", false);
+                appResult.Add("message", "Remote app '" + rdMgmtRemoteApp["remoteAppName"].ToString() + "' has not been published." + ex.Message.ToString() + " Please try it later again.");
             }
             return appResult;
         }
@@ -120,65 +105,22 @@ namespace MSFT.RDMISaaS.API.BLL
         /// <param name="appGroupName">Name of App Group</param>
         /// <param name="remoteAppName">Name of Remote App</param>
         /// <param name="isRemoteAppNameOnly">To get Remote app Name only</param>
+        /// //old parameters --  bool isRemoteAppNameOnly,bool isAll, int pageSize, string sortField, bool isDescending, int initialSkip, string lastEntry
         /// <returns></returns>
-        public List<RdMgmtRemoteApp> GetRemoteAppList(string tenantGroupName, string deploymentUrl, string accessToken, string tenantName, string hostPoolName, string appGroupName, bool isRemoteAppNameOnly,bool isAll, int pageSize, string sortField, bool isDescending, int initialSkip, string lastEntry)
+        public HttpResponseMessage GetRemoteAppList(string tenantGroupName, string deploymentUrl, string accessToken, string tenantName, string hostPoolName, string appGroupName)
         {
-            List<RdMgmtRemoteApp> rdMgmtRemoteApps = new List<RdMgmtRemoteApp>();
             try
             {
-                HttpResponseMessage response;
-                if (isAll==true)
-                {
-                    response = CommonBL.InitializeHttpClient(deploymentUrl, accessToken).GetAsync("/RdsManagement/V1/TenantGroups/" + tenantGroupName + "/Tenants/" + tenantName + "/HostPools/" + hostPoolName + "/AppGroups/" + appGroupName + "/RemoteApps").Result;
+                HttpResponseMessage response = CommonBL.InitializeHttpClient(deploymentUrl, accessToken).GetAsync("/RdsManagement/V1/TenantGroups/" + tenantGroupName + "/Tenants/" + tenantName + "/HostPools/" + hostPoolName + "/AppGroups/" + appGroupName + "/RemoteApps").Result;
+                return response;
 
-                }
-                else
-                {
-                    response = CommonBL.InitializeHttpClient(deploymentUrl, accessToken).GetAsync("/RdsManagement/V1/TenantGroups/" + tenantGroupName + "/Tenants/" + tenantName + "/HostPools/" + hostPoolName + "/AppGroups/" + appGroupName + "/RemoteApps?PageSize=" + pageSize + "&LastEntry=" + lastEntry + "&SortField=" + sortField + "&IsDescending=" + isDescending + "&InitialSkip=" + initialSkip).Result;
-
-                }
-                //call rest api to get  remote app list  -- july code bit
-                string strJson = response.Content.ReadAsStringAsync().Result;
-                if (response.IsSuccessStatusCode)
-                {
-                    //Deserialize the string to JSON object
-                    var jObj = (JArray)JsonConvert.DeserializeObject(strJson);
-                    if (jObj.Count > 0)
-                    {
-                        if (isRemoteAppNameOnly)
-                        {
-                            rdMgmtRemoteApps = jObj.Select(item => new RdMgmtRemoteApp
-                            {
-                                remoteAppName = (string)item["remoteAppName"]
-                            }).ToList();
-                        }
-                        else
-                        {
-                            rdMgmtRemoteApps = jObj.Select(item => new RdMgmtRemoteApp
-                            {
-                                tenantName = (string)item["tenantName"],
-                                remoteAppName = (string)item["remoteAppName"],
-                                appAlias = (string)item["appAlias"],
-                                hostPoolName = (string)item["hostPoolName"],
-                                appGroupName = (string)item["appGroupName"],
-                                description = (string)item["tenantName"],
-                                filePath = (string)item["filePath"],
-                                friendlyName = (string)item["friendlyName"],
-                                commandLineSetting = (string)item["commandLineSetting"],
-                                iconIndex = (int)item["iconIndex"],
-                                iconPath = (string)item["iconPath"],
-                                requiredCommandLine = (string)item["requiredCommandLine"],
-                                showInWebFeed = (bool)item["showInWebFeed"]
-                            }).ToList();
-                        }
-                    }
-                }
+                //api call included pagination 
+                // response = CommonBL.InitializeHttpClient(deploymentUrl, accessToken).GetAsync("/RdsManagement/V1/TenantGroups/" + tenantGroupName + "/Tenants/" + tenantName + "/HostPools/" + hostPoolName + "/AppGroups/" + appGroupName + "/RemoteApps?PageSize=" + pageSize + "&LastEntry=" + lastEntry + "&SortField=" + sortField + "&IsDescending=" + isDescending + "&InitialSkip=" + initialSkip).Result;
             }
-            catch 
+            catch
             {
                 return null;
             }
-            return rdMgmtRemoteApps;
         }
         /// <summary>
         /// Description : Remove remote app from associated app group
@@ -190,7 +132,7 @@ namespace MSFT.RDMISaaS.API.BLL
         /// <param name="appGroupName"></param>
         /// <param name="remoteAppName"></param>
         /// <returns></returns>
-        public RemoteAppResult DeleteRemoteApp(string tenantGroupName, string deploymentUrl, string accessToken, string tenantName, string hostPoolName, string appGroupName, string remoteAppName)
+        public JObject DeleteRemoteApp(string tenantGroupName, string deploymentUrl, string accessToken, string tenantName, string hostPoolName, string appGroupName, string remoteAppName)
         {
             try
             {
@@ -200,27 +142,32 @@ namespace MSFT.RDMISaaS.API.BLL
                 string strJson = response.Content.ReadAsStringAsync().Result;
                 if (response.IsSuccessStatusCode)
                 {
-                    appResult.isSuccess = true;
-                    appResult.message = "Remote app '" + remoteAppName + "' has been removed from app group '" + appGroupName + "' successfully.";
+                    appResult.Add("isSuccess" , true);
+                    appResult.Add("message" , "Remote app '" + remoteAppName + "' has been removed from app group '" + appGroupName + "' successfully.");
+                }
+                else if ((int)response.StatusCode == 429)
+                {
+                    appResult.Add("isSuccess" , false);
+                    appResult.Add("message" , strJson + " Please try again later.");
                 }
                 else
                 {
                     if (!string.IsNullOrEmpty(strJson))
                     {
-                        appResult.isSuccess = false;
-                        appResult.message = CommonBL.GetErrorMessage(strJson);
+                        appResult.Add("isSuccess" , false);
+                        appResult.Add("message" , CommonBL.GetErrorMessage(strJson));
                     }
                     else
                     {
-                        appResult.isSuccess = false;
-                        appResult.message = "Remote app '" + remoteAppName + "' has not been removed from app group '" + appGroupName + "'. Please try again later.";
+                        appResult.Add("isSuccess" , false);
+                        appResult.Add("message" , "Remote app '" + remoteAppName + "' has not been removed from app group '" + appGroupName + "'. Please try again later.");
                     }
                 }
             }
             catch (Exception ex)
             {
-                appResult.isSuccess = false;
-                appResult.message = "Remote app '" + remoteAppName + "' has not been removed from app group '" + appGroupName + "'."+ex.Message.ToString()+" Please try again later.";
+                appResult.Add("isSuccess" , false);
+                appResult.Add("message" , "Remote app '" + remoteAppName + "' has not been removed from app group '" + appGroupName + "'." + ex.Message.ToString() + " Please try again later.");
             }
             return appResult;
         }

@@ -1,17 +1,18 @@
 ﻿#region "Import Namespaces"
-using MSFT.RDMISaaS.API.Model;
+using MSFT.WVDSaaS.API.Model;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Web.Http;
-using MSFT.RDMISaaS.API.BLL;
+using MSFT.WVDSaaS.API.BLL;
 using System.Web.Http.Cors;
+using Newtonsoft.Json.Linq;
 #endregion "Import Namespaces"
 
-#region "MSFT.RDMISaaS.API.Controllers"
-namespace MSFT.RDMISaaS.API.Controllers
+#region "MSFT.WVDSaaS.API.Controllers"
+namespace MSFT.WVDSaaS.API.Controllers
 {
     [EnableCors(origins: "*", headers: "*", methods: "*")]
 
@@ -20,8 +21,8 @@ namespace MSFT.RDMISaaS.API.Controllers
     {
         #region "Class level declaration"
         RemoteAppBL remoteAppBL = new RemoteAppBL();
-        RemoteAppResult remoteAppResult = new RemoteAppResult();
-        List<RemoteAppResult> lstremoteAppResult = new List<RemoteAppResult>();
+        JObject remoteAppResult = new JObject();
+        List<JObject> lstremoteAppResult = new List<JObject>();
         Common.Common common = new Common.Common();
         Common.Configurations configurations = new Common.Configurations();
         string deploymentUrl = "";
@@ -39,11 +40,10 @@ namespace MSFT.RDMISaaS.API.Controllers
         /// <param name="remoteAppName">Name of Remote App</param>
         /// <param name="refresh_token">Refresh token to get access token</param>
         /// <returns></returns>
-        public RdMgmtRemoteApp GetRemoteAppDetails(string tenantGroupName, string tenantName, string hostPoolName, string appGroupName, string remoteAppName, string refresh_token)
+        public HttpResponseMessage GetRemoteAppDetails(string tenantGroupName, string tenantName, string hostPoolName, string appGroupName, string remoteAppName, string refresh_token)
         {
             //get deployment url
             deploymentUrl = configurations.rdBrokerUrl;
-            RdMgmtRemoteApp remoteapp = new RdMgmtRemoteApp();
             try
             {
                 if (!string.IsNullOrEmpty(refresh_token))
@@ -53,19 +53,22 @@ namespace MSFT.RDMISaaS.API.Controllers
                     accessToken = common.GetTokenValue(refresh_token);
                     if (!string.IsNullOrEmpty(accessToken) && accessToken.ToString().ToLower() != invalidToken && accessToken.ToString().ToLower() != invalidCode)
                     {
-                        remoteapp = remoteAppBL.GetRemoteAppDetails(tenantGroupName,deploymentUrl, accessToken, tenantName, hostPoolName, appGroupName, remoteAppName);
+                        return remoteAppBL.GetRemoteAppDetails(tenantGroupName, deploymentUrl, accessToken, tenantName, hostPoolName, appGroupName, remoteAppName);
                     }
                     else
                     {
-                        remoteapp.code = Constants.invalidToken;
+                        return Request.CreateResponse(HttpStatusCode.OK, new JObject() { { "code", Constants.invalidToken } });
                     }
+                }
+                else
+                {
+                    return null;
                 }
             }
             catch
             {
                 return null;
             }
-            return remoteapp;
         }
 
         /// <summary>
@@ -73,7 +76,7 @@ namespace MSFT.RDMISaaS.API.Controllers
         /// </summary>
         /// <param name="rdMgmtRemoteApp">Remote App class</param>
         /// <returns></returns>
-        public IHttpActionResult Post([FromBody] RdMgmtRemoteApp rdMgmtRemoteApp)
+        public IHttpActionResult Post([FromBody] JObject rdMgmtRemoteApp)
         {
             //get deployment url
             deploymentUrl = configurations.rdBrokerUrl;
@@ -81,43 +84,43 @@ namespace MSFT.RDMISaaS.API.Controllers
             {
                 if (rdMgmtRemoteApp != null)
                 {
-                    if (!string.IsNullOrEmpty(rdMgmtRemoteApp.refresh_token))
+                    if (!string.IsNullOrEmpty(rdMgmtRemoteApp["refresh_token"].ToString()))
                     {
                         string accessToken = "";
                         //get token value
-                        accessToken = common.GetTokenValue(rdMgmtRemoteApp.refresh_token);
+                        accessToken = common.GetTokenValue(rdMgmtRemoteApp["refresh_token"].ToString());
                         if (!string.IsNullOrEmpty(accessToken) && accessToken.ToString().ToLower() != invalidToken && accessToken.ToString().ToLower() != invalidCode)
                         {
                             remoteAppResult = remoteAppBL.CreateRemoteApp(deploymentUrl, accessToken, rdMgmtRemoteApp);
                         }
                         else
                         {
-                            remoteAppResult.isSuccess = false;
-                            remoteAppResult.message = Constants.invalidToken;
+                            remoteAppResult.Add("isSuccess" , false);
+                            remoteAppResult.Add("message" , Constants.invalidToken);
                         }
                     }
                 }
                 else
                 {
-                    remoteAppResult.isSuccess = false;
-                    remoteAppResult.message = Constants.invalidDataMessage;
+                    remoteAppResult.Add("isSuccess", false);
+                    remoteAppResult.Add("message", Constants.invalidDataMessage);
                 }
             }
             catch (Exception ex)
             {
-                remoteAppResult.isSuccess = false;
-                remoteAppResult.message = "Remote App '"+ rdMgmtRemoteApp .remoteAppName+ "' has not been published."+ ex.Message.ToString()+" Pleasse try again later.";
+                remoteAppResult.Add("isSuccess", false);
+                remoteAppResult.Add("message", "Remote App '" + rdMgmtRemoteApp["remoteAppName"].ToString() + "' has not been published." + ex.Message.ToString() + " Pleasse try again later.");
             }
             return Ok(remoteAppResult);
         }
 
         /// <summary>
-        /// Descriptio - punlish multiple aps to app group
+        /// Description - punlish multiple aps to app group
         /// </summary>
         /// <param name="rdMgmtRemoteApps"></param>
         /// <param name="refresh_token">Refresh token to get Access Token</param>
         /// <returns></returns>
-        public IHttpActionResult PostApps([FromBody] List<RdMgmtRemoteApp> rdMgmtRemoteApps, string refresh_token)
+        public IHttpActionResult PostApps([FromBody] List<JObject> rdMgmtRemoteApps, string refresh_token)
         {
             //get deployment url
             deploymentUrl = configurations.rdBrokerUrl;
@@ -140,23 +143,23 @@ namespace MSFT.RDMISaaS.API.Controllers
                         }
                         else
                         {
-                            remoteAppResult.isSuccess = false;
-                            remoteAppResult.message = Constants.invalidToken;
+                            remoteAppResult.Add("isSuccess" , false);
+                            remoteAppResult.Add("message" , Constants.invalidToken);
                             lstremoteAppResult.Add(remoteAppResult);
                         }
                     }
                 }
                 else
                 {
-                    remoteAppResult.isSuccess = false;
-                    remoteAppResult.message = Constants.invalidDataMessage;
+                    remoteAppResult.Add("isSuccess", false);
+                    remoteAppResult.Add("message", Constants.invalidDataMessage);
                     lstremoteAppResult.Add(remoteAppResult);
                 }
             }
             catch (Exception ex)
             {
-                remoteAppResult.isSuccess = false;
-                remoteAppResult.message = "Remote apps has not been published."+ex.Message.ToString()+" Please try again later.";
+                remoteAppResult.Add("isSuccess" , false);
+                remoteAppResult.Add("message" , "Remote apps has not been published." + ex.Message.ToString() + " Please try again later.");
                 lstremoteAppResult.Add(remoteAppResult);
             }
             return Ok(remoteAppResult);
@@ -188,15 +191,15 @@ namespace MSFT.RDMISaaS.API.Controllers
                     }
                     else
                     {
-                        remoteAppResult.isSuccess = false;
-                        remoteAppResult.message = Constants.invalidToken;
+                        remoteAppResult.Add("isSuccess", false);
+                        remoteAppResult.Add("message" , Constants.invalidToken);
                     }
                 }
             }
             catch (Exception ex)
             {
-                remoteAppResult.isSuccess = false;
-                remoteAppResult.message = "Remote App '"+ remoteAppName + "' has not been removed."+ex.Message.ToString()+" Please try again later.";
+                remoteAppResult.Add("isSuccess", false);
+                remoteAppResult.Add("message", "Remote App '" + remoteAppName + "' has not been removed." + ex.Message.ToString() + " Please try again later.");
             }
             return Ok(remoteAppResult);
         }
@@ -209,8 +212,9 @@ namespace MSFT.RDMISaaS.API.Controllers
         /// <param name="appGroupName">Name of App Group</param>
         /// <param name="remoteAppName">Name of Remote App</param>
         /// <param name="refresh_token">Refresh token to get access token</param>
+        /// // old parameters -- , int pageSize, string sortField, bool isDescending = false, int initialSkip = 0, string lastEntry = null
         /// <returns></returns>
-        public List<RdMgmtRemoteApp> GetRemoteAppList(string tenantGroupName, string tenantName, string hostPoolName, string appGroupName, string refresh_token, int pageSize, string sortField, bool isDescending = false, int initialSkip = 0, string lastEntry = null)
+        public HttpResponseMessage GetRemoteAppList(string tenantGroupName, string tenantName, string hostPoolName, string appGroupName, string refresh_token)
         {
             //get deployment url
             deploymentUrl = configurations.rdBrokerUrl;
@@ -224,26 +228,25 @@ namespace MSFT.RDMISaaS.API.Controllers
                     accessToken = common.GetTokenValue(refresh_token);
                     if (!string.IsNullOrEmpty(accessToken) && accessToken.ToString().ToLower() != invalidToken && accessToken.ToString().ToLower() != invalidCode)
                     {
-                        rdMgmtRemoteApps = remoteAppBL.GetRemoteAppList(tenantGroupName, deploymentUrl, accessToken, tenantName, hostPoolName, appGroupName, false,false, pageSize, sortField, isDescending, initialSkip, lastEntry);
+                        return remoteAppBL.GetRemoteAppList(tenantGroupName, deploymentUrl, accessToken, tenantName, hostPoolName, appGroupName);
                     }
                     else
                     {
-                        RdMgmtRemoteApp rdMgmtRemoteApp = new RdMgmtRemoteApp();
-                        rdMgmtRemoteApp.code = Constants.invalidToken;
-                        rdMgmtRemoteApps.Add(rdMgmtRemoteApp);
+                        return Request.CreateResponse(HttpStatusCode.OK, new JArray() { new JObject() { { "code", Constants.invalidToken } } });
                     }
                 }
+                else
+                {
+                    return null;
+                }
             }
-            catch 
+            catch
             {
                 return null;
             }
-            return rdMgmtRemoteApps;
         }
         #endregion
-
     }
     #endregion
-
 }
 #endregion

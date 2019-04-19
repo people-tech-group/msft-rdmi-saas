@@ -4,15 +4,16 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
+using System.Threading.Tasks;
 using System.Web;
 using System.Web.Http;
 using System.Web.Http.Cors;
-using MSFT.RDMISaaS.API.Common;
-using MSFT.RDMISaaS.API.Model;
+using MSFT.WVDSaaS.API.Common;
+using MSFT.WVDSaaS.API.Model;
 #endregion "Import Namespaces" 
 
-#region "MSFT.RDMISaaS.API.Controllers"
-namespace MSFT.RDMISaaS.API.Controllers
+#region "MSFT.WVDSaaS.API.Controllers"
+namespace MSFT.WVDSaaS.API.Controllers
 {
     [EnableCors(origins: "*", headers: "*", methods: "*")]
 
@@ -28,14 +29,14 @@ namespace MSFT.RDMISaaS.API.Controllers
         /// <param name="data"></param>
         /// <returns></returns>
         [HttpPost]
-        public IHttpActionResult PostLogin([FromBody] Login data)
+        public async Task<IHttpActionResult> PostLogin([FromBody] Login data)
         {
             Login login = new Login();
             try
             {
                 Common.Common obj = new Common.Common();
                 List<Login> lst = new List<Login>();
-                login = obj.Login(data.Code);
+                login =await obj.Login(data.Code);
             }
             catch (Exception ex)
             {

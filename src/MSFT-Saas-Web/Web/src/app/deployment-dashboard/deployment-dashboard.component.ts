@@ -44,7 +44,7 @@ export class DeploymentDashboardComponent implements OnInit {
   public searchTenants: any = [];
   private sub: any;
   public editedBody: boolean = false;
-  public tenantsList: any;
+  public tenantsList: number = 1;
   public tenants: any;
   public tenantDeleteUrl: any;
   public tenantUrl: any;
@@ -74,6 +74,9 @@ export class DeploymentDashboardComponent implements OnInit {
     timeOut: 2000,
     position: ["top", "right"]
   };
+  public errorMessage: string;
+  public error: boolean = false;
+  public searchByTenantName: any;
   tenantForm;
   tenantFormEdit;
   deploymentID = 0;
@@ -130,7 +133,6 @@ export class DeploymentDashboardComponent implements OnInit {
     this.scopeArray = sessionStorage.getItem("Scope").split(",");
     if (this.scopeArray != null && this.scopeArray.length > 2) {
       this.tenants = [{
-        "id": "",
         "tenantGroupName": "",
         "aadTenantId": "",
         "tenantName": this.scopeArray[1],
@@ -139,11 +141,9 @@ export class DeploymentDashboardComponent implements OnInit {
         "ssoAdfsAuthority": "",
         "ssoClientId": "",
         "ssoClientSecret": "",
-        "noOfHostpool": "",
-        "noOfActivehosts": "",
-        "noOfAppgroups": "",
-        "noOfUsers": "",
-        "noOfSessions": "",
+        "azureSubscriptionId": "",
+        "logAnalyticsWorkspaceId": null,
+        "logAnalyticsPrimaryKey": null,
         "code": null,
         "refresh_token": null
       }];
@@ -258,9 +258,13 @@ export class DeploymentDashboardComponent implements OnInit {
 * -------------
 */
   public ManageTenant() {
+    this.refreshTenantLoading = true;
     localStorage.removeItem("TenantGroupName");
     this.ManageTenantSlideClose(event);
     localStorage.setItem("TenantGroupName", this.slectedtenantgroupname);
+    this.tenants = [];
+    this.searchTenants = [];
+    sessionStorage.removeItem('Tenants');
     //navigate to appcomponent page
     let url = sessionStorage.getItem("redirectUri");
     window.location.replace(url);
@@ -383,6 +387,16 @@ export class DeploymentDashboardComponent implements OnInit {
     }
   }
 
+  /**
+   * This function will calculate and return absolute index of gallery apps.
+   * -------------------
+   * @param indexOnPage - Accepts App Index from gallery Apps
+   * -------------------
+   */
+  absoluteIndex(indexOnPage: number): number {
+    return this.listItems * (this.tenantsList - 1) + indexOnPage;
+  }
+
   /* This function that triggers on click of  Tenants table row click
    * --------------
    * Parameters
@@ -492,57 +506,66 @@ export class DeploymentDashboardComponent implements OnInit {
 
   /* This function is used to  loads all the tenants into table on page load */
   public GetTenants() {
-    this.refreshToken = sessionStorage.getItem("Refresh_Token");
+    this.adminMenuComponent.GetAllTenants();
     this.refreshTenantLoading = true;
-    this.tenantlistErrorFound = false;
-    this.getTenantsUrl = this._AppService.ApiUrl + '/api/Tenant/GetTenantList?tenantGroupName=' + this.tenantGroupName + '&refresh_token=' + this.refreshToken + '&pageSize=' + this.pageSize + '&sortField=TenantName&isDescending=false&initialSkip=' + this.initialSkip + '&lastEntry=' + this.lastEntry;
-    this._AppService.GetTenants(this.getTenantsUrl).subscribe(response => {
-      let responseObject = JSON.parse(response['_body']);
-      this.ShowTenantgroupError = false;
-      this.tenants = responseObject.rdMgmtTenants;
-      this.tenantsCount = responseObject.count;
-      this.refreshTenantLoading = false;
-      //this.lastEntry = responseObject.lastEntry;
-      //if (this.tenants[0]) {
-      //  if (this.tenants[0].code == "Invalid Token") {
-      //    sessionStorage.clear();
-      //    this.router.navigate(['/invalidtokenmessage']);
-      //  }
-      //}
-      this.GetcurrentNoOfPagesCount();
-      this.searchTenants = this.tenants;
-      //this.adminMenuComponent.GetAllTenants(this.tenants);
-      if (this.searchTenants.length == 0) {
-        this.editedBody = true;
-        this.showCreateTenant = true;
-        this.tenantlistErrorFound = false;
-      }
-      else {
-        if (this.searchTenants[0].Message == null) {
-          this.editedBody = false;
-          this.showCreateTenant = false;
-          this.tenantlistErrorFound = false;
+    let Tenants = JSON.parse(sessionStorage.getItem('Tenants'));
+    let TenantGroupName = localStorage.getItem('TenantGroupName');
+    if (sessionStorage.getItem('Tenants') && Tenants.length != 0 && Tenants != null && TenantGroupName == this.tenantGroupName) {
+      this.gettingTenants();
+    }
+    else {
+      this.refreshToken = sessionStorage.getItem("Refresh_Token");
+      this.tenantlistErrorFound = false;
+      // this.getTenantsUrl = this._AppService.ApiUrl + '/api/Tenant/GetTenantList?tenantGroupName=' + this.tenantGroupName + '&refresh_token=' + this.refreshToken + '&pageSize=' + this.pageSize + '&sortField=TenantName&isDescending=false&initialSkip=' + this.initialSkip + '&lastEntry=' + this.lastEntry;
+      this.getTenantsUrl = this._AppService.ApiUrl + '/api/Tenant/GetTenantList?tenantGroupName=' + this.tenantGroupName + '&refresh_token=' + this.refreshToken;
+      this._AppService.GetTenants(this.getTenantsUrl).subscribe(response => {
+        if(response.status == 429){
+          this.error = true;
+          this.errorMessage = response.statusText;
         }
-      }
+        else{
+          this.error = false;
+          let responseObject = JSON.parse(response['_body']);
+          sessionStorage.setItem('Tenants', JSON.stringify(responseObject));
+          this.ShowTenantgroupError = false;
+          this.gettingTenants();
+          this.GetcurrentNoOfPagesCount();
+        }
+      },
+        /*
+         * If Any Error (or) Problem With Services (or) Problem in internet this Error Block Will Execute
+         */
+        error => {
+          this.editedBody = false;
+          this.tenantlistErrorFound = true;
+          this.refreshTenantLoading = false;
+          this.error = true;
+          let errorBody = JSON.parse(error['_body']);
+          this.errorMessage = errorBody.error.target;
+        }
+      );
+    }
+  };
 
-    },
-      /*
-       * If Any Error (or) Problem With Services (or) Problem in internet this Error Block Will Execute
-       */
-      error => {
-        this.editedBody = false;
-        this.tenantlistErrorFound = true;
-        this.refreshTenantLoading = false;
-      }
-    );
+  gettingTenants() {
+    this.adminMenuComponent.GetAllTenants();
+    let responseObject = JSON.parse(sessionStorage.getItem('Tenants'));
+    this.tenants = responseObject;
+    this.tenantsCount = responseObject.length;
+    this.searchTenants = this.tenants;
+    if (this.searchTenants.length == 0) {
+      this.editedBody = true;
+      this.showCreateTenant = true;
+      this.tenantlistErrorFound = false;
+    }
     this.isEditDisabled = true;
     this.isDeleteDisabled = true;
     for (let i = 0; i < this.searchTenants.length; i++) {
       this.checked[i] = false;
     }
     this.checkedMain = false;
-
-  };
+    this.refreshTenantLoading = false;
+  }
 
   /* This function is used to  loads all the tenants into table on click of Previous button in the table */
   public previousPage() {
@@ -554,8 +577,8 @@ export class DeploymentDashboardComponent implements OnInit {
     this.getTenantsUrl = this._AppService.ApiUrl + '/api/Tenant/GetTenantList?tenantGroupName=' + this.tenantGroupName + '&refresh_token=' + this.refreshToken + '&pageSize=' + this.pageSize + '&sortField=TenantName&isDescending=true&initialSkip=' + this.initialSkip + '&lastEntry=' + this.searchTenants[0].tenantName;
     this._AppService.GetTenants(this.getTenantsUrl).subscribe(response => {
       let responseObject = JSON.parse(response['_body']);
-      this.tenants = responseObject.rdMgmtTenants.reverse();
-      this.tenantsCount = responseObject.count;
+      this.tenants = responseObject.reverse();
+      this.tenantsCount = responseObject.length;
       this.previousPageNo = this.currentPageNo;
       this.currentPageNo = this.currentPageNo - 1;
       if (this.tenants[0]) {
@@ -622,8 +645,8 @@ export class DeploymentDashboardComponent implements OnInit {
     this.getTenantsUrl = this._AppService.ApiUrl + '/api/Tenant/GetTenantList?tenantGroupName=' + this.tenantGroupName + '&refresh_token=' + this.refreshToken + '&pageSize=' + this.pageSize + '&sortField=TenantName&isDescending=' + this.isDescending + '&initialSkip=' + this.initialSkip + '&lastEntry=' + this.lastEntry;
     this._AppService.GetTenants(this.getTenantsUrl).subscribe(response => {
       let responseObject = JSON.parse(response['_body']);
-      this.tenants = responseObject.rdMgmtTenants; //.splice(0, 3)
-      this.tenantsCount = responseObject.count;
+      this.tenants = responseObject; //.splice(0, 3)
+      this.tenantsCount = responseObject.length;
       if (this.tenants[0]) {
         if (this.tenants[0].code == "Invalid Token") {
           sessionStorage.clear();
@@ -672,8 +695,8 @@ export class DeploymentDashboardComponent implements OnInit {
     this.getTenantsUrl = this._AppService.ApiUrl + '/api/Tenant/GetTenantList?tenantGroupName=' + this.tenantGroupName + '&refresh_token=' + this.refreshToken + '&pageSize=' + this.pageSize + '&sortField=TenantName&isDescending=false&initialSkip=' + this.initialSkip + '&lastEntry=' + this.lastEntry;
     this._AppService.GetTenants(this.getTenantsUrl).subscribe(response => {
       let responseObject = JSON.parse(response['_body']);
-      this.tenants = responseObject.rdMgmtTenants;
-      this.tenantsCount = responseObject.count;
+      this.tenants = responseObject;
+      this.tenantsCount = responseObject.length;
       this.previousPageNo = this.currentPageNo;
       this.currentPageNo = this.currentPageNo + 1;
       if (this.tenants[0]) {
@@ -716,6 +739,10 @@ export class DeploymentDashboardComponent implements OnInit {
 
   /* This function is used to check Tenant Access and refresh the tenants list */
   public RefreshTenant() {
+    this.refreshTenantLoading = true;
+    this.tenants = [];
+    this.searchTenants = [];
+    sessionStorage.removeItem('Tenants');
     this.CheckTenantAccess();
   }
 
@@ -786,7 +813,7 @@ export class DeploymentDashboardComponent implements OnInit {
           }
         )
         AppComponent.GetNotification('icon icon-fail angular-NotifyFail', 'Failed To Create Tenant', responseData.message, new Date());
-        this.RefreshTenant();
+        //this.RefreshTenant();
       }
     },
       /* If Any Error (or) Problem With Services (or) Problem in internet this Error Block Will Exequte */
@@ -885,7 +912,7 @@ export class DeploymentDashboardComponent implements OnInit {
         )
         AppComponent.GetNotification('icon icon-fail angular-NotifyFail', 'Failed To Update Tenant', responseData.message, new Date());
         this.tenantUpdateClose();
-        this.RefreshTenant();
+        //this.RefreshTenant();
       }
     },
       /* If Any Error (or) Problem With Services (or) Problem in internet this Error Block Will Exequte */
@@ -963,7 +990,7 @@ export class DeploymentDashboardComponent implements OnInit {
             }
           )
           AppComponent.GetNotification('icon icon-fail angular-NotifyFail', 'Failed To Delete Tenant', responseData.message, new Date());
-          this.RefreshTenant();
+          //this.RefreshTenant();
         }
       },
         /* If Any Error (or) Problem With Services (or) Problem in internet this Error Block Will Exequte */

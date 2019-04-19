@@ -1,5 +1,5 @@
 ﻿#region "Import Namespaces"
-using MSFT.RDMISaaS.API.Model;
+using MSFT.WVDSaaS.API.Model;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System;
@@ -11,13 +11,12 @@ using System.Text;
 #endregion "Import Namespaces"
 
 #region "MSFT.RDMISaaS.API.BLL"
-namespace MSFT.RDMISaaS.API.BLL
+namespace MSFT.WVDSaaS.API.BLL
 {
     #region "SessionHostBL"
     public class SessionHostBL
     {
-        SessionHostResult hostResult = new SessionHostResult();
-        //string tenantGroup = Constants.tenantGroupName;
+        JObject hostResult = new JObject();
 
         /// <summary>
         /// Description: Gets all Rds SessionHosts associated with the Tenant and Host Pool specified in the Rds context.
@@ -27,61 +26,23 @@ namespace MSFT.RDMISaaS.API.BLL
         /// <param name="tenantName">Name of Tenant</param>
         /// <param name="hostPoolName">Name of hostpool</param>
         /// <param name="isSessionHostNameOnly">To Get only HostName</param>
+        /// //old parameters --  bool isSessionHostNameOnly,bool isAll, int pageSize, string sortField, bool isDescending, int initialSkip, string lastEntry
         /// <returns></returns>
-        public List<RdMgmtSessionHost> GetSessionhostList(string deploymentUrl, string accessToken,string tenantGroup, string tenantName, string hostPoolName, bool isSessionHostNameOnly,bool isAll, int pageSize, string sortField, bool isDescending, int initialSkip, string lastEntry)
+        public HttpResponseMessage GetSessionhostList(string deploymentUrl, string accessToken, string tenantGroup, string tenantName, string hostPoolName)
         {
-            List<RdMgmtSessionHost> rdMgmtSessionHosts = new List<RdMgmtSessionHost>();
-            HttpResponseMessage response; 
-           
             try
             {
-                if (isAll == true)
-                {
-                    response = CommonBL.InitializeHttpClient(deploymentUrl, accessToken).GetAsync("/RdsManagement/V1/TenantGroups/" + tenantGroup + "/Tenants/" + tenantName + "/HostPools/" + hostPoolName + "/SessionHosts").Result;
+                HttpResponseMessage response = CommonBL.InitializeHttpClient(deploymentUrl, accessToken).GetAsync("/RdsManagement/V1/TenantGroups/" + tenantGroup + "/Tenants/" + tenantName + "/HostPools/" + hostPoolName + "/SessionHosts").Result;
+                return response;
 
-                }
-                else {
-
-                    response = CommonBL.InitializeHttpClient(deploymentUrl, accessToken).GetAsync("/RdsManagement/V1/TenantGroups/" + tenantGroup + "/Tenants/" + tenantName + "/HostPools/" + hostPoolName + "/SessionHosts?PageSize=" + pageSize + "&LastEntry=" + lastEntry + "&SortField=" + sortField + "&IsDescending=" + isDescending + "&InitialSkip=" + initialSkip).Result;
-                }
-                //call rest api to get all Session hosts asscociated with selected  hostpool -- july code bit
-                string strJson = response.Content.ReadAsStringAsync().Result;
-                if (response.IsSuccessStatusCode)
-                {
-                    //Deserialize the string to JSON object
-                    var jObj = (JArray)JsonConvert.DeserializeObject(strJson);
-                    if (jObj.Count > 0)
-                    {
-                        if (isSessionHostNameOnly)
-                        {
-                            rdMgmtSessionHosts = jObj.Select(item => new RdMgmtSessionHost
-                            {
-                                tenantName = (string)item["tenantName"],
-                                hostPoolName = (string)item["hostPoolName"],
-                                sessionHostName = (string)item["sessionHostName"]
-                            }).ToList();
-                        }
-                        else
-                        {
-                            rdMgmtSessionHosts = jObj.Select(item => new RdMgmtSessionHost
-                            {
-                                tenantName = (string)item["tenantName"],
-                                hostPoolName = (string)item["hostPoolName"],
-                                sessionHostName = (string)item["sessionHostName"],
-                                allowNewSession = (bool)item["allowNewSession"],
-                                sessions = (int)item["sessions"],
-                                lastHeartBeat = (DateTime)item["lastHeartBeat"],
-                                agentVersion = (string)item["agentVersion"]
-                            }).ToList();
-                        }
-                    }
-                }
+                //api call included pagination
+                //    response = CommonBL.InitializeHttpClient(deploymentUrl, accessToken).GetAsync("/RdsManagement/V1/TenantGroups/" + tenantGroup + "/Tenants/" + tenantName + "/HostPools/" + hostPoolName + "/SessionHosts?PageSize=" + pageSize + "&LastEntry=" + lastEntry + "&SortField=" + sortField + "&IsDescending=" + isDescending + "&InitialSkip=" + initialSkip).Result;
             }
-            catch 
+            catch
             {
                 return null;
             }
-            return rdMgmtSessionHosts;
+
         }
 
         /// <summary>
@@ -93,26 +54,18 @@ namespace MSFT.RDMISaaS.API.BLL
         /// <param name="hostPoolName">Name of Hostpool</param>
         /// <param name="sessionHostName">Name of Session Host</param>
         /// <returns></returns>
-        public RdMgmtSessionHost GetSessionHostDetails(string deploymentUrl, string accessToken,string tenantGroup,  string tenantName, string hostPoolName, string sessionHostName)
+        public HttpResponseMessage GetSessionHostDetails(string deploymentUrl, string accessToken, string tenantGroup, string tenantName, string hostPoolName, string sessionHostName)
         {
-            RdMgmtSessionHost rdMgmtSessionHost = new RdMgmtSessionHost();
             try
             {
                 //call rest api to get session host details -- july code bit
                 HttpResponseMessage response = CommonBL.InitializeHttpClient(deploymentUrl, accessToken).GetAsync("/RdsManagement/V1/TenantGroups/" + tenantGroup + "/Tenants/" + tenantName + "/HostPools/" + hostPoolName + "/SessionHosts/" + sessionHostName).Result;
-                string strJson = response.Content.ReadAsStringAsync().Result;
-                if (response.IsSuccessStatusCode)
-                {
-                    //Deserialize the string to JSON object
-                    rdMgmtSessionHost = JsonConvert.DeserializeObject<RdMgmtSessionHost>(strJson);
-                }
-
+                return response;
             }
-            catch 
+            catch
             {
                 return null;
             }
-            return rdMgmtSessionHost;
         }
 
         /// <summary>
@@ -122,45 +75,42 @@ namespace MSFT.RDMISaaS.API.BLL
         /// <param name="accessToken">Access token</param>
         /// <param name="rdMgmtSessionHost">Sessio  Host Class</param>
         /// <returns></returns>
-        public SessionHostResult UpdateSessionHost(string deploymentUrl, string accessToken, RdMgmtSessionHost rdMgmtSessionHost)
+        public JObject UpdateSessionHost(string deploymentUrl, string accessToken, JObject rdMgmtSessionHost)
         {
             try
             {
-                //assigning values to Session host class object
-                SessionHostDTO sessionHostDTO = new SessionHostDTO();
-                sessionHostDTO.tenantName = rdMgmtSessionHost.tenantName;
-                sessionHostDTO.hostPoolName = rdMgmtSessionHost.hostPoolName;
-                sessionHostDTO.sessionHostName = rdMgmtSessionHost.sessionHostName;
-                sessionHostDTO.allowNewSession = rdMgmtSessionHost.allowNewSession;
-                sessionHostDTO.tenantGroupName = rdMgmtSessionHost.tenantGroupName;
-
                 //call rest service to update Sesssion host -- july code bit
-                var content = new StringContent(JsonConvert.SerializeObject(sessionHostDTO), Encoding.UTF8, "application/json");
-                HttpResponseMessage response = CommonBL.PatchAsync(deploymentUrl, accessToken, "/RdsManagement/V1/TenantGroups/" + rdMgmtSessionHost.tenantGroupName + "/Tenants/" + rdMgmtSessionHost.tenantName + "/HostPools/" + rdMgmtSessionHost.hostPoolName + "/SessionHosts/" + rdMgmtSessionHost.sessionHostName, content).Result;
+                var content = new StringContent(JsonConvert.SerializeObject(rdMgmtSessionHost), Encoding.UTF8, "application/json");
+                HttpResponseMessage response = CommonBL.PatchAsync(deploymentUrl, accessToken, "/RdsManagement/V1/TenantGroups/" + rdMgmtSessionHost["tenantGroupName"].ToString() + "/Tenants/" + rdMgmtSessionHost["tenantName"].ToString() + "/HostPools/" + rdMgmtSessionHost["hostPoolName"].ToString() + "/SessionHosts/" + rdMgmtSessionHost["sessionHostName"].ToString(), content).Result;
                 string strJson = response.Content.ReadAsStringAsync().Result;
                 if (response.IsSuccessStatusCode)
                 {
-                    hostResult.isSuccess = true;
-                    hostResult.message = "Session host '" + rdMgmtSessionHost.sessionHostName + "' has been updated successfully.";
+                    hostResult.Add("isSuccess", true);
+                    hostResult.Add("message", "Session host '" + rdMgmtSessionHost["sessionHostName"].ToString() + "' has been updated successfully.");
+                }
+                else if ((int)response.StatusCode == 429)
+                {
+                    hostResult.Add("isSuccess", false);
+                    hostResult.Add("message", strJson + " Please try again later.");
                 }
                 else
                 {
                     if (!string.IsNullOrEmpty(strJson))
                     {
-                        hostResult.isSuccess = false;
-                        hostResult.message = CommonBL.GetErrorMessage(strJson);
+                        hostResult.Add("isSuccess", false);
+                        hostResult.Add("message", CommonBL.GetErrorMessage(strJson));
                     }
                     else
                     {
-                        hostResult.isSuccess = false;
-                        hostResult.message = "Updating session host '" + rdMgmtSessionHost.sessionHostName + "' is failed. Please try it again later.";
+                        hostResult.Add("isSuccess", false);
+                        hostResult.Add("message", "Updating session host '" + rdMgmtSessionHost["sessionHostName"].ToString() + "' is failed. Please try it again later.");
                     }
                 }
             }
             catch (Exception ex)
             {
-                hostResult.isSuccess = false;
-                hostResult.message = "Session host '" + rdMgmtSessionHost.sessionHostName + "' has not been updated."+ex.Message.ToString()+" Please try it again later.";
+                hostResult.Add("isSuccess", false);
+                hostResult.Add("message", "Session host '" + rdMgmtSessionHost["sessionHostName"].ToString() + "' has not been updated." + ex.Message.ToString() + " Please try it again later.");
             }
             return hostResult;
         }
@@ -187,6 +137,11 @@ namespace MSFT.RDMISaaS.API.BLL
                     sessionHostResult.isSuccess = true;
                     sessionHostResult.message = "Session host '" + sessionHostName + "' has been deleted successfully.";
                 }
+                else if ((int)response.StatusCode == 429)
+                {
+                    sessionHostResult.isSuccess = false;
+                    sessionHostResult.message = strJson + " Please try again later.";
+                }
                 else
                 {
                     if (!string.IsNullOrEmpty(strJson))
@@ -204,7 +159,7 @@ namespace MSFT.RDMISaaS.API.BLL
             catch (Exception ex)
             {
                 sessionHostResult.isSuccess = false;
-                sessionHostResult.message = "Session host " + sessionHostName + " has not been deleted."+ex.Message.ToString()+" Please try it later again.";
+                sessionHostResult.message = "Session host " + sessionHostName + " has not been deleted." + ex.Message.ToString() + " Please try it later again.";
             }
             return sessionHostResult;
         }

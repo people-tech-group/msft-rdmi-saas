@@ -57,6 +57,7 @@ export class AppComponent implements OnInit {
   public isInvalidToken: boolean = true;
   public appLoader: boolean = false;
   public tenantGroupName: any;
+  public errorMessage: string;
 
   constructor(private _AppService: AppService, private router: Router, private route: ActivatedRoute, private http: Http, ) {
     //localStorage.removeItem("TenantGroupName");
@@ -98,7 +99,7 @@ export class AppComponent implements OnInit {
       this.redirectUri = sessionStorage.getItem('redirectUri');
       var codData = {
         Code: code,
-      }
+      };
       fetch(this._AppService.ApiUrl + '/api/Login/PostLogin', {
         method: 'POST',
         headers: {
@@ -108,50 +109,59 @@ export class AppComponent implements OnInit {
         body: JSON.stringify(codData)
       }).then(response => response.json())
         .then((respdata) => {
-          this.profileName = respdata.UserName[0].toUpperCase() + respdata.UserName.substring(1);
-
-          /*This block of code is used to Split Letters from Username*/
-          //Slit code -starts
-          this.splitName = respdata.UserName.split(' ');
-          if (this.splitName.length > 1) {
-            this.profileNameFirstName = this.splitName[0];
-            this.profileNameLastName = this.splitName[this.splitName.length - 1];
-            this.profileIcon = this.profileNameFirstName[0].toUpperCase() + this.profileNameLastName[0].toUpperCase();
+          if (respdata.Error != null) {
+            if (respdata.Error.StatusCode == 400 || respdata.Error.StatusCode == 429) {
+              this.errorMessage = respdata.Error.Message;
+              this.appLoader = false;
+            }
           }
           else {
-            this.profileNameFirstName = this.splitName[0];
-            this.profileIcon = this.profileNameFirstName.substring(0, 2).toUpperCase();
-          }
-          //Slit code -Ends
+            this.profileName = respdata.UserName[0].toUpperCase() + respdata.UserName.substring(1);
 
-          /*This block of code is used to get the Role Assignment Acces level*/
-          //Role Assignment Acces level -Starts
-          const unique = (value, index, self) => {
-            return self.indexOf(value) === index;
-          };
-          this.tenantGroupNameList = respdata.TenantGroups;
-          const uniqueTenantGroups = this.tenantGroupNameList.filter(unique);
-          localStorage.setItem("TenantGroups", JSON.stringify(uniqueTenantGroups));
-          this.tenantGroupName = localStorage.getItem("TenantGroupName");
-          this.roleDefinitionName = respdata.RoleAssignment.roleDefinitionName;
-          sessionStorage.setItem("profileIcon", this.profileIcon);
-          sessionStorage.setItem("profileName", this.profileName);
-          sessionStorage.setItem("roleDefinitionName", this.roleDefinitionName);
-          if (respdata.RoleAssignment.scope == '/') {
-            this.scope = 'All (Root)';
+            /*This block of code is used to Split Letters from Username*/
+            //Slit code -starts
+            this.splitName = respdata.UserName.split(' ');
+            if (this.splitName.length > 1) {
+              this.profileNameFirstName = this.splitName[0];
+              this.profileNameLastName = this.splitName[this.splitName.length - 1];
+              this.profileIcon = this.profileNameFirstName[0].toUpperCase() + this.profileNameLastName[0].toUpperCase();
+            }
+            else {
+              this.profileNameFirstName = this.splitName[0];
+              this.profileIcon = this.profileNameFirstName.substring(0, 2).toUpperCase();
+            }
+            //Slit code -Ends
+
+            /*This block of code is used to get the Role Assignment Acces level*/
+            //Role Assignment Acces level -Starts
+            const unique = (value, index, self) => {
+              return self.indexOf(value) === index;
+            };
+            this.tenantGroupNameList = respdata.TenantGroups;
+            const uniqueTenantGroups = this.tenantGroupNameList.filter(unique);
+            localStorage.setItem("TenantGroups", JSON.stringify(uniqueTenantGroups));
+            this.tenantGroupName = localStorage.getItem("TenantGroupName");
+            this.roleDefinitionName = respdata.RoleAssignment.roleDefinitionName;
+            sessionStorage.setItem("profileIcon", this.profileIcon);
+            sessionStorage.setItem("profileName", this.profileName);
+            sessionStorage.setItem("roleDefinitionName", this.roleDefinitionName);
+            if (respdata.RoleAssignment.scope == '/') {
+              this.scope = 'All (Root)';
+            }
+            else {
+              this.scope = respdata.RoleAssignment.scope;
+            }
+            //Role Assignment Acces level -Ends
+            sessionStorage.setItem('Scope', this.scope);
+            this.profileEmail = respdata.Email;
+            sessionStorage.setItem("Refresh_Token", respdata.Refresh_Token);
+            sessionStorage.setItem("redirectUri", this.redirectUri);
+            var roleDef = respdata.RoleAssignment.scope.substring(1).split("/");
+            sessionStorage.setItem('profileEmail', this.profileEmail);
+            sessionStorage.setItem('gotCode', 'no');
+            this.appLoader = false;
+            this.router.navigate(['/admin/Tenants']);
           }
-          else {
-            this.scope = respdata.RoleAssignment.scope;
-          }
-          //Role Assignment Acces level -Ends
-          sessionStorage.setItem('Scope', this.scope);
-          this.profileEmail = respdata.Email;
-          sessionStorage.setItem("Refresh_Token", respdata.Refresh_Token);
-          var roleDef = respdata.RoleAssignment.scope.substring(1).split("/");
-          sessionStorage.setItem('profileEmail', this.profileEmail);
-          sessionStorage.setItem('gotCode', 'no');
-          this.appLoader = false;
-          this.router.navigate(['/admin/Tenants']);
         }).catch((error: any) => {
           this.router.navigate(['/invalidtokenmessage']);
           this.appLoader = false;
@@ -167,6 +177,7 @@ export class AppComponent implements OnInit {
         var loginUrl = values.json();
         sessionStorage.setItem("redirectUri", loginUrl.split('&')[2].split('=')[1]);
         sessionStorage.setItem('gotCode', 'yes');
+        this.redirectUri = loginUrl.split('&')[2].split('=')[1];
         window.location.replace(loginUrl);
       });
     }

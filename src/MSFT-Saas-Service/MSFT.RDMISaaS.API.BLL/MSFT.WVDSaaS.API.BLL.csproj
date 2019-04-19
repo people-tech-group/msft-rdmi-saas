@@ -9,7 +9,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\MSFT.RDMISaaS.API.Model\MSFT.RDMISaaS.API.Model.csproj" />
+    <ProjectReference Include="..\MSFT.RDMISaaS.API.Model\MSFT.WVDSaaS.API.Model.csproj" />
   </ItemGroup>
 
 </Project>

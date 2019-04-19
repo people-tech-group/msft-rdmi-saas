@@ -1,6 +1,6 @@
 using System.Collections.ObjectModel;
 
-namespace MSFT.RDMISaaS.API.Areas.HelpPage.ModelDescriptions
+namespace MSFT.WVDSaaS.API.Areas.HelpPage.ModelDescriptions
 {
     public class ComplexTypeModelDescription : ModelDescription
     {

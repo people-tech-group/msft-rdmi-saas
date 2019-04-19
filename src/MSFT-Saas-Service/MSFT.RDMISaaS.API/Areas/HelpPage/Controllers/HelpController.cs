@@ -1,10 +1,10 @@
 using System;
 using System.Web.Http;
 using System.Web.Mvc;
-using MSFT.RDMISaaS.API.Areas.HelpPage.ModelDescriptions;
-using MSFT.RDMISaaS.API.Areas.HelpPage.Models;
+using MSFT.WVDSaaS.API.Areas.HelpPage.ModelDescriptions;
+using MSFT.WVDSaaS.API.Areas.HelpPage.Models;
 
-namespace MSFT.RDMISaaS.API.Areas.HelpPage.Controllers
+namespace MSFT.WVDSaaS.API.Areas.HelpPage.Controllers
 {
     /// <summary>
     /// The controller that will handle requests for the help page.

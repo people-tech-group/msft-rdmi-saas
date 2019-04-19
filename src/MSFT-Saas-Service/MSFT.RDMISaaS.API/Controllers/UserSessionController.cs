@@ -1,18 +1,19 @@
 ﻿#region "Import Namespaces"
-using MSFT.RDMISaaS.API.Model;
+using MSFT.WVDSaaS.API.Model;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Web.Http;
-using MSFT.RDMISaaS.API.BLL;
+using MSFT.WVDSaaS.API.BLL;
 using System.Web.Http.Cors;
-using MSFT.RDMISaaS.API.Common;
+using MSFT.WVDSaaS.API.Common;
+using Newtonsoft.Json.Linq;
 #endregion "Import Namespaces"
 
-#region "MSFT.RDMISaaS.API.Controllers"
-namespace MSFT.RDMISaaS.API.Controllers
+#region "MSFT.WVDSaaS.API.Controllers"
+namespace MSFT.WVDSaaS.API.Controllers
 {
     [EnableCors(origins: "*", headers: "*", methods: "*")]
 
@@ -35,12 +36,12 @@ namespace MSFT.RDMISaaS.API.Controllers
         /// <param name="tenantName">name of tenant</param>
         /// <param name="hostPoolName">Name of Hostpool</param>
         /// <param name="refresh_token">Refresh Token to get access token</param>
+        /// old parameters for pagination --   int pageSize, string sortField, bool isDescending = false, int initialSkip = 0, string lastEntry = null
         /// <returns></returns>
-        public List<RdMgmtUserSession> GetListOfUserSessioons( string tenantGroupName, string tenantName, string hostPoolName, string refresh_token, int pageSize, string sortField, bool isDescending = false, int initialSkip = 0, string lastEntry = null)
+        public HttpResponseMessage GetListOfUserSessions(string tenantGroupName, string tenantName, string hostPoolName, string refresh_token)
         {
             //get deployment url
             deploymentUrl = configurations.rdBrokerUrl;
-            List<RdMgmtUserSession> rdMgmtUserSessions = new List<RdMgmtUserSession>();
             try
             {
                 if (!string.IsNullOrEmpty(refresh_token))
@@ -50,26 +51,25 @@ namespace MSFT.RDMISaaS.API.Controllers
                     accessToken = common.GetTokenValue(refresh_token);
                     if (!string.IsNullOrEmpty(accessToken) && accessToken.ToString().ToLower() != invalidToken && accessToken.ToString().ToLower() != invalidCode)
                     {
-                        rdMgmtUserSessions = userSessionBL.GetListOfUserSessioons(deploymentUrl, accessToken, tenantGroupName, tenantName, hostPoolName,false, pageSize, sortField, isDescending, initialSkip, lastEntry);
+                        return userSessionBL.GetListOfUserSessioons(deploymentUrl, accessToken, tenantGroupName, tenantName, hostPoolName);
                     }
                     else
                     {
-                        RdMgmtUserSession rdMgmtUserSession = new RdMgmtUserSession();
-                        rdMgmtUserSession.code = Constants.invalidToken;
-                        rdMgmtUserSessions.Add(rdMgmtUserSession);
+                        return Request.CreateResponse(HttpStatusCode.OK, new JArray() { new JObject() { { "code", Constants.invalidToken } } });
                     }
                 }
+                else
+                {
+                    return null;
+                }
             }
-            catch 
+            catch
             {
                 return null;
             }
-            return rdMgmtUserSessions;
         }
         #endregion
-
     }
     #endregion
-
 }
 #endregion

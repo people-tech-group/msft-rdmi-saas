@@ -1,5 +1,5 @@
 ﻿#region "Import Namespaces"
-using MSFT.RDMISaaS.API.Model;
+using MSFT.WVDSaaS.API.Model;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System;
@@ -13,15 +13,16 @@ using System.Text;
 using System.Web;
 using System.Web.Configuration;
 using System.IdentityModel.Tokens.Jwt;
-using MSFT.RDMISaaS.API.BLL;
+using MSFT.WVDSaaS.API.BLL;
+using System.Threading.Tasks;
 
 #endregion "Import Namespaces"
 
 #region "MSFT.RDMISaaS.API.Common"
-namespace MSFT.RDMISaaS.API.Common
+namespace MSFT.WVDSaaS.API.Common
 
 {
-   
+
     #region "Common"
     public class Common
     {
@@ -34,7 +35,7 @@ namespace MSFT.RDMISaaS.API.Common
 
 
         #region "Functions/Methods"
-       
+
 
         /// <summary>
         /// Description - Get access token from code
@@ -47,7 +48,7 @@ namespace MSFT.RDMISaaS.API.Common
             try
             {
                 string OAUTH_2_0_TOKEN_ENDPOINT = "https://login.microsoftonline.com/common/oauth2/token";// //https://login.windows.net/common/oauth2/token
-                string client_ID = configurations.applicationId; 
+                string client_ID = configurations.applicationId;
                 var request = (HttpWebRequest)WebRequest.Create(OAUTH_2_0_TOKEN_ENDPOINT);
                 var postData = "redirect_uri=" + HttpUtility.UrlEncode(configurations.redirectUrl);
                 postData += "&grant_type=authorization_code";
@@ -83,7 +84,7 @@ namespace MSFT.RDMISaaS.API.Common
             try
             {
                 string OAUTH_2_0_TOKEN_ENDPOINT = "https://login.windows.net/common/oauth2/token";
-                string client_ID = configurations.applicationId; 
+                string client_ID = configurations.applicationId;
                 var request = (HttpWebRequest)WebRequest.Create(OAUTH_2_0_TOKEN_ENDPOINT);
                 var postData = "redirect_uri=" + configurations.redirectUrl;
                 postData += "&grant_type=refresh_token";
@@ -101,7 +102,7 @@ namespace MSFT.RDMISaaS.API.Common
                 var response = (HttpWebResponse)request.GetResponse();
                 responseString = new StreamReader(response.GetResponseStream()).ReadToEnd();
             }
-            catch 
+            catch
             {
                 return Constants.invalidCode.ToString();
             }
@@ -112,54 +113,75 @@ namespace MSFT.RDMISaaS.API.Common
         /// </summary>
         /// <param name="userName"></param>
         /// <returns></returns>
-        public Login Login(string Code)
+        public async Task<Login> Login(string Code)
         {
-            string token = GetAccessToken(Code);
-            Login loginDetails = JsonConvert.DeserializeObject<Login>(token);
-            var handler = new JwtSecurityTokenHandler();
-            var tokenS = handler.ReadToken(loginDetails.Access_Token) as JwtSecurityToken;
-            loginDetails.UserName = tokenS.Claims.First(claim => claim.Type.Equals("name")).Value.ToString();
-            loginDetails.Email = tokenS.Claims.First(claim => claim.Type.Equals("unique_name")).Value;
-            loginDetails.Code = "";
-
-            //get rele definition
-            if (loginDetails != null && loginDetails.Access_Token != null)
+            Login loginDetails = new Login();
+            try
             {
-                string deploymentUrl = configurations.rdBrokerUrl;
-                List<RdMgmtRoleAssignment> rdMgmtRoleAssignments = new List<RdMgmtRoleAssignment>();
-                List<string> list = new List<string>();
-
-                rdMgmtRoleAssignments = authorizationBL.GetRoleAssignments(deploymentUrl, loginDetails.Access_Token, loginDetails.Email.ToString());
-                for (int i = 0; i < rdMgmtRoleAssignments.Count; i++)
+                string token = GetAccessToken(Code);
+                if(token!=Constants.invalidCode && token != Constants.invalidToken)
                 {
-                    if (rdMgmtRoleAssignments[i].signInName != null && rdMgmtRoleAssignments[i].signInName.ToString().ToLower() == loginDetails.Email.ToString().ToLower())
+                    loginDetails = JsonConvert.DeserializeObject<Login>(token);
+                    var handler = new JwtSecurityTokenHandler();
+                    var tokenS = handler.ReadToken(loginDetails.Access_Token) as JwtSecurityToken;
+                    loginDetails.UserName = tokenS.Claims.First(claim => claim.Type.Equals("name")).Value.ToString();
+                    loginDetails.Email = tokenS.Claims.First(claim => claim.Type.Equals("unique_name")).Value;
+                    loginDetails.Code = "";
+
+                    // to get role assignment
+                    if (loginDetails != null && loginDetails.Access_Token != null)
                     {
-                        loginDetails.RoleAssignment = rdMgmtRoleAssignments[i];
-                        if (loginDetails.RoleAssignment.scope.Split('/').Length > 1)
+                        string deploymentUrl = configurations.rdBrokerUrl;
+                        List<string> list = new List<string>();
+                        HttpResponseMessage httpResponse = await authorizationBL.GetRoleAssignments(deploymentUrl, loginDetails.Access_Token, loginDetails.Email.ToString());
+                        string strJson = httpResponse.Content.ReadAsStringAsync().Result;
+
+                        if (httpResponse.IsSuccessStatusCode)
                         {
-                            list.Add(loginDetails.RoleAssignment.scope.Split('/')[1].ToString());
+                            var rdMgmtRoleAssignments = (JArray)JsonConvert.DeserializeObject(strJson);
+                            for (int i = 0; i < rdMgmtRoleAssignments.Count; i++)
+                            {
+                                loginDetails.RoleAssignment = new JObject() { { "roleDefinitionName", rdMgmtRoleAssignments[i]["roleDefinitionName"].ToString() }, { "scope", rdMgmtRoleAssignments[i]["scope"].ToString() } };
+                                if (rdMgmtRoleAssignments[i]["signInName"] != null && rdMgmtRoleAssignments[i]["signInName"].ToString().ToLower() == loginDetails.Email.ToString().ToLower())
+                                {
+                                    if (rdMgmtRoleAssignments[i]["scope"].ToString().Split('/').Length > 1)
+                                    {
+                                        list.Add(rdMgmtRoleAssignments[i]["scope"].ToString().Split('/')[1].ToString());
+                                    }
+                                    else
+                                    {
+                                        list.Add(Constants.tenantGroupName);
+                                    }
+                                }
+                            }
+                            loginDetails.TenantGroups = list.ToArray();
+                            //return loginDetails;
+                        }
+                        else if ((int)httpResponse.StatusCode == 429)
+                        {
+                            loginDetails.Error = new JObject() { { "StatusCode", httpResponse.StatusCode.ToString() }, { "Message", strJson } };
                         }
                         else
                         {
-                            list.Add(Constants.tenantGroupName);
+                            loginDetails.Error = new JObject() { { "StatusCode", httpResponse.StatusCode.ToString() }, { "Message", strJson } };
                         }
-                        //string TenantGroupName = "";
-                        //if (loginDetails.RoleAssignment.scope.Split('/').Length > 1)
-                        //{
-                        //    TenantGroupName = loginDetails.RoleAssignment.scope.Split('/')[1].ToString();
-                        //}
-                        //else
-                        //{
-                        //    TenantGroupName = Constants.tenantGroupName;
-                        //}
-                        //loginDetails.TenantGroupName = TenantGroupName;
-                        // break;
+                    }
+                    else
+                    {
+                        return null;
                     }
                 }
-                loginDetails.TenantGroups = list.ToArray();
-
+                else
+                {
+                    loginDetails.Error = new JObject() { { "StatusCode", (int)HttpStatusCode.BadRequest }, { "Message", Constants.invalidCode } };
+                }
+                return loginDetails;
             }
-            return loginDetails;
+            catch (Exception ex)
+            {
+                loginDetails.Error = new JObject() { { "StatusCode", (int)HttpStatusCode.BadRequest }, { "Message", Constants.invalidCode } };
+                return loginDetails;
+            }
         }
 
         /// <summary>
@@ -171,7 +193,7 @@ namespace MSFT.RDMISaaS.API.Common
         {
             string refresh_token = "";
             string token = GetAccessToken(code);
-            if(!string.IsNullOrEmpty(token))
+            if (!string.IsNullOrEmpty(token))
             {
                 if (token.ToString().ToLower() == Constants.invalidCode.ToString().ToLower())
                 {
@@ -232,8 +254,8 @@ namespace MSFT.RDMISaaS.API.Common
             }
             return access_token;
         }
-       
-        #endregion 
+
+        #endregion
 
     }
     #endregion "Common"

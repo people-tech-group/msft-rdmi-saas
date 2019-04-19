@@ -11,10 +11,10 @@ using System.Net.Http.Headers;
 using System.Web.Http;
 using System.Web.Http.Controllers;
 using System.Web.Http.Description;
-using MSFT.RDMISaaS.API.Areas.HelpPage.ModelDescriptions;
-using MSFT.RDMISaaS.API.Areas.HelpPage.Models;
+using MSFT.WVDSaaS.API.Areas.HelpPage.ModelDescriptions;
+using MSFT.WVDSaaS.API.Areas.HelpPage.Models;
 
-namespace MSFT.RDMISaaS.API.Areas.HelpPage
+namespace MSFT.WVDSaaS.API.Areas.HelpPage
 {
     public static class HelpPageConfigurationExtensions
     {

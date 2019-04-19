@@ -5,8 +5,8 @@ using System.Linq;
 using System.Web;
 using System.Web.Mvc;
 #endregion "Imports/Namespaces" 
-#region "MSFT.RDMISaaS.API.Controllers"
-namespace MSFT.RDMISaaS.API.Controllers
+#region "MSFT.WVDSaaS.API.Controllers"
+namespace MSFT.WVDSaaS.API.Controllers
 {
     #region "Class - HomeController"
     public class HomeController : Controller

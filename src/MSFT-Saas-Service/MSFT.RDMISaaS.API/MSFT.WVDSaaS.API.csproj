@@ -438,13 +438,13 @@
     <Content Include="Scripts\jquery-3.3.1.min.map" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\MSFT.RDMISaaS.API.BLL\MSFT.RDMISaaS.API.BLL.csproj">
+    <ProjectReference Include="..\MSFT.RDMISaaS.API.BLL\MSFT.WVDSaaS.API.BLL.csproj">
       <Project>{0c561c74-fb86-4d2f-892f-cf7dedf09eb0}</Project>
-      <Name>MSFT.RDMISaaS.API.BLL</Name>
+      <Name>MSFT.WVDSaaS.API.BLL</Name>
     </ProjectReference>
-    <ProjectReference Include="..\MSFT.RDMISaaS.API.Model\MSFT.RDMISaaS.API.Model.csproj">
+    <ProjectReference Include="..\MSFT.RDMISaaS.API.Model\MSFT.WVDSaaS.API.Model.csproj">
       <Project>{2f9523d7-05e6-463e-a3ad-3f0880050a0c}</Project>
-      <Name>MSFT.RDMISaaS.API.Model</Name>
+      <Name>MSFT.WVDSaaS.API.Model</Name>
     </ProjectReference>
   </ItemGroup>
   <PropertyGroup>

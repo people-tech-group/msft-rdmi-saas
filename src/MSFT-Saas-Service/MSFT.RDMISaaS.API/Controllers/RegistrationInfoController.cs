@@ -1,17 +1,18 @@
 ﻿#region "Import Namespaces"
-using MSFT.RDMISaaS.API.Model;
+using MSFT.WVDSaaS.API.Model;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Web.Http;
-using MSFT.RDMISaaS.API.BLL;
+using MSFT.WVDSaaS.API.BLL;
 using System.Web.Http.Cors;
+using Newtonsoft.Json.Linq;
 #endregion "Import Namespaces"
 
-#region "MSFT.RDMISaaS.API.Controllers"
-namespace MSFT.RDMISaaS.API.Controllers
+#region "MSFT.WVDSaaS.API.Controllers"
+namespace MSFT.WVDSaaS.API.Controllers
 {
 
     [EnableCors(origins: "*", headers: "*", methods: "*")]
@@ -21,7 +22,7 @@ namespace MSFT.RDMISaaS.API.Controllers
     {
         #region "class level declaration"
         RegistrationInfoBL registrationInfobl = new RegistrationInfoBL();
-        RegistrationInfoResult infoResult = new RegistrationInfoResult();
+        JObject infoResult = new JObject();
         Common.Common common = new Common.Common();
         Common.Configurations configurations = new Common.Configurations();
         string deploymentUrl = "";
@@ -37,11 +38,10 @@ namespace MSFT.RDMISaaS.API.Controllers
         /// <param name="hostPoolName">Name of Hostpool</param>
         /// <param name="refresh_token">Reffesh token to get access token</param>
         /// <returns></returns>
-        public RdMgmtRegistrationInfo GetRegistrationInfo(string tenantGroupName,string tenantName, string hostPoolName, string refresh_token)
+        public HttpResponseMessage GetRegistrationInfo(string tenantGroupName,string tenantName, string hostPoolName, string refresh_token)
         {
             //get deployment url
             deploymentUrl = configurations.rdBrokerUrl;
-            RdMgmtRegistrationInfo registrationInfo = new RdMgmtRegistrationInfo();
             try
             {
                 if (!string.IsNullOrEmpty(refresh_token))
@@ -51,19 +51,22 @@ namespace MSFT.RDMISaaS.API.Controllers
                     accessToken = common.GetTokenValue(refresh_token);
                     if (!string.IsNullOrEmpty(accessToken) && accessToken.ToString().ToLower() != invalidToken && accessToken.ToString().ToLower() != invalidCode)
                     {
-                        registrationInfo = registrationInfobl.GetRegistrationInfo(tenantGroupName,deploymentUrl, accessToken, tenantName, hostPoolName);
+                       return registrationInfobl.GetRegistrationInfo(tenantGroupName,deploymentUrl, accessToken, tenantName, hostPoolName);
                     }
                     else
                     {
-                        registrationInfo.code = Constants.invalidToken;
+                        return Request.CreateResponse(HttpStatusCode.OK,  new JObject() { { "code", Constants.invalidToken } } );
                     }
+                }
+                else
+                {
+                    return null;
                 }
             }
             catch 
             {
                 return null;
             }
-            return registrationInfo;
         }
 
         /// <summary>
@@ -71,7 +74,7 @@ namespace MSFT.RDMISaaS.API.Controllers
         /// </summary>
         /// <param name="rdMgmtRegistrationInfo"> refistration info class</param>
         /// <returns></returns>
-        public IHttpActionResult Post([FromBody] RdMgmtRegistrationInfo rdMgmtRegistrationInfo)
+        public IHttpActionResult Post([FromBody] JObject rdMgmtRegistrationInfo)
         {
             //get deployment url
             deploymentUrl = configurations.rdBrokerUrl;
@@ -79,32 +82,32 @@ namespace MSFT.RDMISaaS.API.Controllers
             {
                 if (rdMgmtRegistrationInfo != null)
                 {
-                    if (!string.IsNullOrEmpty(rdMgmtRegistrationInfo.refresh_token))
+                    if (!string.IsNullOrEmpty(rdMgmtRegistrationInfo["refresh_token"].ToString()))
                     {
                         string token = "";
                         //get token value
-                        token = common.GetTokenValue(rdMgmtRegistrationInfo.refresh_token);
+                        token = common.GetTokenValue(rdMgmtRegistrationInfo["refresh_token"].ToString());
                         if (!string.IsNullOrEmpty(token) && token.ToString().ToLower() != invalidToken && token.ToString().ToLower() != invalidCode)
                         {
                             infoResult = registrationInfobl.CreateRegistrationInfo(deploymentUrl, token, rdMgmtRegistrationInfo);
                         }
                         else
                         {
-                            infoResult.isSuccess = false;
-                            infoResult.message = Constants.invalidToken;
+                            infoResult.Add("isSuccess", false);
+                            infoResult.Add("message", Constants.invalidToken);
                         }
                     }
                 }
                 else
                 {
-                    infoResult.isSuccess = false;
-                    infoResult.message = Constants.invalidDataMessage;
+                    infoResult.Add("isSuccess" , false);
+                    infoResult.Add("message" , Constants.invalidDataMessage);
                 }
             }
             catch (Exception ex)
             {
-                infoResult.isSuccess = false;
-                infoResult.message ="Registration key has not been generated."+ex.Message.ToString()+" Please try again later.";
+                infoResult.Add("isSuccess" , false);
+                infoResult.Add("message" ,"Registration key has not been generated."+ex.Message.ToString()+" Please try again later.");
             }
             return Ok(infoResult);
         }
@@ -133,15 +136,15 @@ namespace MSFT.RDMISaaS.API.Controllers
                     }
                     else
                     {
-                        infoResult.isSuccess = false;
-                        infoResult.message = Constants.invalidToken;
+                        infoResult.Add("isSuccess", false);
+                        infoResult.Add("message", Constants.invalidToken);
                     }
                 }
             }
             catch (Exception ex)
             {
-                infoResult.isSuccess = false;
-                infoResult.message = "Registration key has not been deleted."+ex.Message.ToString()+" Please try again later.";
+                infoResult.Add("isSuccess", false);
+                infoResult.Add("message", "Registration key has not been deleted." +ex.Message.ToString()+" Please try again later.");
             }
             return Ok(infoResult);
         }

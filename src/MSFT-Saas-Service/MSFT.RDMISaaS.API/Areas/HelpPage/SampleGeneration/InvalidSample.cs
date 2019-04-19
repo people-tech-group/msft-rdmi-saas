@@ -1,6 +1,6 @@
 using System;
 
-namespace MSFT.RDMISaaS.API.Areas.HelpPage
+namespace MSFT.WVDSaaS.API.Areas.HelpPage
 {
     /// <summary>
     /// This represents an invalid sample on the help page. There's a display template named InvalidSample associated with this class.
