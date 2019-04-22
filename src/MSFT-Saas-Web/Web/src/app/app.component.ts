@@ -134,29 +134,34 @@ export class AppComponent implements OnInit {
 
             /*This block of code is used to get the Role Assignment Acces level*/
             //Role Assignment Acces level -Starts
+            this.tenantGroupNameList = respdata.TenantGroups;
+            sessionStorage.setItem("profileIcon", this.profileIcon);
+            sessionStorage.setItem("profileName", this.profileName);
+            if (this.tenantGroupNameList.length != 0) {
+              this.roleDefinitionName = respdata.RoleAssignment.roleDefinitionName;
+              sessionStorage.setItem("roleDefinitionName", this.roleDefinitionName);
+              if (respdata.RoleAssignment.scope == '/') {
+                this.scope = 'All (Root)';
+              }
+              else {
+                this.scope = respdata.RoleAssignment.scope;
+              }
+            }
+            else {
+              const tenantGroupListData = ['Default Tenant Group'];
+              this.tenantGroupNameList = tenantGroupListData;
+            }
             const unique = (value, index, self) => {
               return self.indexOf(value) === index;
             };
-            this.tenantGroupNameList = respdata.TenantGroups;
             const uniqueTenantGroups = this.tenantGroupNameList.filter(unique);
             localStorage.setItem("TenantGroups", JSON.stringify(uniqueTenantGroups));
             this.tenantGroupName = localStorage.getItem("TenantGroupName");
-            this.roleDefinitionName = respdata.RoleAssignment.roleDefinitionName;
-            sessionStorage.setItem("profileIcon", this.profileIcon);
-            sessionStorage.setItem("profileName", this.profileName);
-            sessionStorage.setItem("roleDefinitionName", this.roleDefinitionName);
-            if (respdata.RoleAssignment.scope == '/') {
-              this.scope = 'All (Root)';
-            }
-            else {
-              this.scope = respdata.RoleAssignment.scope;
-            }
             //Role Assignment Acces level -Ends
             sessionStorage.setItem('Scope', this.scope);
             this.profileEmail = respdata.Email;
             sessionStorage.setItem("Refresh_Token", respdata.Refresh_Token);
             sessionStorage.setItem("redirectUri", this.redirectUri);
-            var roleDef = respdata.RoleAssignment.scope.substring(1).split("/");
             sessionStorage.setItem('profileEmail', this.profileEmail);
             sessionStorage.setItem('gotCode', 'no');
             this.appLoader = false;

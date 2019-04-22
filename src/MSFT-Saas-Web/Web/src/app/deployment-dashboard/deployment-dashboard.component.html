@@ -166,7 +166,7 @@
     </div>
   </div>
 
-  <!-- Create Tenant Modal Dialog -->
+  <!-- Select Tenant Group Name Modal Dialog -->
   <div class="overlay" *ngIf="showManageTenantDialog">
     <div class="createTenent">
       <div class="createTenantHead">
@@ -174,11 +174,20 @@
           <h4>Please select a Tenant Group</h4>
           <div class="DeployUrl marginBottom30">
             <label for="manageTenant" style="font-size:11px"><span class="colorRed">&nbsp;*</span><b>Tenant
-                Group</b></label>
-            <select class="form-control" (change)="changeTenantgroup($event.target.value)">
-              <option>Choose tenant group</option>
-              <option *ngFor="let list of TenantGroups" label="">{{list}}</option>
-            </select>
+                Group</b></label>           
+            <div class="input-group">
+                <input type="text" class="form-control" placeholder="Choose tenant group" [(ngModel)]="slectedtenantgroupname">
+                <div class="input-group-btn">
+                  <button class="btn btn-default" (click)="openDropDown()">
+                    <i class="caret"></i>
+                  </button>
+                </div>
+            </div>
+            <div class="dropDown" *ngIf="showDropDown">
+                <ul class="dropDownList">
+                  <li *ngFor="let list of TenantGroups" (click)="changeTenantgroup(list)">{{list}}</li>
+                </ul>
+            </div>
             <div *ngIf="ShowTenantgroupError" class="colorRed">
               Please select tenant group
             </div>
@@ -193,8 +202,7 @@
             <input type=button value="Cancel" id="btnCancel" (click)="CloseManageTenant($event)" />
           </li>
           <li>
-            <input type="button" value="Save" id="btnDone" (click)="ManageTenant($event)"
-              [disabled]="saveButtonDisable" />
+            <input type="button" value="Save" id="btnDone" (click)="ManageTenant($event)" />
             <!--(click)="ManageTenant(tenantForm.value)" [disabled]="tenantDoneButtonDisable"-->
           </li>
         </ul>
