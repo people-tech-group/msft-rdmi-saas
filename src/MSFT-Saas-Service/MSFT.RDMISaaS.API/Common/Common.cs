@@ -128,48 +128,52 @@ namespace MSFT.WVDSaaS.API.Common
                     loginDetails.Email = tokenS.Claims.First(claim => claim.Type.Equals("unique_name")).Value;
                     loginDetails.Code = "";
 
-                    // to get role assignment
-                    if (loginDetails != null && loginDetails.Access_Token != null)
-                    {
-                        string deploymentUrl = configurations.rdBrokerUrl;
-                        List<string> list = new List<string>();
-                        HttpResponseMessage httpResponse = await authorizationBL.GetRoleAssignments(deploymentUrl, loginDetails.Access_Token, loginDetails.Email.ToString());
-                        string strJson = httpResponse.Content.ReadAsStringAsync().Result;
+                    //// to get role assignment
+                    //if (loginDetails != null && loginDetails.Access_Token != null)
+                    //{
+                    //    string deploymentUrl = configurations.rdBrokerUrl;
+                    //    List<string> list = new List<string>();
+                    //    HttpResponseMessage httpResponse = await authorizationBL.GetRoleAssignments(deploymentUrl, loginDetails.Access_Token, loginDetails.Email.ToString());
+                    //    string strJson = httpResponse.Content.ReadAsStringAsync().Result;
 
-                        if (httpResponse.IsSuccessStatusCode)
-                        {
-                            var rdMgmtRoleAssignments = (JArray)JsonConvert.DeserializeObject(strJson);
-                            for (int i = 0; i < rdMgmtRoleAssignments.Count; i++)
-                            {
-                                loginDetails.RoleAssignment = new JObject() { { "roleDefinitionName", rdMgmtRoleAssignments[i]["roleDefinitionName"].ToString() }, { "scope", rdMgmtRoleAssignments[i]["scope"].ToString() } };
-                                if (rdMgmtRoleAssignments[i]["signInName"] != null && rdMgmtRoleAssignments[i]["signInName"].ToString().ToLower() == loginDetails.Email.ToString().ToLower())
-                                {
-                                    if (rdMgmtRoleAssignments[i]["scope"].ToString().Split('/').Length > 1)
-                                    {
-                                        list.Add(rdMgmtRoleAssignments[i]["scope"].ToString().Split('/')[1].ToString());
-                                    }
-                                    else
-                                    {
-                                        list.Add(Constants.tenantGroupName);
-                                    }
-                                }
-                            }
-                            loginDetails.TenantGroups = list.ToArray();
-                            //return loginDetails;
-                        }
-                        else if ((int)httpResponse.StatusCode == 429)
-                        {
-                            loginDetails.Error = new JObject() { { "StatusCode", httpResponse.StatusCode.ToString() }, { "Message", strJson } };
-                        }
-                        else
-                        {
-                            loginDetails.Error = new JObject() { { "StatusCode", httpResponse.StatusCode.ToString() }, { "Message", strJson } };
-                        }
-                    }
-                    else
-                    {
-                        return null;
-                    }
+                    //    if (httpResponse.IsSuccessStatusCode)
+                    //    {
+                    //        var rdMgmtRoleAssignments = (JArray)JsonConvert.DeserializeObject(strJson);
+                    //        for (int i = 0; i < rdMgmtRoleAssignments.Count; i++)
+                    //        {
+                    //            loginDetails.RoleAssignment = new JObject() { { "roleDefinitionName", rdMgmtRoleAssignments[i]["roleDefinitionName"].ToString() }, { "scope", rdMgmtRoleAssignments[i]["scope"].ToString() } };
+                    //            if (rdMgmtRoleAssignments[i]["signInName"] != null && rdMgmtRoleAssignments[i]["signInName"].ToString().ToLower() == loginDetails.Email.ToString().ToLower())
+                    //            {
+                    //                if (rdMgmtRoleAssignments[i]["scope"].ToString().Split('/').Length > 1)
+                    //                {
+                    //                    list.Add(rdMgmtRoleAssignments[i]["scope"].ToString().Split('/')[1].ToString());
+                    //                }
+                    //                else
+                    //                {
+                    //                    list.Add(Constants.tenantGroupName);
+                    //                }
+                    //            }
+                    //        }
+                    //        loginDetails.TenantGroups = list.ToArray();
+                    //        //return loginDetails;
+                    //    }
+                    //    else if ((int)httpResponse.StatusCode == 429)
+                    //    {
+                    //        loginDetails.Error = new JObject() { { "StatusCode", httpResponse.StatusCode.ToString() }, { "Message", strJson } };
+                    //    }
+                    //    else
+                    //    {
+                    //        loginDetails.Error = new JObject() { { "StatusCode", httpResponse.StatusCode.ToString() }, { "Message", strJson } };
+                    //    }
+                    //}
+                    //else
+                    //{
+                    //    return null;
+                    //}
+
+                    //For Temporary Use
+                    loginDetails.TenantGroups = new string[] { };
+
                 }
                 else
                 {

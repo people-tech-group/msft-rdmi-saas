@@ -39,7 +39,7 @@ export class DeploymentDashboardComponent implements OnInit {
   public createTenantId: boolean = false;
   public tenantNextButtonDisable: boolean = true;
   public tenantDoneButtonDisable: boolean = true;
-  public saveButtonDisable: boolean = true;
+  // public saveButtonDisable: boolean = true;
   public refreshTenantLoading: any = false;
   public searchTenants: any = [];
   private sub: any;
@@ -65,11 +65,12 @@ export class DeploymentDashboardComponent implements OnInit {
   public isDeleteDisabled: boolean = true;
   public tenantlistErrorFound: boolean = false;
   public ShowTenantgroupError: boolean = false;
-  public slectedtenantgroupname: any;
+  public slectedtenantgroupname: any = '';
   public tenantGroupName: any;
   public deleteCount: any;
   public refreshToken: any;
   public TenantGroups: any = [];
+  public showDropDown: boolean = false;
   public options: any = {
     timeOut: 2000,
     position: ["top", "right"]
@@ -214,6 +215,7 @@ export class DeploymentDashboardComponent implements OnInit {
   public OpenManageTenant() {
     this.ShowTenantgroupError = false;
     this.showManageTenantDialog = true;
+    this.slectedtenantgroupname = '';
   }
   /* This function is called  to close Manage tenant modal slide dialog
  * --------------
@@ -242,14 +244,19 @@ export class DeploymentDashboardComponent implements OnInit {
 */
   public changeTenantgroup(data: any) {
     this.slectedtenantgroupname = data;
+    this.showDropDown = false;
     if (this.slectedtenantgroupname == null || this.slectedtenantgroupname == undefined || this.slectedtenantgroupname == "Choose tenant group") {
-      this.saveButtonDisable = true;
+      // this.saveButtonDisable = true;
       this.ShowTenantgroupError = true;
     }
     else {
-      this.saveButtonDisable = false;
+      // this.saveButtonDisable = false;
       this.ShowTenantgroupError = false;
     }
+  }
+
+  public openDropDown() {
+    this.showDropDown = this.showDropDown == true ? false : true;
   }
   /* This function is called  when we save a Tenanat group name in the Tenanat group modal
 * --------------
@@ -258,10 +265,11 @@ export class DeploymentDashboardComponent implements OnInit {
 * -------------
 */
   public ManageTenant() {
+    let tenantGroup = this.slectedtenantgroupname == "" ? 'Default Tenant Group' : this.slectedtenantgroupname;
     this.refreshTenantLoading = true;
     localStorage.removeItem("TenantGroupName");
     this.ManageTenantSlideClose(event);
-    localStorage.setItem("TenantGroupName", this.slectedtenantgroupname);
+    localStorage.setItem("TenantGroupName", tenantGroup);
     this.tenants = [];
     this.searchTenants = [];
     sessionStorage.removeItem('Tenants');
@@ -519,11 +527,11 @@ export class DeploymentDashboardComponent implements OnInit {
       // this.getTenantsUrl = this._AppService.ApiUrl + '/api/Tenant/GetTenantList?tenantGroupName=' + this.tenantGroupName + '&refresh_token=' + this.refreshToken + '&pageSize=' + this.pageSize + '&sortField=TenantName&isDescending=false&initialSkip=' + this.initialSkip + '&lastEntry=' + this.lastEntry;
       this.getTenantsUrl = this._AppService.ApiUrl + '/api/Tenant/GetTenantList?tenantGroupName=' + this.tenantGroupName + '&refresh_token=' + this.refreshToken;
       this._AppService.GetTenants(this.getTenantsUrl).subscribe(response => {
-        if(response.status == 429){
+        if (response.status == 429) {
           this.error = true;
           this.errorMessage = response.statusText;
         }
-        else{
+        else {
           this.error = false;
           let responseObject = JSON.parse(response['_body']);
           sessionStorage.setItem('Tenants', JSON.stringify(responseObject));
