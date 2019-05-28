@@ -226,9 +226,9 @@ export class HostpoolDashboardComponent implements OnInit {
   public appslist: number = 1;
   public appGroupsPageNo: number = 1;
   public userslist: number = 1;
-  public SearchByAppUser:any;
-  public searchByAppName:any;
-  public searchBySHSName:any;
+  public SearchByAppUser: any;
+  public searchByAppName: any;
+  public searchBySHSName: any;
   @ViewChild('closeModal') closeModal: ElementRef;
 
   constructor(private _AppService: AppService, private fb: FormBuilder, private http: Http, private route: ActivatedRoute, private _notificationsService: NotificationsService, private router: Router,
@@ -494,22 +494,42 @@ export class HostpoolDashboardComponent implements OnInit {
       (error) => {
         //this.showHostCreate = false;
         let errorBody = JSON.parse(error['_body']);
-        this._notificationsService.html(
-          '<i class="icon icon-fail angular-NotifyFail col-xs-1 no-pad"></i>' +
-          '<label class="notify-label col-xs-10 no-pad">Failed To Generate Registration Key</label>' +
-          '<a class="close"><i class="icon icon-close notify-close" aria-hidden="true"></i></a>' +
-          '<p class="notify-text col-xs-12 no-pad">Problem with server, Please try again</p>',
-          'content optional one',
-          {
-            position: ["top", "right"],
-            timeOut: 3000,
-            showProgressBar: false,
-            pauseOnHover: false,
-            clickToClose: true,
-            maxLength: 10
-          }
-        )
-        AppComponent.GetNotification('icon icon-fail angular-NotifyFail', 'Failed To Generate Registration Key', 'Problem with server, Please try again', new Date());
+        if (error.status == 404) {
+          this._notificationsService.html(
+            '<i class="icon icon-fail angular-NotifyFail col-xs-1 no-pad"></i>' +
+            '<label class="notify-label col-xs-10 no-pad">' + errorBody.error.message + '</label>' +
+            '<a class="close"><i class="icon icon-close notify-close" aria-hidden="true"></i></a>' +
+            '<p class="notify-text col-xs-12 no-pad">' + errorBody.error.target + '</p>',
+            'content optional one',
+            {
+              position: ["top", "right"],
+              timeOut: 3000,
+              showProgressBar: false,
+              pauseOnHover: false,
+              clickToClose: true,
+              maxLength: 10
+            }
+          )
+          AppComponent.GetNotification('icon icon-fail angular-NotifyFail', errorBody.error.message, errorBody.error.target, new Date());
+        }
+        else {
+          this._notificationsService.html(
+            '<i class="icon icon-fail angular-NotifyFail col-xs-1 no-pad"></i>' +
+            '<label class="notify-label col-xs-10 no-pad">Failed To Generate Registration Key</label>' +
+            '<a class="close"><i class="icon icon-close notify-close" aria-hidden="true"></i></a>' +
+            '<p class="notify-text col-xs-12 no-pad">Problem with server, Please try again</p>',
+            'content optional one',
+            {
+              position: ["top", "right"],
+              timeOut: 3000,
+              showProgressBar: false,
+              pauseOnHover: false,
+              clickToClose: true,
+              maxLength: 10
+            }
+          )
+          AppComponent.GetNotification('icon icon-fail angular-NotifyFail', 'Failed To Generate Registration Key', 'Problem with server, Please try again', new Date());
+        }
         //this.RefreshHost();
       }
     );
@@ -1799,7 +1819,7 @@ export class HostpoolDashboardComponent implements OnInit {
         description: new FormControl(this.appGroupsListSearch[index].description),
         editRadiobtnAppType: new FormControl(this.selectedRadioBtn),
       });
-      if (this.appGroupsListSearch[index].resourceType == "Desktop App Group") {
+      if (this.appGroupsListSearch[index].resourceType == 1) {
         this.removeAppsTab = false;
         this.selectedRadioBtn = 'Desktop'
       }
@@ -2220,9 +2240,9 @@ export class HostpoolDashboardComponent implements OnInit {
     //     this.refreshHostpoolLoading = false;
     //   }
     // );
-    if(this.selectedRadioBtn == 'RemoteApp'){
+    if (this.selectedRadioBtn == 'RemoteApp') {
       this.GetAllAppGroupApps();
-    }else{
+    } else {
       this.GetAppGroupUsers();
     }
   }
@@ -2231,12 +2251,6 @@ export class HostpoolDashboardComponent implements OnInit {
    * This function is used to get the Appgroup users list and load into table
    */
   public GetAppGroupUsers() {
-    let Users = JSON.parse(sessionStorage.getItem('Users'));
-    let selectedApproup = sessionStorage.getItem('SelectedAppGroup');
-    if (sessionStorage.getItem('Users') && Users.length != 0 && Users != null && selectedApproup == this.selectedAppGroupName) {
-      this.getusers()
-    }
-    else {
       this.checkedUsers = [];
       this.checkedMainUser = false;
       this.usersListErrorFound = false;
@@ -2268,7 +2282,6 @@ export class HostpoolDashboardComponent implements OnInit {
           this.refreshHostpoolLoading = false;
         }
       );
-    }
     this.isDeleteUserDisabled = true;
   }
 
@@ -3018,50 +3031,50 @@ export class HostpoolDashboardComponent implements OnInit {
    * This function is used to get All AppGroup RemoteApps from Gallery
    */
   public GetAllAppGroupAppsGallery() {
-      this.galleryAppLoader = true;
-      this.appGroupAppListGallery = [];
-      //this.getAllAppGroupAppsGalleryUrl = this._AppService.ApiUrl + '/api/AppGroup/GetStartMenuAppsList?tenantGroupName=' + this.tenantGroupName + '&tenantName=' + this.tenantName + '&appGroupName=' + this.selectedAppGroupName + '&hostPoolName=' + this.hostPoolName + '&refresh_token=' + sessionStorage.getItem("Refresh_Token") + '&pageSize=10&sortField=AppAlias&isDescending=false&initialSkip=0';
-      this.getAllAppGroupAppsGalleryUrl = this._AppService.ApiUrl + '/api/AppGroup/GetStartMenuAppsList?tenantGroupName=' + this.tenantGroupName + '&tenantName=' + this.tenantName + '&appGroupName=' + this.selectedAppGroupName + '&hostPoolName=' + this.hostPoolName + '&refresh_token=' + sessionStorage.getItem("Refresh_Token");// + '&pageSize=10&sortField=AppAlias&isDescending=false&initialSkip=0';
-      this._AppService.GetData(this.getAllAppGroupAppsGalleryUrl).subscribe(response => {
-        if (response.status == 429) {
-          this.error = true;
-          this.errorMessage = response.statusText;
-        }
-        else {
-          this.error = false;
-          this.GAppslist = false;
-          this.appGroupAppListGallery = JSON.parse(response['_body']);
-          if (this.appGroupAppListGallery) {
-            if (this.appGroupAppListGallery.code == "Invalid Token") {
-              sessionStorage.clear();
-              this.router.navigate(['/invalidtokenmessage']);
-            }
-            else if (this.appGroupAppListGallery.length == 0) {
-              this.GAppslist = true;
-              this.appGalleryErrorFound = false;
-            }
-            else {
-              this.GAppslist = false;
-              this.appGalleryErrorFound = false;
-            }
-            this.galleryAppLoader = false;
+    this.galleryAppLoader = true;
+    this.appGroupAppListGallery = [];
+    //this.getAllAppGroupAppsGalleryUrl = this._AppService.ApiUrl + '/api/AppGroup/GetStartMenuAppsList?tenantGroupName=' + this.tenantGroupName + '&tenantName=' + this.tenantName + '&appGroupName=' + this.selectedAppGroupName + '&hostPoolName=' + this.hostPoolName + '&refresh_token=' + sessionStorage.getItem("Refresh_Token") + '&pageSize=10&sortField=AppAlias&isDescending=false&initialSkip=0';
+    this.getAllAppGroupAppsGalleryUrl = this._AppService.ApiUrl + '/api/AppGroup/GetStartMenuAppsList?tenantGroupName=' + this.tenantGroupName + '&tenantName=' + this.tenantName + '&appGroupName=' + this.selectedAppGroupName + '&hostPoolName=' + this.hostPoolName + '&refresh_token=' + sessionStorage.getItem("Refresh_Token");// + '&pageSize=10&sortField=AppAlias&isDescending=false&initialSkip=0';
+    this._AppService.GetData(this.getAllAppGroupAppsGalleryUrl).subscribe(response => {
+      if (response.status == 429) {
+        this.error = true;
+        this.errorMessage = response.statusText;
+      }
+      else {
+        this.error = false;
+        this.GAppslist = false;
+        this.appGroupAppListGallery = JSON.parse(response['_body']);
+        if (this.appGroupAppListGallery) {
+          if (this.appGroupAppListGallery.code == "Invalid Token") {
+            sessionStorage.clear();
+            this.router.navigate(['/invalidtokenmessage']);
           }
-          this.refreshHostpoolLoading = false;
-        }
-      },
-        /*
-         * If Any Error (or) Problem With Services (or) Problem in internet this Error Block Will Exequte
-         */
-        (error) => {
-          this.error = true;
-          let errorBody = JSON.parse(error['_body']);
-          this.errorMessage = errorBody.error.target;
+          else if (this.appGroupAppListGallery.length == 0) {
+            this.GAppslist = true;
+            this.appGalleryErrorFound = false;
+          }
+          else {
+            this.GAppslist = false;
+            this.appGalleryErrorFound = false;
+          }
           this.galleryAppLoader = false;
-          this.refreshHostpoolLoading = false;
-          this.appGalleryErrorFound = true;
-          this.GAppslist = false;
         }
-      );
+        this.refreshHostpoolLoading = false;
+      }
+    },
+      /*
+       * If Any Error (or) Problem With Services (or) Problem in internet this Error Block Will Exequte
+       */
+      (error) => {
+        this.error = true;
+        let errorBody = JSON.parse(error['_body']);
+        this.errorMessage = errorBody.error.target;
+        this.galleryAppLoader = false;
+        this.refreshHostpoolLoading = false;
+        this.appGalleryErrorFound = true;
+        this.GAppslist = false;
+      }
+    );
   }
 
   /*
