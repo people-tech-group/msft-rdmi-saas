@@ -44,8 +44,8 @@
         "hostingPlanName": "[concat(parameters('ApplicationName'),'-SPlan')]",
         "serviceplansku": "S1",
         "workerSize": "0",
-        "baseURL": "https://raw.githubusercontent.com/people-tech-group/msft-rdmi-saas/master/deploy/scripts/",
-        "scriptUri": "https://raw.githubusercontent.com/people-tech-group/msft-rdmi-saas/master/deploy/scripts/New-WVDMgmtSetup.ps1",
+		"baseURL": "https://raw.githubusercontent.com/people-tech-group/msft-rdmi-saas/master/deploy/scripts/",
+        "scriptUri": "[concat(variables('baseURL'),'New-WVDMgmtSetup.ps1')]",
         "fileURI": "[concat(variables('baseURL'),'/msft-wvd-saas-offering.zip')]",
         "sku": "Free",
         "automationVariables": [

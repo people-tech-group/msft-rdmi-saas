@@ -37,34 +37,40 @@ Import-Module AzureAD
     $WebAppExtractionPath = ".\msft-wvd-saas-web\msft-wvd-saas-web.zip"
     $ApiAppDirectory = ".\msft-wvd-saas-api"
     $ApiAppExtractionPath = ".\msft-wvd-saas-api\msft-wvd-saas-api.zip"
+
 	#Function to get PublishingProfileCredentials
 	function Get-PublishingProfileCredentials($resourceGroupName, $webAppName){
-	 	$resourceType = "Microsoft.Web/sites/config"
-		$resourceName = "$webAppName/publishingcredentials"
-	 	$publishingCredentials = Invoke-AzureRmResourceAction -ResourceGroupName $resourceGroupName -ResourceType $resourceType -ResourceName $resourceName -Action list -ApiVersion 2015-08-01 -Force
-		   return $publishingCredentials
-	} 
+ 
+    $resourceType = "Microsoft.Web/sites/config"
+    $resourceName = "$webAppName/publishingcredentials"
+ 
+    $publishingCredentials = Invoke-AzureRmResourceAction -ResourceGroupName $resourceGroupName -ResourceType $resourceType -ResourceName $resourceName -Action list -ApiVersion 2015-08-01 -Force
+ 
+       return $publishingCredentials
+} 
+ 
 	#Function to get KuduApiAuthorisationHeaderValue
-		function Get-KuduApiAuthorisationHeaderValue($resourceGroupName, $webAppName, $slotName = $null){
-		$publishingCredentials = Get-PublishingProfileCredentials $resourceGroupName $webAppName $slotName
-		return ("Basic {0}" -f [Convert]::ToBase64String([Text.Encoding]::ASCII.GetBytes(("{0}:{1}" -f $publishingCredentials.Properties.PublishingUserName, $publishingCredentials.Properties.PublishingPassword))))
-	}
+	function Get-KuduApiAuthorisationHeaderValue($resourceGroupName, $webAppName, $slotName = $null){
+    $publishingCredentials = Get-PublishingProfileCredentials $resourceGroupName $webAppName $slotName
+    return ("Basic {0}" -f [Convert]::ToBase64String([Text.Encoding]::ASCII.GetBytes(("{0}:{1}" -f $publishingCredentials.Properties.PublishingUserName, $publishingCredentials.Properties.PublishingPassword))))
+}
 
-		#Function to confirm files are uploaded or not in both azure app services
-		function RunCommand($dir,$command,$resourceGroupName, $webAppName, $slotName = $null){
-			$kuduApiAuthorisationToken = Get-KuduApiAuthorisationHeaderValue $resourceGroupName $webAppName $slotName
-			$kuduApiUrl="https://$webAppName.scm.azurewebsites.net/api/command"
-			$Body = 
-			  @{
-			  "command"=$command;
-			   "dir"=$dir
-			   } 
-			$bodyContent=@($Body) | ConvertTo-Json
-			#Write-output $bodyContent
-			 Invoke-RestMethod -Uri $kuduApiUrl `
-								-Headers @{"Authorization"=$kuduApiAuthorisationToken;"If-Match"="*"} `
-								-Method POST -ContentType "application/json" -Body $bodyContent
-		}
+	#Function to confirm files are uploaded or not in both azure app services
+	function RunCommand($dir,$command,$resourceGroupName, $webAppName, $slotName = $null){
+        $kuduApiAuthorisationToken = Get-KuduApiAuthorisationHeaderValue $resourceGroupName $webAppName $slotName
+        $kuduApiUrl="https://$webAppName.scm.azurewebsites.net/api/command"
+        $Body = 
+          @{
+          "command"=$command;
+           "dir"=$dir
+           } 
+        $bodyContent=@($Body) | ConvertTo-Json
+        #Write-output $bodyContent
+         Invoke-RestMethod -Uri $kuduApiUrl `
+                            -Headers @{"Authorization"=$kuduApiAuthorisationToken;"If-Match"="*"} `
+                            -Method POST -ContentType "application/json" -Body $bodyContent
+    }
+
 try
 {
                 # Get Url of Web-App
@@ -76,13 +82,19 @@ try
                 
                 #Static value of wvdInfra web appname/appid
                 $wvdinfraWebAppId = "5a0aa725-4958-4b0c-80a9-34562e23f3b7"
-                $serviceIdinfo = Get-AzureRmADServicePrincipal -ApplicationId $wvdinfraWebAppId
+                $serviceIdinfo = Get-AzureRmADServicePrincipal -ErrorAction SilentlyContinue | Where-Object {$_.ApplicationId -eq $wvdinfraWebAppId}
                 
                 if(!$serviceIdinfo){
                 $wvdinfraWebApp = "Windows Virtual Desktop"
-                $serviceIdinfo = Get-AzureRmADServicePrincipal -DisplayName $wvdinfraWebApp
+                
+                $serviceIdinformation = Get-AzureRmADServicePrincipal -DisplayName $wvdinfraWebApp -ErrorAction SilentlyContinue
+                foreach($servicePName in $serviceIdinformation){
+                if($servicePName.ApplicationId -eq $wvdinfraWebAppId){
+                $serviceIdinfo = $servicePName
+                }                
                 }
-
+                }
+                	
                 $wvdInfraWebAppName = $serviceIdinfo.DisplayName
                 #generate unique ID based on subscription ID
                 $unique_subscription_id = ($subscriptionid).Replace('-', '').substring(0, 19)
@@ -99,15 +111,17 @@ try
                 foreach($permission in $resourceAppId.Oauth2Permissions){
                     $clientappreq.ResourceAccess += New-Object -TypeName "Microsoft.Open.AzureAD.Model.ResourceAccess" -ArgumentList $permission.Id,"Scope"
                 }
-				#Setting up the WVD Required Access to Client Application
-                Set-AzureADApplication -ObjectId $clientAdApp.ObjectId -RequiredResourceAccess $clientappreq -ErrorAction Stop
+                #Setting up the WVD Required Access to Client Application
+				 Set-AzureADApplication -ObjectId $clientAdApp.ObjectId -RequiredResourceAccess $clientappreq -ErrorAction Stop
 
-			}
-				catch
-				{
-					Write-Output $_.Exception.Message
-					throw $_.Exception.Message
 				}
+                
+        catch
+        {
+            Write-Output $_.Exception.Message
+            throw $_.Exception.Message
+        }
+
         if($ApiApp)
         {
             try
@@ -155,9 +169,9 @@ try
                                     "RDBrokerUrl" = "$RDBrokerURL";
                                     "ResourceUrl" = "$ResourceURL";
                                     "RedirectURI" = "https://"+"$WebUrl"+"/";
-            }
+				}
                 Set-AzureRmWebApp -AppSettings $ApiAppSettings -Name $ApiApp -ResourceGroupName $ResourceGroupName
-
+				
 				#Checking Extracted files are uploaded or not
 				$returnvalue = RunCommand -dir "site\wwwroot\" -command "ls web.config"  -resourceGroupName $resourceGroupName -webAppName $ApiApp
 				if($returnvalue.output){
@@ -172,7 +186,7 @@ try
             catch
             {
                 Write-Output $_.Exception.Message
-				throw $_.Exception.Message
+                throw $_.Exception.Message
             }
         }
         if($WebApp -and $ApiApp)
@@ -192,7 +206,6 @@ try
 
                 # Get the main.bundle.js file Path 
 
-                #$MainbundlePath = Get-ChildItem $WebAppExtractedPath -recurse | where {($_.FullName -match "main.bundle.js" ) -and ($_.FullName -notmatch "main.bundle.js.map")} | % {$_.FullName}
                 $MainbundlePath = Get-ChildItem $WebAppExtractedPath -recurse | where {($_.FullName -match "main\.(\w+).bundle.js$")} | % {$_.FullName}
 
  
@@ -233,6 +246,7 @@ try
                 $base64AuthInfo = [Convert]::ToBase64String([Text.Encoding]::ASCII.GetBytes(("{0}:{1}" -f $WebAppUserName, $WebApppassword)))
                 $userAgent = "powershell/1.0"
                 Invoke-RestMethod -Uri $apiUrl -Headers @{Authorization=("Basic {0}" -f $base64AuthInfo)} -UserAgent $userAgent -Method POST -InFile $filePath -ContentType "multipart/form-data"
+                
 				#Checking Extracted files are uploaded or not
 				$returnvalue = RunCommand -dir "site\wwwroot\" -command "ls web.config"  -resourceGroupName $resourceGroupName -webAppName $WebApp
 				if($returnvalue.output)
@@ -244,11 +258,11 @@ try
 				Write-output "Extracted files are not uploaded Error: $returnvalue.error"
 				throw $returnvalue.error
 				}
-			}
+            }
             catch
             {
                 Write-Output $_.Exception.Message
-				throw $_.Exception.Message
+                throw $_.Exception.Message
             }
 
             Write-Output "Api URL : https://$ApiUrl"
