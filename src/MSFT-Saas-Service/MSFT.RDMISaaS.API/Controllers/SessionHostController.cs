@@ -189,6 +189,23 @@ namespace MSFT.WVDSaaS.API.Controllers
             return Ok(sessionHostResult);
         }
 
+        public IHttpActionResult RestartHost(string subscriptionId, string resourceGroupName, string sessionHostName, string refresh_token)
+        {
+            deploymentUrl = configurations.managementResourceUrl;// subscriptions/f657519e-2b49-48fe-85ec-3acff0ac67a6/resourceGroups/svTestRG/providers/Microsoft.Compute/virtualMachines/RDSH-7777-0/restart?api-version=2018-06-01
+            try
+            {
+                string accessToken = common.GetManagementTokenValue(refresh_token);
+                hostResult =  sessionHostBL.RestartHost(deploymentUrl, accessToken, subscriptionId, resourceGroupName, sessionHostName);
+            }
+            catch (Exception ex)
+            {
+                hostResult.Add("isSuccess", false);
+                hostResult.Add("message", "Failed to restart host. "+ ex.Message);
+            }
+            return Ok(hostResult);
+
+        }
+
         #endregion
 
     }

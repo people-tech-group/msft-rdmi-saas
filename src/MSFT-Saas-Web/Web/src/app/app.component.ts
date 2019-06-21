@@ -140,6 +140,7 @@ export class AppComponent implements OnInit {
             if (this.tenantGroupNameList.length != 0) {
               this.roleDefinitionName = respdata.RoleAssignment.roleDefinitionName;
               sessionStorage.setItem("roleDefinitionName", this.roleDefinitionName);
+              console.log(respdata.RoleAssignment,"respdata.RoleAssignment");
               if (respdata.RoleAssignment.scope == '/') {
                 this.scope = 'All (Root)';
               }
@@ -158,7 +159,10 @@ export class AppComponent implements OnInit {
             localStorage.setItem("TenantGroups", JSON.stringify(uniqueTenantGroups));
             this.tenantGroupName = localStorage.getItem("TenantGroupName");
             //Role Assignment Acces level -Ends
-            sessionStorage.setItem('Scope', this.scope);
+            var roleDef = respdata.RoleAssignment.scope.substring(1).split("/");
+            //sessionStorage.setItem('Scope', this.scope);
+            sessionStorage.setItem('Scope', roleDef);
+     
             this.profileEmail = respdata.Email;
             sessionStorage.setItem("Refresh_Token", respdata.Refresh_Token);
             sessionStorage.setItem("redirectUri", this.redirectUri);

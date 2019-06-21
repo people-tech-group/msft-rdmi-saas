@@ -7,8 +7,8 @@ export class AppService {
   public ApiEndpoint: any;
   public ApiUrl: string;
   constructor(private http: Http) {
-    this.ApiUrl = "https://msftrdmisaasapi.azurewebsites.net";
-  //this.ApiUrl = "http://localhost:34816/";
+   // this.ApiUrl = "https://msftrdmisaasapi.azurewebsites.net";
+  this.ApiUrl = "http://localhost:34816/";
   }
 
   /*
@@ -126,6 +126,31 @@ export class AppService {
     let options = new RequestOptions({ headers: headers });
     return this.http.post(hosturl, JSON.stringify(data), options)
       .catch((error: any) => Observable.throw(error));
+  }
+
+  UserSessionLogOff(hosturl: any, data)
+  {
+    let headers = new Headers({ 'Content-Type': 'application/json;charset=utf8', 'Accept': 'application/json' });
+    let options = new RequestOptions({ headers: headers });
+    return this.http.post(hosturl, JSON.stringify(data), options)
+    .catch((error: any) => Observable.throw(error));
+  }
+
+  SendMessage(hosturl: any, data)
+  {
+    let headers = new Headers({ 'Content-Type': 'application/json;charset=utf8', 'Accept': 'application/json' });
+    let options = new RequestOptions({ headers: headers });
+    return this.http.post(hosturl, JSON.stringify(data), options)
+    .catch((error: any) => Observable.throw(error));
+  }
+
+  
+  RestartHost(hosturl: any)
+  {
+    let headers = new Headers({ 'Content-Type': 'application/json;charset=utf8', 'Accept': 'application/json' });
+    let options = new RequestOptions({ headers: headers });
+    return this.http.post(hosturl, options)
+    .catch((error: any) => Observable.throw(error));
   }
 
   /*

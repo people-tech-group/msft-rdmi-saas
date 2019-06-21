@@ -5,6 +5,7 @@ using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Text;
@@ -162,6 +163,40 @@ namespace MSFT.WVDSaaS.API.BLL
                 sessionHostResult.message = "Session host " + sessionHostName + " has not been deleted." + ex.Message.ToString() + " Please try it later again.";
             }
             return sessionHostResult;
+        }
+
+        public JObject RestartHost(string deploymentUrl, string accessToken, string subscriptionId, string resourceGroupName, string sessionHostName)
+        {
+            try
+            {
+                JObject vmDetails = new JObject()
+                {
+                    new  JProperty("subscriptionId",subscriptionId),
+                    new  JProperty("resourceGroupName",resourceGroupName),
+                    new  JProperty("vmName",sessionHostName)
+                };
+                var content = new StringContent(JsonConvert.SerializeObject(vmDetails), Encoding.UTF8, "application/json");
+                HttpResponseMessage response= CommonBL.InitializeHttpClient(deploymentUrl, accessToken).PostAsync("subscriptions/" + subscriptionId + "/resourceGroups/" + resourceGroupName + "/providers/Microsoft.Compute/virtualMachines/" + sessionHostName + "/restart?api-version=2018-06-01", content).Result;
+                string strJson = response.Content.ReadAsStringAsync().Result;
+                if (response.StatusCode == HttpStatusCode.OK || response.StatusCode == HttpStatusCode.Accepted)
+                {
+                    hostResult.Add("isSuccess", true);
+                    hostResult.Add("message", sessionHostName + " is restarted successfully");
+                }
+                else
+                {
+                    hostResult.Add("isSuccess", false);
+                    hostResult.Add("message", CommonBL.GetErrorMessage(strJson));
+                }
+            }
+            catch (Exception ex)
+            {
+                hostResult.Add("isSuccess", false);
+                hostResult.Add("message", ex.Message.ToString());
+            }
+
+            return hostResult;
+
         }
     }
     #endregion "SessionHostBL"

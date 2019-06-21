@@ -229,6 +229,41 @@ export class HostpoolDashboardComponent implements OnInit {
   public SearchByAppUser: any;
   public searchByAppName: any;
   public searchBySHSName: any;
+  public showAppGroupDashBoard: boolean = false;
+  public showHostDashBoard: boolean = false;
+  public hostDetails: any = {};
+  public getUserSessionUrl: any;
+  public userSessions: any = [];
+  public userSessionsCount: number = 0;
+  public SessionsListErrorFound: boolean = false;
+  // public logOffCountSelectedSessions:any;
+  public showSendMessageDialog: boolean = false;
+  public sendMessageForm: any;
+  public restartHostForm: any;
+  // public checkedUSerSessions:any=[];
+  // public selectedUserSessions:any[];
+  // public checkedMainUserSession:boolean=false;
+  // public isDisableLogOffUser:boolean=true;
+  // public checkedAllTrueUserSessions:any=[];
+  // public selectedUserSessionRow:any=[];
+  // public checkedUSerSession:any=[];
+
+  //for user sessions
+  public checkedUserSessions: any = [];
+  public userSessionCheckedTrue: any = [];
+  public isLogOffDisabled: boolean = true;
+  public isSendMsgDisabled: boolean = true;
+  public checkedMainUserSession: boolean;
+  public selectedUserSessionsRows: any = [];
+  public checkedAllTrueUserSessions: any = [];
+  public CountSelectedUserSession: any;
+  public userSessionlist: number = 1;
+  public userSessionLogOffUrl: any;
+  public selectedHostName: any;
+  public SendMessageUrl: any;
+  public userSessionslist: number = 1;
+  public showRestartDialog: boolean = false;
+  public RestartHostUrl: any;
   @ViewChild('closeModal') closeModal: ElementRef;
 
   constructor(private _AppService: AppService, private fb: FormBuilder, private http: Http, private route: ActivatedRoute, private _notificationsService: NotificationsService, private router: Router,
@@ -288,6 +323,18 @@ export class HostpoolDashboardComponent implements OnInit {
     this.addUserForm = new FormGroup({
       UserPrincipalName: new FormControl('', Validators.required),
     });
+
+    this.sendMessageForm = new FormGroup({
+      Title: new FormControl('', Validators.required),
+      Message: new FormControl('', Validators.required)
+    });
+
+
+    this.restartHostForm = new FormGroup({
+      SubscriptionId: new FormControl('', Validators.required),
+      ResourceGroup: new FormControl('', Validators.required)
+    });
+
     this.appgroupFormEdit = new FormGroup({
       appGroupName: new FormControl(''),
       friendlyName: new FormControl(''),
@@ -388,6 +435,16 @@ export class HostpoolDashboardComponent implements OnInit {
     this.checkedMainAppGroup = false;
     this.isEditAppgroupDisabled = true;
     this.isDeleteAppgroupDisabled = true;
+  }
+
+  public userSesionBottomClose(event: any) {
+    this.state = 'down';
+    event.preventDefault();
+    this.selectedClassMax = true;
+    this.selectedClassMin = false;
+    this.checkedMainUserSession = false;
+    this.isLogOffDisabled = true;
+    this.isSendMsgDisabled = true;
   }
 
   /* This function is used to close the Appgroup details, App & Users split view
@@ -646,6 +703,7 @@ export class HostpoolDashboardComponent implements OnInit {
    * --------------
    */
   public SessionHostIsChecked(hostIndex: any) {
+
     this.sessionHostchecked[hostIndex] = !this.sessionHostchecked[hostIndex];
     this.sessionHostCheckedTrue = [];
     for (let i = 0; i < this.sessionHostchecked.length; i++) {
@@ -666,6 +724,8 @@ export class HostpoolDashboardComponent implements OnInit {
       if (this.sessionHostCheckedTrue.length == 1) {
         this.editHostDisabled = false;
         this.deleteHostDisabled = false;
+        this.state = "up";
+
       }
       else if (this.sessionHostCheckedTrue.length > 1) {
         this.editHostDisabled = true;
@@ -1150,6 +1210,8 @@ export class HostpoolDashboardComponent implements OnInit {
    * --------------
    */
   public HostClicked(hostIndex: any, hostName: any) {
+    this.showHostDashBoard = !this.showHostDashBoard;
+    console.log(this.showHostDashBoard, "this.showHostDashBoard");
     this.SessionHostIsChecked(hostIndex);
     this.sessionHostName = hostName;
     this.sessionHostCheckedTrue = [];
@@ -1162,18 +1224,29 @@ export class HostpoolDashboardComponent implements OnInit {
     if (this.sessionHostCheckedTrue.length == 1) {
       this.editHostDisabled = false;
       this.deleteHostDisabled = false;
-      this.hostDeleteData = this.sessionHostListsSearch[index].sessionHostName;
+      this.hostDeleteData = this.sessionHostListsSearch[hostIndex].sessionHostName;
+      this.hostDetails = this.sessionHostListsSearch[hostIndex];
+      this.state = "up";
+      this.selectedHostName = this.sessionHostListsSearch[hostIndex].sessionHostName;
+      // make service call to get user sessions
+      console.log(this.hostDeleteData, "this.hostDeleteData");
+      this.GetUserSessions();
     } else if (this.sessionHostCheckedTrue.length > 1) {
       this.editHostDisabled = true;
       this.deleteHostDisabled = false;
       this.hostDeleteData = this.sessionHostCheckedTrue.length;
+      this.state = "down";
     } else {
       this.editHostDisabled = true;
       this.deleteHostDisabled = true;
     }
+
+
+
+    console.log(this.hostDetails, "this.hostDetails");
     this.hostFormEdit = new FormGroup({
-      sessionHostName: new FormControl(this.sessionHostListsSearch[index].sessionHostName),
-      allowNewSession: new FormControl(this.sessionHostListsSearch[index].allowNewSession),
+      sessionHostName: new FormControl(this.sessionHostListsSearch[hostIndex].sessionHostName),
+      allowNewSession: new FormControl(this.sessionHostListsSearch[hostIndex].allowNewSession),
     });
   }
 
@@ -1537,6 +1610,14 @@ export class HostpoolDashboardComponent implements OnInit {
     return new Array(i);
   }
 
+  public RefreshUserSessions() {
+    this.isLogOffDisabled = true;
+    this.isSendMsgDisabled = true;
+    this.userSessions = [];
+    // sessionStorage.removeItem('UserSessions');//need to check
+    this.GetUserSessions();
+  }
+
   /* This function is used to  divide the number of pages based on Tenants Count */
   public GetcurrentNoOfPagesCountAppgroup() {
     this.appGroupsList = JSON.parse(sessionStorage.getItem('Appgroups'));
@@ -1761,6 +1842,7 @@ export class HostpoolDashboardComponent implements OnInit {
    */
   public IsCheckedAppGroup(appGroupIndex: any) {
     this.checked[appGroupIndex] = !this.checked[appGroupIndex];
+    this.showAppGroupDashBoard = !this.showAppGroupDashBoard;
     this.appGroupcheckedTrue = [];
     for (let i = 0; i < this.checked.length; i++) {
       if (this.checked[i] == true) {
@@ -2251,37 +2333,116 @@ export class HostpoolDashboardComponent implements OnInit {
    * This function is used to get the Appgroup users list and load into table
    */
   public GetAppGroupUsers() {
-      this.checkedUsers = [];
-      this.checkedMainUser = false;
-      this.usersListErrorFound = false;
-      this.refreshHostpoolLoading = true;
-      // this.getAppGroupUserUrl = this._AppService.ApiUrl + '/api/AppGroup/GetUsersList?tenantGroupName=' + this.tenantGroupName + '&tenantName=' + this.tenantName + '&hostPoolName=' + this.hostPoolName + '&appGroupName=' + this.selectedAppGroupName + '&refresh_token=' + sessionStorage.getItem("Refresh_Token") + '&pageSize=' + this.pageSize + '&sortField=UserPrincipalName&isDescending=false&initialSkip=' + this.usersInitialSkip + '&lastEntry=' + this.usersLastEntry;
-      this.getAppGroupUserUrl = this._AppService.ApiUrl + '/api/AppGroup/GetUsersList?tenantGroupName=' + this.tenantGroupName + '&tenantName=' + this.tenantName + '&hostPoolName=' + this.hostPoolName + '&appGroupName=' + this.selectedAppGroupName + '&refresh_token=' + sessionStorage.getItem("Refresh_Token");//+ '&pageSize=' + this.pageSize + '&sortField=UserPrincipalName&isDescending=false&initialSkip=' + this.usersInitialSkip + '&lastEntry=' + this.usersLastEntry;
-      this._AppService.GetData(this.getAppGroupUserUrl).subscribe(response => {
-        if (response.status == 429) {
-          this.error = true;
-          this.errorMessage = response.statusText;
+    this.checkedUsers = [];
+    this.checkedMainUser = false;
+    this.usersListErrorFound = false;
+    this.refreshHostpoolLoading = true;
+    // this.getAppGroupUserUrl = this._AppService.ApiUrl + '/api/AppGroup/GetUsersList?tenantGroupName=' + this.tenantGroupName + '&tenantName=' + this.tenantName + '&hostPoolName=' + this.hostPoolName + '&appGroupName=' + this.selectedAppGroupName + '&refresh_token=' + sessionStorage.getItem("Refresh_Token") + '&pageSize=' + this.pageSize + '&sortField=UserPrincipalName&isDescending=false&initialSkip=' + this.usersInitialSkip + '&lastEntry=' + this.usersLastEntry;
+    this.getAppGroupUserUrl = this._AppService.ApiUrl + '/api/AppGroup/GetUsersList?tenantGroupName=' + this.tenantGroupName + '&tenantName=' + this.tenantName + '&hostPoolName=' + this.hostPoolName + '&appGroupName=' + this.selectedAppGroupName + '&refresh_token=' + sessionStorage.getItem("Refresh_Token");//+ '&pageSize=' + this.pageSize + '&sortField=UserPrincipalName&isDescending=false&initialSkip=' + this.usersInitialSkip + '&lastEntry=' + this.usersLastEntry;
+    this._AppService.GetData(this.getAppGroupUserUrl).subscribe(response => {
+      if (response.status == 429) {
+        this.error = true;
+        this.errorMessage = response.statusText;
+      }
+      else {
+        this.error = false;
+        this.appUsersList = JSON.parse(response['_body']);
+        this.usersCount = this.appUsersList.length;
+        sessionStorage.setItem('Users', JSON.stringify(this.appUsersList));
+        sessionStorage.setItem('SelectedAppGroup', this.selectedAppGroupName);
+        this.getusers();
+      }
+    },
+      /*
+       * If Any Error (or) Problem With Services (or) Problem in internet this Error Block Will Exequte
+       */
+      (error) => {
+        this.error = true;
+        let errorBody = JSON.parse(error['_body']);
+        this.errorMessage = errorBody.error.target;
+        this.usersListErrorFound = true;
+        this.refreshHostpoolLoading = false;
+      }
+    );
+    this.isDeleteUserDisabled = true;
+  }
+
+
+  /**
+   * 
+   */
+  public GetUserSessions() {
+    this.checkedUserSessions = [];
+    this.checkedMainUserSession = false;
+    this.SessionsListErrorFound = false;
+    this.getUserSessionUrl = this._AppService.ApiUrl + '/api/UserSession/GetListOfUserSessions?tenantGroupName=' + this.tenantGroupName + '&tenantName=' + this.tenantName + '&hostPoolName=' + this.hostPoolName + '&hostName=' + this.selectedHostName + '&refresh_token=' + sessionStorage.getItem("Refresh_Token");
+
+
+    this._AppService.GetData(this.getUserSessionUrl).subscribe(response => {
+      if (response.status == 429) {
+        this.error = true;
+        this.errorMessage = response.statusText;
+      }
+      else {
+        this.error = false;
+        //this.userSessions = JSON.parse(response['_body']);
+
+        var obj = {
+          "tenantGroupName": "Default Tenant Group",
+          "tenantName": "Peopletech-Tenant",
+          "hostPoolName": "wvdtestwin2k16-01",
+          "sessionHostName": "Win2k16-0.PeopleTechCSP.onmicrosoft.com",
+          "sessionId": "4",
+          "adUserName": "PEOPLETECHCSP\\wvddemo_user3",
+          "applicationType": "Desktop"
         }
-        else {
-          this.error = false;
-          this.appUsersList = JSON.parse(response['_body']);
-          this.usersCount = this.appUsersList.length;
-          sessionStorage.setItem('Users', JSON.stringify(this.appUsersList));
-          sessionStorage.setItem('SelectedAppGroup', this.selectedAppGroupName);
-          this.getusers();
-        }
-      },
-        /*
-         * If Any Error (or) Problem With Services (or) Problem in internet this Error Block Will Exequte
-         */
-        (error) => {
-          this.error = true;
-          let errorBody = JSON.parse(error['_body']);
-          this.errorMessage = errorBody.error.target;
-          this.usersListErrorFound = true;
-          this.refreshHostpoolLoading = false;
-        }
-      );
+        this.userSessions.push(obj);
+        this.userSessions.push(obj);
+        this.userSessions.push(obj);
+        this.userSessions.push(obj);
+        this.userSessions.push(obj);
+        this.userSessions.push(obj);
+        this.userSessions.push(obj);
+        this.userSessions.push(obj);
+        this.userSessions.push(obj);
+        this.userSessions.push(obj);
+        this.userSessions.push(obj);
+        this.userSessions.push(obj);
+        this.userSessions.push(obj);
+        this.userSessions.push(obj);
+        this.userSessions.push(obj);
+        this.userSessions.push(obj);
+        this.userSessions.push(obj);
+        this.userSessions.push(obj);
+        this.userSessions.push(obj);
+        this.userSessions.push(obj);
+        this.userSessions.push(obj);
+        this.userSessions.push(obj);
+        this.userSessions.push(obj);
+        this.userSessions.push(obj);
+        this.userSessions.push(obj);
+        this.userSessions.push(obj);
+        this.userSessions.push(obj);
+        this.userSessionsCount = this.userSessions.length;
+
+        //  sessionStorage.setItem('UserSessions', JSON.stringify(this.userSessions));
+        sessionStorage.setItem('UserSessions', this.userSessions);
+        sessionStorage.setItem('SelectedHost', this.selectedHostName);
+        console.log(this.userSessions, "this.userSessions ");
+
+      }
+    },
+      /*
+       * If Any Error (or) Problem With Services (or) Problem in internet this Error Block Will Exequte
+       */
+      (error) => {
+        this.error = true;
+        let errorBody = JSON.parse(error['_body']);
+        this.errorMessage = errorBody.error.target;
+        this.SessionsListErrorFound = true;
+        this.refreshHostpoolLoading = false;
+      }
+    );
     this.isDeleteUserDisabled = true;
   }
 
@@ -2493,6 +2654,40 @@ export class HostpoolDashboardComponent implements OnInit {
     }
   }
 
+  public UserSessionCheckAll(event: any) {
+    this.checkedMainUserSession = !this.checkedMainUserSession;
+    this.userSessionCheckedTrue = [];
+    this.selectedUserSessionsRows = [];
+    /* If we check the checkbox then this block of code executes*/
+    for (let i = 0; i < this.userSessions.length; i++) {
+      if (event.target.checked) {
+        this.checkedUserSessions[i] = true;
+      }
+      /* If we uncheck the checkbox then this block of code executes*/
+      else {
+        this.checkedUserSessions[i] = false;
+      }
+    }
+    /* If we check the multiple checkboxes then this block of code executes*/
+    this.checkedAllTrueUserSessions = [];
+    for (let j = 0; j < this.checkedUserSessions.length; j++) {
+      if (this.checkedUserSessions[j] == true) {
+        this.checkedAllTrueUserSessions.push(this.checkedUserSessions[j]);
+        this.selectedUserSessionsRows.push(j);
+      }
+    }
+    this.CountSelectedUserSession = this.checkedAllTrueUserSessions.length;
+    this.selectedUserSessionsRows.length = this.CountSelectedUserSession;
+    if (this.checkedAllTrueUserSessions.length >= 1) {
+      this.isLogOffDisabled = false;
+      this.isSendMsgDisabled = false;
+    }
+    else if (this.checkedAllTrueUserSessions.length == 0) {
+      this.isLogOffDisabled = true;
+      this.isSendMsgDisabled = true;
+    }
+  }
+
   /*
    * This function is used to select single AppGroup users from the table using checkbox or rowclick
    * ----------
@@ -2517,6 +2712,35 @@ export class HostpoolDashboardComponent implements OnInit {
 
         if (this.appUsersListSearch.length == this.userCheckedTrue.length) {
           this.checkedMainUser = true;
+        }
+      }
+    }
+  }
+
+  /**
+   * This function is used to select single user session from the table using checkbox or rowclick
+   */
+
+  public UserSessionIsChecked(ind: any) {
+
+    this.checkedUserSessions[ind] = !this.checkedUserSessions[ind];
+    this.userSessionCheckedTrue = [];
+    for (let i = 0; i < this.checkedUserSessions.length; i++) {
+      if (this.checkedUserSessions[i] == true) {
+        this.userSessionCheckedTrue.push(this.checkedUserSessions[i]);
+        this.isLogOffDisabled = true;
+        this.isSendMsgDisabled = true;
+      }
+      if (this.checkedUserSessions[i] == false) {
+        this.checkedMainUserSession = false;
+        this.isLogOffDisabled = false;
+        this.isSendMsgDisabled = false;
+        break;
+      }
+      else {
+
+        if (this.userSessions.length == this.userSessionCheckedTrue.length) {
+          this.checkedMainUserSession = true;
         }
       }
     }
@@ -2558,6 +2782,37 @@ export class HostpoolDashboardComponent implements OnInit {
     }
   }
 
+  public UserSessionRowClick(session: any, ind: any) {
+    this.UserSessionIsChecked(ind);
+    this.selectedUserSessionsRows = [];
+    //this.selectedUserSession ;
+    this.userSessionCheckedTrue = [];
+    var index = null;
+    for (var i = 0; i < this.checkedUserSessions.length; i++) {
+      if (this.checkedUserSessions[i] == true) {
+        this.userSessionCheckedTrue.push(this.checkedUserSessions[i]);
+        this.selectedUserSessionsRows.push(i);
+        index = i;
+      }
+    }
+    if (this.userSessionCheckedTrue.length == 1) {
+      //this.selectedUsergroupName = session;
+      this.CountSelectedUserSession = this.userSessions[index].adUserName;
+      this.isLogOffDisabled = false;
+      this.isSendMsgDisabled = false;
+    }
+    else if (this.userSessionCheckedTrue.length > 1) {
+      this.CountSelectedUserSession = this.selectedUserSessionsRows.length;
+      this.isLogOffDisabled = false;
+      this.isSendMsgDisabled = false;
+    }
+    else {
+      this.userSessionCheckedTrue = [];
+      this.isLogOffDisabled = true;
+      this.isSendMsgDisabled = true;
+    }
+  }
+
   /*
    * This function is used to refresh appp users list
    */
@@ -2595,12 +2850,221 @@ export class HostpoolDashboardComponent implements OnInit {
     this.userPrincipalName = false;
   }
 
+  public OpenSendMessagePanel() {
+    this.showSendMessageDialog = true;
+    //this.userprincipalButtonDisable = true;
+    this.sendMessageForm = new FormGroup({
+      Title: new FormControl('', Validators.compose([Validators.required])),
+      Message: new FormControl('', Validators.compose([Validators.required])),
+    });
+
+  }
+
+  public OpenRestartPanel() {
+    this.showRestartDialog = true;
+    //this.userprincipalButtonDisable = true;
+    this.restartHostForm = new FormGroup({
+      SubscriptionId: new FormControl('', Validators.compose([Validators.required])),
+      ResourceGroup: new FormControl('', Validators.compose([Validators.required])),
+    });
+
+  }
+
+
+
   /*
    * This function is used to Close Add user modal Pop Up
    */
   public HideAppUserDialog() {
     this.showAddUserDialog = false;
   }
+
+  /**
+   * this function is used to close send message panel
+   */
+  public HideSendMessageDialog() {
+    this.showSendMessageDialog = false;
+  }
+
+  public HideRestartHostDialog() {
+    this.showRestartDialog = false;
+  }
+
+  /**
+   * send message
+   */
+  public SendMessage(formdata) {
+    for (let i = 0; i < this.selectedUserSessionsRows.length; i++) {
+      var index = this.selectedUserSessionsRows[i];
+      console.log(this.selectedUserSessionsRows[i], "this.selectedUserSessionsRows[i]");
+      var objSendMessage = {
+        "tenantGroupName": this.tenantGroupName,
+        "tenantName": this.tenantName,
+        "hostPoolName": this.hostPoolName,
+        "sessionHostName": this.selectedHostName,
+        "sessionId": this.userSessions[index].sessionId,
+        "adUserName": this.userSessions[index].adUserName,
+        "refresh_token": sessionStorage.getItem("Refresh_Token"),
+        "messageTitle": formdata.Title,
+        "messageBody": formdata.Message
+      };
+      this.SendMessageUrl = this._AppService.ApiUrl + '/api/UserSession/SendMessage';
+      this._AppService.SendMessage(this.SendMessageUrl, objSendMessage).subscribe(response => {
+        this.refreshHostpoolLoading = false;
+        var responseData = JSON.parse(response['_body']);
+        if (responseData.message == "Invalid Token") {
+          sessionStorage.clear();
+          this.router.navigate(['/invalidtokenmessage']);
+        }
+        /* If response data is success then it enters into if and this block of code will execute to show the ' Remote App Removed Successfully' notification */
+        if (responseData.isSuccess === true) {
+          this._notificationsService.html(
+            '<i class="icon icon-check angular-Notify col-xs-1 no-pad"></i>' +
+            '<label class="notify-label col-xs-10 no-pad"> Message Sent Successfully</label>' +
+            '<a class="close"><i class="icon icon-close notify-close" aria-hidden="true"></i></a>' +
+            '<p class="notify-text col-xs-12 no-pad">' + responseData.message + '</p>',
+            'content optional one',
+            {
+              position: ["top", "right"],
+              timeOut: 3000,
+              showProgressBar: false,
+              pauseOnHover: false,
+              clickToClose: true,
+              maxLength: 10
+            }
+          )
+          AppComponent.GetNotification('icon icon-check angular-Notify', ' Message Sent Successfully', responseData.message, new Date());
+          this.RefreshUserSessions();
+        }
+        /* If response data is success then it enters into else and this block of code will execute to show the 'Failed To Remove Remote App' notification */
+        else {
+          this._notificationsService.html(
+            '<i class="icon icon-fail angular-NotifyFail col-xs-1 no-pad"></i>' +
+            '<label class="notify-label col-xs-10 no-pad">Failed To send message</label>' +
+            '<a class="close"><i class="icon icon-close notify-close" aria-hidden="true"></i></a>' +
+            '<p class="notify-text col-xs-12 no-pad">' + responseData.message + '</p>',
+            'content optional one',
+            {
+              position: ["top", "right"],
+              timeOut: 3000,
+              showProgressBar: false,
+              pauseOnHover: false,
+              clickToClose: true,
+              maxLength: 10
+            }
+          )
+          AppComponent.GetNotification('icon icon-fail angular-NotifyFail', 'Failed To send message', responseData.message, new Date());
+          this.RefreshUserSessions();
+        }
+      },
+        /*
+         * If Any Error (or) Problem With Services (or) Problem in internet this Error Block Will Exequte
+         */
+        (error) => {
+          this._notificationsService.html(
+            '<i class="icon icon-fail angular-NotifyFail col-xs-1 no-pad"></i>' +
+            '<label class="notify-label col-xs-10 no-pad">Failed To send message</label>' +
+            '<a class="close"><i class="icon icon-close notify-close" aria-hidden="true"></i></a>' +
+            '<p class="notify-text col-xs-12 no-pad">Problem with server, Please try again</p>',
+            'content optional one',
+            {
+              position: ["top", "right"],
+              timeOut: 3000,
+              showProgressBar: false,
+              pauseOnHover: false,
+              clickToClose: true,
+              maxLength: 10
+            }
+          )
+          AppComponent.GetNotification('icon icon-fail angular-NotifyFail', 'Failed To send message', 'Problem with server, Please try again', new Date());
+          this.RefreshUserSessions();
+        }
+      );
+    }
+    this.checkedUserSessions = [];
+    this.checkedMainUserSession = false;
+    this.HideSendMessageDialog();
+  }
+
+
+  /**Restart Host */
+  public RestartHost(formdata) {
+    var hostName = this.selectedHostName;
+    this.RestartHostUrl = this._AppService.ApiUrl + '/api/SessionHost/RestartHost?subscriptionId=' + formdata.SubscriptionId + '&resourceGroupName=' + formdata.ResourceGroup + '&sessionHostName=' + hostName + '&refresh_token=' + sessionStorage.getItem("Refresh_Token");
+    this._AppService.RestartHost(this.RestartHostUrl).subscribe(response => {
+      this.refreshHostpoolLoading = false;
+      var responseData = JSON.parse(response['_body']);
+      if (responseData.message == "Invalid Token") {
+        sessionStorage.clear();
+        this.router.navigate(['/invalidtokenmessage']);
+      }
+      /* If response data is success then it enters into if and this block of code will execute to show the ' Remote App Removed Successfully' notification */
+      if (responseData.isSuccess === true) {
+        this._notificationsService.html(
+          '<i class="icon icon-check angular-Notify col-xs-1 no-pad"></i>' +
+          '<label class="notify-label col-xs-10 no-pad"> Host Restarted Successfully</label>' +
+          '<a class="close"><i class="icon icon-close notify-close" aria-hidden="true"></i></a>' +
+          '<p class="notify-text col-xs-12 no-pad">' + responseData.message + '</p>',
+          'content optional one',
+          {
+            position: ["top", "right"],
+            timeOut: 3000,
+            showProgressBar: false,
+            pauseOnHover: false,
+            clickToClose: true,
+            maxLength: 10
+          }
+        )
+        AppComponent.GetNotification('icon icon-check angular-Notify', ' Host Restarted Successfully', responseData.message, new Date());
+        this.RefreshHost();
+      }
+      /* If response data is success then it enters into else and this block of code will execute to show the 'Failed To Remove Remote App' notification */
+      else {
+        this._notificationsService.html(
+          '<i class="icon icon-fail angular-NotifyFail col-xs-1 no-pad"></i>' +
+          '<label class="notify-label col-xs-10 no-pad">Failed To Restart Host</label>' +
+          '<a class="close"><i class="icon icon-close notify-close" aria-hidden="true"></i></a>' +
+          '<p class="notify-text col-xs-12 no-pad">' + responseData.message + '</p>',
+          'content optional one',
+          {
+            position: ["top", "right"],
+            timeOut: 3000,
+            showProgressBar: false,
+            pauseOnHover: false,
+            clickToClose: true,
+            maxLength: 10
+          }
+        )
+        AppComponent.GetNotification('icon icon-fail angular-NotifyFail', 'Failed To Restart Host', responseData.message, new Date());
+        this.RefreshHost();
+      }
+    },
+      /*
+       * If Any Error (or) Problem With Services (or) Problem in internet this Error Block Will Exequte
+       */
+      (error) => {
+        this._notificationsService.html(
+          '<i class="icon icon-fail angular-NotifyFail col-xs-1 no-pad"></i>' +
+          '<label class="notify-label col-xs-10 no-pad">Failed To Restart Host</label>' +
+          '<a class="close"><i class="icon icon-close notify-close" aria-hidden="true"></i></a>' +
+          '<p class="notify-text col-xs-12 no-pad">Problem with server, Please try again</p>',
+          'content optional one',
+          {
+            position: ["top", "right"],
+            timeOut: 3000,
+            showProgressBar: false,
+            pauseOnHover: false,
+            clickToClose: true,
+            maxLength: 10
+          }
+        )
+        AppComponent.GetNotification('icon icon-fail angular-NotifyFail', 'Failed To Restart Host', 'Problem with server, Please try again', new Date());
+        this.RefreshHost();
+      }
+    );
+    this.HideRestartHostDialog();
+  }
+
 
   /*
    * This function is used to Create\Add the Appgroup AppUser from Active directory
@@ -3628,6 +4092,112 @@ export class HostpoolDashboardComponent implements OnInit {
     this.checkedApps = [];
     this.checkedMainApp = false;
   }
+
+  public LogOffUserSessions() {
+    //this.refreshHostpoolLoading = true;
+    for (let i = 0; i < this.selectedUserSessionsRows.length; i++) {
+      var index = this.selectedUserSessionsRows[i];
+      console.log(this.selectedUserSessionsRows[i], "this.selectedUserSessionsRows[i]");
+      var objLogOff = {
+        "tenantGroupName": this.tenantGroupName,
+        "tenantName": this.tenantName,
+        "hostPoolName": this.hostPoolName,
+        "sessionHostName": this.selectedHostName,
+        "sessionId": this.userSessions[index].sessionId,
+        "adUserName": this.userSessions[index].adUserName,
+        "refresh_token": sessionStorage.getItem("Refresh_Token")
+      };
+      console.log(objLogOff);
+      this.userSessionLogOffUrl = this._AppService.ApiUrl + '/api/UserSession/LogOffUserSesion';
+      this._AppService.UserSessionLogOff(this.userSessionLogOffUrl, objLogOff).subscribe(response => {
+        this.refreshHostpoolLoading = false;
+        var responseData = JSON.parse(response['_body']);
+        if (responseData.message == "Invalid Token") {
+          sessionStorage.clear();
+          this.router.navigate(['/invalidtokenmessage']);
+        }
+        /* If response data is success then it enters into if and this block of code will execute to show the ' Remote App Removed Successfully' notification */
+        if (responseData.isSuccess === true) {
+          this._notificationsService.html(
+            '<i class="icon icon-check angular-Notify col-xs-1 no-pad"></i>' +
+            '<label class="notify-label col-xs-10 no-pad"> Session(s) LoggedOff Successfully</label>' +
+            '<a class="close"><i class="icon icon-close notify-close" aria-hidden="true"></i></a>' +
+            '<p class="notify-text col-xs-12 no-pad">' + responseData.message + '</p>',
+            'content optional one',
+            {
+              position: ["top", "right"],
+              timeOut: 3000,
+              showProgressBar: false,
+              pauseOnHover: false,
+              clickToClose: true,
+              maxLength: 10
+            }
+          )
+          AppComponent.GetNotification('icon icon-check angular-Notify', ' Session(s) LoggedOff Successfully', responseData.message, new Date());
+          this.RefreshUserSessions();
+        }
+        /* If response data is success then it enters into else and this block of code will execute to show the 'Failed To Remove Remote App' notification */
+        else {
+          this._notificationsService.html(
+            '<i class="icon icon-fail angular-NotifyFail col-xs-1 no-pad"></i>' +
+            '<label class="notify-label col-xs-10 no-pad">Failed To logoff session(s)</label>' +
+            '<a class="close"><i class="icon icon-close notify-close" aria-hidden="true"></i></a>' +
+            '<p class="notify-text col-xs-12 no-pad">' + responseData.message + '</p>',
+            'content optional one',
+            {
+              position: ["top", "right"],
+              timeOut: 3000,
+              showProgressBar: false,
+              pauseOnHover: false,
+              clickToClose: true,
+              maxLength: 10
+            }
+          )
+          AppComponent.GetNotification('icon icon-fail angular-NotifyFail', 'Failed To logoff session(s)', responseData.message, new Date());
+          this.RefreshUserSessions();
+        }
+      },
+        /*
+         * If Any Error (or) Problem With Services (or) Problem in internet this Error Block Will Exequte
+         */
+        (error) => {
+          this._notificationsService.html(
+            '<i class="icon icon-fail angular-NotifyFail col-xs-1 no-pad"></i>' +
+            '<label class="notify-label col-xs-10 no-pad">Failed To logoff session(s)</label>' +
+            '<a class="close"><i class="icon icon-close notify-close" aria-hidden="true"></i></a>' +
+            '<p class="notify-text col-xs-12 no-pad">Problem with server, Please try again</p>',
+            'content optional one',
+            {
+              position: ["top", "right"],
+              timeOut: 3000,
+              showProgressBar: false,
+              pauseOnHover: false,
+              clickToClose: true,
+              maxLength: 10
+            }
+          )
+          AppComponent.GetNotification('icon icon-fail angular-NotifyFail', 'Failed To logoff session(s)', 'Problem with server, Please try again', new Date());
+          this.RefreshUserSessions();
+        }
+      );
+    }
+    this.checkedUserSessions = [];
+    this.checkedMainUserSession = false;
+  }
+
+  SetSelectedHost(index: number, hostName: string) {
+    //sessionStorage.setItem("TenantName", TenantName);
+    //sessionStorage.setItem("TenantNameIndex", index);
+    // this.adminMenuComponent.SetSelectedTenant(index, TenantName);
+    this.router.navigate(['/admin/hostDashboard/', hostName]);
+    let data = [{
+      name: hostName,
+      type: 'Host',
+      path: 'hostDashboard',
+    }];
+    BreadcrumComponent.GetCurrentPage(data);
+  }
+
 }
 
 
