@@ -438,6 +438,7 @@ export class HostpoolDashboardComponent implements OnInit {
   }
 
   public userSesionBottomClose(event: any) {
+    console.log(event,"event");
     this.state = 'down';
     event.preventDefault();
     this.selectedClassMax = true;
@@ -2385,51 +2386,9 @@ export class HostpoolDashboardComponent implements OnInit {
       }
       else {
         this.error = false;
-        //this.userSessions = JSON.parse(response['_body']);
-
-        var obj = {
-          "tenantGroupName": "Default Tenant Group",
-          "tenantName": "Peopletech-Tenant",
-          "hostPoolName": "wvdtestwin2k16-01",
-          "sessionHostName": "Win2k16-0.PeopleTechCSP.onmicrosoft.com",
-          "sessionId": "4",
-          "adUserName": "PEOPLETECHCSP\\wvddemo_user3",
-          "applicationType": "Desktop"
-        }
-        this.userSessions.push(obj);
-        this.userSessions.push(obj);
-        this.userSessions.push(obj);
-        this.userSessions.push(obj);
-        this.userSessions.push(obj);
-        this.userSessions.push(obj);
-        this.userSessions.push(obj);
-        this.userSessions.push(obj);
-        this.userSessions.push(obj);
-        this.userSessions.push(obj);
-        this.userSessions.push(obj);
-        this.userSessions.push(obj);
-        this.userSessions.push(obj);
-        this.userSessions.push(obj);
-        this.userSessions.push(obj);
-        this.userSessions.push(obj);
-        this.userSessions.push(obj);
-        this.userSessions.push(obj);
-        this.userSessions.push(obj);
-        this.userSessions.push(obj);
-        this.userSessions.push(obj);
-        this.userSessions.push(obj);
-        this.userSessions.push(obj);
-        this.userSessions.push(obj);
-        this.userSessions.push(obj);
-        this.userSessions.push(obj);
-        this.userSessions.push(obj);
+        this.userSessions = JSON.parse(response['_body']);
         this.userSessionsCount = this.userSessions.length;
-
-        //  sessionStorage.setItem('UserSessions', JSON.stringify(this.userSessions));
-        sessionStorage.setItem('UserSessions', this.userSessions);
-        sessionStorage.setItem('SelectedHost', this.selectedHostName);
-        console.log(this.userSessions, "this.userSessions ");
-
+        sessionStorage.setItem('UserSessions', JSON.stringify(this.userSessions));
       }
     },
       /*
