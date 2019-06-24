@@ -39,20 +39,22 @@ namespace MSFT.WVDSaaS.API.Controllers
         /// <param name="refresh_token">Refresh token to get access token</param>
         /// //old parameters -- , int pageSize, string sortField, bool isDescending = false, int initialSkip = 0, string lastEntry = null
         /// <returns></returns>
-        public HttpResponseMessage GetSessionhostList(string tenantGroupName, string tenantName, string hostPoolName, string refresh_token)
+        public HttpResponseMessage GetSessionhostList(string tenantGroupName, string tenantName, string hostPoolName, string refresh_token, string subscriptionId=null)
         {
             //get deployment url
             deploymentUrl = configurations.rdBrokerUrl;
+           string  azureDeployUrl = configurations.managementResourceUrl;
             try
             {
                 if (!string.IsNullOrEmpty(refresh_token))
                 {
-                    string accessToken = "";
+                    string wvdAccessToken = "", AzureAccessToken="";
                     //get token value
-                    accessToken = common.GetTokenValue(refresh_token);
-                    if (!string.IsNullOrEmpty(accessToken) && accessToken.ToString().ToLower() != invalidToken && accessToken.ToString().ToLower() != invalidCode)
+                    wvdAccessToken = common.GetTokenValue(refresh_token);
+                    AzureAccessToken = common.GetManagementTokenValue(refresh_token);
+                    if (!string.IsNullOrEmpty(wvdAccessToken) && wvdAccessToken.ToString().ToLower() != invalidToken && wvdAccessToken.ToString().ToLower() != invalidCode)
                     {
-                        return sessionHostBL.GetSessionhostList(deploymentUrl, accessToken, tenantGroupName, tenantName, hostPoolName);
+                        return sessionHostBL.GetSessionhostList(deploymentUrl, wvdAccessToken, tenantGroupName, tenantName, hostPoolName, azureDeployUrl, AzureAccessToken, subscriptionId);
                     }
                     else
                     {

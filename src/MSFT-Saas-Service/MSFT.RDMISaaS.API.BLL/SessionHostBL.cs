@@ -29,7 +29,7 @@ namespace MSFT.WVDSaaS.API.BLL
         /// <param name="isSessionHostNameOnly">To Get only HostName</param>
         /// //old parameters --  bool isSessionHostNameOnly,bool isAll, int pageSize, string sortField, bool isDescending, int initialSkip, string lastEntry
         /// <returns></returns>
-        public HttpResponseMessage GetSessionhostList(string deploymentUrl, string accessToken, string tenantGroup, string tenantName, string hostPoolName)
+        public HttpResponseMessage GetWVDSessionhostList(string deploymentUrl, string accessToken, string tenantGroup, string tenantName, string hostPoolName)
         {
             try
             {
@@ -44,6 +44,93 @@ namespace MSFT.WVDSaaS.API.BLL
                 return null;
             }
 
+        }
+
+        public HttpResponseMessage GetSessionhostList(string deploymentUrl, string wvdAccessToken, string tenantGroup, string tenantName, string hostPoolName,string azureDeployUrl=null, string azureAccessToken=null, string subscriptionId = null)
+        {
+            try
+            {
+                HttpResponseMessage WVDResponse = GetWVDSessionhostList(deploymentUrl, wvdAccessToken, tenantGroup, tenantName, hostPoolName);
+                if (!string.IsNullOrEmpty(subscriptionId))
+                {
+                    if (WVDResponse.StatusCode == HttpStatusCode.OK)
+                    {
+
+                        var wvdData = WVDResponse.Content.ReadAsStringAsync().Result;
+                        var arrWVD = (JArray)JsonConvert.DeserializeObject(wvdData);
+                        var WVDresult = ((JArray)arrWVD).ToList();
+
+                        HttpResponseMessage AzureResponse = GetAzureVMList(azureDeployUrl, azureAccessToken, subscriptionId);
+                        var azureData = AzureResponse.Content.ReadAsStringAsync().Result;
+                        var arrAzure1 =  (JObject)JsonConvert.DeserializeObject(azureData);// (JObject)JsonConvert.DeserializeObject(azureData);
+                        var arrAzure = arrAzure1["value"];// (JObject)JsonConvert.DeserializeObject(azureData);
+
+                        var AzureResult = ((JArray)arrAzure).Select(item => new JObject()
+                        {
+                               new JProperty("vmName",  item["name"]),
+                               new JProperty("subscriptionId",  item["id"]==null?null: item["id"].ToString().Split('/')[2]),
+                               new JProperty("resourceGroupName",   item["id"]==null?null:item["id"].ToString().Split('/')[4]),
+                        }).ToList();
+
+                       // var filterList = AzureResult.ToList().Where(p => WVDresult.ToList().Any(p2 => p["vmName"].ToString() == p2["sessionHostName"].ToString().Split('.')[0].ToString()));
+
+                       var differences = AzureResult.ToList().Where(r => WVDresult.ToList().Any(d => r["vmName"].ToString() == d["sessionHostName"].ToString().Split('.')[0].ToString())).ToList();
+
+                        differences.ForEach(item =>
+                        {
+                            var element = WVDresult.ToList().FirstOrDefault(d => d["sessionHostName"].ToString().Split('.')[0].ToString() == item["vmName"].ToString());
+                            item["sessionHostName"] = element["sessionHostName"] ;
+                            item["tenantName"] = element["tenantName"];
+                            item["tenantGroupName"] = element["tenantGroupName"];
+                            item["hostPoolName"] = element["hostPoolName"];
+                            item["allowNewSession"] = element["allowNewSession"];
+                            item["sessions"] = element["sessions"];
+                            item["lastHeartBeat"] = element["lastHeartBeat"];
+                            item["agentVersion"] = element["agentVersion"];
+                            item["assignedUser"] = element["assignedUser"];
+                            item["osVersion"] = element["osVersion"];
+                            item["sxSStackVersion"] = element["sxSStackVersion"];
+                            item["status"] = element["status"];
+                            item["updateState"] = element["updateState"];
+                            item["lastUpdateTime"] = element["lastUpdateTime"];
+                            item["updateErrorMessage"] = element["updateErrorMessage"];
+                        });
+
+                        return new HttpResponseMessage()
+                        {
+                            StatusCode = HttpStatusCode.OK,
+                            Content = new StringContent(JsonConvert.SerializeObject(differences))
+                        };
+                        //WVDresult.ToList().ForEach(c => c["subscriptionId"] = AzureResult.ToList().Where(p => WVDresult.ToList().Any(p2 => p["vmName"].ToString() == p2["sessionHostName"].ToString().Split('.')[0].ToString())).Select(s=> s["subscriptionId"]).FirstOrDefault());
+                    }
+                    return null;
+                }
+                else
+                {
+                    return WVDResponse;
+                }
+
+
+            }
+            catch(Exception ex)
+            {
+                return null;
+            }
+
+        }
+
+        public HttpResponseMessage GetAzureVMList(string deploymentUrl, string accessToken, string subscriptionId)
+        {
+            try
+            {
+                HttpResponseMessage response = CommonBL.InitializeHttpClient(deploymentUrl, accessToken).GetAsync("subscriptions/" + subscriptionId + "/providers/Microsoft.Compute/virtualMachines?api-version=2018-04-01").Result;
+                return response;
+
+            }
+            catch
+            {
+                return null;
+            }
         }
 
         /// <summary>
@@ -176,7 +263,7 @@ namespace MSFT.WVDSaaS.API.BLL
                     new  JProperty("vmName",sessionHostName)
                 };
                 var content = new StringContent(JsonConvert.SerializeObject(vmDetails), Encoding.UTF8, "application/json");
-                HttpResponseMessage response= CommonBL.InitializeHttpClient(deploymentUrl, accessToken).PostAsync("subscriptions/" + subscriptionId + "/resourceGroups/" + resourceGroupName + "/providers/Microsoft.Compute/virtualMachines/" + sessionHostName + "/restart?api-version=2018-06-01", content).Result;
+                HttpResponseMessage response = CommonBL.InitializeHttpClient(deploymentUrl, accessToken).PostAsync("subscriptions/" + subscriptionId + "/resourceGroups/" + resourceGroupName + "/providers/Microsoft.Compute/virtualMachines/" + sessionHostName + "/restart?api-version=2018-06-01", content).Result;
                 string strJson = response.Content.ReadAsStringAsync().Result;
                 if (response.StatusCode == HttpStatusCode.OK || response.StatusCode == HttpStatusCode.Accepted)
                 {
