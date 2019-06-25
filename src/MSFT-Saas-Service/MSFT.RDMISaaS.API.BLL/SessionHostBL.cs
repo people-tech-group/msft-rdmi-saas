@@ -59,24 +59,18 @@ namespace MSFT.WVDSaaS.API.BLL
                         var wvdData = WVDResponse.Content.ReadAsStringAsync().Result;
                         var arrWVD = (JArray)JsonConvert.DeserializeObject(wvdData);
                         var WVDresult = ((JArray)arrWVD).ToList();
-
                         HttpResponseMessage AzureResponse = GetAzureVMList(azureDeployUrl, azureAccessToken, subscriptionId);
                         var azureData = AzureResponse.Content.ReadAsStringAsync().Result;
-                        var arrAzure1 =  (JObject)JsonConvert.DeserializeObject(azureData);// (JObject)JsonConvert.DeserializeObject(azureData);
-                        var arrAzure = arrAzure1["value"];// (JObject)JsonConvert.DeserializeObject(azureData);
-
+                        var arrAzure1 =  (JObject)JsonConvert.DeserializeObject(azureData);
+                        var arrAzure = arrAzure1["value"];
                         var AzureResult = ((JArray)arrAzure).Select(item => new JObject()
                         {
                                new JProperty("vmName",  item["name"]),
-                               new JProperty("subscriptionId",  item["id"]==null?null: item["id"].ToString().Split('/')[2]),
-                               new JProperty("resourceGroupName",   item["id"]==null?null:item["id"].ToString().Split('/')[4]),
+                               new JProperty("subscriptionId",  item["id"]==null ? null: item["id"].ToString().Split('/')[2]),
+                               new JProperty("resourceGroupName",   item["id"]==null ? null:item["id"].ToString().Split('/')[4]),
                         }).ToList();
-
-                       // var filterList = AzureResult.ToList().Where(p => WVDresult.ToList().Any(p2 => p["vmName"].ToString() == p2["sessionHostName"].ToString().Split('.')[0].ToString()));
-
-                       var differences = AzureResult.ToList().Where(r => WVDresult.ToList().Any(d => r["vmName"].ToString() == d["sessionHostName"].ToString().Split('.')[0].ToString())).ToList();
-
-                        differences.ForEach(item =>
+                        var finalVmList = AzureResult.ToList().Where(r => WVDresult.ToList().Any(d => r["vmName"].ToString() == d["sessionHostName"].ToString().Split('.')[0].ToString())).ToList();
+                        finalVmList.ForEach(item =>
                         {
                             var element = WVDresult.ToList().FirstOrDefault(d => d["sessionHostName"].ToString().Split('.')[0].ToString() == item["vmName"].ToString());
                             item["sessionHostName"] = element["sessionHostName"] ;
@@ -95,28 +89,26 @@ namespace MSFT.WVDSaaS.API.BLL
                             item["lastUpdateTime"] = element["lastUpdateTime"];
                             item["updateErrorMessage"] = element["updateErrorMessage"];
                         });
-
                         return new HttpResponseMessage()
                         {
                             StatusCode = HttpStatusCode.OK,
-                            Content = new StringContent(JsonConvert.SerializeObject(differences))
+                            Content = new StringContent(JsonConvert.SerializeObject(finalVmList))
                         };
-                        //WVDresult.ToList().ForEach(c => c["subscriptionId"] = AzureResult.ToList().Where(p => WVDresult.ToList().Any(p2 => p["vmName"].ToString() == p2["sessionHostName"].ToString().Split('.')[0].ToString())).Select(s=> s["subscriptionId"]).FirstOrDefault());
                     }
-                    return null;
+                    else
+                    {
+                        return WVDResponse;
+                    }
                 }
                 else
                 {
                     return WVDResponse;
                 }
-
-
             }
             catch(Exception ex)
             {
                 return null;
             }
-
         }
 
         public HttpResponseMessage GetAzureVMList(string deploymentUrl, string accessToken, string subscriptionId)
@@ -202,6 +194,56 @@ namespace MSFT.WVDSaaS.API.BLL
             }
             return hostResult;
         }
+
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="deploymentUrl"></param>
+        /// <param name="accessToken"></param>
+        /// <param name="rdMgmtSessionHost"></param>
+        /// <returns></returns>
+        public JObject ChangeDrainMode(string deploymentUrl, string accessToken, JObject rdMgmtSessionHost)
+        {
+            try
+            {
+                //call rest service to update Sesssion host -- july code bit
+                var content = new StringContent(JsonConvert.SerializeObject(rdMgmtSessionHost), Encoding.UTF8, "application/json");
+                HttpResponseMessage response = CommonBL.PatchAsync(deploymentUrl, accessToken, "/RdsManagement/V1/TenantGroups/" + rdMgmtSessionHost["tenantGroupName"].ToString() + "/Tenants/" + rdMgmtSessionHost["tenantName"].ToString() + "/HostPools/" + rdMgmtSessionHost["hostPoolName"].ToString() + "/SessionHosts/" + rdMgmtSessionHost["sessionHostName"].ToString(), content).Result;
+                string strJson = response.Content.ReadAsStringAsync().Result;
+                if (response.IsSuccessStatusCode)
+                {
+                    hostResult.Add("isSuccess", true);
+                    hostResult.Add("message", "'Allow new Session' is set to "+ rdMgmtSessionHost["allowNewSession"] + " for " + rdMgmtSessionHost["sessionHostName"].ToString() + "'.");
+                }
+                else if ((int)response.StatusCode == 429)
+                {
+                    hostResult.Add("isSuccess", false);
+                    hostResult.Add("message", strJson + " Please try again later.");
+                }
+                else
+                {
+                    if (!string.IsNullOrEmpty(strJson))
+                    {
+                        hostResult.Add("isSuccess", false);
+                        hostResult.Add("message", CommonBL.GetErrorMessage(strJson));
+                    }
+                    else
+                    {
+                        hostResult.Add("isSuccess", false);
+                        hostResult.Add("message", "Failed to set 'Allow new Session' for '" + rdMgmtSessionHost["sessionHostName"].ToString() + "'. Please try it again later.");
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                hostResult.Add("isSuccess", false);
+                hostResult.Add("message", "Failed to set 'Allow new Session' for '" + rdMgmtSessionHost["sessionHostName"].ToString() + "'. " + ex.Message.ToString() + " Please try it again later.");
+            }
+            return hostResult;
+        }
+
+
 
         /// <summary>
         /// Description : Removes a Rds SessionHost associated with the Tenant and HostPool specified in the Rds context.

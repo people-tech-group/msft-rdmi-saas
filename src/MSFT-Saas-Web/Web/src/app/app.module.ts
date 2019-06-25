@@ -49,7 +49,7 @@ if (window.location.href != redirectUri) {
     HostpoolDashboardComponent,
     SearchPipe,
     BreadcrumComponent,
-    InvalidtokenmessageComponent
+    InvalidtokenmessageComponent,
   ],
   imports: [
     BrowserModule,
@@ -89,6 +89,7 @@ if (window.location.href != redirectUri) {
             component: HostpoolDashboardComponent,
             canActivate: [AuthGuard]
           },
+          
         ]
       }
     ])

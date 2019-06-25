@@ -7,7 +7,7 @@ export class AppService {
   public ApiEndpoint: any;
   public ApiUrl: string;
   constructor(private http: Http) {
-   // this.ApiUrl = "https://msftrdmisaasapi.azurewebsites.net";
+    //this.ApiUrl = "https://msftrdmisaasapi.azurewebsites.net";
   this.ApiUrl = "http://localhost:34816/";
   }
 
@@ -45,10 +45,10 @@ export class AppService {
 * tenantDetails - Accepts the Get Tenant URL
 * ----------
 */
-  public GetTenantDetails(tenantDetails: any) {
+  public GetTenantDetails(tenantDetailsUrl:any) {
     let headers = new Headers({ 'Accept': 'application/json' });
     let options = new RequestOptions({ headers: headers });
-    return this.http.get(tenantDetails, options)
+    return this.http.get(tenantDetailsUrl, options)
       .catch((error: any) => Observable.throw(error));
   }
 
@@ -150,6 +150,14 @@ export class AppService {
     let headers = new Headers({ 'Content-Type': 'application/json;charset=utf8', 'Accept': 'application/json' });
     let options = new RequestOptions({ headers: headers });
     return this.http.post(hosturl, options)
+    .catch((error: any) => Observable.throw(error));
+  }
+
+  ChangeDrainMode(hosturl:any, data)
+  {
+    let headers = new Headers({ 'Content-Type': 'application/json;charset=utf8', 'Accept': 'application/json' });
+    let options = new RequestOptions({ headers: headers });
+    return this.http.post(hosturl, JSON.stringify(data), options)
     .catch((error: any) => Observable.throw(error));
   }
 

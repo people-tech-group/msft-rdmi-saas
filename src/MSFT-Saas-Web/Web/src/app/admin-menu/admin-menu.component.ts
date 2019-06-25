@@ -95,17 +95,20 @@ export class AdminMenuComponent {
     this.displayTenantList = [];
     let tenants = sessionStorage.getItem('Tenants') ? JSON.parse(sessionStorage.getItem('Tenants')) : [];
     let data = tenants;
+  
     this.tenantList = [];
     this.hostPoolList = [];
     if (data == undefined || data == null) {
       this.router.navigate(['/admin/Tenants']);
     }
     else {
+     
       this.initialIndex = 0;
       this.tenantLength = 10;
       this.storeLength = 0;
       this.tenantList = data;
       this.tenantListLength = data.length;
+     
       this.FilterData();
       this.hostPoolList = [];
       this.selectedTenant = null;

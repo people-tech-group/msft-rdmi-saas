@@ -71,6 +71,7 @@ export class DeploymentDashboardComponent implements OnInit {
   public refreshToken: any;
   public TenantGroups: any = [];
   public showDropDown: boolean = false;
+  public getTenantDetailsUrl:any;
   public options: any = {
     timeOut: 2000,
     position: ["top", "right"]
@@ -481,6 +482,35 @@ export class DeploymentDashboardComponent implements OnInit {
       path: 'tenantDashboard',
     }];
     BreadcrumComponent.GetCurrentPage(data);
+
+    //making service call to get tenant details
+    this.getTenantDetailsUrl = this._AppService.ApiUrl + '/api/Tenant/GetTenantDetails?tenantGroupName=' + this.tenantGroupName + '&tenantName='+TenantName+'&refresh_token=' + sessionStorage.getItem("Refresh_Token");
+    this._AppService.GetTenantDetails(this.getTenantDetailsUrl).subscribe(response => {
+      if (response.status == 429) {
+        this.error = true;
+        this.errorMessage = response.statusText;
+      }
+      else {
+        this.error = false;
+        let responseObject = JSON.parse(response['_body']);
+        sessionStorage.setItem('SelectedTenant', JSON.stringify(responseObject));
+     console.log(responseObject);
+     if(responseObject!=null)
+     {
+      sessionStorage.setItem('SubscriptionId',responseObject.azureSubscriptionId);
+     }
+     
+      }
+    },
+      /*
+       * If Any Error (or) Problem With Services (or) Problem in internet this Error Block Will Execute
+       */
+      error => {
+        this.error = true;
+        let errorBody = JSON.parse(error['_body']);
+        this.errorMessage = errorBody.error.target;
+      }
+    );
   }
 
   /* This function is used Search functonality from the tenant table
@@ -520,6 +550,7 @@ export class DeploymentDashboardComponent implements OnInit {
     let TenantGroupName = localStorage.getItem('TenantGroupName');
     if (sessionStorage.getItem('Tenants') && Tenants.length != 0 && Tenants != null && TenantGroupName == this.tenantGroupName) {
       this.gettingTenants();
+     
     }
     else {
       this.refreshToken = sessionStorage.getItem("Refresh_Token");

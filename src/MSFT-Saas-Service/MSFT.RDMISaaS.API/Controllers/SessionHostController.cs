@@ -152,6 +152,45 @@ namespace MSFT.WVDSaaS.API.Controllers
             return Ok(hostResult);
         }
 
+        [HttpPost]
+        public IHttpActionResult ChangeDrainMode(JObject rdMgmtSessionHost)
+        {
+            //get deployment url
+            deploymentUrl = configurations.rdBrokerUrl;
+            try
+            {
+                if (rdMgmtSessionHost != null)
+                {
+                    if (!string.IsNullOrEmpty(rdMgmtSessionHost["refresh_token"].ToString()))
+                    {
+                        string accessToken = "";
+                        //get token value
+                        accessToken = common.GetTokenValue(rdMgmtSessionHost["refresh_token"].ToString());
+                        if (!string.IsNullOrEmpty(accessToken) && accessToken.ToString().ToLower() != invalidToken && accessToken.ToString().ToLower() != invalidCode)
+                        {
+                            hostResult = sessionHostBL.ChangeDrainMode(deploymentUrl, accessToken, rdMgmtSessionHost);
+                        }
+                        else
+                        {
+                            hostResult.Add("isSuccess", false);
+                            hostResult.Add("message", Constants.invalidToken);
+                        }
+                    }
+                }
+                else
+                {
+                    hostResult.Add("isSuccess", false);
+                    hostResult.Add("message", Constants.invalidDataMessage);
+                }
+            }
+            catch (Exception ex)
+            {
+                hostResult.Add("isSuccess", false);
+                hostResult.Add("message", "Host '" + rdMgmtSessionHost["sessionHostName"].ToString() + "' has not been updated." + ex.Message.ToString() + " Please try again later.");
+            }
+            return Ok(hostResult);
+        }
+
         /// <summary>
         /// Description : Removes a Rds SessionHost associated with the Tenant and HostPool specified in the Rds context.
         /// </summary>
