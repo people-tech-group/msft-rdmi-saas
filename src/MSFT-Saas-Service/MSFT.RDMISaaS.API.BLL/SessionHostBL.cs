@@ -46,7 +46,7 @@ namespace MSFT.WVDSaaS.API.BLL
 
         }
 
-        public HttpResponseMessage GetSessionhostList(string deploymentUrl, string wvdAccessToken, string tenantGroup, string tenantName, string hostPoolName,string azureDeployUrl=null, string azureAccessToken=null, string subscriptionId = null)
+        public HttpResponseMessage GetSessionhostList(string deploymentUrl, string wvdAccessToken, string tenantGroup, string tenantName, string hostPoolName, string azureDeployUrl = null, string azureAccessToken = null, string subscriptionId = null)
         {
             try
             {
@@ -60,40 +60,48 @@ namespace MSFT.WVDSaaS.API.BLL
                         var arrWVD = (JArray)JsonConvert.DeserializeObject(wvdData);
                         var WVDresult = ((JArray)arrWVD).ToList();
                         HttpResponseMessage AzureResponse = GetAzureVMList(azureDeployUrl, azureAccessToken, subscriptionId);
-                        var azureData = AzureResponse.Content.ReadAsStringAsync().Result;
-                        var arrAzure1 =  (JObject)JsonConvert.DeserializeObject(azureData);
-                        var arrAzure = arrAzure1["value"];
-                        var AzureResult = ((JArray)arrAzure).Select(item => new JObject()
+                        if (AzureResponse.StatusCode == HttpStatusCode.OK)
+                        {
+                            var azureData = AzureResponse.Content.ReadAsStringAsync().Result;
+                            var arrAzure1 = (JObject)JsonConvert.DeserializeObject(azureData);
+                            var arrAzure = arrAzure1["value"];
+                            var AzureResult = ((JArray)arrAzure).Select(item => new JObject()
                         {
                                new JProperty("vmName",  item["name"]),
                                new JProperty("subscriptionId",  item["id"]==null ? null: item["id"].ToString().Split('/')[2]),
                                new JProperty("resourceGroupName",   item["id"]==null ? null:item["id"].ToString().Split('/')[4]),
                         }).ToList();
-                        var finalVmList = AzureResult.ToList().Where(r => WVDresult.ToList().Any(d => r["vmName"].ToString() == d["sessionHostName"].ToString().Split('.')[0].ToString())).ToList();
-                        finalVmList.ForEach(item =>
+                            var finalVmList = AzureResult.ToList().Where(r => WVDresult.ToList().Any(d => r["vmName"].ToString() == d["sessionHostName"].ToString().Split('.')[0].ToString())).ToList();
+                            finalVmList.ForEach(item =>
+                            {
+                                var element = WVDresult.ToList().FirstOrDefault(d => d["sessionHostName"].ToString().Split('.')[0].ToString() == item["vmName"].ToString());
+                                item["sessionHostName"] = element["sessionHostName"];
+                                item["tenantName"] = element["tenantName"];
+                                item["tenantGroupName"] = element["tenantGroupName"];
+                                item["hostPoolName"] = element["hostPoolName"];
+                                item["allowNewSession"] = element["allowNewSession"];
+                                item["sessions"] = element["sessions"];
+                                item["lastHeartBeat"] = element["lastHeartBeat"];
+                                item["agentVersion"] = element["agentVersion"];
+                                item["assignedUser"] = element["assignedUser"];
+                                item["osVersion"] = element["osVersion"];
+                                item["sxSStackVersion"] = element["sxSStackVersion"];
+                                item["status"] = element["status"];
+                                item["updateState"] = element["updateState"];
+                                item["lastUpdateTime"] = element["lastUpdateTime"];
+                                item["updateErrorMessage"] = element["updateErrorMessage"];
+                            });
+                            return new HttpResponseMessage()
+                            {
+                                StatusCode = HttpStatusCode.OK,
+                                Content = new StringContent(JsonConvert.SerializeObject(finalVmList))
+                            };
+                        }
+                        else
                         {
-                            var element = WVDresult.ToList().FirstOrDefault(d => d["sessionHostName"].ToString().Split('.')[0].ToString() == item["vmName"].ToString());
-                            item["sessionHostName"] = element["sessionHostName"] ;
-                            item["tenantName"] = element["tenantName"];
-                            item["tenantGroupName"] = element["tenantGroupName"];
-                            item["hostPoolName"] = element["hostPoolName"];
-                            item["allowNewSession"] = element["allowNewSession"];
-                            item["sessions"] = element["sessions"];
-                            item["lastHeartBeat"] = element["lastHeartBeat"];
-                            item["agentVersion"] = element["agentVersion"];
-                            item["assignedUser"] = element["assignedUser"];
-                            item["osVersion"] = element["osVersion"];
-                            item["sxSStackVersion"] = element["sxSStackVersion"];
-                            item["status"] = element["status"];
-                            item["updateState"] = element["updateState"];
-                            item["lastUpdateTime"] = element["lastUpdateTime"];
-                            item["updateErrorMessage"] = element["updateErrorMessage"];
-                        });
-                        return new HttpResponseMessage()
-                        {
-                            StatusCode = HttpStatusCode.OK,
-                            Content = new StringContent(JsonConvert.SerializeObject(finalVmList))
-                        };
+                            return WVDResponse;
+                        }
+
                     }
                     else
                     {
@@ -105,7 +113,7 @@ namespace MSFT.WVDSaaS.API.BLL
                     return WVDResponse;
                 }
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 return null;
             }
@@ -214,7 +222,7 @@ namespace MSFT.WVDSaaS.API.BLL
                 if (response.IsSuccessStatusCode)
                 {
                     hostResult.Add("isSuccess", true);
-                    hostResult.Add("message", "'Allow new Session' is set to "+ rdMgmtSessionHost["allowNewSession"] + " for " + rdMgmtSessionHost["sessionHostName"].ToString() + "'.");
+                    hostResult.Add("message", "'Allow new Session' is set to " + rdMgmtSessionHost["allowNewSession"] + " for " + rdMgmtSessionHost["sessionHostName"].ToString() + "'.");
                 }
                 else if ((int)response.StatusCode == 429)
                 {

@@ -168,15 +168,15 @@ namespace MSFT.WVDSaaS.API.Common
 
                         if (httpResponse.IsSuccessStatusCode)
                         {
-                            var rdMgmtRoleAssignments = (JArray)JsonConvert.DeserializeObject(strJson);
-                            for (int i = 0; i < rdMgmtRoleAssignments.Count; i++)
+                            loginDetails.RoleAssignment = (JArray)JsonConvert.DeserializeObject(strJson);
+                            for (int i = 0; i < loginDetails.RoleAssignment.Count; i++)
                             {
-                                loginDetails.RoleAssignment = new JObject() { { "roleDefinitionName", rdMgmtRoleAssignments[i]["roleDefinitionName"].ToString() }, { "scope", rdMgmtRoleAssignments[i]["scope"].ToString() } };
-                                if (rdMgmtRoleAssignments[i]["signInName"] != null && rdMgmtRoleAssignments[i]["signInName"].ToString().ToLower() == loginDetails.Email.ToString().ToLower())
+                               // loginDetails.RoleAssignment = new JObject() { { "roleDefinitionName", rdMgmtRoleAssignments[i]["roleDefinitionName"].ToString() }, { "scope", rdMgmtRoleAssignments[i]["scope"].ToString() } };
+                                if (loginDetails.RoleAssignment[i]["signInName"] != null && loginDetails.RoleAssignment[i]["signInName"].ToString().ToLower() == loginDetails.Email.ToString().ToLower())
                                 {
-                                    if (rdMgmtRoleAssignments[i]["scope"].ToString().Split('/').Length > 1)
+                                    if (loginDetails.RoleAssignment[i]["scope"].ToString().Split('/').Length > 1)
                                     {
-                                        list.Add(rdMgmtRoleAssignments[i]["scope"].ToString().Split('/')[1].ToString());
+                                        list.Add(loginDetails.RoleAssignment[i]["scope"].ToString().Split('/')[1].ToString());
                                     }
                                     else
                                     {

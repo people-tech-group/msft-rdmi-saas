@@ -132,8 +132,11 @@ export class DeploymentDashboardComponent implements OnInit {
    * This Function is called on Component Load and it is used to check the Access level of Tenant 
    */
   public CheckTenantAccess() {
+    
     this.scopeArray = sessionStorage.getItem("Scope").split(",");
-    if (this.scopeArray != null && this.scopeArray.length > 2) {
+    let roledefinition= sessionStorage.getItem("roleDefinitionName");
+    console.log(this.scopeArray.length,"this.scopeArray");
+    if (this.scopeArray != null && this.scopeArray.length >2 ||  ( this.scopeArray != null && this.scopeArray.length == 2 && roledefinition !="RDS Owner")) {
       this.tenants = [{
         "tenantGroupName": "",
         "aadTenantId": "",
@@ -150,6 +153,7 @@ export class DeploymentDashboardComponent implements OnInit {
         "refresh_token": null
       }];
       this.searchTenants = this.tenants;
+      sessionStorage.setItem('Tenants', JSON.stringify(this.searchTenants));
     }
     else {
       this.GetTenants();
@@ -274,6 +278,21 @@ export class DeploymentDashboardComponent implements OnInit {
     this.tenants = [];
     this.searchTenants = [];
     sessionStorage.removeItem('Tenants');
+
+    //change role assignment details in signout panel
+     let roles:any=[];
+     roles=JSON.parse(sessionStorage.getItem("roleAssignments"));
+     console.log(roles,"roles");
+     if(roles!=null && roles.length>0)
+     {
+      let selectedRole= roles.filter(element => 
+        element.scope.split('/')[1] == tenantGroup);
+      console.log(selectedRole)
+      sessionStorage.setItem("roleDefinitionName", selectedRole[0].roleDefinitionName);
+      var roleDef = selectedRole[0].scope.substring(1).split("/");
+      sessionStorage.setItem('Scope', roleDef);
+      sessionStorage.setItem('infraPermission', selectedRole[0].scope);
+     }
     //navigate to appcomponent page
     let url = sessionStorage.getItem("redirectUri");
     window.location.replace(url);

@@ -163,6 +163,7 @@ export class TenantDashboardComponent implements OnInit {
         "ring": null
       }];
       this.searchHostPools = this.hostPoolsList;
+      this.hostpoolsCount=this.hostPoolsList.length;
       this.tenantInfo = {
         "tenantName": this.scopeArray[1]
       };
@@ -291,6 +292,8 @@ export class TenantDashboardComponent implements OnInit {
   public GetTenantDetails(tenantName: any) {
     let Tenants = JSON.parse(sessionStorage.getItem('Tenants'));
     let data = Tenants.filter(item => item.tenantName == tenantName);
+    console.log(Tenants,"Tenants");
+    console.log(data,"data-GetTenantDetails");
     this.tenantInfo = data[0];
     // this.refreshHostpoolLoading = true;
     // this.getTenantlistErrorFound = false;

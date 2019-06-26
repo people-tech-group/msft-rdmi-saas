@@ -29,12 +29,12 @@ export class AdminMenuComponent {
   public tenantGroupName: any;
 
   constructor(private router: Router, private appService: AppService) {
-    if (this.tenantListLength == 1) {
-      this.loadMore = false;
-    }
-    else {
-      this.loadMore = true;
-    }
+    // if (this.tenantListLength == 1) {
+    //   this.loadMore = false;
+    // }
+    // else {
+    //   this.loadMore = true;
+    // }
   }
 
   public ngOnInit() {
@@ -95,7 +95,6 @@ export class AdminMenuComponent {
     this.displayTenantList = [];
     let tenants = sessionStorage.getItem('Tenants') ? JSON.parse(sessionStorage.getItem('Tenants')) : [];
     let data = tenants;
-  
     this.tenantList = [];
     this.hostPoolList = [];
     if (data == undefined || data == null) {

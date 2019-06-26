@@ -394,9 +394,9 @@
                                      
                                     </tr>
                                   </thead>
-                                  <tbody *ngIf="!(SessionsListErrorFound || editedLbodyUsers)">
+                                  <tbody *ngIf="!(SessionsListErrorFound)">
                                     <tr
-                                      *ngFor="let session of userSessionSearchList | paginate: { itemsPerPage: listItems, currentPage: userSessionslist }; let sessionIndex=index"
+                                      *ngFor="let session of userSessionSearchList | paginate: { itemsPerPage: listItems, currentPage: userSessionslist, id:'sessions' }; let sessionIndex=index"
                                       [ngClass]="{'rowSelect':checkedUserSessions[absoluteIndex(sessionIndex, listItems, userSessionslist)]}"
                                       id="row-sessions-{{session.sessionId}}"
                                       (click)="UserSessionRowClick(session.sessionId, absoluteIndex(sessionIndex, listItems, userSessionslist))"
@@ -424,10 +424,11 @@
                                 </table>
 
                                 <div class="row" style="margin: 0; position:fixed; right:20px; bottom:0px;"
-                                  *ngIf="!(editedLbodyUsers || SessionsListErrorFound)">
+                                  >
                                   <pagination-controls (pageChange)="userSessionslist = $event" class="pagination pull-right"
-                                    id="sessions"></pagination-controls>
+                                  id="sessions"></pagination-controls>
                                 </div>
+                                
                                 <div *ngIf="editedLbodyUsers">
                                   <div class="EmptyTableMsg">
                                     <div style="text-align:center">
@@ -449,6 +450,9 @@
                                       <button class="btn btn-sm btn-primary" (click)="RefreshUserSessions()">Refresh</button>
                                     </div>
                                   </div>
+                                </div>
+                                <div *ngIf="UserSessionLoader" class="ngLoader">
+                                   <img src="assets/Images/loading.gif" />
                                 </div>
                               </div>
                             </div>
@@ -659,6 +663,9 @@
                           <button class="btn btn-sm btn-primary" (click)="RefreshBtnClick()">Refresh</button>
                         </div>
                       </div>
+                      <div *ngIf="UserSessionLoader" class="ngLoader">
+                        <img src="assets/Images/loading.gif" />
+                     </div>
                     </div>
                   </div>
                   <div class="tab-pane" id="tab_default_5" *ngIf="removeAppsTab">
@@ -1026,10 +1033,10 @@
     <div class="modal-content popup-main">
       <div class="modal-header">
         <i class="icon icon-close" aria-hidden="true" data-dismiss="modal"></i>
-        <h4 class="modal-title">Change Drain Mode Confirmation</h4>
+        <h4 class="modal-title">Set Drain Mode Confirmation</h4>
       </div>
       <div class="modal-body">
-        <p>Are you sure you want to set drain mode to <b>{{HostAllowNewSession}}</b> of host <span style="font-weight:bold;">{{hostDeleteData}}</span>' ?</p>
+        <p>Are you sure you want to set drain mode(Allow New Session)  <b> false </b> of host <span style="font-weight:bold;">{{hostDeleteData}}</span>' ?</p>
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-primary" (click)="ChangeDrainMode()" data-dismiss="modal">Procceed</button>
@@ -1047,11 +1054,14 @@
           <i class="icon icon-close" aria-hidden="true" data-dismiss="modal"></i>
           <h4 class="modal-title">Change Drain Mode Confirmation</h4>
         </div>
-        <div class="modal-body">
-          <p>If you restart host, existing user sessions will be closed. Are you sure you want to restart host '<span style="font-weight:bold;">{{hostDeleteData}}</span>' ?</p>
+        <div *ngIf="!HostAllowNewSession" class="modal-body">
+          <p> You need to set the drain mode(allow new session)  false to  restart host.</p>
+        </div>
+        <div *ngIf="HostAllowNewSession" class="modal-body">
+          <p> If you restart host, existing user sessions will be closed. Are you sure you want to restart host '<span style="font-weight:bold;">{{hostDeleteData}}</span>' ?</p>
         </div>
         <div class="modal-footer">
-          <button type="button" class="btn btn-primary" (click)="RestartHost()" data-dismiss="modal">Procceed</button>
+          <button type="button" class="btn btn-primary" (click)="RestartHost()" [disabled]="!HostAllowNewSession" data-dismiss="modal">Procceed</button>
           <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
         </div>
       </div>
@@ -1541,7 +1551,7 @@
 <!-- Send message Panel-->
 <div class="overlay" *ngIf="showSendMessageDialog">
   <div class="createUserName">
-    <!-- <input type="hidden" id="AddAppCreateOpen" value="{{isCreateOpen}}" /> -->
+ 
     <form [formGroup]="sendMessageForm" autocomplete="off">
       <div class="createTenantHead">
         <div class="TenantStatus">
@@ -1570,7 +1580,7 @@
                   <div *ngIf="sendMessageForm.controls['Message'].hasError('pattern')" class="colorRed">
                     Please enter message body
                   </div>
-                  <div *ngIf="Title" class="colorRed">
+                  <div *ngIf="Message" class="colorRed">
                     Please enter message body
                   </div>
                 </div>
@@ -1588,7 +1598,7 @@
           </li>
           <li>
             <input type="button" value="Send" id="btnSendMessage"
-              [disabled]=" sendMessageForm.controls['Title'].hasError('pattern') || sendMessageForm.controls['Message'].hasError('pattern')"
+              [disabled]=" sendMesageButtonDisable || sendMessageForm.controls['Title'].hasError('pattern') || sendMessageForm.controls['Message'].hasError('pattern')"
               (click)="SendMessage(sendMessageForm.value)" />
           </li>
         </ul>

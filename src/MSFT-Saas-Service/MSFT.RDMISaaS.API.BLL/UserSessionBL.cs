@@ -79,7 +79,7 @@ namespace MSFT.WVDSaaS.API.BLL
                 if (response.IsSuccessStatusCode)
                 {
                     userSessionResult.Add("isSuccess", true);
-                    userSessionResult.Add("message", "Log off successfully for " + userSession["adUserName"].ToString());
+                    userSessionResult.Add("message", "Log off successfully for '" + userSession["adUserName"].ToString()+"'");
                 }
                 else if ((int)response.StatusCode == 429)
                 {
@@ -119,7 +119,7 @@ namespace MSFT.WVDSaaS.API.BLL
                 if (response.IsSuccessStatusCode)
                 {
                     userSessionResult.Add("isSuccess", true);
-                    userSessionResult.Add("message", "Message sent successfully to '" + userSession["adUserName"].ToString());
+                    userSessionResult.Add("message", "Message sent successfully to '" + userSession["adUserName"].ToString()+"'");
                 }
                 else if ((int)response.StatusCode == 429)
                 {
