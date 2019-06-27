@@ -89,7 +89,6 @@ if (window.location.href != redirectUri) {
             component: HostpoolDashboardComponent,
             canActivate: [AuthGuard]
           },
-          
         ]
       }
     ])

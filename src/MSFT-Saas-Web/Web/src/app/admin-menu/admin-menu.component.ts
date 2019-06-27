@@ -101,13 +101,13 @@ export class AdminMenuComponent {
       this.router.navigate(['/admin/Tenants']);
     }
     else {
-     
+
       this.initialIndex = 0;
       this.tenantLength = 10;
       this.storeLength = 0;
       this.tenantList = data;
       this.tenantListLength = data.length;
-     
+
       this.FilterData();
       this.hostPoolList = [];
       this.selectedTenant = null;
@@ -116,7 +116,6 @@ export class AdminMenuComponent {
       let hostpoolName = sessionStorage.getItem("selectedhostpoolname");
       let tenantName = sessionStorage.getItem("TenantName");
       if (decodeURIComponent(path) == `/admin/hostpoolDashboard/${hostpoolName}`) {
-        let hostpoolList = JSON.parse(sessionStorage.getItem("hostpoolList"));
         this.GetHostpools(tenantName);
       }
     }
@@ -169,9 +168,8 @@ export class AdminMenuComponent {
    * tenantName -  Accepts Tenant Name
    * ----------
    */
-  public GetHostpools( tenantName: any) {
+  public GetHostpools(tenantName: any) {
     let hostpoolData = sessionStorage.getItem('sideMenuHostpools') ? JSON.parse(sessionStorage.getItem('sideMenuHostpools')) : [];
-    // sessionStorage.setItem("hostpoolList", JSON.stringify(hostpoolData));
     this.hostPoolList = [];
     this.hostPoolList = hostpoolData;
     let data = [{
@@ -216,9 +214,9 @@ export class AdminMenuComponent {
    * @param hostpoolName - Accepts HostpoolName
    * @param tenantName - Accepts TenantName
    */
-  public getHostpoolIndex(hostpoolName: string, tenantName: string){
-    this.hostPoolList.forEach((item, index)=>{
-      if(item.hostPoolName == hostpoolName){
+  public getHostpoolIndex(hostpoolName: string, tenantName: string) {
+    this.hostPoolList.forEach((item, index) => {
+      if (item.hostPoolName == hostpoolName) {
         this.SetSelectedhostPool(index, tenantName, hostpoolName);
       }
     });
@@ -228,9 +226,9 @@ export class AdminMenuComponent {
    * This method is used to get the selected tenantName index
    * @param tenantName - Accepts TenantName
    */
-  public getTenantIndex(tenantName: string){
-    this.displayTenantList.forEach((item, index)=>{
-      if(item.tenantName == tenantName){
+  public getTenantIndex(tenantName: string) {
+    this.displayTenantList.forEach((item, index) => {
+      if (item.tenantName == tenantName) {
         this.SetSelectedTenant(index, tenantName);
       }
     });

@@ -240,17 +240,9 @@ export class HostpoolDashboardComponent implements OnInit {
   public userSessionSearchList: any = [];
   public userSessionsCount: number = 0;
   public SessionsListErrorFound: boolean = false;
-  // public logOffCountSelectedSessions:any;
   public showSendMessageDialog: boolean = false;
   public sendMessageForm: any;
   public restartHostForm: any;
-  // public checkedUSerSessions:any=[];
-  // public selectedUserSessions:any[];
-  // public checkedMainUserSession:boolean=false;
-  // public isDisableLogOffUser:boolean=true;
-  // public checkedAllTrueUserSessions:any=[];
-  // public selectedUserSessionRow:any=[];
-  // public checkedUSerSession:any=[];
 
   //for user sessions
   public checkedUserSessions: any = [];
@@ -341,12 +333,6 @@ export class HostpoolDashboardComponent implements OnInit {
       Title: new FormControl('', Validators.required),
       Message: new FormControl('', Validators.required)
     });
-
-
-    // this.restartHostForm = new FormGroup({
-    //   SubscriptionId: new FormControl('', Validators.required),
-    //   ResourceGroup: new FormControl('', Validators.required)
-    // });
 
     this.appgroupFormEdit = new FormGroup({
       appGroupName: new FormControl(''),
@@ -459,10 +445,10 @@ export class HostpoolDashboardComponent implements OnInit {
     this.isLogOffDisabled = true;
     this.isSendMsgDisabled = true;
     this.sessionHostchecked = [];
-    this.editHostDisabled=true;
-    this.deleteHostDisabled=true;
-    this.restartHostDisabled=true;
-    this.drainHostDisabled=true;
+    this.editHostDisabled = true;
+    this.deleteHostDisabled = true;
+    this.restartHostDisabled = true;
+    this.drainHostDisabled = true;
   }
 
   /* This function is used to close the Appgroup details, App & Users split view
@@ -1183,10 +1169,11 @@ export class HostpoolDashboardComponent implements OnInit {
       // this.getAllSessionHostUrl = this._AppService.ApiUrl + '/api/SessionHost/GetSessionhostList?tenantGroupName=' + this.tenantGroupName + '&tenantName=' + this.tenantName + '&hostPoolName=' + this.hostPoolName + '&refresh_token=' + sessionStorage.getItem("Refresh_Token") + '&pageSize=' + this.HostpageSize + '&sortField=SessionHostName&isDescending=false&initialSkip=' + this.hostinitialSkip + '&lastEntry=%22%20%22';
       this.getAllSessionHostUrl = this._AppService.ApiUrl + '/api/SessionHost/GetSessionhostList?tenantGroupName=' + this.tenantGroupName + '&tenantName=' + this.tenantName + '&hostPoolName=' + this.hostPoolName + '&refresh_token=' + sessionStorage.getItem("Refresh_Token") + '&subscriptionId=' + subscriptionId;
       this._AppService.GetData(this.getAllSessionHostUrl).subscribe(response => {
-        this.refreshHostpoolLoading = false;
+
         if (response.status == 429) {
           this.error = true;
           this.errorMessage = response.statusText;
+          this.refreshHostpoolLoading = false;
         }
         else {
           this.error = false;
@@ -1202,14 +1189,16 @@ export class HostpoolDashboardComponent implements OnInit {
         (error) => {
           this.error = true;
           let errorBody = JSON.parse(error['_body']);
-          if(errorBody.error.code=="403")
-          {
+          if (errorBody.error.code == "403") {
             this.errorMessage = "Access Denied! You are not authorized user to view host details.";
+            this.showHostEmpty = true;
+            this.hostListErrorFound = false;
           }
-          else{
+          else {
             this.errorMessage = errorBody.error.target;
+            this.showHostEmpty = false;
+            this.hostListErrorFound = true;
           }
-          this.hostListErrorFound = true;
           this.refreshHostpoolLoading = false;
         }
       );
@@ -1218,12 +1207,13 @@ export class HostpoolDashboardComponent implements OnInit {
     this.deleteHostDisabled = true;
     this.drainHostDisabled = true;
     this.restartHostDisabled = true;
+    this.showHostDashBoard = false;
   }
 
   gettingHosts() {
     this.sessionHostLists = JSON.parse(sessionStorage.getItem('Hosts'));
 
-    if (this.sessionHostLists != null && this.sessionHostLists.length > 0) {
+    if (this.sessionHostLists != null) {
       /* This Block of code is used to Exchange the allowNewSession value 'true' or 'false' to 'Yes' or 'No' */
       /*Exchange Block starting*/
       for (let j in this.sessionHostLists) {
@@ -1273,10 +1263,7 @@ export class HostpoolDashboardComponent implements OnInit {
         }
       }
     }
-
-
-
-    //this.refreshHostpoolLoading = false;
+    this.refreshHostpoolLoading = false;
   }
 
   /*
@@ -1369,9 +1356,12 @@ export class HostpoolDashboardComponent implements OnInit {
    * --------------
    */
   public HostClicked(hostIndex: any, hostName: any, event) {
- 
+
     if (event.target.checked != null && event.target.checked != undefined) {
       this.showHostDashBoard = !event.target.checked;
+    }
+    else if (event.type == "click") {
+      this.showHostDashBoard = !this.showHostDashBoard;
     }
     //this.showAppGroupDashBoard = false;///added by susmita
     this.SessionHostIsChecked(hostIndex);
@@ -1384,7 +1374,7 @@ export class HostpoolDashboardComponent implements OnInit {
       }
     }
     if (this.sessionHostCheckedTrue.length == 1) {
-      
+
       this.editHostDisabled = false;
       this.deleteHostDisabled = false;
       this.drainHostDisabled = false;
@@ -1394,10 +1384,9 @@ export class HostpoolDashboardComponent implements OnInit {
       this.HostAllowNewSession = this.hostDetails.allowNewSession == "Yes" ? false : true;
       this.state = "up";
       this.selectedHostName = this.sessionHostListsSearch[hostIndex].sessionHostName;
-    
+
       // make service call to get user sessions
-      if(this.showHostDashBoard == true)
-      {
+      if (this.showHostDashBoard == true) {
         this.GetUserSessions();
 
       }
@@ -2559,9 +2548,7 @@ export class HostpoolDashboardComponent implements OnInit {
    * 
    */
   public GetUserSessions() {
-
     this.refreshHostpoolLoading = true;
-    console.log(this.refreshHostpoolLoading,"GetUserSessions");
     this.checkedUserSessions = [];
     this.checkedMainUserSession = false;
     this.SessionsListErrorFound = false;
@@ -4359,7 +4346,6 @@ export class HostpoolDashboardComponent implements OnInit {
     }];
     BreadcrumComponent.GetCurrentPage(data);
   }
-
 }
 
 

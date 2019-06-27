@@ -1036,7 +1036,7 @@
         <h4 class="modal-title">Set Drain Mode Confirmation</h4>
       </div>
       <div class="modal-body">
-        <p>Are you sure you want to set drain mode(Allow New Session)  <b> false </b> of host <span style="font-weight:bold;">{{hostDeleteData}}</span>' ?</p>
+        <p>Are you sure you want to set drain mode of host <span style="font-weight:bold;">'{{hostDeleteData}}'</span> ?</p>
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-primary" (click)="ChangeDrainMode()" data-dismiss="modal">Procceed</button>
@@ -1566,10 +1566,10 @@
                     (ngModelChange)="TitleChange($event)" style="width: 359px;"
                      />
                   <div *ngIf="sendMessageForm.controls['Title'].hasError('pattern')" class="colorRed">
-                    Please enter message title
+                    Please enter title
                   </div>
                   <div *ngIf="Title" class="colorRed">
-                    Please enter message title
+                    Please enter title
                   </div>
                 </div>
                 <div class="form-group">
@@ -1578,10 +1578,10 @@
                     (ngModelChange)="MessageChange($event)" style="width: 359px;"
                      />
                   <div *ngIf="sendMessageForm.controls['Message'].hasError('pattern')" class="colorRed">
-                    Please enter message body
+                    Please enter message 
                   </div>
                   <div *ngIf="Message" class="colorRed">
-                    Please enter message body
+                    Please enter message 
                   </div>
                 </div>
               </div>

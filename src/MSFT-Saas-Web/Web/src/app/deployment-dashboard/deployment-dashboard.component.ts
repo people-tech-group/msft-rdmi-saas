@@ -71,7 +71,7 @@ export class DeploymentDashboardComponent implements OnInit {
   public refreshToken: any;
   public TenantGroups: any = [];
   public showDropDown: boolean = false;
-  public getTenantDetailsUrl:any;
+  public getTenantDetailsUrl: any;
   public options: any = {
     timeOut: 2000,
     position: ["top", "right"]
@@ -132,11 +132,10 @@ export class DeploymentDashboardComponent implements OnInit {
    * This Function is called on Component Load and it is used to check the Access level of Tenant 
    */
   public CheckTenantAccess() {
-    
+
     this.scopeArray = sessionStorage.getItem("Scope").split(",");
-    let roledefinition= sessionStorage.getItem("roleDefinitionName");
-    console.log(this.scopeArray.length,"this.scopeArray");
-    if (this.scopeArray != null && this.scopeArray.length >2 ||  ( this.scopeArray != null && this.scopeArray.length == 2 && roledefinition !="RDS Owner")) {
+    let roledefinition = sessionStorage.getItem("roleDefinitionName");
+    if (this.scopeArray != null && this.scopeArray.length > 2 || (this.scopeArray != null && this.scopeArray.length == 2 && roledefinition != "RDS Owner" && roledefinition != "RDS Contributor")) {
       this.tenants = [{
         "tenantGroupName": "",
         "aadTenantId": "",
@@ -154,6 +153,7 @@ export class DeploymentDashboardComponent implements OnInit {
       }];
       this.searchTenants = this.tenants;
       sessionStorage.setItem('Tenants', JSON.stringify(this.searchTenants));
+      this.gettingTenants();
     }
     else {
       this.GetTenants();
@@ -280,19 +280,16 @@ export class DeploymentDashboardComponent implements OnInit {
     sessionStorage.removeItem('Tenants');
 
     //change role assignment details in signout panel
-     let roles:any=[];
-     roles=JSON.parse(sessionStorage.getItem("roleAssignments"));
-     console.log(roles,"roles");
-     if(roles!=null && roles.length>0)
-     {
-      let selectedRole= roles.filter(element => 
+    let roles: any = [];
+    roles = JSON.parse(sessionStorage.getItem("roleAssignments"));
+    if (roles != null && roles.length > 0) {
+      let selectedRole = roles.filter(element =>
         element.scope.split('/')[1] == tenantGroup);
-      console.log(selectedRole)
       sessionStorage.setItem("roleDefinitionName", selectedRole[0].roleDefinitionName);
       var roleDef = selectedRole[0].scope.substring(1).split("/");
       sessionStorage.setItem('Scope', roleDef);
       sessionStorage.setItem('infraPermission', selectedRole[0].scope);
-     }
+    }
     //navigate to appcomponent page
     let url = sessionStorage.getItem("redirectUri");
     window.location.replace(url);
@@ -493,17 +490,9 @@ export class DeploymentDashboardComponent implements OnInit {
   public SetSelectedTenant(index: any, TenantName: any) {
     sessionStorage.setItem("TenantName", TenantName);
     sessionStorage.setItem("TenantNameIndex", index);
-    this.adminMenuComponent.SetSelectedTenant(index, TenantName);
-    this.router.navigate(['/admin/tenantDashboard/', TenantName]);
-    let data = [{
-      name: TenantName,
-      type: 'Tenant',
-      path: 'tenantDashboard',
-    }];
-    BreadcrumComponent.GetCurrentPage(data);
 
     //making service call to get tenant details
-    this.getTenantDetailsUrl = this._AppService.ApiUrl + '/api/Tenant/GetTenantDetails?tenantGroupName=' + this.tenantGroupName + '&tenantName='+TenantName+'&refresh_token=' + sessionStorage.getItem("Refresh_Token");
+    this.getTenantDetailsUrl = this._AppService.ApiUrl + '/api/Tenant/GetTenantDetails?tenantGroupName=' + this.tenantGroupName + '&tenantName=' + TenantName + '&refresh_token=' + sessionStorage.getItem("Refresh_Token");
     this._AppService.GetTenantDetails(this.getTenantDetailsUrl).subscribe(response => {
       if (response.status == 429) {
         this.error = true;
@@ -512,13 +501,11 @@ export class DeploymentDashboardComponent implements OnInit {
       else {
         this.error = false;
         let responseObject = JSON.parse(response['_body']);
-        sessionStorage.setItem('SelectedTenant', JSON.stringify(responseObject));
-     console.log(responseObject);
-     if(responseObject!=null)
-     {
-      sessionStorage.setItem('SubscriptionId',responseObject.azureSubscriptionId);
-     }
-     
+        if (responseObject != null) {
+          sessionStorage.setItem('SelectedTenant', JSON.stringify(responseObject));
+          sessionStorage.setItem('SubscriptionId', responseObject.azureSubscriptionId);
+        }
+
       }
     },
       /*
@@ -530,6 +517,15 @@ export class DeploymentDashboardComponent implements OnInit {
         this.errorMessage = errorBody.error.target;
       }
     );
+
+    this.adminMenuComponent.SetSelectedTenant(index, TenantName);
+    this.router.navigate(['/admin/tenantDashboard/', TenantName]);
+    let data = [{
+      name: TenantName,
+      type: 'Tenant',
+      path: 'tenantDashboard',
+    }];
+    BreadcrumComponent.GetCurrentPage(data);
   }
 
   /* This function is used Search functonality from the tenant table
@@ -564,44 +560,46 @@ export class DeploymentDashboardComponent implements OnInit {
   /* This function is used to  loads all the tenants into table on page load */
   public GetTenants() {
     this.adminMenuComponent.GetAllTenants();
-    this.refreshTenantLoading = true;
     let Tenants = JSON.parse(sessionStorage.getItem('Tenants'));
     let TenantGroupName = localStorage.getItem('TenantGroupName');
-    if (sessionStorage.getItem('Tenants') && Tenants.length != 0 && Tenants != null && TenantGroupName == this.tenantGroupName) {
-      this.gettingTenants();
-     
-    }
-    else {
-      this.refreshToken = sessionStorage.getItem("Refresh_Token");
-      this.tenantlistErrorFound = false;
-      // this.getTenantsUrl = this._AppService.ApiUrl + '/api/Tenant/GetTenantList?tenantGroupName=' + this.tenantGroupName + '&refresh_token=' + this.refreshToken + '&pageSize=' + this.pageSize + '&sortField=TenantName&isDescending=false&initialSkip=' + this.initialSkip + '&lastEntry=' + this.lastEntry;
-      this.getTenantsUrl = this._AppService.ApiUrl + '/api/Tenant/GetTenantList?tenantGroupName=' + this.tenantGroupName + '&refresh_token=' + this.refreshToken;
-      this._AppService.GetTenants(this.getTenantsUrl).subscribe(response => {
-        if (response.status == 429) {
-          this.error = true;
-          this.errorMessage = response.statusText;
-        }
-        else {
-          this.error = false;
-          let responseObject = JSON.parse(response['_body']);
-          sessionStorage.setItem('Tenants', JSON.stringify(responseObject));
-          this.ShowTenantgroupError = false;
-          this.gettingTenants();
-          this.GetcurrentNoOfPagesCount();
-        }
-      },
-        /*
-         * If Any Error (or) Problem With Services (or) Problem in internet this Error Block Will Execute
-         */
-        error => {
-          this.editedBody = false;
-          this.tenantlistErrorFound = true;
+    if (TenantGroupName != null && TenantGroupName != undefined) {
+
+      if (sessionStorage.getItem('Tenants') && Tenants.length != 0 && Tenants != null && TenantGroupName == this.tenantGroupName) {
+        this.gettingTenants();
+      }
+      else {
+        this.refreshToken = sessionStorage.getItem("Refresh_Token");
+        this.tenantlistErrorFound = false;
+        // this.getTenantsUrl = this._AppService.ApiUrl + '/api/Tenant/GetTenantList?tenantGroupName=' + this.tenantGroupName + '&refresh_token=' + this.refreshToken + '&pageSize=' + this.pageSize + '&sortField=TenantName&isDescending=false&initialSkip=' + this.initialSkip + '&lastEntry=' + this.lastEntry;
+        this.getTenantsUrl = this._AppService.ApiUrl + '/api/Tenant/GetTenantList?tenantGroupName=' + this.tenantGroupName + '&refresh_token=' + this.refreshToken;
+        this._AppService.GetTenants(this.getTenantsUrl).subscribe(response => {
           this.refreshTenantLoading = false;
-          this.error = true;
-          let errorBody = JSON.parse(error['_body']);
-          this.errorMessage = errorBody.error.target;
-        }
-      );
+          if (response.status == 429) {
+            this.error = true;
+            this.errorMessage = response.statusText;
+          }
+          else {
+            this.error = false;
+            let responseObject = JSON.parse(response['_body']);
+            sessionStorage.setItem('Tenants', JSON.stringify(responseObject));
+            this.ShowTenantgroupError = false;
+            this.gettingTenants();
+            this.GetcurrentNoOfPagesCount();
+          }
+        },
+          /*
+           * If Any Error (or) Problem With Services (or) Problem in internet this Error Block Will Execute
+           */
+          error => {
+            this.editedBody = false;
+            this.tenantlistErrorFound = true;
+            this.refreshTenantLoading = false;
+            this.error = true;
+            let errorBody = JSON.parse(error['_body']);
+            this.errorMessage = errorBody.error.target;
+          }
+        );
+      }
     }
   };
 
@@ -950,6 +948,8 @@ export class DeploymentDashboardComponent implements OnInit {
         AppComponent.GetNotification('icon icon-check angular-Notify', 'Tenant Updated Successfully', responseData.message, new Date());
         this.tenantUpdateClose();
         this.RefreshTenant();
+        this.refreshTenantLoading = false;
+
       }
       /* If response data is success then it enters into else and this block of code will execute to show the 'Failed To Update Tenant' notification */
       else {
@@ -994,7 +994,6 @@ export class DeploymentDashboardComponent implements OnInit {
         AppComponent.GetNotification('fa fa-times-circle checkstyle', 'Failed To Update Tenant', 'Problem with the service. Please try later', new Date());
       }
     );
-
   }
 
   /* This function is used to  delete the selected Tenant */
@@ -1071,9 +1070,7 @@ export class DeploymentDashboardComponent implements OnInit {
           )
           AppComponent.GetNotification('fa fa-times-circle checkstyle', 'Failed To Delete Tenant', 'Problem with the service. Please try later', new Date());
         }
-
       );
-
     }
   }
 }
