@@ -191,6 +191,7 @@ export class DeploymentDashboardComponent implements OnInit {
       this.createTenantUniqueName = true;
       this.tenantDoneButtonDisable = true;
     }
+
   }
 
   /* This function is called on Click of Create Tenant and it clears the input fields
@@ -253,10 +254,12 @@ export class DeploymentDashboardComponent implements OnInit {
     if (this.slectedtenantgroupname == null || this.slectedtenantgroupname == undefined || this.slectedtenantgroupname == "Choose tenant group") {
       // this.saveButtonDisable = true;
       this.ShowTenantgroupError = true;
+      this.tenantDoneButtonDisable=true;
     }
     else {
       // this.saveButtonDisable = false;
       this.ShowTenantgroupError = false;
+      this.tenantDoneButtonDisable=false;
     }
   }
 
@@ -487,7 +490,7 @@ export class DeploymentDashboardComponent implements OnInit {
    * TenantName- Accepts tenantname .
    * --------------
   */
-  public SetSelectedTenant(index: any, TenantName: any) {
+  public SetSelectedTenant(index: any, TenantName: any,subscriptionId:any) {
     sessionStorage.setItem("TenantName", TenantName);
     sessionStorage.setItem("TenantNameIndex", index);
 
@@ -518,7 +521,7 @@ export class DeploymentDashboardComponent implements OnInit {
       }
     );
 
-    this.adminMenuComponent.SetSelectedTenant(index, TenantName);
+    this.adminMenuComponent.SetSelectedTenant(index, TenantName,subscriptionId);
     this.router.navigate(['/admin/tenantDashboard/', TenantName]);
     let data = [{
       name: TenantName,

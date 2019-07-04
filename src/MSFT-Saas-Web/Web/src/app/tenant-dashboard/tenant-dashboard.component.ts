@@ -860,6 +860,8 @@ export class TenantDashboardComponent implements OnInit {
     this.searchHostPools = [];
     sessionStorage.removeItem('Hostpools');
     sessionStorage.removeItem('sideMenuHostpools');
+    this.checked = [];
+    this.checkedMain = false;
     this.CheckHostpoolAccess(this.tenantName);
   }
 

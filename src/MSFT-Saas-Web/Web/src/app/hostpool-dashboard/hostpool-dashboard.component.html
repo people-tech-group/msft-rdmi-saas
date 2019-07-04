@@ -43,7 +43,7 @@
             </a>
           </li>
           <li>
-            <a href="#tab_default_3" data-toggle="tab" (click)=HideHostDetails() >
+            <a href="#tab_default_31" data-toggle="tab" (click)=HideHostDetails() >
               App Groups
             </a>
           </li>
@@ -198,7 +198,7 @@
                       <div class="control-group">
                         <label class="control control--checkbox">
                           <input type="checkbox" class="solcheckbox"
-                            (click)="HostClicked(absoluteIndex(hostIndex, listItems, Hostslist), SHSList.sessionHostName,$event)"
+                            (click)="SessionHostIsChecked(absoluteIndex(hostIndex, listItems, Hostslist), SHSList.sessionHostName,$event)"
                             [checked]="sessionHostchecked[absoluteIndex(hostIndex, listItems, Hostslist)]">
                           <span class="control__indicator"></span>
                         </label>
@@ -466,7 +466,7 @@
                 </div>
               </div>
             </div>
-          <div class="tab-pane" id="tab_default_3">
+          <div class="tab-pane" id="tab_default_31">
             <div class="col-xs-12 no-pad">
               <div class="col-md-8">
                 <ul>

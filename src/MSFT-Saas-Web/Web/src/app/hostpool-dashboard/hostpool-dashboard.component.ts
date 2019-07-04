@@ -434,6 +434,7 @@ export class HostpoolDashboardComponent implements OnInit {
     this.checkedMainAppGroup = false;
     this.isEditAppgroupDisabled = true;
     this.isDeleteAppgroupDisabled = true;
+    this.showAppGroupDashBoard=false;
   }
 
   public userSesionBottomClose(event: any) {
@@ -449,6 +450,7 @@ export class HostpoolDashboardComponent implements OnInit {
     this.deleteHostDisabled = true;
     this.restartHostDisabled = true;
     this.drainHostDisabled = true;
+    this.showHostDashBoard=false;
   }
 
   /* This function is used to close the Appgroup details, App & Users split view
@@ -713,8 +715,16 @@ export class HostpoolDashboardComponent implements OnInit {
    * hostIndex - Accepts the Session Host index
    * --------------
    */
-  public SessionHostIsChecked(hostIndex: any) {
+  public SessionHostIsChecked(hostIndex: any,event) {
+    console.log(event);
     this.sessionHostchecked[hostIndex] = !this.sessionHostchecked[hostIndex];
+    if (event.target.checked != null && event.target.checked != undefined) {
+      console.log(event.target.checked,"event.target.checked---HostClicked");
+      this.showHostDashBoard = event.target.checked==false?true:false;// !event.target.checked;
+    }
+    else if (event.type == "click") {
+      this.showHostDashBoard = this.showHostDashBoard==true?false:true;// !this.showHostDashBoard;
+    }
     this.sessionHostCheckedTrue = [];
     for (let i = 0; i < this.sessionHostchecked.length; i++) {
       if (this.sessionHostchecked[i] == true) {
@@ -1165,9 +1175,8 @@ export class HostpoolDashboardComponent implements OnInit {
     }
     else {
       sessionStorage.setItem('SelectedHostpool', this.hostPoolName);
-      let subscriptionId = sessionStorage.getItem("SubscriptionId") == null || sessionStorage.getItem("SubscriptionId") == undefined ? "" : sessionStorage.getItem("SubscriptionId");
       // this.getAllSessionHostUrl = this._AppService.ApiUrl + '/api/SessionHost/GetSessionhostList?tenantGroupName=' + this.tenantGroupName + '&tenantName=' + this.tenantName + '&hostPoolName=' + this.hostPoolName + '&refresh_token=' + sessionStorage.getItem("Refresh_Token") + '&pageSize=' + this.HostpageSize + '&sortField=SessionHostName&isDescending=false&initialSkip=' + this.hostinitialSkip + '&lastEntry=%22%20%22';
-      this.getAllSessionHostUrl = this._AppService.ApiUrl + '/api/SessionHost/GetSessionhostList?tenantGroupName=' + this.tenantGroupName + '&tenantName=' + this.tenantName + '&hostPoolName=' + this.hostPoolName + '&refresh_token=' + sessionStorage.getItem("Refresh_Token") + '&subscriptionId=' + subscriptionId;
+      this.getAllSessionHostUrl = this._AppService.ApiUrl + '/api/SessionHost/GetSessionhostList?tenantGroupName=' + this.tenantGroupName + '&tenantName=' + this.tenantName + '&hostPoolName=' + this.hostPoolName + '&refresh_token=' + sessionStorage.getItem("Refresh_Token") + '&subscriptionId=' + sessionStorage.getItem("SubscriptionId");
       this._AppService.GetData(this.getAllSessionHostUrl).subscribe(response => {
 
         if (response.status == 429) {
@@ -1355,16 +1364,17 @@ export class HostpoolDashboardComponent implements OnInit {
    * hostName - Accepts Host Name
    * --------------
    */
-  public HostClicked(hostIndex: any, hostName: any, event) {
+  public HostClicked(hostIndex: any, hostName: any, event:Event) {
 
-    if (event.target.checked != null && event.target.checked != undefined) {
-      this.showHostDashBoard = !event.target.checked;
-    }
-    else if (event.type == "click") {
-      this.showHostDashBoard = !this.showHostDashBoard;
-    }
-    //this.showAppGroupDashBoard = false;///added by susmita
-    this.SessionHostIsChecked(hostIndex);
+    // if (event.target.checked != null && event.target.checked != undefined) {
+    //   console.log(event.target.checked,"event.target.checked---HostClicked");
+    //   this.showHostDashBoard = event.target.checked==false?true:false;// !event.target.checked;
+    // }
+    // else if (event.type == "click") {
+    //   this.showHostDashBoard = this.showHostDashBoard==true?false:true;// !this.showHostDashBoard;
+    // }
+   
+    this.SessionHostIsChecked(hostIndex,event);
     this.sessionHostName = hostName;
     this.sessionHostCheckedTrue = [];
     for (var i = 0; i < this.sessionHostchecked.length; i++) {
@@ -2007,6 +2017,10 @@ export class HostpoolDashboardComponent implements OnInit {
     if (event.target.checked != null && event.target.checked != undefined) {
       this.showAppGroupDashBoard = !event.target.checked;// !this.showAppGroupDashBoard;
     }
+    else if (event.type == "click") {
+      this.showAppGroupDashBoard = this.showAppGroupDashBoard==true?false:true;// !this.showHostDashBoard;
+    }
+
     //this.showHostDashBoard = false;///addded by susmita
     this.appGroupcheckedTrue = [];
     for (let i = 0; i < this.checked.length; i++) {

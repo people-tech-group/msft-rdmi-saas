@@ -147,7 +147,7 @@ export class AdminMenuComponent {
    * tenantName - Accepts Tenant Name
    * ----------
    */
-  public SetSelectedTenant(index: any, tenantName: any) {
+  public SetSelectedTenant(index: any, tenantName: any, subscriptionId:any) {
     if (index == null && tenantName == '') {
       this.router.navigate(['/admin/Tenants']);
     }
@@ -157,6 +157,7 @@ export class AdminMenuComponent {
       this.selectedAllTenants = false;
       sessionStorage.setItem("TenantName", tenantName);
       sessionStorage.setItem("TenantNameIndex", index);
+      sessionStorage.setItem("SubscriptionId",subscriptionId);
     }
   }
 
@@ -181,7 +182,7 @@ export class AdminMenuComponent {
     let tenantIndex = +sessionStorage.getItem("TenantNameIndex");
     let hostpoolIndex = +sessionStorage.getItem("hostpoolNameIndex");
     let hostpoolName = sessionStorage.getItem("selectedhostpoolname");
-    this.SetSelectedTenant(tenantIndex, tenantName);
+    this.SetSelectedTenant(tenantIndex, tenantName,sessionStorage.getItem("SubscriptionId"));
     this.SetSelectedhostPool(hostpoolIndex, tenantName, hostpoolName);
   }
 
@@ -229,7 +230,7 @@ export class AdminMenuComponent {
   public getTenantIndex(tenantName: string) {
     this.displayTenantList.forEach((item, index) => {
       if (item.tenantName == tenantName) {
-        this.SetSelectedTenant(index, tenantName);
+        this.SetSelectedTenant(index, tenantName,sessionStorage.getItem("SubscriptionId"));
       }
     });
   }
