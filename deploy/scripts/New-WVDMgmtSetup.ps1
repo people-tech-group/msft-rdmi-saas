@@ -106,7 +106,7 @@ try
                 Connect-AzureAD -Credential $Cred
                 $clientAdApp = New-AzureADApplication -DisplayName $wvdSaaS_clientapp_display_name -ReplyUrls $redirectURL -PublicClient $true -AvailableToOtherTenants $false -Verbose -ErrorAction Stop
                 
-                #Getting WVD Serviceprincipal informatio and provide access to new azure ad application
+                #Getting WVD Serviceprincipal information and provide access to new azure ad application
                 $WVDServicePrincipal = Get-AzureADServicePrincipal -ObjectId $wvdInfraWebAppObjId #-SearchString $wvdInfraWebAppName | Where-Object {$_.DisplayName -eq $wvdInfraWebAppName}
                 $AzureAdResouceAcessObject = New-Object -TypeName "Microsoft.Open.AzureAD.Model.RequiredResourceAccess"
                 $AzureAdResouceAcessObject.ResourceAppId = $WVDServicePrincipal.AppId
@@ -114,7 +114,7 @@ try
                 $AzureAdResouceAcessObject.ResourceAccess += New-Object -TypeName "Microsoft.Open.AzureAD.Model.ResourceAccess" -ArgumentList $permission.Id,"Scope"
                 }
 
-                #Getting AzureService Management Api
+                #Getting AzureService Management Api and provide access to new azure ad application
                 $AzureServMgmtApi = Get-AzureRmADServicePrincipal -ApplicationId "797f4846-ba00-4fd7-ba43-dac1f8f63013"
                 $AzureAdServMgmtApi = Get-AzureADServicePrincipal -ObjectId $AzureServMgmtApi.Id.Guid
                 $AzureServMgmtApiResouceAcessObject = New-Object -TypeName "Microsoft.Open.AzureAD.Model.RequiredResourceAccess"
@@ -125,10 +125,7 @@ try
 
                 #Setting up the WVD Required Access to Client Application and azure service management Access
 				Set-AzureADApplication -ObjectId $clientAdApp.ObjectId -RequiredResourceAccess $AzureAdResouceAcessObject,$AzureServMgmtApiResouceAcessObject -ErrorAction Stop
-                #Assigning RBAC role of "Contributor" to ClientApplication
-                #New-AzureRmRoleAssignment -ApplicationId 
-
-				}
+                }
                 
         catch
         {
