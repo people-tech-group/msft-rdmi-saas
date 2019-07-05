@@ -107,7 +107,7 @@
                       </div>
                     </td>
                     <td class="hoverUnderline" style="width: 15%;text-align:left;"
-                      (click)="SetSelectedTenant(absoluteIndex(ind), i.tenantName)">
+                      (click)="SetSelectedTenant(absoluteIndex(ind), i.tenantName,i.azureSubscriptionId)">
                       {{i.tenantName}}
                     </td>
                     <td style="width: 15%;text-align:left;"><span>{{i.friendlyName}}</span></td>
@@ -202,7 +202,7 @@
             <input type=button value="Cancel" id="btnCancel" (click)="CloseManageTenant($event)" />
           </li>
           <li>
-            <input type="button" value="Save" id="btnDone" (click)="ManageTenant($event)" />
+            <input type="button" value="Save" id="btnDone" [disabled]="tenantDoneButtonDisable" (click)="ManageTenant($event)" />
             <!--(click)="ManageTenant(tenantForm.value)" [disabled]="tenantDoneButtonDisable"-->
           </li>
         </ul>

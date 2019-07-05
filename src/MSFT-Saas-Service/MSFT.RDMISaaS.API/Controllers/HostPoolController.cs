@@ -170,7 +170,6 @@ namespace MSFT.WVDSaaS.API.Controllers
         {
             //get deployment url
             deploymentUrl = configurations.rdBrokerUrl;
-            // List<RdMgmtHostPool> lsthostpool = new List<RdMgmtHostPool>();
             try
             {
                 if (!string.IsNullOrEmpty(refresh_token))
@@ -188,9 +187,6 @@ namespace MSFT.WVDSaaS.API.Controllers
                         {
                            new JObject() {"code",  Constants.invalidToken}
                         });
-                        //RdMgmtHostPool rdMgmtHostPool = new RdMgmtHostPool();
-                        //rdMgmtHostPool.code = Constants.invalidToken;
-                        //lsthostpool.Add(rdMgmtHostPool);
                     }
                 }
                 else
@@ -202,7 +198,6 @@ namespace MSFT.WVDSaaS.API.Controllers
             {
                 return null;
             }
-            //  return lsthostpool;
         }
 
         /// <summary>

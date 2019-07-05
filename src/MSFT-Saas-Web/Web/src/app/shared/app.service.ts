@@ -6,9 +6,10 @@ import { Observable } from "rxjs";
 export class AppService {
   public ApiEndpoint: any;
   public ApiUrl: string;
+
   constructor(private http: Http) {
-    this.ApiUrl = "https://msftrdmisaasapi.azurewebsites.net";
-  //this.ApiUrl = "http://localhost:34816/";
+    //this.ApiUrl = "https://msftrdmisaasapi.azurewebsites.net";
+    this.ApiUrl = "http://localhost:34816/";
   }
 
   /*
@@ -25,13 +26,13 @@ export class AppService {
       .catch((error: any) => Observable.throw(error));
   }
 
-   /*
-   * This Function is used to make Service call to get tenants list
-   * ----------
-   * Parameters
-   * tenantDetailsList - Accepts the Get Tenant URL
-   * ----------
-   */
+  /*
+  * This Function is used to make Service call to get tenants list
+  * ----------
+  * Parameters
+  * tenantDetailsList - Accepts the Get Tenant URL
+  * ----------
+  */
   public GetTenants(tenantDetailsList: any) {
     let headers = new Headers({ 'Accept': 'application/json' });
     let options = new RequestOptions({ headers: headers });
@@ -45,10 +46,10 @@ export class AppService {
 * tenantDetails - Accepts the Get Tenant URL
 * ----------
 */
-  public GetTenantDetails(tenantDetails: any) {
+  public GetTenantDetails(tenantDetailsUrl: any) {
     let headers = new Headers({ 'Accept': 'application/json' });
     let options = new RequestOptions({ headers: headers });
-    return this.http.get(tenantDetails, options)
+    return this.http.get(tenantDetailsUrl, options)
       .catch((error: any) => Observable.throw(error));
   }
 
@@ -60,19 +61,19 @@ export class AppService {
 * ----------
 */
   public GetHostpools(hostpoolsList: any) {
-    let headers = new Headers({ 'Accept': 'application/json', 'Access-Control-Allow-Origin': '*'  });
+    let headers = new Headers({ 'Accept': 'application/json', 'Access-Control-Allow-Origin': '*' });
     let options = new RequestOptions({ headers: headers });
     return this.http.get(hostpoolsList, options)
       .catch((error: any) => Observable.throw(error));
   }
 
- /*
-* This Function is used to make Service calls to get in hostpool dashboard
-* ----------
-* Parameters
-* url - Accepts the Get Hostpool URL
-* ----------
-*/
+  /*
+ * This Function is used to make Service calls to get in hostpool dashboard
+ * ----------
+ * Parameters
+ * url - Accepts the Get Hostpool URL
+ * ----------
+ */
   public GetData(url: any) {
     let headers = new Headers({ 'Accept': 'application/json' });
     let options = new RequestOptions({ headers: headers });
@@ -122,6 +123,35 @@ export class AppService {
     let result = {
       "message": "success"
     }
+    let headers = new Headers({ 'Content-Type': 'application/json;charset=utf8', 'Accept': 'application/json' });
+    let options = new RequestOptions({ headers: headers });
+    return this.http.post(hosturl, JSON.stringify(data), options)
+      .catch((error: any) => Observable.throw(error));
+  }
+
+  UserSessionLogOff(hosturl: any, data) {
+    let headers = new Headers({ 'Content-Type': 'application/json;charset=utf8', 'Accept': 'application/json' });
+    let options = new RequestOptions({ headers: headers });
+    return this.http.post(hosturl, JSON.stringify(data), options)
+      .catch((error: any) => Observable.throw(error));
+  }
+
+  SendMessage(hosturl: any, data) {
+    let headers = new Headers({ 'Content-Type': 'application/json;charset=utf8', 'Accept': 'application/json' });
+    let options = new RequestOptions({ headers: headers });
+    return this.http.post(hosturl, JSON.stringify(data), options)
+      .catch((error: any) => Observable.throw(error));
+  }
+
+
+  RestartHost(hosturl: any) {
+    let headers = new Headers({ 'Content-Type': 'application/json;charset=utf8', 'Accept': 'application/json' });
+    let options = new RequestOptions({ headers: headers });
+    return this.http.post(hosturl, options)
+      .catch((error: any) => Observable.throw(error));
+  }
+
+  ChangeDrainMode(hosturl: any, data) {
     let headers = new Headers({ 'Content-Type': 'application/json;charset=utf8', 'Accept': 'application/json' });
     let options = new RequestOptions({ headers: headers });
     return this.http.post(hosturl, JSON.stringify(data), options)
@@ -290,5 +320,4 @@ export class AppService {
     return this.http.delete(regeneratekeyURL, options)
       .catch((error: any) => Observable.throw('Server error'));
   }
-
 }

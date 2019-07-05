@@ -58,7 +58,7 @@ export class AppComponent implements OnInit {
   public appLoader: boolean = false;
   public tenantGroupName: any;
   public errorMessage: string;
-
+  public InfraPermission: string;
   constructor(private _AppService: AppService, private router: Router, private route: ActivatedRoute, private http: Http, ) {
     //localStorage.removeItem("TenantGroupName");
   }
@@ -94,6 +94,7 @@ export class AppComponent implements OnInit {
     this.roleDefinitionName = sessionStorage.getItem("roleDefinitionName");
     this.profileEmail = sessionStorage.getItem("profileEmail");
     this.scope = sessionStorage.getItem("Scope");
+    this.InfraPermission = sessionStorage.getItem("infraPermission");
     if (code != "undefined" && code != null && gotCode == 'yes') {
       this.appLoader = true;
       this.redirectUri = sessionStorage.getItem('redirectUri');
@@ -137,14 +138,19 @@ export class AppComponent implements OnInit {
             this.tenantGroupNameList = respdata.TenantGroups;
             sessionStorage.setItem("profileIcon", this.profileIcon);
             sessionStorage.setItem("profileName", this.profileName);
-            if (this.tenantGroupNameList.length != 0) {
-              this.roleDefinitionName = respdata.RoleAssignment.roleDefinitionName;
+            sessionStorage.setItem("roleAssignments", JSON.stringify(respdata.RoleAssignment));
+            if (this.tenantGroupNameList != null && this.tenantGroupNameList.length > 0) {
+              this.roleDefinitionName = respdata.RoleAssignment[0].roleDefinitionName;
               sessionStorage.setItem("roleDefinitionName", this.roleDefinitionName);
-              if (respdata.RoleAssignment.scope == '/') {
+
+              if (respdata.RoleAssignment[0].scope == '/') {
                 this.scope = 'All (Root)';
+                this.InfraPermission = 'All (Root)';
               }
               else {
-                this.scope = respdata.RoleAssignment.scope;
+                this.scope = respdata.RoleAssignment[0].scope;
+                this.InfraPermission = respdata.RoleAssignment[0].scope;
+
               }
             }
             else {
@@ -158,7 +164,12 @@ export class AppComponent implements OnInit {
             localStorage.setItem("TenantGroups", JSON.stringify(uniqueTenantGroups));
             this.tenantGroupName = localStorage.getItem("TenantGroupName");
             //Role Assignment Acces level -Ends
-            sessionStorage.setItem('Scope', this.scope);
+            var roleDef = respdata.RoleAssignment[0].scope.substring(1).split("/");
+            //sessionStorage.setItem('Scope', this.scope);
+            sessionStorage.setItem('Scope', roleDef);
+            sessionStorage.setItem('infraPermission', this.scope);
+
+
             this.profileEmail = respdata.Email;
             sessionStorage.setItem("Refresh_Token", respdata.Refresh_Token);
             sessionStorage.setItem("redirectUri", this.redirectUri);
@@ -241,6 +252,7 @@ export class AppComponent implements OnInit {
    */
   public Signout() {
     sessionStorage.clear();
+    localStorage.clear();
     let headers = new Headers({ 'Accept': 'application/json' });
     var url = this._AppService.ApiUrl + '/api/Login/GetRedirectUrl'
     this.http.get(url, {
@@ -251,6 +263,7 @@ export class AppComponent implements OnInit {
       sessionStorage.removeItem('Code');
       sessionStorage.removeItem('LoginUrl');
       sessionStorage.removeItem('redirectUri');
+
     });
   }
 
@@ -291,5 +304,4 @@ export class AppComponent implements OnInit {
       this.isInvalidToken = true;
     }
   }
-
 }

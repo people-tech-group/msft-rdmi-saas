@@ -5,6 +5,7 @@ using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Text;
@@ -28,7 +29,7 @@ namespace MSFT.WVDSaaS.API.BLL
         /// <param name="isSessionHostNameOnly">To Get only HostName</param>
         /// //old parameters --  bool isSessionHostNameOnly,bool isAll, int pageSize, string sortField, bool isDescending, int initialSkip, string lastEntry
         /// <returns></returns>
-        public HttpResponseMessage GetSessionhostList(string deploymentUrl, string accessToken, string tenantGroup, string tenantName, string hostPoolName)
+        public HttpResponseMessage GetWVDSessionhostList(string deploymentUrl, string accessToken, string tenantGroup, string tenantName, string hostPoolName)
         {
             try
             {
@@ -43,6 +44,93 @@ namespace MSFT.WVDSaaS.API.BLL
                 return null;
             }
 
+        }
+
+        public HttpResponseMessage GetSessionhostList(string deploymentUrl, string wvdAccessToken, string tenantGroup, string tenantName, string hostPoolName, string azureDeployUrl = null, string azureAccessToken = null, string subscriptionId = null)
+        {
+            try
+            {
+                HttpResponseMessage WVDResponse = GetWVDSessionhostList(deploymentUrl, wvdAccessToken, tenantGroup, tenantName, hostPoolName);
+                if (!string.IsNullOrEmpty(subscriptionId))
+                {
+                    if (WVDResponse.StatusCode == HttpStatusCode.OK)
+                    {
+
+                        var wvdData = WVDResponse.Content.ReadAsStringAsync().Result;
+                        var arrWVD = (JArray)JsonConvert.DeserializeObject(wvdData);
+                        var WVDresult = ((JArray)arrWVD).ToList();
+                        HttpResponseMessage AzureResponse = GetAzureVMList(azureDeployUrl, azureAccessToken, subscriptionId);
+                        if (AzureResponse.StatusCode == HttpStatusCode.OK)
+                        {
+                            var azureData = AzureResponse.Content.ReadAsStringAsync().Result;
+                            var arrAzure1 = (JObject)JsonConvert.DeserializeObject(azureData);
+                            var arrAzure = arrAzure1["value"];
+                            var AzureResult = ((JArray)arrAzure).Select(item => new JObject()
+                        {
+                               new JProperty("vmName",  item["name"]),
+                               new JProperty("subscriptionId",  item["id"]==null ? null: item["id"].ToString().Split('/')[2]),
+                               new JProperty("resourceGroupName",   item["id"]==null ? null:item["id"].ToString().Split('/')[4]),
+                        }).ToList();
+                            var finalVmList = AzureResult.ToList().Where(r => WVDresult.ToList().Any(d => r["vmName"].ToString() == d["sessionHostName"].ToString().Split('.')[0].ToString())).ToList();
+                            finalVmList.ForEach(item =>
+                            {
+                                var element = WVDresult.ToList().FirstOrDefault(d => d["sessionHostName"].ToString().Split('.')[0].ToString() == item["vmName"].ToString());
+                                item["sessionHostName"] = element["sessionHostName"];
+                                item["tenantName"] = element["tenantName"];
+                                item["tenantGroupName"] = element["tenantGroupName"];
+                                item["hostPoolName"] = element["hostPoolName"];
+                                item["allowNewSession"] = element["allowNewSession"];
+                                item["sessions"] = element["sessions"];
+                                item["lastHeartBeat"] = element["lastHeartBeat"];
+                                item["agentVersion"] = element["agentVersion"];
+                                item["assignedUser"] = element["assignedUser"];
+                                item["osVersion"] = element["osVersion"];
+                                item["sxSStackVersion"] = element["sxSStackVersion"];
+                                item["status"] = element["status"];
+                                item["updateState"] = element["updateState"];
+                                item["lastUpdateTime"] = element["lastUpdateTime"];
+                                item["updateErrorMessage"] = element["updateErrorMessage"];
+                            });
+                            return new HttpResponseMessage()
+                            {
+                                StatusCode = HttpStatusCode.OK,
+                                Content = new StringContent(JsonConvert.SerializeObject(finalVmList))
+                            };
+                        }
+                        else
+                        {
+                            return WVDResponse;
+                        }
+
+                    }
+                    else
+                    {
+                        return WVDResponse;
+                    }
+                }
+                else
+                {
+                    return WVDResponse;
+                }
+            }
+            catch (Exception ex)
+            {
+                return null;
+            }
+        }
+
+        public HttpResponseMessage GetAzureVMList(string deploymentUrl, string accessToken, string subscriptionId)
+        {
+            try
+            {
+                HttpResponseMessage response = CommonBL.InitializeHttpClient(deploymentUrl, accessToken).GetAsync("subscriptions/" + subscriptionId + "/providers/Microsoft.Compute/virtualMachines?api-version=2018-04-01").Result;
+                return response;
+
+            }
+            catch
+            {
+                return null;
+            }
         }
 
         /// <summary>
@@ -115,6 +203,56 @@ namespace MSFT.WVDSaaS.API.BLL
             return hostResult;
         }
 
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="deploymentUrl"></param>
+        /// <param name="accessToken"></param>
+        /// <param name="rdMgmtSessionHost"></param>
+        /// <returns></returns>
+        public JObject ChangeDrainMode(string deploymentUrl, string accessToken, JObject rdMgmtSessionHost)
+        {
+            try
+            {
+                //call rest service to update Sesssion host -- july code bit
+                var content = new StringContent(JsonConvert.SerializeObject(rdMgmtSessionHost), Encoding.UTF8, "application/json");
+                HttpResponseMessage response = CommonBL.PatchAsync(deploymentUrl, accessToken, "/RdsManagement/V1/TenantGroups/" + rdMgmtSessionHost["tenantGroupName"].ToString() + "/Tenants/" + rdMgmtSessionHost["tenantName"].ToString() + "/HostPools/" + rdMgmtSessionHost["hostPoolName"].ToString() + "/SessionHosts/" + rdMgmtSessionHost["sessionHostName"].ToString(), content).Result;
+                string strJson = response.Content.ReadAsStringAsync().Result;
+                if (response.IsSuccessStatusCode)
+                {
+                    hostResult.Add("isSuccess", true);
+                    hostResult.Add("message", "'Allow new Session' is set to " + rdMgmtSessionHost["allowNewSession"] + " for " + rdMgmtSessionHost["sessionHostName"].ToString() + "'.");
+                }
+                else if ((int)response.StatusCode == 429)
+                {
+                    hostResult.Add("isSuccess", false);
+                    hostResult.Add("message", strJson + " Please try again later.");
+                }
+                else
+                {
+                    if (!string.IsNullOrEmpty(strJson))
+                    {
+                        hostResult.Add("isSuccess", false);
+                        hostResult.Add("message", CommonBL.GetErrorMessage(strJson));
+                    }
+                    else
+                    {
+                        hostResult.Add("isSuccess", false);
+                        hostResult.Add("message", "Failed to set 'Allow new Session' for '" + rdMgmtSessionHost["sessionHostName"].ToString() + "'. Please try it again later.");
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                hostResult.Add("isSuccess", false);
+                hostResult.Add("message", "Failed to set 'Allow new Session' for '" + rdMgmtSessionHost["sessionHostName"].ToString() + "'. " + ex.Message.ToString() + " Please try it again later.");
+            }
+            return hostResult;
+        }
+
+
+
         /// <summary>
         /// Description : Removes a Rds SessionHost associated with the Tenant and HostPool specified in the Rds context.
         /// </summary>
@@ -162,6 +300,40 @@ namespace MSFT.WVDSaaS.API.BLL
                 sessionHostResult.message = "Session host " + sessionHostName + " has not been deleted." + ex.Message.ToString() + " Please try it later again.";
             }
             return sessionHostResult;
+        }
+
+        public JObject RestartHost(string deploymentUrl, string accessToken, string subscriptionId, string resourceGroupName, string sessionHostName)
+        {
+            try
+            {
+                JObject vmDetails = new JObject()
+                {
+                    new  JProperty("subscriptionId",subscriptionId),
+                    new  JProperty("resourceGroupName",resourceGroupName),
+                    new  JProperty("vmName",sessionHostName)
+                };
+                var content = new StringContent(JsonConvert.SerializeObject(vmDetails), Encoding.UTF8, "application/json");
+                HttpResponseMessage response = CommonBL.InitializeHttpClient(deploymentUrl, accessToken).PostAsync("subscriptions/" + subscriptionId + "/resourceGroups/" + resourceGroupName + "/providers/Microsoft.Compute/virtualMachines/" + sessionHostName + "/restart?api-version=2018-06-01", content).Result;
+                string strJson = response.Content.ReadAsStringAsync().Result;
+                if (response.StatusCode == HttpStatusCode.OK || response.StatusCode == HttpStatusCode.Accepted)
+                {
+                    hostResult.Add("isSuccess", true);
+                    hostResult.Add("message", sessionHostName + " is restarted successfully");
+                }
+                else
+                {
+                    hostResult.Add("isSuccess", false);
+                    hostResult.Add("message", CommonBL.GetErrorMessage(strJson));
+                }
+            }
+            catch (Exception ex)
+            {
+                hostResult.Add("isSuccess", false);
+                hostResult.Add("message", ex.Message.ToString());
+            }
+
+            return hostResult;
+
         }
     }
     #endregion "SessionHostBL"

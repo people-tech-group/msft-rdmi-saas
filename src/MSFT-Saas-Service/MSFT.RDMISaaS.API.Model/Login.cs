@@ -18,7 +18,7 @@ namespace MSFT.WVDSaaS.API.Model
         public string Id_Token { get; set; }
         public string Refresh_Token { get; set; }
         public string Code { get; set; }
-        public JObject RoleAssignment { get; set; }
+        public JArray RoleAssignment { get; set; }
         //public RdMgmtRoleAssignment RoleAssignment { get; set; }
         public string[] TenantGroups { get; set; }
         public JObject Error { get; set; }

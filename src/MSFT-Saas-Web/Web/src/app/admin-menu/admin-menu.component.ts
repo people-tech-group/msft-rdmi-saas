@@ -29,12 +29,12 @@ export class AdminMenuComponent {
   public tenantGroupName: any;
 
   constructor(private router: Router, private appService: AppService) {
-    if (this.tenantListLength == 1) {
-      this.loadMore = false;
-    }
-    else {
-      this.loadMore = true;
-    }
+    // if (this.tenantListLength == 1) {
+    //   this.loadMore = false;
+    // }
+    // else {
+    //   this.loadMore = true;
+    // }
   }
 
   public ngOnInit() {
@@ -101,11 +101,13 @@ export class AdminMenuComponent {
       this.router.navigate(['/admin/Tenants']);
     }
     else {
+
       this.initialIndex = 0;
       this.tenantLength = 10;
       this.storeLength = 0;
       this.tenantList = data;
       this.tenantListLength = data.length;
+
       this.FilterData();
       this.hostPoolList = [];
       this.selectedTenant = null;
@@ -114,7 +116,6 @@ export class AdminMenuComponent {
       let hostpoolName = sessionStorage.getItem("selectedhostpoolname");
       let tenantName = sessionStorage.getItem("TenantName");
       if (decodeURIComponent(path) == `/admin/hostpoolDashboard/${hostpoolName}`) {
-        let hostpoolList = JSON.parse(sessionStorage.getItem("hostpoolList"));
         this.GetHostpools(tenantName);
       }
     }
@@ -146,7 +147,7 @@ export class AdminMenuComponent {
    * tenantName - Accepts Tenant Name
    * ----------
    */
-  public SetSelectedTenant(index: any, tenantName: any) {
+  public SetSelectedTenant(index: any, tenantName: any, subscriptionId:any) {
     if (index == null && tenantName == '') {
       this.router.navigate(['/admin/Tenants']);
     }
@@ -156,6 +157,7 @@ export class AdminMenuComponent {
       this.selectedAllTenants = false;
       sessionStorage.setItem("TenantName", tenantName);
       sessionStorage.setItem("TenantNameIndex", index);
+      sessionStorage.setItem("SubscriptionId",subscriptionId);
     }
   }
 
@@ -167,9 +169,8 @@ export class AdminMenuComponent {
    * tenantName -  Accepts Tenant Name
    * ----------
    */
-  public GetHostpools( tenantName: any) {
+  public GetHostpools(tenantName: any) {
     let hostpoolData = sessionStorage.getItem('sideMenuHostpools') ? JSON.parse(sessionStorage.getItem('sideMenuHostpools')) : [];
-    // sessionStorage.setItem("hostpoolList", JSON.stringify(hostpoolData));
     this.hostPoolList = [];
     this.hostPoolList = hostpoolData;
     let data = [{
@@ -181,7 +182,7 @@ export class AdminMenuComponent {
     let tenantIndex = +sessionStorage.getItem("TenantNameIndex");
     let hostpoolIndex = +sessionStorage.getItem("hostpoolNameIndex");
     let hostpoolName = sessionStorage.getItem("selectedhostpoolname");
-    this.SetSelectedTenant(tenantIndex, tenantName);
+    this.SetSelectedTenant(tenantIndex, tenantName,sessionStorage.getItem("SubscriptionId"));
     this.SetSelectedhostPool(hostpoolIndex, tenantName, hostpoolName);
   }
 
@@ -214,9 +215,9 @@ export class AdminMenuComponent {
    * @param hostpoolName - Accepts HostpoolName
    * @param tenantName - Accepts TenantName
    */
-  public getHostpoolIndex(hostpoolName: string, tenantName: string){
-    this.hostPoolList.forEach((item, index)=>{
-      if(item.hostPoolName == hostpoolName){
+  public getHostpoolIndex(hostpoolName: string, tenantName: string) {
+    this.hostPoolList.forEach((item, index) => {
+      if (item.hostPoolName == hostpoolName) {
         this.SetSelectedhostPool(index, tenantName, hostpoolName);
       }
     });
@@ -226,10 +227,10 @@ export class AdminMenuComponent {
    * This method is used to get the selected tenantName index
    * @param tenantName - Accepts TenantName
    */
-  public getTenantIndex(tenantName: string){
-    this.displayTenantList.forEach((item, index)=>{
-      if(item.tenantName == tenantName){
-        this.SetSelectedTenant(index, tenantName);
+  public getTenantIndex(tenantName: string) {
+    this.displayTenantList.forEach((item, index) => {
+      if (item.tenantName == tenantName) {
+        this.SetSelectedTenant(index, tenantName,sessionStorage.getItem("SubscriptionId"));
       }
     });
   }
