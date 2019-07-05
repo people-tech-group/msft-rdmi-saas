@@ -38,12 +38,12 @@
             </a>
           </li>
           <li>
-            <a href="#tab_default_2" data-toggle="tab">
+            <a href="#tab_default_2" data-toggle="tab" (click)=HideAppGroupDetails() >
               Hosts
             </a>
           </li>
           <li>
-            <a href="#tab_default_3" data-toggle="tab">
+            <a href="#tab_default_31" data-toggle="tab" (click)=HideHostDetails() >
               App Groups
             </a>
           </li>
@@ -142,6 +142,14 @@
                   <li><button type="button" id="btnDeleteHosts" [disabled]="deleteHostDisabled" data-toggle="modal"
                       data-target="#deleteModal"><i class="icon icon-delete" aria-hidden="true"></i> Delete</button>
                   </li>
+                  <li><button type="button" id="btnRestartHosts" data-toggle="modal"
+                    data-target="#RestartModal"  [disabled]="restartHostDisabled" 
+                   ><i class="icon icon-refresh" aria-hidden="true"></i> Restart</button>
+                  </li>
+                  <li><button type="button" id="btndrainHosts" [disabled]="drainHostDisabled"   data-toggle="modal"
+                    data-target="#DrainModeModal"
+                    ><i class="icon icon-download" aria-hidden="true" ></i> Drain Mode</button>
+                  </li>
                   <li><button type="button" (click)="RefreshHost()"><i class="icon icon-refresh" aria-hidden="true"></i>
                       Refresh</button></li>
                 </ul>
@@ -174,10 +182,10 @@
                     </th>
                     <th style="width:20%;text-align:left;">Host Name</th>
                     <th style="width:20%;text-align:left;">Allow New Sessions</th>
-                    <th style="width:20%;text-align: left;">Sessions</th>
+                    <th style="width:20%;text-align: left;">Agent Version</th>
                     <!-- <th style="width:15%;text-align: center;">Max Session Limit</th> -->
                     <th style="width:20%;">Last Heart Beat</th>
-                    <th style="width:20%;text-align: left;">Last Restart</th>
+                    <th style="width:20%;text-align: left;">Last Update Time</th>
                   </tr>
                 </thead>
                 <tbody *ngIf="!(hostListErrorFound || showHostEmpty)">
@@ -185,12 +193,12 @@
                     *ngFor="let SHSList of sessionHostListsSearch | paginate: { itemsPerPage: listItems, currentPage: Hostslist, id: 'Hosts' }; let hostIndex=index"
                     class="TableData" id="row-tenant-{{SHSList.sessionHostName}}"
                     [ngClass]="{'rowSelect':sessionHostchecked[absoluteIndex(hostIndex, listItems, Hostslist)]}"
-                    (click)="HostClicked(absoluteIndex(hostIndex, listItems, Hostslist), SHSList.sessionHostName)">
+                    (click)="HostClicked(absoluteIndex(hostIndex, listItems, Hostslist), SHSList.sessionHostName,$event)">
                     <td style="width: 4%;text-align: left">
                       <div class="control-group">
                         <label class="control control--checkbox">
                           <input type="checkbox" class="solcheckbox"
-                            (click)="HostClicked(absoluteIndex(hostIndex, listItems, Hostslist), SHSList.sessionHostName)"
+                            (click)="SessionHostIsChecked(absoluteIndex(hostIndex, listItems, Hostslist), SHSList.sessionHostName,$event)"
                             [checked]="sessionHostchecked[absoluteIndex(hostIndex, listItems, Hostslist)]">
                           <span class="control__indicator"></span>
                         </label>
@@ -198,10 +206,10 @@
                     </td>
                     <td style="width:20%;text-align:left;">{{SHSList.sessionHostName}}</td>
                     <td style="width:20%;text-align:left;">{{SHSList.allowNewSession}}</td>
-                    <td style="width:20%;text-align: left;">{{SHSList.sessions}}</td>
+                    <td style="width:20%;text-align: left;">{{SHSList.agentVersion}}</td>
                     <!-- <td style="width:15%;text-align: center;">N\A</td> -->
                     <td style="width:20%;">{{SHSList.lastHeartBeat}}</td>
-                    <td style="width:20%;text-align: left;">N\A</td>
+                    <td style="width:20%;text-align: left;">{{SHSList.lastUpdateTime}}</td>
                   </tr>
                 </tbody>
               </table>
@@ -248,8 +256,217 @@
                 </div>
               </div>
             </div>
+            
+               
+            
+            
           </div>
-          <div class="tab-pane" id="tab_default_3">
+          <div class="AppGrouptoggle" id="HostDashboard" *ngIf="showHostDashBoard" [@slidemodal]="state" style="transform: translateY(0px);">
+              <div class="col-xs-12 paddingTop20">
+                <div class="col-xs-10">
+                  <h5 *ngIf="hostDetails.sessionHostName" class="paddingLeft0"> "{{hostDetails.sessionHostName}}"
+                    Details of <span> {{hostDetails.hostPoolName}}</span></h5>
+                </div>
+                <div class="col-xs-2 txtalignRight postionRelTop15">
+                  <a class="paddingLeftRight5" *ngIf="selectedClassMin" (click)="MinWindowOpen($event)"
+                    title="Minimize">
+                    <i class="icon icon-win-minimize "></i>
+                  </a> <!---->
+                  <a class="paddingLeftRight5"  *ngIf="selectedClassMax" (click)="MaxWindowOpen($event)"
+                    title="Maximize">
+                    <img src="../../assets/Images/maximize.png" class="maximizePosition" />
+                  </a><!---->
+                  <a class="paddingLeftRight5" id="userSessionbottomBtnClose" (click)="userSesionBottomClose($event)"><i
+                      class="icon icon-close" aria-hidden="true" style="font-size:12px;"></i></a>
+                </div>
+
+                <div class="col-xs-12">
+                  <ul class="nav nav-tabs">
+                    <li class="active">
+                      <a href="#tab_default_4" data-toggle="tab">
+                        Summary
+                      </a>
+                    </li>
+                    <li >
+                      <a href="#tab_default_5" data-toggle="tab">
+                        User Sessions
+                      </a>
+                    </li>
+
+                  </ul>
+                  <div class="tab-content">
+                    <div class="tab-pane active" id="tab_default_4">
+                      <div class="col-xs-12">
+                        <div class="Deployment-details" *ngIf="!detailsErrorFound">
+                          <div class="row">
+                            <div class="col-md-5">
+                              <label>Name</label>
+                              <p>{{hostDetails.sessionHostName}}</p>
+                            </div>
+                            <div class="col-md-3">
+                            </div>
+                            <div class="col-md-3" *ngIf="removeAppsTab">
+                              <label>UserSessions</label>
+                              <p>{{userSessionsCount}}</p>
+                            
+                            </div>
+                        
+                          </div>
+                          <div class="row">
+                            <div class="col-md-5">
+                              <label>Allow New Sessions</label>
+                              <p>{{hostDetails.allowNewSession}}</p>
+
+                            </div>
+                            <div class="col-md-3">
+                            </div>
+                            <div class="col-md-3" *ngIf="removeAppsTab">
+                              <label>Last Heart Beat</label>
+                              <p>{{hostDetails.lastHeartBeat}}</p>
+                            </div>
+                          </div>
+                          <div class="row">
+                            <div class="col-md-5">
+                              <label>Last Updated</label>
+                              <p>{{hostDetails.lastUpdateTime}}</p>
+                            </div>
+                          </div>
+                        </div>
+                        <div class="EmptyTableMsg" *ngIf="detailsErrorFound">
+                          <div style="text-align:center">
+                            <br /><br />
+                            <img src="../../assets/Images/sad-cloud.png" class="img img-responsive"
+                              style="position: relative; width: 10%; left: 44%;" />
+                            <h5 style="color:#808080;font-weight:400;"> Error</h5>
+                            <p style="color:#808080"> Problem with serve, Please try again </p>
+                            <button class="btn btn-sm btn-primary" (click)="RefreshBtnClick()">Refresh</button>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="tab-pane" id="tab_default_5" >
+                      <div class="col-xs-12 no-pad">
+                        <div class="">
+                          <div class="col-xs-12">
+                            <div class="col-md-9">
+                              <ul>
+                                <li><button type="button" id="linklogOff" data-target="#logoffModal" data-toggle="modal" [disabled]="isLogOffDisabled"><i
+                                      class="icon icon-plus" aria-hidden="true"></i> LogOff Sessions(s)
+                                  </button></li>
+                                <li><button type="button" id="linkSendMessage" (click)="OpenSendMessagePanel($event)" [disabled]="isSendMsgDisabled" ><i
+                                      class="icon icon-plus" aria-hidden="true"></i> Send Message </button></li>
+                                <li><button type="button" (click)="RefreshUserSessions()"><i class="icon icon-refresh"
+                                      aria-hidden="true"></i> Refresh</button></li>
+                              </ul>
+                            </div>
+                            <div class="col-md-3 pull-right">
+                              <div class="search marginTop10">
+                                <div class="input-group" id="searchFormTop">
+                                  <input type="text" class="form-control" name="q" id="q" placeholder="Search"
+                                    [(ngModel)]="SearchBySessionList" (ngModelChange)="GetSearchByUserSessionList(SearchBySessionList)"
+                                    [ngModelOptions]="{standalone: true}">
+                                  <span class="input-group-btn">
+                                    <button class="btn btn-default" type="button"><i
+                                        class="icon icon-search"></i></button>
+                                  </span>
+                                </div>
+                              </div>
+                            </div>
+                         
+                            <div class="col-md-12">
+                              <div class="table-responsive">
+                                <table class="table AppGroup-apptable tableSelection table-hover">
+                                  <thead>
+                                    <tr>
+                                      <th style="width: 4%;text-align: left">
+                                        <div class="control-group">
+                                          <label class="control control--checkbox">
+                                            <input type="checkbox" class="solcheckbox" [checked]="checkedMainUserSession"
+                                              (click)="UserSessionCheckAll($event)">
+                                            <span class="control__indicator"></span>
+                                          </label>
+                                        </div>
+                                      </th>
+                                    
+                                      <th style="width:10%">Session ID</th>
+                                      <th style="width:15%;text-align:center">User Name</th>
+                                      <th style="width:15%;text-align:center">Application Type</th>
+                                     
+                                    </tr>
+                                  </thead>
+                                  <tbody *ngIf="!(SessionsListErrorFound)">
+                                    <tr
+                                      *ngFor="let session of userSessionSearchList | paginate: { itemsPerPage: listItems, currentPage: userSessionslist, id:'sessions' }; let sessionIndex=index"
+                                      [ngClass]="{'rowSelect':checkedUserSessions[absoluteIndex(sessionIndex, listItems, userSessionslist)]}"
+                                      id="row-sessions-{{session.sessionId}}"
+                                      (click)="UserSessionRowClick(session.sessionId, absoluteIndex(sessionIndex, listItems, userSessionslist))"
+                                     >
+                                      <td style="width: 4%;text-align: left">
+                                        <div class="control-group">
+                                          <label class="control control--checkbox">
+                                            <input type="checkbox" class="solcheckbox"
+                                              (click)="UserSessionIsChecked(absoluteIndex(sessionIndex, listItems, userSessionslist))"
+                                              [checked]="checkedUserSessions[absoluteIndex(sessionIndex, listItems, userSessionslist)]">
+                                            <span class="control__indicator"></span>
+                                          </label>
+                                        </div>
+                                      </td>
+                                      <td style="width:10%">
+                                        <span _ngcontent-c3="" class="marginRight3">
+                                          <i class="icon icon-win-contact iconAlignment"></i>
+                                        </span>{{session.sessionId}} 
+                                      </td>
+                                      <td style="width:15%;text-align:center">{{session.adUserName}}</td>
+                                      <td style="width:15%;text-align:center">{{session.applicationType}}</td>
+                                     
+                                    </tr>
+                                  </tbody>
+                                </table>
+
+                                <div class="row" style="margin: 0; position:fixed; right:20px; bottom:0px;"
+                                  >
+                                  <pagination-controls (pageChange)="userSessionslist = $event" class="pagination pull-right"
+                                  id="sessions"></pagination-controls>
+                                </div>
+                                
+                                <div *ngIf="editedLbodyUsers">
+                                  <div class="EmptyTableMsg">
+                                    <div style="text-align:center">
+                                      <br /><br />
+                                      <img src="../../assets/Images/sad-cloud.png" class="img img-responsive"
+                                        style="position: relative; width: 10%; left: 44%;" />
+                                      <h5 style="color:#808080;font-weight:400;"> No User Sessions to display</h5>
+                                    </div>
+                                  </div>
+                                </div>
+                                <div *ngIf="SessionsListErrorFound">
+                                  <div class="EmptyTableMsg">
+                                    <div style="text-align:center">
+                                      <br /><br />
+                                      <img src="../../assets/Images/sad-cloud.png" class="img img-responsive"
+                                        style="position: relative; width: 10%; left: 44%;" />
+                                      <h5 style="color:#808080;font-weight:400;"> Error</h5>
+                                      <p style="color:#808080"> Problem with server, Please try again </p>
+                                      <button class="btn btn-sm btn-primary" (click)="RefreshUserSessions()">Refresh</button>
+                                    </div>
+                                  </div>
+                                </div>
+                                <div *ngIf="UserSessionLoader" class="ngLoader">
+                                   <img src="assets/Images/loading.gif" />
+                                </div>
+                              </div>
+                            </div>
+
+
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          <div class="tab-pane" id="tab_default_31">
             <div class="col-xs-12 no-pad">
               <div class="col-md-8">
                 <ul>
@@ -296,7 +513,7 @@
                       <th style="width:18%;text-align:center;">Friendly Name</th>
                       <th style="width:18%;text-align:center;">Type</th>
                       <th style="width:18%;text-align:center;">Description</th>
-                      <!-- <th style="width:18%;text-align:center;">Users</th> -->
+                   
                     </tr>
                   </thead>
                   <tbody *ngIf="!(appGroupListErrorFound || editedBodyAppGroup)">
@@ -304,12 +521,12 @@
                       *ngFor="let List of appGroupsListSearch | paginate: { itemsPerPage: listItems, currentPage: appGroupsPageNo, id:'appGroups' }; let AInd=index"
                       [ngClass]="{'rowSelect':checked[absoluteIndex(AInd, listItems, appGroupsPageNo)]}"
                       id="row-tenant-{{List.Id}}"
-                      (click)="AppGroupsListRowClicked(absoluteIndex(AInd, listItems, appGroupsPageNo))">
+                      (click)="AppGroupsListRowClicked(absoluteIndex(AInd, listItems, appGroupsPageNo),$event)">
                       <td style="width: 4%;text-align: left">
                         <div class="control-group">
                           <label class="control control--checkbox">
                             <input type="checkbox" class="solcheckbox AppGroupbottomBtnClose"
-                              (click)="IsCheckedAppGroup(absoluteIndex(AInd, listItems, appGroupsPageNo))"
+                              (click)="IsCheckedAppGroup(absoluteIndex(AInd, listItems, appGroupsPageNo),$event)"
                               [checked]="checked[absoluteIndex(AInd, listItems, appGroupsPageNo)]">
                             <span class="control__indicator"></span>
                           </label>
@@ -321,22 +538,11 @@
                       <td style="width:18%;text-align:center;">
                         {{List.resourceType == 0 ? "Remote App Group" : "Desktop App Group"}}</td>
                       <td style="width:18%;text-align:center;">{{List.description}}</td>
-                      <!-- <td style="width:18%;text-align:center;">{{List.noOfusers}}</td> -->
+                     
                     </tr>
                   </tbody>
                 </table>
-                <!-- pagination code -->
-                <!-- <ul class="pagination  pull-right" *ngIf="!(editedBodyAppGroup || appGroupListErrorFound)">
-                  <li [ngClass]="{disabled:AppGroupCurrentPageNo === 1 ,  link:AppGroupCurrentPageNo === 1}">
-                    <a (click)="previousPageAppGroup()">Previous</a>
-                  </li>
-                  <li class="CurrentIndex" *ngFor="let item of counter(currentNoOfPagesCount);let i=index">
-                    <a [ngClass]="{'isActive': curentIndex === i }" (click)="CurrentPageAppGroup(i)">{{i + 1 }}</a>
-                  </li>
-                  <li [ngClass]="{disabled:currentNoOfPagesCount === AppGroupCurrentPageNo ,  link:currentNoOfPagesCount === AppGroupCurrentPageNo}">
-                    <a (click)="NextPageAppGroup()">Next</a>
-                  </li>
-                </ul> -->
+             
                 <div class="row" style="margin: 0;" *ngIf="!(editedBodyAppGroup || appGroupListErrorFound)">
                   <pagination-controls (pageChange)="appGroupsPageNo = $event" class="pagination pull-right"
                     id="appGroups"></pagination-controls>
@@ -366,7 +572,10 @@
                 </div>
               </div>
             </div>
-            <div id="AppGroupDashboard" class="AppGrouptoggle" [@slidemodal]="state">
+            
+          </div>
+          <div class="AppGrouptoggle" id="AppGroupDashboard" *ngIf="showAppGroupDashBoard" [@slidemodal]="state">
+
               <div class="col-xs-12 paddingTop20">
                 <div class="col-xs-10">
                   <h5 *ngIf="appGroupDetails.appGroupName" class="paddingLeft0">"{{appGroupDetails.appGroupName}}"
@@ -454,6 +663,9 @@
                           <button class="btn btn-sm btn-primary" (click)="RefreshBtnClick()">Refresh</button>
                         </div>
                       </div>
+                      <div *ngIf="UserSessionLoader" class="ngLoader">
+                        <img src="assets/Images/loading.gif" />
+                     </div>
                     </div>
                   </div>
                   <div class="tab-pane" id="tab_default_5" *ngIf="removeAppsTab">
@@ -533,19 +745,19 @@
                           </table>
                           <!-- pagination code -->
                           <!-- <ul class="pagination  pull-right" *ngIf="!(editedBodyApp || appListErrorFound)">
-                            <li [ngClass]="{disabled:appsCurrentPageNo === 1 ,  link:appsCurrentPageNo === 1}">
-                              <a (click)="appsPreviousPage()">Previous</a>
-                            </li>
-                            <li class="CurrentIndex"
-                              *ngFor="let item of appsCounter(currentNoOfAppsPagesCount);let i=index">
-                              <a [ngClass]="{'isActive': appsCurentIndex === i }"
-                                (click)="appsCurrentPage(i)">{{i + 1 }}</a>
-                            </li>
-                            <li
-                              [ngClass]="{disabled:currentNoOfAppsPagesCount === appsCurrentPageNo ,  link:currentNoOfAppsPagesCount === appsCurrentPageNo}">
-                              <a (click)="appsNextPage()">Next</a>
-                            </li>
-                          </ul> -->
+                                <li [ngClass]="{disabled:appsCurrentPageNo === 1 ,  link:appsCurrentPageNo === 1}">
+                                  <a (click)="appsPreviousPage()">Previous</a>
+                                </li>
+                                <li class="CurrentIndex"
+                                  *ngFor="let item of appsCounter(currentNoOfAppsPagesCount);let i=index">
+                                  <a [ngClass]="{'isActive': appsCurentIndex === i }"
+                                    (click)="appsCurrentPage(i)">{{i + 1 }}</a>
+                                </li>
+                                <li
+                                  [ngClass]="{disabled:currentNoOfAppsPagesCount === appsCurrentPageNo ,  link:currentNoOfAppsPagesCount === appsCurrentPageNo}">
+                                  <a (click)="appsNextPage()">Next</a>
+                                </li>
+                              </ul> -->
                           <!-- pagination code -->
                           <div class="row" style="margin: 0; position:fixed; right:20px; bottom:0px;"
                             *ngIf="!(editedBodyApp || appListErrorFound)">
@@ -644,10 +856,10 @@
                                 </div>
                               </td>
                               <!--<td style="width:10%">
-                                <span _ngcontent-c3="" class="marginRight3">
-                                  <i class="icon icon-win-contact iconAlignment"></i>
-                                </span>
-                              </td>-->
+                                    <span _ngcontent-c3="" class="marginRight3">
+                                      <i class="icon icon-win-contact iconAlignment"></i>
+                                    </span>
+                                  </td>-->
                               <td style="width:30%">
                                 <span _ngcontent-c3="" class="marginRight3">
                                   <i class="icon icon-win-contact iconAlignment"></i>
@@ -661,19 +873,19 @@
                         </table>
                         <!-- pagination code -->
                         <!-- <ul class="pagination  pull-right" *ngIf="!(editedLbodyUsers || usersListErrorFound)">
-                          <li [ngClass]="{disabled:usersCurrentPageNo === 1 ,  link:usersCurrentPageNo === 1}">
-                            <a (click)="usersPreviousPage()">Previous</a>
-                          </li>
-                          <li class="CurrentIndex"
-                            *ngFor="let item of usersCounter(currentNoOfUsersPagesCount);let i=index">
-                            <a [ngClass]="{'isActive': usersCurentIndex === i }"
-                              (click)="usersCurrentPage(i)">{{i + 1}}</a>
-                          </li>
-                          <li
-                            [ngClass]="{disabled:currentNoOfUsersPagesCount === usersCurrentPageNo ,  link:currentNoOfUsersPagesCount === usersCurrentPageNo}">
-                            <a (click)="usersNextPage()">Next</a>
-                          </li>
-                        </ul> -->
+                              <li [ngClass]="{disabled:usersCurrentPageNo === 1 ,  link:usersCurrentPageNo === 1}">
+                                <a (click)="usersPreviousPage()">Previous</a>
+                              </li>
+                              <li class="CurrentIndex"
+                                *ngFor="let item of usersCounter(currentNoOfUsersPagesCount);let i=index">
+                                <a [ngClass]="{'isActive': usersCurentIndex === i }"
+                                  (click)="usersCurrentPage(i)">{{i + 1}}</a>
+                              </li>
+                              <li
+                                [ngClass]="{disabled:currentNoOfUsersPagesCount === usersCurrentPageNo ,  link:currentNoOfUsersPagesCount === usersCurrentPageNo}">
+                                <a (click)="usersNextPage()">Next</a>
+                              </li>
+                            </ul> -->
                         <!-- pagination code -->
                         <div class="row" style="margin: 0; position:fixed; right:20px; bottom:0px;"
                           *ngIf="!(editedLbodyUsers || usersListErrorFound)">
@@ -709,8 +921,9 @@
                   </div>
                 </div>
               </div>
+
+
             </div>
-          </div>
         </div>
       </div>
     </div>
@@ -813,6 +1026,47 @@
     </div>
   </div>
 </div>
+
+<div id="DrainModeModal" class="modal fade"  role="dialog">
+  <div class="modal-dialog">
+    <!-- Modal content-->
+    <div class="modal-content popup-main">
+      <div class="modal-header">
+        <i class="icon icon-close" aria-hidden="true" data-dismiss="modal"></i>
+        <h4 class="modal-title">Set Drain Mode Confirmation</h4>
+      </div>
+      <div class="modal-body">
+        <p>Are you sure you want to set drain mode of host <span style="font-weight:bold;">'{{hostDeleteData}}'</span> ?</p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-primary" (click)="ChangeDrainMode()" data-dismiss="modal">Procceed</button>
+        <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+      </div>
+    </div>
+  </div>
+</div> 
+
+<div id="RestartModal" class="modal fade"  role="dialog">
+    <div class="modal-dialog">
+      <!-- Modal content-->
+      <div class="modal-content popup-main">
+        <div class="modal-header">
+          <i class="icon icon-close" aria-hidden="true" data-dismiss="modal"></i>
+          <h4 class="modal-title">Change Drain Mode Confirmation</h4>
+        </div>
+        <div *ngIf="!HostAllowNewSession" class="modal-body">
+          <p> You need to set the drain mode(allow new session)  false to  restart host.</p>
+        </div>
+        <div *ngIf="HostAllowNewSession" class="modal-body">
+          <p> If you restart host, existing user sessions will be closed. Are you sure you want to restart host '<span style="font-weight:bold;">{{hostDeleteData}}</span>' ?</p>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-primary" (click)="RestartHost()" [disabled]="!HostAllowNewSession" data-dismiss="modal">Procceed</button>
+          <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+        </div>
+      </div>
+    </div>
+  </div>
 
 <!--edit hosts starts-->
 <div class="modal fade" id="editHostModal" role="dialog">
@@ -1202,7 +1456,8 @@
                   style="position: relative; width: 10%; left: 44%;" />
                 <h5 style="color:#808080;font-weight:400;">Error</h5>
                 <p style="color:#808080"> Problem with server, Please try again </p>
-                <button class="btn btn-sm btn-primary" style="border-radius:0px;" id="" (click)="GetAllAppGroupAppsGallery()">Refresh</button>
+                <button class="btn btn-sm btn-primary" style="border-radius:0px;" id=""
+                  (click)="GetAllAppGroupAppsGallery()">Refresh</button>
               </div>
             </div>
           </div>
@@ -1271,3 +1526,143 @@
   </div>
 </div>
 <!-- Add csv File End-->
+<!-- Log Off Modal -->
+<div class="modal fade" id="logoffModal" role="dialog">
+  <div class="modal-dialog">
+    <!-- Modal content-->
+    <div class="modal-content popup-main">
+      <div class="modal-header">
+        <i class="icon icon-close" aria-hidden="true" data-dismiss="modal"></i>
+        <h4 class="modal-title">Log Off Confirmation</h4>
+      </div>
+      <div class="modal-body">
+        <p>Are you sure you want to logoff '<span id="logoffModalSelectedUserSession"
+            style="font-weight:bold;">{{CountSelectedUserSession}}</span>' session(s)?</p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-primary" (click)="LogOffUserSessions()" data-dismiss="modal">Proceed</button>
+        <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- Send message Panel-->
+<div class="overlay" *ngIf="showSendMessageDialog">
+  <div class="createUserName">
+ 
+    <form [formGroup]="sendMessageForm" autocomplete="off">
+      <div class="createTenantHead">
+        <div class="TenantStatus">
+          <h4>Send Message</h4>
+          <div class="col-xs-12 no-pad">
+            <div style="clear:both"></div>
+            <div id="" class="tab-content current">
+              <div class="DeployUrl" id="">
+                <div class="form-group">
+                  <label>Title <span class="important-Field">*</span></label>
+                  <input type="text" name="name" formControlName="Title"
+                    (ngModelChange)="TitleChange($event)" style="width: 359px;"
+                     />
+                  <div *ngIf="sendMessageForm.controls['Title'].hasError('pattern')" class="colorRed">
+                    Please enter title
+                  </div>
+                  <div *ngIf="Title" class="colorRed">
+                    Please enter title
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label>Message <span class="important-Field">*</span></label>
+                  <input type="text" name="name" formControlName="Message"
+                    (ngModelChange)="MessageChange($event)" style="width: 359px;"
+                     />
+                  <div *ngIf="sendMessageForm.controls['Message'].hasError('pattern')" class="colorRed">
+                    Please enter message 
+                  </div>
+                  <div *ngIf="Message" class="colorRed">
+                    Please enter message 
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <a class="close" id="SendMessageClose" (click)="HideSendMessageDialog()"><i class="icon icon-close"
+          aria-hidden="true"></i></a>
+      <div class="botomBtn">
+        <ul>
+          <li>
+            <input type=button value="Cancel" id="SendMessageCancel" (click)="HideSendMessageDialog()" />
+          </li>
+          <li>
+            <input type="button" value="Send" id="btnSendMessage"
+              [disabled]=" sendMesageButtonDisable || sendMessageForm.controls['Title'].hasError('pattern') || sendMessageForm.controls['Message'].hasError('pattern')"
+              (click)="SendMessage(sendMessageForm.value)" />
+          </li>
+        </ul>
+      </div>
+    </form>
+  </div>
+</div>
+
+
+<!-- Restart Host Panel-->
+<!-- <div class="overlay" *ngIf="showRestartDialog">
+  <div class="createUserName">
+   
+    <form [formGroup]="restartHostForm" autocomplete="off">
+      <div class="createTenantHead">
+        <div class="TenantStatus">
+          <h4>Restart Host</h4>
+          <div class="col-xs-12 no-pad">
+            <div style="clear:both"></div>
+            <div id="" class="tab-content current">
+              <div class="DeployUrl" id="">
+                <div class="form-group">
+                  <label>Subscription ID <span class="important-Field">*</span></label>
+                  <input type="text" name="name" formControlName="SubscriptionId"
+                    (ngModelChange)="SubscriptionChange($event)" style="width: 359px;"
+                     />
+                  <div *ngIf="restartHostForm.controls['SubscriptionId'].hasError('pattern')" class="colorRed">
+                    Please enter Subscription Id
+                  </div>
+                  <div *ngIf="SubscriptionId" class="colorRed">
+                    Please enter Subscription Id
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label>Resource Group Name <span class="important-Field">*</span></label>
+                  <input type="text" name="name" formControlName="ResourceGroup"
+                    (ngModelChange)="ResourceGroupChange($event)" style="width: 359px;"
+                     />
+                  <div *ngIf="restartHostForm.controls['ResourceGroup'].hasError('pattern')" class="colorRed">
+                    Please enter ResourceGroup
+                  </div>
+                  <div *ngIf="ResourceGroup" class="colorRed">
+                    Please enter ResourceGroup
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <a class="close" id="restartHostClose" (click)="HideRestartHostDialog()"><i class="icon icon-close"
+          aria-hidden="true"></i></a>
+      <div class="botomBtn">
+        <ul>
+          <li>
+            <input type=button value="Cancel" id="RestartHostCancel" (click)="HideRestartHostDialog()" />
+          </li>
+          <li>
+            <input type="button" value="Send" id="btnRestartHost"
+              [disabled]="restartHostForm.controls['SubscriptionId'].hasError('pattern') || restartHostForm.controls['ResourceGroup'].hasError('pattern')"
+              (click)="RestartHost(restartHostForm.value)" />
+          </li>
+        </ul>
+      </div>
+    </form>
+  </div>
+</div> -->

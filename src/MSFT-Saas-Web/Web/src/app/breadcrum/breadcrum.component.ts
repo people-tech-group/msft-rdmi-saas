@@ -25,7 +25,7 @@ export class BreadcrumComponent {
    * bd - Accepts object contains details
    *----------
    */
-  public Navigate(path: any, type: any, index: any, bc:any) {
+  public Navigate(path: any, type: any, index: any, bc: any) {
     if (type === 'Tenants') {
       BreadcrumComponent.breadCrums['Tenant'].splice(index, 1);
       this.router.navigate(['/admin/Tenants']);
@@ -39,12 +39,12 @@ export class BreadcrumComponent {
     }
   }
 
-   /*This  Function  is used to  get gets current router path
-    * ----------
-    * Parameters
-    * value - Accepts the details of Breadcrumb
-    * ----------
-    */ 
+  /*This  Function  is used to  get gets current router path
+   * ----------
+   * Parameters
+   * value - Accepts the details of Breadcrumb
+   * ----------
+   */
   static GetCurrentPage(value: any) {
     if (value[0].type == '') {
       delete BreadcrumComponent.breadCrums['Tenants']
@@ -59,7 +59,9 @@ export class BreadcrumComponent {
     if (value[0].type == 'Tenant') {
       delete BreadcrumComponent.breadCrums['Hostpool']
     }
+   
     BreadcrumComponent.breadCrums[value[0].type] = value;
+    
   }
 
   /*

@@ -114,12 +114,13 @@ export class TenantDashboardComponent implements OnInit {
         type: 'Tenant',
         path: 'tenantDashboard',
       }];
-      BreadcrumComponent.GetCurrentPage(data);
+
       var index = +sessionStorage.getItem("TenantNameIndex");
       this.adminMenuComponent.selectedTenant = index;
       this.adminMenuComponent.getTenantIndex(this.tenantName);
       this.scopeArray = sessionStorage.getItem("Scope").split(",");
       this.CheckHostpoolAccess(this.tenantName);
+      BreadcrumComponent.GetCurrentPage(data);
     });
     this.adminMenuComponent.SetSelectedhostPool(null, '', '');
     this.refreshToken = sessionStorage.getItem("Refresh_Token");
@@ -163,6 +164,8 @@ export class TenantDashboardComponent implements OnInit {
         "ring": null
       }];
       this.searchHostPools = this.hostPoolsList;
+      this.hostpoolsCount = this.hostPoolsList.length;
+      sessionStorage.setItem('sideMenuHostpools', JSON.stringify(this.hostPoolsList));
       this.tenantInfo = {
         "tenantName": this.scopeArray[1]
       };
@@ -290,31 +293,43 @@ export class TenantDashboardComponent implements OnInit {
    */
   public GetTenantDetails(tenantName: any) {
     let Tenants = JSON.parse(sessionStorage.getItem('Tenants'));
-    let data = Tenants.filter(item => item.tenantName == tenantName);
-    this.tenantInfo = data[0];
+    let SelectedTenant = JSON.parse(sessionStorage.getItem('SelectedTenant'));
+    // if(SelectedTenant!=null && SelectedTenant!=undefined)
+    // {
+    //   this.tenantInfo=SelectedTenant;
+    // }
+    // else
+    // {
+    //   let data = Tenants.filter(item => item.tenantName == tenantName);
+    //   this.tenantInfo = data[0];
+    // }
+
     // this.refreshHostpoolLoading = true;
-    // this.getTenantlistErrorFound = false;
-    // this.getTenantDetailsUrl = this._AppService.ApiUrl + '/api/Tenant/GetTenantDetails?tenantGroupName=' + this.tenantGroupName + '&tenantName=' + tenantName + '&refresh_token=' + sessionStorage.getItem("Refresh_Token");
-    // this._AppService.GetTenantDetails(this.getTenantDetailsUrl).subscribe(response => {
-    //   this.tenantInfo = JSON.parse(response['_body']);
-    //   // this.hostpoolsCount = this.tenantInfo.noOfHostpool;
-    //   this.GetcurrentNoOfPagesHostpoolsCount();
-    //   if (this.tenantInfo) {
-    //     if (this.tenantInfo.code == "Invalid Token") {
-    //       sessionStorage.clear();
-    //       this.router.navigate(['/invalidtokenmessage']);
-    //     }
-    //   }
-    //   this.refreshHostpoolLoading = false;
-    // },
-    //   /*
-    //    * If Any Error (or) Problem With Services (or) Problem in internet this Error Block Will Exequte
-    //    */
-    //   error => {
-    //     this.refreshHostpoolLoading = false;
-    //     this.getTenantlistErrorFound = true;
-    //   }
-    // );
+
+    this.getTenantlistErrorFound = false;
+    this.getTenantDetailsUrl = this._AppService.ApiUrl + '/api/Tenant/GetTenantDetails?tenantGroupName=' + this.tenantGroupName + '&tenantName=' + tenantName + '&refresh_token=' + sessionStorage.getItem("Refresh_Token");
+    this._AppService.GetTenantDetails(this.getTenantDetailsUrl).subscribe(response => {
+      this.tenantInfo = JSON.parse(response['_body']);
+      // this.hostpoolsCount = this.tenantInfo.noOfHostpool;
+      this.GetcurrentNoOfPagesHostpoolsCount();
+      if (this.tenantInfo) {
+        if (this.tenantInfo.code == "Invalid Token") {
+          sessionStorage.clear();
+          this.router.navigate(['/invalidtokenmessage']);
+        }
+      }
+      this.refreshHostpoolLoading = false;
+    },
+      /*
+       * If Any Error (or) Problem With Services (or) Problem in internet this Error Block Will Exequte
+       */
+      error => {
+        this.refreshHostpoolLoading = false;
+        this.getTenantlistErrorFound = false;
+        let data = Tenants.filter(item => item.tenantName == tenantName);
+        this.tenantInfo = data[0];
+      }
+    );
   }
 
 
@@ -495,7 +510,7 @@ export class TenantDashboardComponent implements OnInit {
   */
   public SetSelectedHostRoute(index: any, tenantName: any, hostpoolName: any) {
     this.adminMenuComponent.SetSelectedhostPool(index, tenantName, hostpoolName);
-    this.router.navigate(['/admin/hostpoolDashboard', hostpoolName]);
+
     let data = [{
       name: hostpoolName,
       type: 'Hostpool',
@@ -504,6 +519,7 @@ export class TenantDashboardComponent implements OnInit {
     }];
     BreadcrumComponent.GetCurrentPage(data);
     sessionStorage.setItem('selectedhostpoolname', hostpoolName);
+    this.router.navigate(['/admin/hostpoolDashboard', hostpoolName]);
   }
   /* This function is used to create an  array of current page numbers */
 
@@ -712,7 +728,6 @@ export class TenantDashboardComponent implements OnInit {
         if (this.searchHostPools[0].Message == null) {
           this.editedBody = false;
         }
-
         this.showCreateHostpool = false;
       }
       this.refreshHostpoolLoading = false;
@@ -845,6 +860,8 @@ export class TenantDashboardComponent implements OnInit {
     this.searchHostPools = [];
     sessionStorage.removeItem('Hostpools');
     sessionStorage.removeItem('sideMenuHostpools');
+    this.checked = [];
+    this.checkedMain = false;
     this.CheckHostpoolAccess(this.tenantName);
   }
 
@@ -966,7 +983,6 @@ export class TenantDashboardComponent implements OnInit {
       /* If Any Error (or) Problem With Services (or) Problem in internet this Error Block Will Exequte */
       error => {
         this.refreshHostpoolLoading = false;
-        //console.error('catchBlock', error)
         this._notificationsService.html(
           '<i class="icon icon-close angular-NotifyFail"></i>' +
           '<label class="notify-label padleftright">Failed To Create Host pool</label>' +
@@ -1084,7 +1100,6 @@ export class TenantDashboardComponent implements OnInit {
       /* If Any Error (or) Problem With Services (or) Problem in internet this Error Block Will Exequte */
       error => {
         this.refreshHostpoolLoading = false;
-       // console.error('catchBlock', error)
         this._notificationsService.html(
           '<i class="icon icon-close angular-NotifyFail"></i>' +
           '<label class="notify-label padleftright">Failed To Update Host pool</label>' +
@@ -1162,7 +1177,6 @@ export class TenantDashboardComponent implements OnInit {
         /* If Any Error (or) Problem With Services (or) Problem in internet this Error Block Will Exequte */
         error => {
           this.refreshHostpoolLoading = false;
-          //console.error('catchBlock', error)
           this._notificationsService.html(
             '<i class="icon icon-close angular-NotifyFail"></i>' +
             '<label class="notify-label padleftright">Failed To Delete Host pool</label>' +

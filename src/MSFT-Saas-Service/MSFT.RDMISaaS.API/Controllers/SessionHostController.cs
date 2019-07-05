@@ -39,20 +39,22 @@ namespace MSFT.WVDSaaS.API.Controllers
         /// <param name="refresh_token">Refresh token to get access token</param>
         /// //old parameters -- , int pageSize, string sortField, bool isDescending = false, int initialSkip = 0, string lastEntry = null
         /// <returns></returns>
-        public HttpResponseMessage GetSessionhostList(string tenantGroupName, string tenantName, string hostPoolName, string refresh_token)
+        public HttpResponseMessage GetSessionhostList(string tenantGroupName, string tenantName, string hostPoolName, string refresh_token, string subscriptionId=null)
         {
             //get deployment url
             deploymentUrl = configurations.rdBrokerUrl;
+           string  azureDeployUrl = configurations.managementResourceUrl;
             try
             {
                 if (!string.IsNullOrEmpty(refresh_token))
                 {
-                    string accessToken = "";
+                    string wvdAccessToken = "", AzureAccessToken="";
                     //get token value
-                    accessToken = common.GetTokenValue(refresh_token);
-                    if (!string.IsNullOrEmpty(accessToken) && accessToken.ToString().ToLower() != invalidToken && accessToken.ToString().ToLower() != invalidCode)
+                    wvdAccessToken = common.GetTokenValue(refresh_token);
+                    AzureAccessToken = common.GetManagementTokenValue(refresh_token);
+                    if (!string.IsNullOrEmpty(wvdAccessToken) && wvdAccessToken.ToString().ToLower() != invalidToken && wvdAccessToken.ToString().ToLower() != invalidCode)
                     {
-                        return sessionHostBL.GetSessionhostList(deploymentUrl, accessToken, tenantGroupName, tenantName, hostPoolName);
+                        return sessionHostBL.GetSessionhostList(deploymentUrl, wvdAccessToken, tenantGroupName, tenantName, hostPoolName, azureDeployUrl, AzureAccessToken, subscriptionId);
                     }
                     else
                     {
@@ -150,6 +152,45 @@ namespace MSFT.WVDSaaS.API.Controllers
             return Ok(hostResult);
         }
 
+        [HttpPost]
+        public IHttpActionResult ChangeDrainMode(JObject rdMgmtSessionHost)
+        {
+            //get deployment url
+            deploymentUrl = configurations.rdBrokerUrl;
+            try
+            {
+                if (rdMgmtSessionHost != null)
+                {
+                    if (!string.IsNullOrEmpty(rdMgmtSessionHost["refresh_token"].ToString()))
+                    {
+                        string accessToken = "";
+                        //get token value
+                        accessToken = common.GetTokenValue(rdMgmtSessionHost["refresh_token"].ToString());
+                        if (!string.IsNullOrEmpty(accessToken) && accessToken.ToString().ToLower() != invalidToken && accessToken.ToString().ToLower() != invalidCode)
+                        {
+                            hostResult = sessionHostBL.ChangeDrainMode(deploymentUrl, accessToken, rdMgmtSessionHost);
+                        }
+                        else
+                        {
+                            hostResult.Add("isSuccess", false);
+                            hostResult.Add("message", Constants.invalidToken);
+                        }
+                    }
+                }
+                else
+                {
+                    hostResult.Add("isSuccess", false);
+                    hostResult.Add("message", Constants.invalidDataMessage);
+                }
+            }
+            catch (Exception ex)
+            {
+                hostResult.Add("isSuccess", false);
+                hostResult.Add("message", "Host '" + rdMgmtSessionHost["sessionHostName"].ToString() + "' has not been updated." + ex.Message.ToString() + " Please try again later.");
+            }
+            return Ok(hostResult);
+        }
+
         /// <summary>
         /// Description : Removes a Rds SessionHost associated with the Tenant and HostPool specified in the Rds context.
         /// </summary>
@@ -187,6 +228,23 @@ namespace MSFT.WVDSaaS.API.Controllers
                 sessionHostResult.isSuccess = false;
             }
             return Ok(sessionHostResult);
+        }
+
+        public IHttpActionResult RestartHost(string subscriptionId, string resourceGroupName, string sessionHostName, string refresh_token)
+        {
+            deploymentUrl = configurations.managementResourceUrl;// subscriptions/f657519e-2b49-48fe-85ec-3acff0ac67a6/resourceGroups/svTestRG/providers/Microsoft.Compute/virtualMachines/RDSH-7777-0/restart?api-version=2018-06-01
+            try
+            {
+                string accessToken = common.GetManagementTokenValue(refresh_token);
+                hostResult =  sessionHostBL.RestartHost(deploymentUrl, accessToken, subscriptionId, resourceGroupName, sessionHostName);
+            }
+            catch (Exception ex)
+            {
+                hostResult.Add("isSuccess", false);
+                hostResult.Add("message", "Failed to restart host. "+ ex.Message);
+            }
+            return Ok(hostResult);
+
         }
 
         #endregion

@@ -17,6 +17,7 @@ namespace MSFT.WVDSaaS.API.Common
         public string redirectUrl = "";
         public string applicationId = "";
         public string resourceUrl = "";
+        public string managementResourceUrl = "";
         #endregion
 
         #region " Constructor "
@@ -26,6 +27,7 @@ namespace MSFT.WVDSaaS.API.Common
             redirectUrl = System.Web.Configuration.WebConfigurationManager.AppSettings["RedirectURI"];
             applicationId = System.Web.Configuration.WebConfigurationManager.AppSettings["ApplicationId"];
             resourceUrl = System.Web.Configuration.WebConfigurationManager.AppSettings["ResourceUrl"];
+            managementResourceUrl= System.Web.Configuration.WebConfigurationManager.AppSettings["ManagementResourceUrl"];
         }
         #endregion
 
