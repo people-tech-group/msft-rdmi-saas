@@ -269,6 +269,7 @@ export class HostpoolDashboardComponent implements OnInit {
   public UserSessionLoader: boolean = false;
   public Title: boolean = false;
   public Message: boolean = false;
+  public checkedHostIndex:any=[];
   @ViewChild('closeModal') closeModal: ElementRef;
 
   constructor(private _AppService: AppService, private fb: FormBuilder, private http: Http, private route: ActivatedRoute, private _notificationsService: NotificationsService, private router: Router,
@@ -443,6 +444,7 @@ export class HostpoolDashboardComponent implements OnInit {
     this.selectedClassMax = true;
     this.selectedClassMin = false;
     this.checkedMainUserSession = false;
+    this.sessionHostCheckedMain=false;
     this.isLogOffDisabled = true;
     this.isSendMsgDisabled = true;
     this.sessionHostchecked = [];
@@ -716,11 +718,12 @@ export class HostpoolDashboardComponent implements OnInit {
    * --------------
    */
   public SessionHostIsChecked(hostIndex: any,event) {
-    console.log(event);
+  console.log(event,"event");
     this.sessionHostchecked[hostIndex] = !this.sessionHostchecked[hostIndex];
-    if (event.target.checked != null && event.target.checked != undefined) {
-      console.log(event.target.checked,"event.target.checked---HostClicked");
+    
+    if (event.target!=null &&  event.target.checked != null && event.target.checked != undefined) {
       this.showHostDashBoard = event.target.checked==false?true:false;// !event.target.checked;
+     
     }
     else if (event.type == "click") {
       this.showHostDashBoard = this.showHostDashBoard==true?false:true;// !this.showHostDashBoard;
@@ -744,11 +747,13 @@ export class HostpoolDashboardComponent implements OnInit {
         }
       }
       if (this.sessionHostCheckedTrue.length == 1) {
+        console.log("testtbvbn");
         this.editHostDisabled = false;
         this.drainHostDisabled = false;
         this.deleteHostDisabled = false;
         this.restartHostDisabled = sessionStorage.getItem("roleDefinitionName") == "RDS Owner" ? false : true;
-        this.state = "up";
+         this.state = "up";
+         
       }
       else if (this.sessionHostCheckedTrue.length > 1) {
         this.editHostDisabled = true;
@@ -1373,14 +1378,14 @@ export class HostpoolDashboardComponent implements OnInit {
     // else if (event.type == "click") {
     //   this.showHostDashBoard = this.showHostDashBoard==true?false:true;// !this.showHostDashBoard;
     // }
-   
     this.SessionHostIsChecked(hostIndex,event);
     this.sessionHostName = hostName;
     this.sessionHostCheckedTrue = [];
+    var index = hostIndex;
     for (var i = 0; i < this.sessionHostchecked.length; i++) {
       if (this.sessionHostchecked[i] == true) {
         this.sessionHostCheckedTrue.push(this.sessionHostchecked[i]);
-        var index = i;
+         index = i;
       }
     }
     if (this.sessionHostCheckedTrue.length == 1) {
@@ -1389,12 +1394,12 @@ export class HostpoolDashboardComponent implements OnInit {
       this.deleteHostDisabled = false;
       this.drainHostDisabled = false;
       this.restartHostDisabled = sessionStorage.getItem("roleDefinitionName") == "RDS Owner" ? false : true;
-      this.hostDeleteData = this.sessionHostListsSearch[hostIndex].sessionHostName;
-      this.hostDetails = this.sessionHostListsSearch[hostIndex];
+      this.hostDeleteData = this.sessionHostListsSearch[index].sessionHostName;
+      this.hostDetails = this.sessionHostListsSearch[index];
       this.HostAllowNewSession = this.hostDetails.allowNewSession == "Yes" ? false : true;
       this.state = "up";
-      this.selectedHostName = this.sessionHostListsSearch[hostIndex].sessionHostName;
-
+      this.selectedHostName = this.sessionHostListsSearch[index].sessionHostName;
+      this.showHostDashBoard = true;
       // make service call to get user sessions
       if (this.showHostDashBoard == true) {
         this.GetUserSessions();
@@ -1941,6 +1946,8 @@ export class HostpoolDashboardComponent implements OnInit {
   // * This function is used to make service call to get all the respective Appgrops of the selected hostpool
   // */
   public GetAllAppGroupsList(hostPoolName) {
+    this.checked = [];
+    this.checkedMainAppGroup = false;
     this.refreshHostpoolLoading = true;
     this.appGroupListErrorFound = false;
     this.editedBodyAppGroup = false;
@@ -3583,9 +3590,14 @@ export class HostpoolDashboardComponent implements OnInit {
    * This function is used to get All AppGroup RemoteApps
    */
   public GetAllAppGroupApps() {
+    this.checkedApps = [];
+    this.checkedMainApp = false;
+    this.appListErrorFound = false;
     let Apps = JSON.parse(sessionStorage.getItem('Apps'));
+
     let selectedApproup = sessionStorage.getItem('SelectedAppGroup');
     if (sessionStorage.getItem('Apps') && Apps.length != 0 && Apps != null && selectedApproup == this.selectedAppGroupName) {
+      this.appsCount = Apps.length;
       this.getapps()
     } else {
       this.checkedApps = [];
@@ -3621,6 +3633,8 @@ export class HostpoolDashboardComponent implements OnInit {
         }
       );
     }
+   this.isDeleteAppsDisabled=true;
+   console.log(this.appsCount,"this.appsCount");
     this.GetAppGroupUsers();
   }
 

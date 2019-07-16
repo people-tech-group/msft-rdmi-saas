@@ -9,6 +9,7 @@ using System.Web.Http;
 using MSFT.WVDSaaS.API.BLL;
 using System.Web.Http.Cors;
 using Newtonsoft.Json.Linq;
+using System.Threading.Tasks;
 #endregion "Import Namespaces"
 
 #region "MSFT.WVDSaaS.API.Controllers"
@@ -39,7 +40,7 @@ namespace MSFT.WVDSaaS.API.Controllers
         /// <param name="refresh_token">Refresh token to get access token</param>
         /// //old parameters -- , int pageSize, string sortField, bool isDescending = false, int initialSkip = 0, string lastEntry = null
         /// <returns></returns>
-        public HttpResponseMessage GetSessionhostList(string tenantGroupName, string tenantName, string hostPoolName, string refresh_token, string subscriptionId=null)
+        public async Task<HttpResponseMessage> GetSessionhostList(string tenantGroupName, string tenantName, string hostPoolName, string refresh_token, string subscriptionId=null)
         {
             //get deployment url
             deploymentUrl = configurations.rdBrokerUrl;
@@ -54,7 +55,7 @@ namespace MSFT.WVDSaaS.API.Controllers
                     AzureAccessToken = common.GetManagementTokenValue(refresh_token);
                     if (!string.IsNullOrEmpty(wvdAccessToken) && wvdAccessToken.ToString().ToLower() != invalidToken && wvdAccessToken.ToString().ToLower() != invalidCode)
                     {
-                        return sessionHostBL.GetSessionhostList(deploymentUrl, wvdAccessToken, tenantGroupName, tenantName, hostPoolName, azureDeployUrl, AzureAccessToken, subscriptionId);
+                        return await sessionHostBL.GetSessionhostList(deploymentUrl, wvdAccessToken, tenantGroupName, tenantName, hostPoolName, azureDeployUrl, AzureAccessToken, subscriptionId);
                     }
                     else
                     {
