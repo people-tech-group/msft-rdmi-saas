@@ -393,7 +393,7 @@
             <div class="row">
               <div class="col-sm-12 form-group">
                 <label>Host pool Unique Name <span class="important-Field">*</span></label>
-                <input type="text" name="hostPoolName" formControlName="hostPoolName" readonly />
+                <input type="text" name="hostPoolName" formControlName="hostPoolName" readonly (keydown)="$event.preventDefault();" />
               </div>
               <div class="col-sm-12 form-group">
                 <label>Host pool Friendly Name – <span class="ashColor">optional</span></label>

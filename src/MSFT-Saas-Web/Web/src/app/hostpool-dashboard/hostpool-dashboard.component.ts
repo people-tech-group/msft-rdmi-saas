@@ -718,7 +718,6 @@ export class HostpoolDashboardComponent implements OnInit {
    * --------------
    */
   public SessionHostIsChecked(hostIndex: any,event) {
-  console.log(event,"event");
     this.sessionHostchecked[hostIndex] = !this.sessionHostchecked[hostIndex];
     
     if (event.target!=null &&  event.target.checked != null && event.target.checked != undefined) {
@@ -747,7 +746,6 @@ export class HostpoolDashboardComponent implements OnInit {
         }
       }
       if (this.sessionHostCheckedTrue.length == 1) {
-        console.log("testtbvbn");
         this.editHostDisabled = false;
         this.drainHostDisabled = false;
         this.deleteHostDisabled = false;
@@ -1176,18 +1174,16 @@ export class HostpoolDashboardComponent implements OnInit {
     let hosts = JSON.parse(sessionStorage.getItem('Hosts'));
     if (sessionStorage.getItem('Hosts') && hosts.length != 0 && hosts != null && sessionStorage.getItem('SelectedHostpool') == this.hostPoolName) {
       this.gettingHosts();
-      this.refreshHostpoolLoading = false;
     }
     else {
       sessionStorage.setItem('SelectedHostpool', this.hostPoolName);
       // this.getAllSessionHostUrl = this._AppService.ApiUrl + '/api/SessionHost/GetSessionhostList?tenantGroupName=' + this.tenantGroupName + '&tenantName=' + this.tenantName + '&hostPoolName=' + this.hostPoolName + '&refresh_token=' + sessionStorage.getItem("Refresh_Token") + '&pageSize=' + this.HostpageSize + '&sortField=SessionHostName&isDescending=false&initialSkip=' + this.hostinitialSkip + '&lastEntry=%22%20%22';
       this.getAllSessionHostUrl = this._AppService.ApiUrl + '/api/SessionHost/GetSessionhostList?tenantGroupName=' + this.tenantGroupName + '&tenantName=' + this.tenantName + '&hostPoolName=' + this.hostPoolName + '&refresh_token=' + sessionStorage.getItem("Refresh_Token") + '&subscriptionId=' + sessionStorage.getItem("SubscriptionId");
       this._AppService.GetData(this.getAllSessionHostUrl).subscribe(response => {
-
+         this.refreshHostpoolLoading = false;
         if (response.status == 429) {
           this.error = true;
           this.errorMessage = response.statusText;
-          this.refreshHostpoolLoading = false;
         }
         else {
           this.error = false;
@@ -1213,7 +1209,7 @@ export class HostpoolDashboardComponent implements OnInit {
             this.showHostEmpty = false;
             this.hostListErrorFound = true;
           }
-          this.refreshHostpoolLoading = false;
+         this.refreshHostpoolLoading = false;
         }
       );
     }
@@ -1277,7 +1273,7 @@ export class HostpoolDashboardComponent implements OnInit {
         }
       }
     }
-    this.refreshHostpoolLoading = false;
+   this.refreshHostpoolLoading = false;
   }
 
   /*
@@ -1370,14 +1366,6 @@ export class HostpoolDashboardComponent implements OnInit {
    * --------------
    */
   public HostClicked(hostIndex: any, hostName: any, event:Event) {
-
-    // if (event.target.checked != null && event.target.checked != undefined) {
-    //   console.log(event.target.checked,"event.target.checked---HostClicked");
-    //   this.showHostDashBoard = event.target.checked==false?true:false;// !event.target.checked;
-    // }
-    // else if (event.type == "click") {
-    //   this.showHostDashBoard = this.showHostDashBoard==true?false:true;// !this.showHostDashBoard;
-    // }
     this.SessionHostIsChecked(hostIndex,event);
     this.sessionHostName = hostName;
     this.sessionHostCheckedTrue = [];
@@ -1955,11 +1943,12 @@ export class HostpoolDashboardComponent implements OnInit {
     let appGroups = JSON.parse(sessionStorage.getItem('Appgroups'));
     if (sessionStorage.getItem('Appgroups') && appGroups.length != 0 && appGroups != null && sessionStorage.getItem('SelectedHostpool') == this.hostPoolName) {
       this.gettingAppgroups();
-      this.refreshHostpoolLoading = false;
+      this.refreshHostpoolLoading = false; 
     } else {
       //this.getAllAppGroupsListUrl = this._AppService.ApiUrl + '/api/AppGroup/GetAppGroupsList?tenantGroupName=' + this.tenantGroupName + '&tenantName=' + this.tenantName + '&hostPoolName=' + hostPoolName + '&refresh_token=' + sessionStorage.getItem("Refresh_Token") + ' &pageSize=' + this.pageSize + '&sortField=AppGroupName&isDescending=false&initialSkip=' + this.initialSkip + '&lastEntry=%22%20%22';
       this.getAllAppGroupsListUrl = this._AppService.ApiUrl + '/api/AppGroup/GetAppGroupsList?tenantGroupName=' + this.tenantGroupName + '&tenantName=' + this.tenantName + '&hostPoolName=' + hostPoolName + '&refresh_token=' + sessionStorage.getItem("Refresh_Token");// + ' &pageSize=' + this.pageSize + '&sortField=AppGroupName&isDescending=false&initialSkip=' + this.initialSkip + '&lastEntry=%22%20%22';
       this._AppService.GetData(this.getAllAppGroupsListUrl).subscribe(response => {
+        this.refreshHostpoolLoading = false;
         if (response.status == 429) {
           this.error = true;
           this.errorMessage = response.statusText;
@@ -1969,7 +1958,6 @@ export class HostpoolDashboardComponent implements OnInit {
           this.appGroupsList = JSON.parse(response['_body']);
           sessionStorage.setItem('Appgroups', JSON.stringify(this.appGroupsList));
           this.gettingAppgroups();
-          this.refreshHostpoolLoading = false;
         }
       },
         /*
@@ -1980,12 +1968,13 @@ export class HostpoolDashboardComponent implements OnInit {
           let errorBody = JSON.parse(error['_body']);
           this.errorMessage = errorBody.error.target;
           this.appGroupListErrorFound = true;
+          this.refreshHostpoolLoading = false; 
+
         }
       );
     }
     this.isEditAppgroupDisabled = true;
     this.isDeleteAppgroupDisabled = true;
-    this.refreshHostpoolLoading = false;
   }
 
   gettingAppgroups() {
@@ -3634,7 +3623,6 @@ export class HostpoolDashboardComponent implements OnInit {
       );
     }
    this.isDeleteAppsDisabled=true;
-   console.log(this.appsCount,"this.appsCount");
     this.GetAppGroupUsers();
   }
 
