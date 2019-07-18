@@ -269,7 +269,6 @@ export class HostpoolDashboardComponent implements OnInit {
   public UserSessionLoader: boolean = false;
   public Title: boolean = false;
   public Message: boolean = false;
-  public checkedHostIndex:any=[];
   @ViewChild('closeModal') closeModal: ElementRef;
 
   constructor(private _AppService: AppService, private fb: FormBuilder, private http: Http, private route: ActivatedRoute, private _notificationsService: NotificationsService, private router: Router,
@@ -894,6 +893,8 @@ export class HostpoolDashboardComponent implements OnInit {
       this.editHostDisabled = false;
       this.deleteHostDisabled = false;
       this.drainHostDisabled = false;
+      this.state="up";
+      this.showHostDashBoard=true;
       this.restartHostDisabled = sessionStorage.getItem("roleDefinitionName") == "RDS Owner" ? false : true;
       this.hostFormEdit = new FormGroup({
         sessionHostName: new FormControl(this.sessionHostListsSearch[index].sessionHostName),
@@ -1940,6 +1941,7 @@ export class HostpoolDashboardComponent implements OnInit {
     this.appGroupListErrorFound = false;
     this.editedBodyAppGroup = false;
     this.checkedMainAppGroup = false;
+    
     let appGroups = JSON.parse(sessionStorage.getItem('Appgroups'));
     if (sessionStorage.getItem('Appgroups') && appGroups.length != 0 && appGroups != null && sessionStorage.getItem('SelectedHostpool') == this.hostPoolName) {
       this.gettingAppgroups();
@@ -1975,6 +1977,7 @@ export class HostpoolDashboardComponent implements OnInit {
     }
     this.isEditAppgroupDisabled = true;
     this.isDeleteAppgroupDisabled = true;
+    this.showAppGroupDashBoard=false;
   }
 
   gettingAppgroups() {
@@ -2069,6 +2072,7 @@ export class HostpoolDashboardComponent implements OnInit {
       this.isEditAppgroupDisabled = false;
       this.isDeleteAppgroupDisabled = false;
       this.state = 'up';
+      this.showAppGroupDashBoard=true;
       this.deleteCountSelectedAppgroups = this.appGroupsListSearch[index].appGroupName;
       this.appgroupFormEdit = new FormGroup({
         appGroupName: new FormControl(this.appGroupsListSearch[index].appGroupName),
