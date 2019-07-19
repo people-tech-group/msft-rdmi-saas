@@ -9,6 +9,7 @@ using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Text;
+using System.Threading.Tasks;
 #endregion "Import Namespaces"
 
 #region "MSFT.RDMISaaS.API.BLL"
@@ -46,7 +47,7 @@ namespace MSFT.WVDSaaS.API.BLL
 
         }
 
-        public HttpResponseMessage GetSessionhostList(string deploymentUrl, string wvdAccessToken, string tenantGroup, string tenantName, string hostPoolName, string azureDeployUrl = null, string azureAccessToken = null, string subscriptionId = null)
+        public async Task<HttpResponseMessage> GetSessionhostList(string deploymentUrl, string wvdAccessToken, string tenantGroup, string tenantName, string hostPoolName, string azureDeployUrl = null, string azureAccessToken = null, string subscriptionId = null)
         {
             try
             {
@@ -55,22 +56,12 @@ namespace MSFT.WVDSaaS.API.BLL
                 {
                     if (WVDResponse.StatusCode == HttpStatusCode.OK)
                     {
-
                         var wvdData = WVDResponse.Content.ReadAsStringAsync().Result;
                         var arrWVD = (JArray)JsonConvert.DeserializeObject(wvdData);
                         var WVDresult = ((JArray)arrWVD).ToList();
-                        HttpResponseMessage AzureResponse = GetAzureVMList(azureDeployUrl, azureAccessToken, subscriptionId);
-                        if (AzureResponse.StatusCode == HttpStatusCode.OK)
+                        var AzureResult = await GetAzureVMs(azureDeployUrl, azureAccessToken, subscriptionId);
+                        if (AzureResult != null && AzureResult.Count >0)
                         {
-                            var azureData = AzureResponse.Content.ReadAsStringAsync().Result;
-                            var arrAzure1 = (JObject)JsonConvert.DeserializeObject(azureData);
-                            var arrAzure = arrAzure1["value"];
-                            var AzureResult = ((JArray)arrAzure).Select(item => new JObject()
-                        {
-                               new JProperty("vmName",  item["name"]),
-                               new JProperty("subscriptionId",  item["id"]==null ? null: item["id"].ToString().Split('/')[2]),
-                               new JProperty("resourceGroupName",   item["id"]==null ? null:item["id"].ToString().Split('/')[4]),
-                        }).ToList();
                             var finalVmList = AzureResult.ToList().Where(r => WVDresult.ToList().Any(d => r["vmName"].ToString() == d["sessionHostName"].ToString().Split('.')[0].ToString())).ToList();
                             finalVmList.ForEach(item =>
                             {
@@ -101,7 +92,6 @@ namespace MSFT.WVDSaaS.API.BLL
                         {
                             return WVDResponse;
                         }
-
                     }
                     else
                     {
@@ -125,7 +115,54 @@ namespace MSFT.WVDSaaS.API.BLL
             {
                 HttpResponseMessage response = CommonBL.InitializeHttpClient(deploymentUrl, accessToken).GetAsync("subscriptions/" + subscriptionId + "/providers/Microsoft.Compute/virtualMachines?api-version=2018-04-01").Result;
                 return response;
+            }
+            catch
+            {
+                return null;
+            }
+        }
 
+        public async Task<List<JObject>> GetAzureVMs(string deploymentUrl, string accessToken, string subscriptionId)
+        {
+            string nextLink = "";
+            HttpResponseMessage responseNext = null;
+            try
+            {
+                HttpResponseMessage response =  CommonBL.InitializeHttpClient(deploymentUrl, accessToken).GetAsync("subscriptions/" + subscriptionId + "/providers/Microsoft.Compute/virtualMachines?api-version=2018-04-01").Result;
+                var azureData = response.Content.ReadAsStringAsync().Result;
+                var arrAzure1 = (JObject)JsonConvert.DeserializeObject(azureData);
+                var arrAzure = arrAzure1["value"];
+                var finalVmList = new List<JObject>();
+                var AzureResult = new List<JObject>();
+                nextLink = arrAzure1["nextLink"] != null ? arrAzure1["nextLink"].ToString() : null;
+                AzureResult = ((JArray)arrAzure).Select(item => new JObject()
+                    {
+                            new JProperty("vmName",  item["name"]),
+                            new JProperty("subscriptionId",  item["id"]==null ? null: item["id"].ToString().Split('/')[2]),
+                            new JProperty("resourceGroupName",   item["id"]==null ? null:item["id"].ToString().Split('/')[4]),
+                    }).ToList();
+                finalVmList.AddRange(AzureResult);
+                while (!string.IsNullOrEmpty(nextLink))
+                {
+                    using (HttpClient client = new HttpClient())
+                    {
+                        HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Get, nextLink);
+                        request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", accessToken);
+                        responseNext = await client.SendAsync(request); // clientr.SendAsync(requestr);
+                        var azureData1 = responseNext.Content.ReadAsStringAsync().Result;
+                        var arrAzureNext = (JObject)JsonConvert.DeserializeObject(azureData1);
+                        var arrAzureData = arrAzureNext["value"];
+                        nextLink = arrAzureNext["nextLink"]!=null ? arrAzureNext["nextLink"].ToString():null;
+                        AzureResult = ((JArray)arrAzureData).Select(item => new JObject()
+                        {
+                               new JProperty("vmName",  item["name"]),
+                               new JProperty("subscriptionId",  item["id"]==null ? null: item["id"].ToString().Split('/')[2]),
+                               new JProperty("resourceGroupName",   item["id"]==null ? null:item["id"].ToString().Split('/')[4]),
+                        }).ToList();
+                        finalVmList.AddRange(AzureResult);
+                    }
+                }
+                return finalVmList;
             }
             catch
             {

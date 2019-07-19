@@ -114,7 +114,8 @@ namespace MSFT.WVDSaaS.API.BLL
             {
                 //call rest service to log off user sessions 
                 var content = new StringContent(JsonConvert.SerializeObject(userSession), Encoding.UTF8, "application/json");
-                HttpResponseMessage response = CommonBL.InitializeHttpClient(deploymentUrl, accessToken).PostAsync("/RdsManagement/V1/TenantGroups/" + userSession["tenantGroupName"] + "/Tenants/" + userSession["tenantName"] + "/HostPools/" + userSession["hostPoolName"] + "/SessionHosts/" + userSession["sessionHostName"] + "/Sessions/" + userSession["sessionId"] + "/actions/send-message-user?MessageTitle=" + userSession["messageTitle"] + "&MessageBody=" + userSession["messageBody"], content).Result;
+                userSession["messageBody"] = userSession["messageBody"].ToString().Contains("&")==true? userSession["messageBody"].ToString().Replace("&", "and") : userSession["messageBody"];
+                HttpResponseMessage response = CommonBL.InitializeHttpClient(deploymentUrl, accessToken).PostAsync("/RdsManagement/V1/TenantGroups/" + userSession["tenantGroupName"] + "/Tenants/" + userSession["tenantName"] + "/HostPools/" + userSession["hostPoolName"] + "/SessionHosts/" + userSession["sessionHostName"] + "/Sessions/" + userSession["sessionId"] + "/actions/send-message-user?MessageTitle=" + userSession["messageTitle"].ToString() + "&MessageBody=" + userSession["messageBody"].ToString(), content).Result;
                 string strJson = response.Content.ReadAsStringAsync().Result;
                 if (response.IsSuccessStatusCode)
                 {

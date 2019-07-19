@@ -393,7 +393,7 @@
             <div class="row">
               <div class="col-sm-12 form-group">
                 <label>Host pool Unique Name <span class="important-Field">*</span></label>
-                <input type="text" name="hostPoolName" formControlName="hostPoolName" readonly />
+                <input type="text" name="hostPoolName" formControlName="hostPoolName" readonly (keydown)="$event.preventDefault();" />
               </div>
               <div class="col-sm-12 form-group">
                 <label>Host pool Friendly Name – <span class="ashColor">optional</span></label>
@@ -446,7 +446,7 @@
     <div class="modal-dialog">
       <div class="modal-content popup-main">
         <div class="modal-header">
-          <i class="icon icon-close" aria-hidden="true" data-dismiss="modal"></i>
+          <i class="icon icon-close" aria-hidden="true" (click)="RefreshHostpools()" data-dismiss="modal"></i>
           <h4 class="modal-title">Delete Host pool Confirmation</h4>
         </div>
         <div class="modal-body">

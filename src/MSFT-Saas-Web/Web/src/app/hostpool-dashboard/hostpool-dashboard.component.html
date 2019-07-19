@@ -171,7 +171,7 @@
               <table class="table tableSelection table-hover ">
                 <thead>
                   <tr>
-                    <th style="width: 4%;text-align: left">
+                    <th style="width: 6%;text-align: left">
                       <div class="control-group">
                         <label class="control control--checkbox">
                           <input type="checkbox" class="solcheckbox" [checked]="sessionHostCheckedMain"
@@ -180,9 +180,9 @@
                         </label>
                       </div>
                     </th>
-                    <th style="width:20%;text-align:left;">Host Name</th>
-                    <th style="width:20%;text-align:left;">Allow New Sessions</th>
-                    <th style="width:20%;text-align: left;">Agent Version</th>
+                    <th style="width:18%;text-align:left;">Host Name</th>
+                    <th style="width:18%;text-align:left;">Allow New Sessions</th>
+                    <th style="width:18%;text-align: left;">Agent Version</th>
                     <!-- <th style="width:15%;text-align: center;">Max Session Limit</th> -->
                     <th style="width:20%;">Last Heart Beat</th>
                     <th style="width:20%;text-align: left;">Last Update Time</th>
@@ -194,7 +194,7 @@
                     class="TableData" id="row-tenant-{{SHSList.sessionHostName}}"
                     [ngClass]="{'rowSelect':sessionHostchecked[absoluteIndex(hostIndex, listItems, Hostslist)]}"
                     (click)="HostClicked(absoluteIndex(hostIndex, listItems, Hostslist), SHSList.sessionHostName,$event)">
-                    <td style="width: 4%;text-align: left">
+                    <td style="width: 6%;text-align: left">
                       <div class="control-group">
                         <label class="control control--checkbox">
                           <input type="checkbox" class="solcheckbox"
@@ -204,12 +204,12 @@
                         </label>
                       </div>
                     </td>
-                    <td style="width:20%;text-align:left;">{{SHSList.sessionHostName}}</td>
-                    <td style="width:20%;text-align:left;">{{SHSList.allowNewSession}}</td>
-                    <td style="width:20%;text-align: left;">{{SHSList.agentVersion}}</td>
+                    <td style="width:18%;text-align:left;word-wrap:break-word;">{{SHSList.sessionHostName}}</td>
+                    <td style="width:18%;text-align:left;">{{SHSList.allowNewSession}}</td>
+                    <td style="width:18%;text-align: left;">{{SHSList.agentVersion}}</td>
                     <!-- <td style="width:15%;text-align: center;">N\A</td> -->
-                    <td style="width:20%;">{{SHSList.lastHeartBeat}}</td>
-                    <td style="width:20%;text-align: left;">{{SHSList.lastUpdateTime}}</td>
+                    <td style="width:20%;word-wrap:break-word;">{{SHSList.lastHeartBeat}}</td>
+                    <td style="width:20%;text-align: left;word-wrap:break-word;">{{SHSList.lastUpdateTime}}</td>
                   </tr>
                 </tbody>
               </table>
@@ -305,7 +305,7 @@
                             </div>
                             <div class="col-md-3">
                             </div>
-                            <div class="col-md-3" *ngIf="removeAppsTab">
+                            <div class="col-md-3" >
                               <label>UserSessions</label>
                               <p>{{userSessionsCount}}</p>
                             
@@ -320,14 +320,14 @@
                             </div>
                             <div class="col-md-3">
                             </div>
-                            <div class="col-md-3" *ngIf="removeAppsTab">
+                            <div class="col-md-3" >
                               <label>Last Heart Beat</label>
                               <p>{{hostDetails.lastHeartBeat}}</p>
                             </div>
                           </div>
                           <div class="row">
                             <div class="col-md-5">
-                              <label>Last Updated</label>
+                              <label>Last Updated Time</label>
                               <p>{{hostDetails.lastUpdateTime}}</p>
                             </div>
                           </div>
@@ -738,8 +738,8 @@
                                 </td>
                                 <td style="width:15%;text-align:left;">{{List.remoteAppName}}</td>
                                 <td style="width:30%;"><span>{{List.filePath}}</span></td>
-                                <td style="width:20%;"><span>{{List.appAlias}}</span></td>
-                                <td style="width:20%;text-align:center;"><span>{{List.requiredCommandLine}}</span></td>
+                                <td style="width:20%;"><span> {{List.appAlias == null || List.appAlias == "" ? 'N/A' : 'List.appAlias'}}  </span></td>
+                                <td style="width:20%;text-align:left;"><span>{{List.requiredCommandLine == null || List.requiredCommandLine == "" ? 'N/A' : 'List.requiredCommandLine'}}</span></td>
                               </tr>
                             </tbody>
                           </table>
@@ -860,9 +860,9 @@
                                       <i class="icon icon-win-contact iconAlignment"></i>
                                     </span>
                                   </td>-->
-                              <td style="width:30%">
+                              <td style="width:30%; word-wrap: break-word;">
                                 <span _ngcontent-c3="" class="marginRight3">
-                                  <i class="icon icon-win-contact iconAlignment"></i>
+                                  <i class="icon icon-win-contact iconAlignment" style="float:left;"></i>
                                 </span>{{UserList.userPrincipalName}}
                               </td>
                               <td style="width:15%;text-align:center">Inactive</td>
@@ -957,7 +957,7 @@
               <div class="col-xs-12 no-pad">
                 <div class="DeployUrl">
                   <p>Registration key expires at : {{expiryDate}}</p>
-                  <textarea rows="3" cols="47" name="Description" readonly [(ngModel)]="responsevalue"
+                  <textarea rows="3" cols="47" name="Description" readonly (keydown)="$event.preventDefault();" [(ngModel)]="responsevalue"
                     formControlName="Description" placeholder="Regenerate Key value" #foo>  </textarea>
                 </div>
                 <div class="DeployUrl">
@@ -1013,7 +1013,7 @@
     <!-- Modal content-->
     <div class="modal-content popup-main">
       <div class="modal-header">
-        <i class="icon icon-close" aria-hidden="true" data-dismiss="modal"></i>
+        <i class="icon icon-close" aria-hidden="true" (click)="GetAllSessionHost()" data-dismiss="modal"></i>
         <h4 class="modal-title">Delete Host Confirmation</h4>
       </div>
       <div class="modal-body">
@@ -1081,7 +1081,7 @@
           <div class="row">
             <div class="col-sm-12">
               <label>Host Name <span class="important-Field">*</span></label>
-              <input type="text" name="sessionHostName" formControlName="sessionHostName" readonly />
+              <input type="text" name="sessionHostName" formControlName="sessionHostName" (keydown)="$event.preventDefault();" readonly />
             </div>
             <div class="col-sm-12">
               <label>Allow New Sessions</label>
@@ -1199,7 +1199,7 @@
           <div class="row">
             <div class="col-sm-12">
               <label>App Group Name <span class="important-Field">*</span></label>
-              <input type="text" name="appGroupName" formControlName="appGroupName" readonly />
+              <input type="text" name="appGroupName" formControlName="appGroupName" (keydown)="$event.preventDefault();" readonly />
             </div>
             <div class="col-sm-12">
               <label>App Group Friendly Name – <span class="ashColor">optional</span></label>
@@ -1227,7 +1227,7 @@
     <!-- Modal content-->
     <div class="modal-content popup-main">
       <div class="modal-header">
-        <i class="icon icon-close" aria-hidden="true" data-dismiss="modal"></i>
+        <i class="icon icon-close" aria-hidden="true" (click)="GetAllAppGroupsList(hostPoolName)" data-dismiss="modal"></i>
         <h4 class="modal-title">Delete App Group Confirmation</h4>
       </div>
       <div class="modal-body">
@@ -1300,7 +1300,7 @@
     <!-- Modal content-->
     <div class="modal-content popup-main">
       <div class="modal-header">
-        <i class="icon icon-close" aria-hidden="true" data-dismiss="modal"></i>
+        <i class="icon icon-close" aria-hidden="true" (click)="GetAllAppGroupApps()" data-dismiss="modal"></i>
         <h4 class="modal-title">Remove App Confirmation</h4>
       </div>
       <div class="modal-body">
@@ -1574,9 +1574,9 @@
                 </div>
                 <div class="form-group">
                   <label>Message <span class="important-Field">*</span></label>
-                  <input type="text" name="name" formControlName="Message"
+                  <textarea   name="name" formControlName="Message"
                     (ngModelChange)="MessageChange($event)" style="width: 359px;"
-                     />
+                     ></textarea>
                   <div *ngIf="sendMessageForm.controls['Message'].hasError('pattern')" class="colorRed">
                     Please enter message 
                   </div>
