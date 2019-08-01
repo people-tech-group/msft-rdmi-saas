@@ -322,8 +322,11 @@ export class HostpoolDashboardComponent implements OnInit {
       Description: new FormControl('', Validators.required),
     });
     this.newAppCreateGroup2 = new FormGroup({
-      Browse: new FormControl('', Validators.compose([Validators.required])),
+      AppPath: new FormControl('', Validators.compose([Validators.required])),
       Name: new FormControl('', Validators.compose([Validators.required, Validators.pattern(/^[^\s\W\_]([A-Za-z0-9\s])+$/)])),
+      IconPath: new FormControl('', Validators.compose([Validators.required])),
+      IconIndex: new FormControl('', Validators.compose([Validators.required])),
+
     });
     this.addUserForm = new FormGroup({
       UserPrincipalName: new FormControl('', Validators.required),
@@ -3943,8 +3946,10 @@ export class HostpoolDashboardComponent implements OnInit {
     this.showAddAppGalleryDialog = false;
     this.showAddAppDialog = true;
     this.newAppCreateGroup2 = new FormGroup({
-      Browse: new FormControl('', Validators.compose([Validators.required])),
+      AppPath: new FormControl('', Validators.compose([Validators.required])),
       Name: new FormControl('', Validators.compose([Validators.required, Validators.pattern(/^[^\s\W\_]([A-Za-z0-9\s])+$/)])),
+      IconPath: new FormControl('', Validators.compose([Validators.required])),
+      IconIndex: new FormControl('', Validators.compose([Validators.required])),
     });
   }
 
@@ -3980,12 +3985,12 @@ export class HostpoolDashboardComponent implements OnInit {
       "appGroupName": this.selectedAppGroupName,
       "remoteAppName": createAppGroupData.Name,
       "appAlias": createAppGroupData.Name,
-      "filePath": createAppGroupData.Browse,
+      "filePath": createAppGroupData.AppPath,
       "commandLineSetting": 1,
       "description": null,
       "friendlyName": createAppGroupData.Name,
-      "iconIndex": 0,
-      "iconPath": null,
+      "iconIndex": createAppGroupData.IconIndex!=null?createAppGroupData.IconIndex: 0,
+      "iconPath": createAppGroupData.IconPath,
       "requiredCommandLine": null,
       "showInWebFeed": true,
       "refresh_token": sessionStorage.getItem("Refresh_Token"),

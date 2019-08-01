@@ -76,7 +76,7 @@
                     <label>Host pool Unique Name</label>
                     <p>
                       <ng-template #HostNameAvilable>{{hostPoolDetails.hostPoolName}}</ng-template>
-                      <ng-template #HostNameNotAvilable>N/A</ng-template>
+                      <ng-template #HostNameNotAvilable>NA</ng-template>
                       <span
                         *ngIf="hostPoolDetails.hostPoolName ; then HostNameAvilable else HostNameNotAvilable"></span>
                     </p>
@@ -99,7 +99,7 @@
                     <label>Host pool Friendly Name</label>
                     <p>
                       <ng-template #HostfndNameAvilable>{{hostPoolDetails.friendlyName}}</ng-template>
-                      <ng-template #HostfndNameNotAvilable>N/A</ng-template>
+                      <ng-template #HostfndNameNotAvilable>NA</ng-template>
                       <span
                         *ngIf="hostPoolDetails.friendlyName ; then HostfndNameAvilable else HostfndNameNotAvilable"></span>
                     </p>
@@ -108,7 +108,7 @@
                     <label>Description</label>
                     <p>
                       <ng-template #HostdescriptionAvilable>{{hostPoolDetails.description}}</ng-template>
-                      <ng-template #HostdescriptionNotAvilable>N/A</ng-template>
+                      <ng-template #HostdescriptionNotAvilable>NA</ng-template>
                       <span
                         *ngIf="hostPoolDetails.description ; then HostdescriptionAvilable else HostdescriptionNotAvilable"></span>
                     </p>
@@ -391,7 +391,8 @@
                                       <th style="width:10%">Session ID</th>
                                       <th style="width:15%;text-align:center">User Name</th>
                                       <th style="width:15%;text-align:center">Application Type</th>
-                                     
+                                      <th style="width:15%;text-align:center">Session State</th>
+                                      <th style="width:15%;text-align:center">Created Time</th>
                                     </tr>
                                   </thead>
                                   <tbody *ngIf="!(SessionsListErrorFound)">
@@ -418,6 +419,8 @@
                                       </td>
                                       <td style="width:15%;text-align:center">{{session.adUserName}}</td>
                                       <td style="width:15%;text-align:center">{{session.applicationType}}</td>
+                                      <td style="width:15%;text-align:center">{{session.sessionState}}</td>
+                                      <td style="width:15%;text-align:center">{{session.createTime}}</td>
                                      
                                     </tr>
                                   </tbody>
@@ -716,7 +719,7 @@
                                 </th>
                                 <th style="width:15%">Name</th>
                                 <th style="width:30%">Path</th>
-                                <th style="width:20%">Alias</th>
+                                <th style="width:20%">Friendly Name</th>
                                 <th style="width:20%">Require Command Line</th>
                               </tr>
                             </thead>
@@ -738,8 +741,8 @@
                                 </td>
                                 <td style="width:15%;text-align:left;">{{List.remoteAppName}}</td>
                                 <td style="width:30%;"><span>{{List.filePath}}</span></td>
-                                <td style="width:20%;"><span> {{List.appAlias == null || List.appAlias == "" ? 'N/A' : 'List.appAlias'}}  </span></td>
-                                <td style="width:20%;text-align:left;"><span>{{List.requiredCommandLine == null || List.requiredCommandLine == "" ? 'N/A' : 'List.requiredCommandLine'}}</span></td>
+                                <td style="width:20%;"><span> {{List.friendlyName}}  </span></td>
+                                <td style="width:20%;text-align:left;"><span>{{List.requiredCommandLine == null || List.requiredCommandLine == "" ? 'NA' : 'List.requiredCommandLine'}}</span></td>
                               </tr>
                             </tbody>
                           </table>
@@ -865,9 +868,9 @@
                                   <i class="icon icon-win-contact iconAlignment" style="float:left;"></i>
                                 </span>{{UserList.userPrincipalName}}
                               </td>
-                              <td style="width:15%;text-align:center">Inactive</td>
-                              <td style="width:15%;text-align:center">N/A</td>
-                              <td style="width:15%;text-align:center">N/A</td>
+                              <td style="width:15%;text-align:center">{{UserList.sessionState}}</td>
+                              <td style="width:15%;text-align:center">{{UserList.createTime}}</td>
+                              <td style="width:15%;text-align:center">{{UserList.sessionHostName}}</td>
                             </tr>
                           </tbody>
                         </table>
@@ -1259,17 +1262,34 @@
               <div class="DeployUrl" id="">
                 <div class="col-xs-12 form-group">
                   <label for="usr">Path<span class="important-Field">*</span></label>
-                  <input type="text" id="imagepath" placeholder="Enter Valid Path" formControlName="Browse">
+                  <input type="text" id="imagepath" placeholder="Enter Valid Path" formControlName="AppPath">
                   <!--(ngModelChange)="PathChange($event)"-->
-                  <div *ngIf="newAppCreateGroup2.controls['Browse'].hasError('pattern')" class="colorRed">
+                  <div *ngIf="newAppCreateGroup2.controls['AppPath'].hasError('pattern')" class="colorRed">
                     Please enter valid path
                   </div>
                 </div>
-                <div class="col-xs-12">
-                  <label>App Name<span class="important-Field">*</span></label>
-                  <input type="text" name="name" formControlName="Name" placeholder="Enter Name of RemoteApp" />
+                <div class="col-xs-12  form-group">
+                  <label for="usr">App Name<span class="important-Field">*</span></label>
+                  <input type="text" id="appName" formControlName="Name" placeholder="Enter Name of RemoteApp" />
                   <div *ngIf="newAppCreateGroup2.controls['Name'].hasError('pattern')" class="colorRed">
                     Please enter valid Name
+                  </div>
+                </div>
+                <div class="col-xs-12  form-group">
+                  <label for="usr">Icon Index<span class="important-Field">*</span></label>
+                  <input type="number"  id="IconIndex" formControlName="IconIndex" placeholder="Enter Icon Index " value="0" style="width:100%"/>
+                  <div *ngIf="newAppCreateGroup2.controls['IconIndex'].hasError('pattern')" class="colorRed">
+                    Please enter Icon Index
+                  </div>
+                </div>
+                <div class="col-xs-12 form-group">
+                  <label for="usr">Icon Path
+                    <span class="important-Field">*</span>
+                  </label>
+                  <input type="text" id="IconPath"  placeholder="Enter Valid Icon Path" formControlName="IconPath">
+                  <!--(ngModelChange)="PathChange($event)"-->
+                  <div *ngIf="newAppCreateGroup2.controls['IconPath'].hasError('pattern')" class="colorRed">
+                    Please enter valid icon path
                   </div>
                 </div>
               </div>

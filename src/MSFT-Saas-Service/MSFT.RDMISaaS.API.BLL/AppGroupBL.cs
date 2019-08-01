@@ -9,6 +9,7 @@ using MSFT.WVDSaaS.API.Model;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System.Web;
+using System.Net;
 #endregion "Import Namespaces" 
 
 #region "MSFT.WVDSaaS.API.BLL"
@@ -18,6 +19,8 @@ namespace MSFT.WVDSaaS.API.BLL
     public class AppGroupBL
     {
         JObject groupResult = new JObject();
+        UserSessionBL userSessionBL = new UserSessionBL();
+
         // string tenantGroup = Constants.tenantGroupName;
 
 
@@ -57,7 +60,7 @@ namespace MSFT.WVDSaaS.API.BLL
         /// <param name="appGroupName">Name of App Group</param>
         /// //old parametewrs for pagination - bool isUserNameOnly,bool isAll, int pageSize, string sortField, bool isDescending, int initialSkip, string lastEntry
         /// <returns></returns>
-        public HttpResponseMessage GetUsersList(string tenantGroupName, string deploymentUrl, string accessToken, string tenantName, string hostPoolName, string appGroupName)
+        public HttpResponseMessage GetAppGroupUsersList(string tenantGroupName, string deploymentUrl, string accessToken, string tenantName, string hostPoolName, string appGroupName)
         {
             HttpResponseMessage response;
             try
@@ -69,6 +72,82 @@ namespace MSFT.WVDSaaS.API.BLL
             {
                 return null;
             }
+        }
+
+        public HttpResponseMessage GetUsersList(string tenantGroupName, string deploymentUrl, string accessToken, string tenantName, string hostPoolName, string appGroupName)
+        {
+            HttpResponseMessage userResponse = GetAppGroupUsersList(tenantGroupName, deploymentUrl, accessToken, tenantName, hostPoolName, appGroupName);
+            if (userResponse.StatusCode == HttpStatusCode.OK)
+            {
+
+                var arrUsers = (JArray)JsonConvert.DeserializeObject(userResponse.Content.ReadAsStringAsync().Result);
+                var usersResult = ((JArray)arrUsers);
+                if (usersResult != null && usersResult.ToList().Count > 0)
+                {
+                    HttpResponseMessage userSessionResponse = userSessionBL.GetListOfUserSessioons(deploymentUrl, accessToken, tenantGroupName, tenantName, hostPoolName);
+                    if (userSessionResponse.StatusCode == HttpStatusCode.OK)
+                    {
+                        var arrSessionUsers = (JArray)JsonConvert.DeserializeObject(userSessionResponse.Content.ReadAsStringAsync().Result);
+                        var sessionUsersResult = ((JArray)arrSessionUsers).ToList();
+                        if (sessionUsersResult != null && sessionUsersResult.Count > 0)
+                        {
+                            usersResult.ToList().ForEach(item =>
+                            {
+                                var element = sessionUsersResult.ToList().FirstOrDefault(d => d["userPrincipalName"].ToString().ToLower() == item["userPrincipalName"].ToString().ToLower());
+                                item["sessionHostName"] = element != null ? element["sessionHostName"] : "N/A";
+                                item["tenantName"] = element != null ? element["tenantName"] : item["tenantName"];
+                                item["tenantGroupName"] = element != null ? element["tenantGroupName"] : item["tenantGroupName"];
+                                item["hostPoolName"] = element != null ? element["hostPoolName"] : item["hostPoolName"];
+                                item["createTime"] = element != null ? element["createTime"]:"N/A";
+                                item["sessionState"] = element != null ? element["sessionState"]:"N/A";
+                                item["userPrincipalName"] = element != null ? element["userPrincipalName"] : item["userPrincipalName"];
+                            });
+
+                            return new HttpResponseMessage()
+                            {
+                                Content = new StringContent(JsonConvert.SerializeObject(usersResult)),
+                                StatusCode = System.Net.HttpStatusCode.OK
+                            };
+                        }
+                        else
+                        {
+                            return PrepareUserList(usersResult);
+                        }
+                    }
+                    else
+                    {
+                        return PrepareUserList(usersResult);
+                    }
+                }
+                else
+                {
+                    return userResponse;
+                }
+            }
+            else
+            {
+                return userResponse;
+            }
+
+        }
+
+        public HttpResponseMessage PrepareUserList(JArray usersResult)
+        {
+            usersResult.ToList().ForEach(item =>
+            {
+                item["sessionHostName"] = "N/A";
+                item["tenantName"] = item["tenantName"];
+                item["tenantGroupName"] =  item["tenantGroupName"];
+                item["hostPoolName"] = item["hostPoolName"];
+                item["createTime"] = "N/A";
+                item["sessionState"] =  "N/A";
+                item["userPrincipalName"] = item["userPrincipalName"];
+            });
+            return new HttpResponseMessage()
+            {
+                Content = new StringContent(JsonConvert.SerializeObject(usersResult)),
+                StatusCode = System.Net.HttpStatusCode.OK
+            };
         }
 
         /// <summary>
@@ -88,7 +167,7 @@ namespace MSFT.WVDSaaS.API.BLL
                 //call rest api to get  app groups details -- july code bit
                 HttpResponseMessage response = CommonBL.InitializeHttpClient(deploymentUrl, accessToken).GetAsync("/RdsManagement/V1/TenantGroups/" + tenantGroupName + "/Tenants/" + tenantName + "/HostPools/" + hostPoolName + "/AppGroups/" + appGroupName).Result;
                 return response;
-                
+
             }
             catch
             {
@@ -140,7 +219,7 @@ namespace MSFT.WVDSaaS.API.BLL
                 //folllowing api call is included pagination
                 //HttpResponseMessage response = CommonBL.InitializeHttpClient(deploymentUrl, accessToken).GetAsync("/RdsManagement/V1/TenantGroups/" + tenantGroupName + "/Tenants/" + tenantName + "/HostPools/" + hostPoolName + "/AppGroups/" + appGroupName + "/StartMenuApps?PageSize=" + pageSize + "&LastEntry=" + lastEntry + "&SortField=" + sortField + "&IsDescending=" + isDescending + "&InitialSkip=" + initialSkip).Result;
                 return response;
-               
+
             }
             catch
             {
@@ -207,7 +286,7 @@ namespace MSFT.WVDSaaS.API.BLL
         {
             try
             {
-                
+
                 //call rest service to update app group details 
                 var content = new StringContent(JsonConvert.SerializeObject(rdMgmtAppGroup), Encoding.UTF8, "application/json");
                 HttpResponseMessage response = CommonBL.PatchAsync(deploymentUrl, accessToken, "/RdsManagement/V1/TenantGroups/" + rdMgmtAppGroup["tenantGroupName"].ToString() + "/Tenants/" + rdMgmtAppGroup["tenantName"].ToString() + "/HostPools/" + rdMgmtAppGroup["hostPoolName"].ToString() + "/AppGroups/" + rdMgmtAppGroup["appGroupName"].ToString(), content).Result;
