@@ -1707,9 +1707,9 @@ app-breadcrum a {
 }*/
 
 .AppGrouptoggle {
-  position: fixed;
+  position: absolute;
   bottom: 0px;
-  left: 330px;
+  left: 280px;
   right: 0px;
   height: 50%;
   background-color: #fff;

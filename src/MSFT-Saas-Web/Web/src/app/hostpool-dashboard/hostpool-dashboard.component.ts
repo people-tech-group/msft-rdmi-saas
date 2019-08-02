@@ -1227,7 +1227,7 @@ export class HostpoolDashboardComponent implements OnInit {
   gettingHosts() {
     this.sessionHostLists = JSON.parse(sessionStorage.getItem('Hosts'));
 
-    if (this.sessionHostLists != null) {
+    if (this.sessionHostLists != null && this.sessionHostLists.length>0) {
       /* This Block of code is used to Exchange the allowNewSession value 'true' or 'false' to 'Yes' or 'No' */
       /*Exchange Block starting*/
       for (let j in this.sessionHostLists) {
@@ -4075,10 +4075,14 @@ export class HostpoolDashboardComponent implements OnInit {
 
   HideAppGroupDetails() {
     this.showAppGroupDashBoard = false;
+    this.sessionHostCheckedMain=false;
+    this.sessionHostchecked = [];
   }
 
   HideHostDetails() {
-    this.showHostDashBoard = false;
+    this.showHostDashBoard =  false;
+    this.checkedMainAppGroup=false;
+    this.checked=[];
   }
 
   /*

@@ -94,12 +94,12 @@ namespace MSFT.WVDSaaS.API.BLL
                             usersResult.ToList().ForEach(item =>
                             {
                                 var element = sessionUsersResult.ToList().FirstOrDefault(d => d["userPrincipalName"].ToString().ToLower() == item["userPrincipalName"].ToString().ToLower());
-                                item["sessionHostName"] = element != null ? element["sessionHostName"] : "N/A";
+                                item["sessionHostName"] = element != null ? element["sessionHostName"] : "NA";
                                 item["tenantName"] = element != null ? element["tenantName"] : item["tenantName"];
                                 item["tenantGroupName"] = element != null ? element["tenantGroupName"] : item["tenantGroupName"];
                                 item["hostPoolName"] = element != null ? element["hostPoolName"] : item["hostPoolName"];
-                                item["createTime"] = element != null ? element["createTime"]:"N/A";
-                                item["sessionState"] = element != null ? element["sessionState"]:"N/A";
+                                item["createTime"] = element != null ? element["createTime"]:"NA";
+                                item["sessionState"] = element != null ? element["sessionState"]:"NA";
                                 item["userPrincipalName"] = element != null ? element["userPrincipalName"] : item["userPrincipalName"];
                             });
 
@@ -135,12 +135,12 @@ namespace MSFT.WVDSaaS.API.BLL
         {
             usersResult.ToList().ForEach(item =>
             {
-                item["sessionHostName"] = "N/A";
+                item["sessionHostName"] = "NA";
                 item["tenantName"] = item["tenantName"];
                 item["tenantGroupName"] =  item["tenantGroupName"];
                 item["hostPoolName"] = item["hostPoolName"];
-                item["createTime"] = "N/A";
-                item["sessionState"] =  "N/A";
+                item["createTime"] = "NA";
+                item["sessionState"] =  "NA";
                 item["userPrincipalName"] = item["userPrincipalName"];
             });
             return new HttpResponseMessage()
