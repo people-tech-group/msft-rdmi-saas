@@ -627,56 +627,56 @@ export class DeploymentDashboardComponent implements OnInit {
   }
 
   /* This function is used to  loads all the tenants into table on click of Previous button in the table */
-  public previousPage() {
-    this.refreshToken = sessionStorage.getItem("Refresh_Token");
-    this.refreshTenantLoading = true;
-    this.tenantlistErrorFound = false;
-    this.lastEntry = this.searchTenants[0].tenantName;
-    this.curentIndex = this.curentIndex - 1;
-    this.getTenantsUrl = this._AppService.ApiUrl + '/api/Tenant/GetTenantList?tenantGroupName=' + this.tenantGroupName + '&refresh_token=' + this.refreshToken + '&pageSize=' + this.pageSize + '&sortField=TenantName&isDescending=true&initialSkip=' + this.initialSkip + '&lastEntry=' + this.searchTenants[0].tenantName;
-    this._AppService.GetTenants(this.getTenantsUrl).subscribe(response => {
-      let responseObject = JSON.parse(response['_body']);
-      this.tenants = responseObject.reverse();
-      this.tenantsCount = responseObject.length;
-      this.previousPageNo = this.currentPageNo;
-      this.currentPageNo = this.currentPageNo - 1;
-      if (this.tenants[0]) {
-        if (this.tenants[0].code == "Invalid Token") {
-          sessionStorage.clear();
-          this.router.navigate(['/invalidtokenmessage']);
-        }
-      }
-      this.searchTenants = this.tenants;
-      if (this.searchTenants.length == 0) {
-        this.editedBody = true;
-        this.showCreateTenant = true;
-        this.tenantlistErrorFound = false;
-      }
-      else {
-        if (this.searchTenants[0].Message == null) {
-          this.editedBody = false;
-          this.showCreateTenant = false;
-          this.tenantlistErrorFound = false;
-        }
-      }
-      this.refreshTenantLoading = false;
-    },
-      /*
-       * If Any Error (or) Problem With Services (or) Problem in internet this Error Block Will Execute
-       */
-      error => {
-        this.editedBody = false;
-        this.tenantlistErrorFound = true;
-        this.refreshTenantLoading = false;
-      }
-    );
-    this.isEditDisabled = true;
-    this.isDeleteDisabled = true;
-    for (let i = 0; i < this.searchTenants.length; i++) {
-      this.checked[i] = false;
-    }
-    this.checkedMain = false;
-  }
+  // public previousPage() {
+  //   this.refreshToken = sessionStorage.getItem("Refresh_Token");
+  //   this.refreshTenantLoading = true;
+  //   this.tenantlistErrorFound = false;
+  //   this.lastEntry = this.searchTenants[0].tenantName;
+  //   this.curentIndex = this.curentIndex - 1;
+  //   this.getTenantsUrl = this._AppService.ApiUrl + '/api/Tenant/GetTenantList?tenantGroupName=' + this.tenantGroupName + '&refresh_token=' + this.refreshToken + '&pageSize=' + this.pageSize + '&sortField=TenantName&isDescending=true&initialSkip=' + this.initialSkip + '&lastEntry=' + this.searchTenants[0].tenantName;
+  //   this._AppService.GetTenants(this.getTenantsUrl).subscribe(response => {
+  //     let responseObject = JSON.parse(response['_body']);
+  //     this.tenants = responseObject.reverse();
+  //     this.tenantsCount = responseObject.length;
+  //     this.previousPageNo = this.currentPageNo;
+  //     this.currentPageNo = this.currentPageNo - 1;
+  //     if (this.tenants[0]) {
+  //       if (this.tenants[0].code == "Invalid Token") {
+  //         sessionStorage.clear();
+  //         this.router.navigate(['/invalidtokenmessage']);
+  //       }
+  //     }
+  //     this.searchTenants = this.tenants;
+  //     if (this.searchTenants.length == 0) {
+  //       this.editedBody = true;
+  //       this.showCreateTenant = true;
+  //       this.tenantlistErrorFound = false;
+  //     }
+  //     else {
+  //       if (this.searchTenants[0].Message == null) {
+  //         this.editedBody = false;
+  //         this.showCreateTenant = false;
+  //         this.tenantlistErrorFound = false;
+  //       }
+  //     }
+  //     this.refreshTenantLoading = false;
+  //   },
+  //     /*
+  //      * If Any Error (or) Problem With Services (or) Problem in internet this Error Block Will Execute
+  //      */
+  //     error => {
+  //       this.editedBody = false;
+  //       this.tenantlistErrorFound = true;
+  //       this.refreshTenantLoading = false;
+  //     }
+  //   );
+  //   this.isEditDisabled = true;
+  //   this.isDeleteDisabled = true;
+  //   for (let i = 0; i < this.searchTenants.length; i++) {
+  //     this.checked[i] = false;
+  //   }
+  //   this.checkedMain = false;
+  // }
 
   /* This function is used to  loads all the tenants into table on click of Current page number values  in the table
     * ---------
@@ -684,117 +684,117 @@ export class DeploymentDashboardComponent implements OnInit {
    * index - Accepts current index  count 
    * ---------
    */
-  public CurrentPage(index) {
-    this.previousPageNo = this.currentPageNo;
-    this.currentPageNo = index + 1;
-    this.curentIndex = index;
-    this.refreshToken = sessionStorage.getItem("Refresh_Token");
-    this.refreshTenantLoading = true;
-    this.tenantlistErrorFound = false;
-    let diff = this.currentPageNo - this.previousPageNo;
-    // to get intialskip
-    if (this.currentPageNo >= this.previousPageNo) {
-      this.isDescending = false;
-      this.pageSize = diff * this.pageSize;
-      this.lastEntry = this.searchTenants[this.searchTenants.length - 1].tenantName;
-    } else {
-      this.isDescending = true;
-      this.lastEntry = this.searchTenants[0].tenantName;
-    }
-    this.getTenantsUrl = this._AppService.ApiUrl + '/api/Tenant/GetTenantList?tenantGroupName=' + this.tenantGroupName + '&refresh_token=' + this.refreshToken + '&pageSize=' + this.pageSize + '&sortField=TenantName&isDescending=' + this.isDescending + '&initialSkip=' + this.initialSkip + '&lastEntry=' + this.lastEntry;
-    this._AppService.GetTenants(this.getTenantsUrl).subscribe(response => {
-      let responseObject = JSON.parse(response['_body']);
-      this.tenants = responseObject; //.splice(0, 3)
-      this.tenantsCount = responseObject.length;
-      if (this.tenants[0]) {
-        if (this.tenants[0].code == "Invalid Token") {
-          sessionStorage.clear();
-          this.router.navigate(['/invalidtokenmessage']);
-        }
-      }
-      this.searchTenants = this.tenants;
-      if (this.searchTenants.length == 0) {
-        this.editedBody = true;
-        this.showCreateTenant = true;
-        this.tenantlistErrorFound = false;
-      }
-      else {
-        if (this.searchTenants[0].Message == null) {
-          this.editedBody = false;
-          this.showCreateTenant = false;
-          this.tenantlistErrorFound = false;
-        }
-      }
-      this.refreshTenantLoading = false;
-    },
-      /*
-       * If Any Error (or) Problem With Services (or) Problem in internet this Error Block Will Execute
-       */
-      error => {
-        this.editedBody = false;
-        this.tenantlistErrorFound = true;
-        this.refreshTenantLoading = false;
-      }
-    );
-    this.isEditDisabled = true;
-    this.isDeleteDisabled = true;
-    for (let i = 0; i < this.searchTenants.length; i++) {
-      this.checked[i] = false;
-    }
-    this.checkedMain = false;
-  }
+  // public CurrentPage(index) {
+  //   this.previousPageNo = this.currentPageNo;
+  //   this.currentPageNo = index + 1;
+  //   this.curentIndex = index;
+  //   this.refreshToken = sessionStorage.getItem("Refresh_Token");
+  //   this.refreshTenantLoading = true;
+  //   this.tenantlistErrorFound = false;
+  //   let diff = this.currentPageNo - this.previousPageNo;
+  //   // to get intialskip
+  //   if (this.currentPageNo >= this.previousPageNo) {
+  //     this.isDescending = false;
+  //     this.pageSize = diff * this.pageSize;
+  //     this.lastEntry = this.searchTenants[this.searchTenants.length - 1].tenantName;
+  //   } else {
+  //     this.isDescending = true;
+  //     this.lastEntry = this.searchTenants[0].tenantName;
+  //   }
+  //   this.getTenantsUrl = this._AppService.ApiUrl + '/api/Tenant/GetTenantList?tenantGroupName=' + this.tenantGroupName + '&refresh_token=' + this.refreshToken + '&pageSize=' + this.pageSize + '&sortField=TenantName&isDescending=' + this.isDescending + '&initialSkip=' + this.initialSkip + '&lastEntry=' + this.lastEntry;
+  //   this._AppService.GetTenants(this.getTenantsUrl).subscribe(response => {
+  //     let responseObject = JSON.parse(response['_body']);
+  //     this.tenants = responseObject; //.splice(0, 3)
+  //     this.tenantsCount = responseObject.length;
+  //     if (this.tenants[0]) {
+  //       if (this.tenants[0].code == "Invalid Token") {
+  //         sessionStorage.clear();
+  //         this.router.navigate(['/invalidtokenmessage']);
+  //       }
+  //     }
+  //     this.searchTenants = this.tenants;
+  //     if (this.searchTenants.length == 0) {
+  //       this.editedBody = true;
+  //       this.showCreateTenant = true;
+  //       this.tenantlistErrorFound = false;
+  //     }
+  //     else {
+  //       if (this.searchTenants[0].Message == null) {
+  //         this.editedBody = false;
+  //         this.showCreateTenant = false;
+  //         this.tenantlistErrorFound = false;
+  //       }
+  //     }
+  //     this.refreshTenantLoading = false;
+  //   },
+  //     /*
+  //      * If Any Error (or) Problem With Services (or) Problem in internet this Error Block Will Execute
+  //      */
+  //     error => {
+  //       this.editedBody = false;
+  //       this.tenantlistErrorFound = true;
+  //       this.refreshTenantLoading = false;
+  //     }
+  //   );
+  //   this.isEditDisabled = true;
+  //   this.isDeleteDisabled = true;
+  //   for (let i = 0; i < this.searchTenants.length; i++) {
+  //     this.checked[i] = false;
+  //   }
+  //   this.checkedMain = false;
+  // }
 
   /* This function is used to  loads all the tenants into table on click of Next button in the table */
-  public NextPage() {
-    this.refreshToken = sessionStorage.getItem("Refresh_Token");
-    this.refreshTenantLoading = true;
-    this.tenantlistErrorFound = false;
-    this.lastEntry = this.searchTenants[this.searchTenants.length - 1].tenantName;
-    this.curentIndex = this.curentIndex + 1;
-    this.getTenantsUrl = this._AppService.ApiUrl + '/api/Tenant/GetTenantList?tenantGroupName=' + this.tenantGroupName + '&refresh_token=' + this.refreshToken + '&pageSize=' + this.pageSize + '&sortField=TenantName&isDescending=false&initialSkip=' + this.initialSkip + '&lastEntry=' + this.lastEntry;
-    this._AppService.GetTenants(this.getTenantsUrl).subscribe(response => {
-      let responseObject = JSON.parse(response['_body']);
-      this.tenants = responseObject;
-      this.tenantsCount = responseObject.length;
-      this.previousPageNo = this.currentPageNo;
-      this.currentPageNo = this.currentPageNo + 1;
-      if (this.tenants[0]) {
-        if (this.tenants[0].code == "Invalid Token") {
-          sessionStorage.clear();
-          this.router.navigate(['/invalidtokenmessage']);
-        }
-      }
-      this.searchTenants = this.tenants;
-      if (this.searchTenants.length == 0) {
-        this.editedBody = true;
-        this.showCreateTenant = true;
-        this.tenantlistErrorFound = false;
-      }
-      else {
-        if (this.searchTenants[0].Message == null) {
-          this.editedBody = false;
-          this.showCreateTenant = false;
-          this.tenantlistErrorFound = false;
-        }
-      }
-      this.refreshTenantLoading = false;
-    },
-      /*
-       * If Any Error (or) Problem With Services (or) Problem in internet this Error Block Will Execute
-       */
-      error => {
-        this.editedBody = false;
-        this.tenantlistErrorFound = true;
-        this.refreshTenantLoading = false;
-      }
-    );
-    this.isEditDisabled = true;
-    this.isDeleteDisabled = true;
-    for (let i = 0; i < this.searchTenants.length; i++) {
-      this.checked[i] = false;
-    }
-    this.checkedMain = false;
-  };
+  // public NextPage() {
+  //   this.refreshToken = sessionStorage.getItem("Refresh_Token");
+  //   this.refreshTenantLoading = true;
+  //   this.tenantlistErrorFound = false;
+  //   this.lastEntry = this.searchTenants[this.searchTenants.length - 1].tenantName;
+  //   this.curentIndex = this.curentIndex + 1;
+  //   this.getTenantsUrl = this._AppService.ApiUrl + '/api/Tenant/GetTenantList?tenantGroupName=' + this.tenantGroupName + '&refresh_token=' + this.refreshToken + '&pageSize=' + this.pageSize + '&sortField=TenantName&isDescending=false&initialSkip=' + this.initialSkip + '&lastEntry=' + this.lastEntry;
+  //   this._AppService.GetTenants(this.getTenantsUrl).subscribe(response => {
+  //     let responseObject = JSON.parse(response['_body']);
+  //     this.tenants = responseObject;
+  //     this.tenantsCount = responseObject.length;
+  //     this.previousPageNo = this.currentPageNo;
+  //     this.currentPageNo = this.currentPageNo + 1;
+  //     if (this.tenants[0]) {
+  //       if (this.tenants[0].code == "Invalid Token") {
+  //         sessionStorage.clear();
+  //         this.router.navigate(['/invalidtokenmessage']);
+  //       }
+  //     }
+  //     this.searchTenants = this.tenants;
+  //     if (this.searchTenants.length == 0) {
+  //       this.editedBody = true;
+  //       this.showCreateTenant = true;
+  //       this.tenantlistErrorFound = false;
+  //     }
+  //     else {
+  //       if (this.searchTenants[0].Message == null) {
+  //         this.editedBody = false;
+  //         this.showCreateTenant = false;
+  //         this.tenantlistErrorFound = false;
+  //       }
+  //     }
+  //     this.refreshTenantLoading = false;
+  //   },
+  //     /*
+  //      * If Any Error (or) Problem With Services (or) Problem in internet this Error Block Will Execute
+  //      */
+  //     error => {
+  //       this.editedBody = false;
+  //       this.tenantlistErrorFound = true;
+  //       this.refreshTenantLoading = false;
+  //     }
+  //   );
+  //   this.isEditDisabled = true;
+  //   this.isDeleteDisabled = true;
+  //   for (let i = 0; i < this.searchTenants.length; i++) {
+  //     this.checked[i] = false;
+  //   }
+  //   this.checkedMain = false;
+  // };
 
   /* This function is used to check Tenant Access and refresh the tenants list */
   public RefreshTenant() {

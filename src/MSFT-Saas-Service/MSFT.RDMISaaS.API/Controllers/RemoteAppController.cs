@@ -114,6 +114,44 @@ namespace MSFT.WVDSaaS.API.Controllers
             return Ok(remoteAppResult);
         }
 
+        public IHttpActionResult Put([FromBody] JObject rdMgmtRemoteApp)
+        {
+            //get deployment url
+            deploymentUrl = configurations.rdBrokerUrl;
+            try
+            {
+                if (rdMgmtRemoteApp != null)
+                {
+                    if (!string.IsNullOrEmpty(rdMgmtRemoteApp["refresh_token"].ToString()))
+                    {
+                        string accessToken = "";
+                        //get token value
+                        accessToken = common.GetTokenValue(rdMgmtRemoteApp["refresh_token"].ToString());
+                        if (!string.IsNullOrEmpty(accessToken) && accessToken.ToString().ToLower() != invalidToken && accessToken.ToString().ToLower() != invalidCode)
+                        {
+                            remoteAppResult = remoteAppBL.EditRemoteApp(deploymentUrl, accessToken, rdMgmtRemoteApp);
+                        }
+                        else
+                        {
+                            remoteAppResult.Add("isSuccess", false);
+                            remoteAppResult.Add("message", Constants.invalidToken);
+                        }
+                    }
+                }
+                else
+                {
+                    remoteAppResult.Add("isSuccess", false);
+                    remoteAppResult.Add("message", Constants.invalidDataMessage);
+                }
+            }
+            catch (Exception ex)
+            {
+                remoteAppResult.Add("isSuccess", false);
+                remoteAppResult.Add("message", "Remote App '" + rdMgmtRemoteApp["remoteAppName"].ToString() + "' has not been updated." + ex.Message.ToString() + " Pleasse try again later.");
+            }
+            return Ok(remoteAppResult);
+        }
+
         /// <summary>
         /// Description - punlish multiple aps to app group
         /// </summary>

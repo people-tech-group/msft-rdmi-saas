@@ -50,7 +50,7 @@
         </ul>
         <div class="tab-content">
           <div class="tab-pane active" id="tab_default_1">
-            <div class="col-xs-12">
+            <div class="col-xs-8">
               <div class="Deployment-details" *ngIf="!hostpoolDetailsErrorFound">
                 <div class="row">
                   <div class="col-md-5">
@@ -397,17 +397,17 @@
                                   </thead>
                                   <tbody *ngIf="!(SessionsListErrorFound)">
                                     <tr
-                                      *ngFor="let session of userSessionSearchList | paginate: { itemsPerPage: listItems, currentPage: userSessionslist, id:'sessions' }; let sessionIndex=index"
-                                      [ngClass]="{'rowSelect':checkedUserSessions[absoluteIndex(sessionIndex, listItems, userSessionslist)]}"
+                                      *ngFor="let session of userSessionSearchList | paginate: { itemsPerPage: userSessionlistItems, currentPage: userSessionslist, id:'sessions' }; let sessionIndex=index"
+                                      [ngClass]="{'rowSelect':checkedUserSessions[absoluteIndex(sessionIndex, userSessionlistItems, userSessionslist)]}"
                                       id="row-sessions-{{session.sessionId}}"
-                                      (click)="UserSessionRowClick(session.sessionId, absoluteIndex(sessionIndex, listItems, userSessionslist))"
+                                      (click)="UserSessionRowClick(session.sessionId, absoluteIndex(sessionIndex, userSessionlistItems, userSessionslist))"
                                      >
                                       <td style="width: 4%;text-align: left">
                                         <div class="control-group">
                                           <label class="control control--checkbox">
                                             <input type="checkbox" class="solcheckbox"
-                                              (click)="UserSessionIsChecked(absoluteIndex(sessionIndex, listItems, userSessionslist))"
-                                              [checked]="checkedUserSessions[absoluteIndex(sessionIndex, listItems, userSessionslist)]">
+                                              (click)="UserSessionIsChecked(absoluteIndex(sessionIndex, userSessionlistItems, userSessionslist))"
+                                              [checked]="checkedUserSessions[absoluteIndex(sessionIndex, userSessionlistItems, userSessionslist)]">
                                             <span class="control__indicator"></span>
                                           </label>
                                         </div>
@@ -685,6 +685,9 @@
                               <li><button type="button" data-toggle="modal" [disabled]="isDeleteAppsDisabled"
                                   data-target="#deleteModalApps" id="btnDeleteAppPath"><i class="icon icon-delete"
                                     aria-hidden="true"></i> Remove Apps</button></li>
+                                    <li><button type="button"  [disabled]="isEditAppsDisabled" (click)="OpenEditApp($event)"
+                                      id="btnEditApp"><i class="icon icon-edit"
+                                        aria-hidden="true"></i> Edit</button></li>
                               <li><button type="button" (click)="RefreshApps()"><i class="icon icon-refresh"
                                     aria-hidden="true"></i> Refresh</button></li>
                             </ul>
@@ -725,16 +728,16 @@
                             </thead>
                             <tbody *ngIf="!(appListErrorFound || editedBodyApp)">
                               <tr
-                                *ngFor="let List of appGroupsAppListSearch | paginate: { itemsPerPage: listItems, currentPage: appslist, id:'apps' }; let AppInd=index"
-                                [ngClass]="{'rowSelect':checkedApps[absoluteIndex(AppInd, listItems, appslist)]}"
+                                *ngFor="let List of appGroupsAppListSearch | paginate: { itemsPerPage: applistItems, currentPage: appslist, id:'apps' }; let AppInd=index"
+                                [ngClass]="{'rowSelect':checkedApps[absoluteIndex(AppInd, applistItems, appslist)]}"
                                 id="row-users-{{List.appAlias}}"
-                                (click)="AppListRowClicked(List.remoteAppName, absoluteIndex(AppInd, listItems, appslist))">
+                                (click)="AppListRowClicked(List.remoteAppName, absoluteIndex(AppInd, applistItems, appslist))">
                                 <td style="width: 4%;text-align: left">
                                   <div class="control-group">
                                     <label class="control control--checkbox">
                                       <input type="checkbox" class="solcheckbox appGroupbottomBtnClose"
-                                        (click)="IsCheckedApp(absoluteIndex(AppInd, listItems, appslist))"
-                                        [checked]="checkedApps[absoluteIndex(AppInd, listItems, appslist)]">
+                                        (click)="IsCheckedApp(absoluteIndex(AppInd, applistItems, appslist))"
+                                        [checked]="checkedApps[absoluteIndex(AppInd, applistItems, appslist)]">
                                       <span class="control__indicator"></span>
                                     </label>
                                   </div>
@@ -764,7 +767,7 @@
                           <!-- pagination code -->
                           <div class="row" style="margin: 0; position:fixed; right:20px; bottom:0px;"
                             *ngIf="!(editedBodyApp || appListErrorFound)">
-                            <pagination-controls (pageChange)="appslist = $event" class="pagination pull-right"
+                            <pagination-controls  (pageChange)="appslist = $event" class="pagination pull-right"
                               id="apps"></pagination-controls>
                           </div>
                           <!--<div>-->
@@ -844,16 +847,16 @@
                           </thead>
                           <tbody *ngIf="!(usersListErrorFound || editedLbodyUsers)">
                             <tr
-                              *ngFor="let UserList of appUsersListSearch | paginate: { itemsPerPage: listItems, currentPage: userslist, id:'users' }; let UserInd=index"
-                              [ngClass]="{'rowSelect':checkedUsers[absoluteIndex(UserInd, listItems, userslist)]}"
+                              *ngFor="let UserList of appUsersListSearch | paginate: { itemsPerPage: userlistItems, currentPage: userslist, id:'users' }; let UserInd=index"
+                              [ngClass]="{'rowSelect':checkedUsers[absoluteIndex(UserInd, userlistItems, userslist)]}"
                               id="row-users-{{UserList.Name}}"
-                              (click)="AppUserRowClick(UserList.userPrincipalName, absoluteIndex(UserInd, listItems, userslist))">
+                              (click)="AppUserRowClick(UserList.userPrincipalName, absoluteIndex(UserInd, userlistItems, userslist))">
                               <td style="width: 4%;text-align: left">
                                 <div class="control-group">
                                   <label class="control control--checkbox">
                                     <input type="checkbox" class="solcheckbox"
-                                      (click)="AppUsersIsChecked(absoluteIndex(UserInd, listItems, userslist))"
-                                      [checked]="checkedUsers[absoluteIndex(UserInd, listItems, userslist)]">
+                                      (click)="AppUsersIsChecked(absoluteIndex(UserInd, userlistItems, userslist))"
+                                      [checked]="checkedUsers[absoluteIndex(UserInd, userlistItems, userslist)]">
                                     <span class="control__indicator"></span>
                                   </label>
                                 </div>
@@ -1292,6 +1295,16 @@
                     Please enter valid icon path
                   </div>
                 </div>
+                <div class="col-xs-12 form-group">
+                  <label for="usr">Friendly Name
+                  </label>
+                  <input type="text" id="friendlyName"  placeholder="Enter Friendly Name" formControlName="friendlyName">
+                </div>
+                <div class="col-xs-12 form-group">
+                  <label for="usr">Command Line
+                  </label>
+                  <input type="text" id="requiredCommandLine"  placeholder="Enter Command Line" formControlName="requiredCommandLine">
+                </div>
               </div>
             </div>
           </div>
@@ -1314,6 +1327,81 @@
   </div>
 </div>
 <!-- Add App from Path End-->
+
+<!--edit App-->
+<div class="overlay" *ngIf="showEditAppDialog">
+  <div class="newAppPath" id="EditAppPath">
+    <!--<input type="hidden" id="AppGroupNew" value="{{isCreateOpen}}" />-->
+    <form [formGroup]="newAppEditGroup">
+      <div class="createTenantHead">
+        <div class="TenantStatus">
+          <h4>Edit App </h4>
+          <div class="col-xs-12 no-pad">
+            <div class="DeployUrl">
+
+            </div>
+            <div style="clear:both"></div>
+            <div id="" class="tab-content current">
+              <div class="DeployUrl" id="">
+                <div class="col-xs-12 form-group">
+                  <label for="usr">Path<span class="important-Field">*</span></label>
+                  <input type="text" id="imagepath" placeholder="Enter Valid Path" formControlName="AppPath">
+                  <!--(ngModelChange)="PathChange($event)"-->
+                  <div *ngIf="newAppEditGroup.controls['AppPath'].hasError('pattern')" class="colorRed">
+                    Please enter valid path
+                  </div>
+                </div>
+                <div class="col-xs-12  form-group">
+                  <label for="usr">App Name<span class="important-Field">*</span></label>
+                  <input type="text" id="appName" formControlName="Name" placeholder="Enter Name of RemoteApp" />
+                  <div *ngIf="newAppEditGroup.controls['Name'].hasError('pattern')" class="colorRed">
+                    Please enter valid Name
+                  </div>
+                </div>
+                <div class="col-xs-12  form-group">
+                  <label for="usr">Icon Index<span class="important-Field">*</span></label>
+                  <input type="number"  id="IconIndex" formControlName="IconIndex" placeholder="Enter Icon Index " value="0" style="width:100%"/>
+                </div>
+                <div class="col-xs-12 form-group">
+                  <label for="usr">Icon Path
+                    <span class="important-Field">*</span>
+                  </label>
+                  <input type="text" id="IconPath"  placeholder="Enter Valid Icon Path" formControlName="IconPath">
+                  
+                </div>
+                <div class="col-xs-12 form-group">
+                  <label for="usr">Friendly Name
+                  </label>
+                  <input type="text" id="friendlyName"  placeholder="Enter Friend Name" formControlName="friendlyName">
+                </div>
+                <div class="col-xs-12 form-group">
+                  <label for="usr">Require Command Line
+                  </label>
+                  <input type="text" id="requiredCommandLine"  placeholder="Enter Command Line" formControlName="requiredCommandLine">
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <a class="close" id="AddUserSlideClose" (click)="HideAppEditDialog()"><i class="icon icon-close"
+          aria-hidden="true"></i></a>
+      <div class="botomBtn">
+        <ul>
+          <li>
+            <input type=button value="Cancel" id="editAppbtnCancel" (click)="HideAppEditDialog()" />
+          </li>
+          <li>
+            <input type="button" value="Update" [disabled]="newAppEditGroup.invalid"
+              (click)="UpdateApp(newAppEditGroup.value)" />
+          </li>
+        </ul>
+      </div>
+    </form>
+  </div>
+</div>
+
+
 <!--Remove Apps from path starts-->
 <div class="modal fade" id="deleteModalApps" role="dialog">
   <div class="modal-dialog">
@@ -1351,7 +1439,7 @@
                   <label>User Principal Name <span class="important-Field">*</span></label>
                   <input type="text" name="name" formControlName="UserPrincipalName"
                     (ngModelChange)="UserPrincipalNameChange($event)" style="width: 359px;"
-                    placeholder="Ex. example@demo.onmicrosoft.com" />
+                    placeholder="Ex. example@demo.onmicrosoft.com"  />
                   <div *ngIf="addUserForm.controls['UserPrincipalName'].hasError('pattern')" class="colorRed">
                     Please enter valid User Principal Name(Ex: cris@contoso.com)
                   </div>

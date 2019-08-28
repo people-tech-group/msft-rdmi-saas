@@ -92,7 +92,7 @@ namespace MSFT.WVDSaaS.API.BLL
                 string strJson = response.Content.ReadAsStringAsync().Result;
                 if (response.IsSuccessStatusCode)
                 {
-                    if (response.StatusCode.ToString().ToLower() == "created")
+                    if (response.StatusCode == System.Net.HttpStatusCode.Created || response.StatusCode==System.Net.HttpStatusCode.OK)
                     {
                         poolResult.Add("isSuccess", true);
                         poolResult.Add("message","Hostpool '" + rdMgmtHostPool["hostPoolName"].ToString() + "' has been created successfully.");

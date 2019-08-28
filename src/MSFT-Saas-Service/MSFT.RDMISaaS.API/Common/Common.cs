@@ -35,8 +35,6 @@ namespace MSFT.WVDSaaS.API.Common
 
 
         #region "Functions/Methods"
-
-
         /// <summary>
         /// Description - Get access token from code
         /// </summary>
@@ -44,33 +42,29 @@ namespace MSFT.WVDSaaS.API.Common
         /// <returns></returns>
         public string GetAccessToken(string code)
         {
-            var responseString = "";
             try
             {
-                string OAUTH_2_0_TOKEN_ENDPOINT = "https://login.microsoftonline.com/common/oauth2/token";// //https://login.windows.net/common/oauth2/token
-                string client_ID = configurations.applicationId;
-                var request = (HttpWebRequest)WebRequest.Create(OAUTH_2_0_TOKEN_ENDPOINT);
-                var postData = "redirect_uri=" + HttpUtility.UrlEncode(configurations.redirectUrl);
-                postData += "&grant_type=authorization_code";
-                postData += "&resource=" + HttpUtility.UrlEncode(configurations.resourceUrl);
-                postData += "&client_id=" + client_ID;
-                postData += "&code=" + code + "";
-                var data = Encoding.ASCII.GetBytes(postData);
-                request.Method = "POST";
-                request.ContentType = "application/x-www-form-urlencoded";
-                request.ContentLength = data.Length;
-                using (var stream = request.GetRequestStream())
+                HttpResponseMessage response;
+                Dictionary<string, string> requestdata = new Dictionary<string, string>();
+                var url = configurations.aadTokenUrl;
+                requestdata.Add("redirect_uri", configurations.redirectUrl);
+                requestdata.Add("grant_type", "authorization_code");
+                requestdata.Add("resource", configurations.resourceUrl);
+                requestdata.Add("code", code);
+                requestdata.Add("client_id", configurations.applicationId);
+                requestdata.Add("client_secret", configurations.clientSecret);
+                using (HttpClient client = new HttpClient())
                 {
-                    stream.Write(data, 0, data.Length);
+                    client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+                    response = client.PostAsync(url, new FormUrlEncodedContent(requestdata)).Result;
+                    var tokenval = response.Content.ReadAsStringAsync().Result;
+                    return tokenval;
                 }
-                var response = (HttpWebResponse)request.GetResponse();
-                responseString = new StreamReader(response.GetResponseStream()).ReadToEnd();
             }
             catch (Exception ex)
             {
                 return Constants.invalidCode.ToString();
             }
-            return responseString.ToString();
         }
 
         /// <summary>
@@ -80,63 +74,56 @@ namespace MSFT.WVDSaaS.API.Common
         /// <returns></returns>
         public string GetAccessTokenByRefreshToken(string refreshToken)
         {
-            var responseString = "";
             try
             {
-                string OAUTH_2_0_TOKEN_ENDPOINT = "https://login.windows.net/common/oauth2/token";
-                string client_ID = configurations.applicationId;
-                var request = (HttpWebRequest)WebRequest.Create(OAUTH_2_0_TOKEN_ENDPOINT);
-                var postData = "redirect_uri=" + configurations.redirectUrl;
-                postData += "&grant_type=refresh_token";
-                postData += "&resource=" + configurations.resourceUrl;
-                postData += "&client_id=" + client_ID;
-                postData += "&refresh_token=" + refreshToken + "";
-                var data = Encoding.ASCII.GetBytes(postData);
-                request.Method = "POST";
-                request.ContentType = "application/x-www-form-urlencoded";
-                request.ContentLength = data.Length;
-                using (var stream = request.GetRequestStream())
+                HttpResponseMessage response;
+                Dictionary<string, string> requestdata = new Dictionary<string, string>();
+                var url = configurations.aadTokenUrl;
+                requestdata.Add("redirect_uri", configurations.redirectUrl);
+                requestdata.Add("grant_type", "refresh_token");
+                requestdata.Add("resource", configurations.resourceUrl);
+                requestdata.Add("refresh_token", refreshToken);
+                requestdata.Add("client_id", configurations.applicationId);
+                requestdata.Add("client_secret", configurations.clientSecret);
+                using (HttpClient client = new HttpClient())
                 {
-                    stream.Write(data, 0, data.Length);
+                    client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+                    response = client.PostAsync(url, new FormUrlEncodedContent(requestdata)).Result;
+                    var tokenval = response.Content.ReadAsStringAsync().Result;
+                    return tokenval;
                 }
-                var response = (HttpWebResponse)request.GetResponse();
-                responseString = new StreamReader(response.GetResponseStream()).ReadToEnd();
             }
             catch
             {
                 return Constants.invalidCode.ToString();
             }
-            return responseString.ToString();
         }
 
 
         public string GetAccessTokenByRefreshTokenManagement(string refreshToken)
         {
-            var responseString = "";
             try
             {
-                string OAUTH_2_0_TOKEN_ENDPOINT = "https://login.windows.net/common/oauth2/token";
-                string client_ID = configurations.applicationId;
-                var request = (HttpWebRequest)WebRequest.Create(OAUTH_2_0_TOKEN_ENDPOINT);
-                var postData = "grant_type=refresh_token";
-                postData += "&resource=" + configurations.managementResourceUrl;
-                postData += "&refresh_token=" + refreshToken + "";
-                var data = Encoding.ASCII.GetBytes(postData);
-                request.Method = "POST";
-                request.ContentType = "application/x-www-form-urlencoded";
-                request.ContentLength = data.Length;
-                using (var stream = request.GetRequestStream())
+                HttpResponseMessage response;
+                Dictionary<string, string> requestdata = new Dictionary<string, string>();
+                var url = configurations.aadTokenUrl;
+                requestdata.Add("grant_type", "refresh_token");
+                requestdata.Add("resource", configurations.managementResourceUrl);
+                requestdata.Add("refresh_token", refreshToken);
+                requestdata.Add("client_id", configurations.applicationId);
+                requestdata.Add("client_secret", configurations.clientSecret);
+                using (HttpClient client = new HttpClient())
                 {
-                    stream.Write(data, 0, data.Length);
+                    client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+                    response = client.PostAsync(url, new FormUrlEncodedContent(requestdata)).Result;
+                    var tokenval = response.Content.ReadAsStringAsync().Result;
+                    return tokenval;
                 }
-                var response = (HttpWebResponse)request.GetResponse();
-                responseString = new StreamReader(response.GetResponseStream()).ReadToEnd();
             }
-            catch
+            catch (Exception ex)
             {
                 return Constants.invalidCode.ToString();
             }
-            return responseString.ToString();
         }
         /// <summary>
         /// Description : Get login details from code
@@ -185,7 +172,6 @@ namespace MSFT.WVDSaaS.API.Common
                                 }
                             }
                             loginDetails.TenantGroups = list.ToArray();
-                            //return loginDetails;
                         }
                         else if ((int)httpResponse.StatusCode == 429)
                         {
@@ -200,10 +186,6 @@ namespace MSFT.WVDSaaS.API.Common
                     {
                         return null;
                     }
-
-                    //For Temporary Use
-                    // loginDetails.TenantGroups = new string[] { };
-
                 }
                 else
                 {
