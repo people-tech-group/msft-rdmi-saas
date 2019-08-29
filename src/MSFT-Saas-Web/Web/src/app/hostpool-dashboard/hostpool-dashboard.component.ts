@@ -2019,21 +2019,18 @@ export class HostpoolDashboardComponent implements OnInit {
    */
   public IsCheckedAppGroup(appGroupIndex: any, event) {
     this.checked[appGroupIndex] = !this.checked[appGroupIndex];
-
     if (event.target.checked != null && event.target.checked != undefined) {
       this.showAppGroupDashBoard = !event.target.checked;// !this.showAppGroupDashBoard;
     }
     else if (event.type == "click") {
       this.showAppGroupDashBoard = this.showAppGroupDashBoard == true ? false : true;// !this.showHostDashBoard;
     }
-
     //this.showHostDashBoard = false;///addded by susmita
     this.appGroupcheckedTrue = [];
     for (let i = 0; i < this.checked.length; i++) {
       if (this.checked[i] == true) {
         this.appGroupcheckedTrue.push(this.checked[i]);
       }
-     
       if (this.checked[i] == false) {
         this.checkedMainAppGroup = false;
         break;
@@ -2043,12 +2040,11 @@ export class HostpoolDashboardComponent implements OnInit {
           this.checkedMainAppGroup = true;
         }
       }
-     
     }
-    if(this.checked.length==1)
-    {
-      this.state = "up";
-    }
+    if(this.appGroupcheckedTrue.length==1)
+      {
+        this.state = 'up';
+      }
   }
 
   /*
@@ -2136,7 +2132,6 @@ export class HostpoolDashboardComponent implements OnInit {
         index = i;
       }
     }
-    console.log(this.appGroupcheckedTrue.length,"this.appGroupcheckedTrue.length");
     if (this.appGroupcheckedTrue.length == 1) {
       this.appGroupDetails = [];
       this.state = 'up';
@@ -3161,7 +3156,6 @@ export class HostpoolDashboardComponent implements OnInit {
   public RestartHost() {
     var hostName = this.selectedHostName;
     let subscriptionId = this.hostDetails.subscriptionId != null ? this.hostDetails.subscriptionId : sessionStorage.getItem("SubscriptionId");
-    console.log(subscriptionId, "subscriptionId");
     this.RestartHostUrl = this._AppService.ApiUrl + '/api/SessionHost/RestartHost?subscriptionId=' + subscriptionId + '&resourceGroupName=' + this.hostDetails.resourceGroupName + '&sessionHostName=' + this.hostDetails.vmName + '&refresh_token=' + sessionStorage.getItem("Refresh_Token");
     this._AppService.RestartHost(this.RestartHostUrl).subscribe(response => {
       this.refreshHostpoolLoading = false;

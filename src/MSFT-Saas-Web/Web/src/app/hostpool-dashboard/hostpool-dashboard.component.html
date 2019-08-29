@@ -745,7 +745,7 @@
                                 <td style="width:15%;text-align:left;">{{List.remoteAppName}}</td>
                                 <td style="width:30%;"><span>{{List.filePath}}</span></td>
                                 <td style="width:20%;"><span> {{List.friendlyName}}  </span></td>
-                                <td style="width:20%;text-align:left;"><span>{{List.requiredCommandLine == null || List.requiredCommandLine == "" ? 'NA' : 'List.requiredCommandLine'}}</span></td>
+                                <td style="width:20%;text-align:left;"><span>{{List.requiredCommandLine =="" || List.requiredCommandLine==null ? "NA": List.requiredCommandLine}}</span></td>
                               </tr>
                             </tbody>
                           </table>
