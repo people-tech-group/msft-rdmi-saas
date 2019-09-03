@@ -271,6 +271,7 @@ export class HostpoolDashboardComponent implements OnInit {
   public Message: boolean = false;
   public isEditAppsDisabled: boolean = true;
   public showEditAppDialog: boolean = false;
+  public selectedHostRows: any = [];
   @ViewChild('closeModal') closeModal: ElementRef;
 
   constructor(private _AppService: AppService, private fb: FormBuilder, private http: Http, private route: ActivatedRoute, private _notificationsService: NotificationsService, private router: Router,
@@ -880,6 +881,7 @@ export class HostpoolDashboardComponent implements OnInit {
     this.showHostDashBoard = false;
     this.sessionHostCheckedMain = !this.sessionHostCheckedMain;
     var index;
+    this.selectedHostRows=[];
     for (let i = 0; i < this.sessionHostListsSearch.length; i++) {
       if (event.target.checked) {
         this.sessionHostchecked[i] = true;
@@ -892,6 +894,7 @@ export class HostpoolDashboardComponent implements OnInit {
     for (let j = 0; j < this.sessionHostchecked.length; j++) {
       if (this.sessionHostchecked[j] == true) {
         this.sessionHostCheckedAllTrue.push(this.sessionHostchecked[j]);
+        this.selectedHostRows.push(j);
         index = j;
       }
     }
@@ -1288,9 +1291,9 @@ export class HostpoolDashboardComponent implements OnInit {
    */
   public DeleteHost() {
     this.refreshHostpoolLoading = true;
-    for (let i = 0; i < this.sessionHostCheckedTrue.length; i++) {
-      let index = this.sessionHostCheckedTrue[i];
-      this.hostDeleteUrl = this._AppService.ApiUrl + '/api/SessionHost/DeleteSessionHost?tenantGroupName=' + this.tenantGroupName + '&tenantName=' + this.tenantName + '&hostPoolName=' + this.hostPoolName + '&sessionHostName=' + this.sessionHostName + '&refresh_token=' + sessionStorage.getItem("Refresh_Token");
+    for (let i = 0; i < this.selectedHostRows.length; i++) { 
+      let index = this.selectedHostRows[i];
+      this.hostDeleteUrl = this._AppService.ApiUrl + 'api/SessionHost/DeleteSessionHost?tenantGroup=' + this.tenantGroupName + '&tenantName=' + this.tenantName + '&hostPoolName=' + this.hostPoolName + '&sessionHostName=' + this.sessionHostListsSearch[index].sessionHostName + '&refresh_token=' + sessionStorage.getItem("Refresh_Token");
       this._AppService.DeleteHostService(this.hostDeleteUrl).subscribe(response => {
         this.refreshHostpoolLoading = false;
         var responseData = JSON.parse(response['_body']);
@@ -1360,8 +1363,9 @@ export class HostpoolDashboardComponent implements OnInit {
           AppComponent.GetNotification('icon icon-fail angular-NotifyFail', 'Failed To Delete Host', 'Problem with server, Please try again', new Date());
         }
       );
-      this.RefreshHost();
     }
+    this.RefreshHost();
+
   }
 
   /*
@@ -1376,10 +1380,12 @@ export class HostpoolDashboardComponent implements OnInit {
     this.SessionHostIsChecked(hostIndex, event);
     this.sessionHostName = hostName;
     this.sessionHostCheckedTrue = [];
+    this.selectedHostRows=[];
     var index = hostIndex;
     for (var i = 0; i < this.sessionHostchecked.length; i++) {
       if (this.sessionHostchecked[i] == true) {
         this.sessionHostCheckedTrue.push(this.sessionHostchecked[i]);
+        this.selectedHostRows.push(i);
         index = i;
       }
     }

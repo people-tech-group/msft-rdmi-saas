@@ -200,7 +200,7 @@ namespace MSFT.WVDSaaS.API.Controllers
         /// <param name="sessionHostName">Name of Session Host</param>
         /// <param name="refresh_token">refresh token to get access token</param>
         /// <returns></returns>
-        public IHttpActionResult DeleteSessionHost(string tenantGroup, string tenantName, string hostPoolName, string sessionHostName, string refresh_token)
+        public IHttpActionResult DeleteSessionHost([FromUri] string tenantGroup, string tenantName, string hostPoolName, string sessionHostName, string refresh_token)
         {
             //get deployment url
             deploymentUrl = configurations.rdBrokerUrl;
