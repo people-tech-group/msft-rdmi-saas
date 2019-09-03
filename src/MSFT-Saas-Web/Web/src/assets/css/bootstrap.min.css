@@ -3763,7 +3763,8 @@ input[type=button].btn-block, input[type=reset].btn-block, input[type=submit].bt
 }
 
     .fade.in {
-        opacity: 1
+        opacity: 1;
+        background-color: rgba(000,0,0,0.3);
     }
 
 .collapse {
@@ -6306,13 +6307,15 @@ button.close {
 
 .modal-open .modal {
     overflow-x: hidden;
-    overflow-y: auto
+    overflow-y: auto;
 }
 
 .modal-dialog {
     position: relative;
     width: auto;
-    margin: 10px
+    margin: 10px;
+    top: 5%;
+    z-index: 9999;
 }
 
 .modal-content {
@@ -6324,17 +6327,19 @@ button.close {
     border: 1px solid rgba(0,0,0,.2);
     border-radius: 0px;
     outline: 0;
+    opacity: 1.5;
     -webkit-box-shadow: 0 3px 9px rgba(0,0,0,.5);
     box-shadow: 0 3px 9px rgba(0,0,0,.5)
 }
 
 .modal-backdrop {
-    position: fixed;
+    /* position: fixed; */
     top: 0;
     right: 0;
     bottom: 0;
     left: 0;
     z-index: 1040;
+    /* z-index: 1; */
     background-color: #000
 }
 

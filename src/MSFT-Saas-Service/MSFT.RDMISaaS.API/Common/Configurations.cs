@@ -18,6 +18,8 @@ namespace MSFT.WVDSaaS.API.Common
         public string applicationId = "";
         public string resourceUrl = "";
         public string managementResourceUrl = "";
+        public string clientSecret = "";
+        public string aadTokenUrl = "";
         #endregion
 
         #region " Constructor "
@@ -28,6 +30,8 @@ namespace MSFT.WVDSaaS.API.Common
             applicationId = System.Web.Configuration.WebConfigurationManager.AppSettings["ApplicationId"];
             resourceUrl = System.Web.Configuration.WebConfigurationManager.AppSettings["ResourceUrl"];
             managementResourceUrl= System.Web.Configuration.WebConfigurationManager.AppSettings["ManagementResourceUrl"];
+            clientSecret = System.Web.Configuration.WebConfigurationManager.AppSettings["ApplicationSecret"];
+            aadTokenUrl = System.Web.Configuration.WebConfigurationManager.AppSettings["AADTokenURL"];
         }
         #endregion
 

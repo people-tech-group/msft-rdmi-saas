@@ -5,6 +5,7 @@ using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Net.Http;
 using System.Text;
 #endregion "Import Namespaces"
@@ -61,7 +62,7 @@ namespace MSFT.WVDSaaS.API.BLL
                 string strJson = response.Content.ReadAsStringAsync().Result;
                 if (response.IsSuccessStatusCode)
                 {
-                    if (response.StatusCode.ToString().ToLower() == "created")
+                    if (response.StatusCode == HttpStatusCode.OK || response.StatusCode == HttpStatusCode.Created)
                     {
                         appResult.Add("isSuccess" , true);
                         appResult.Add("message" , "Remote app '" + rdMgmtRemoteApp["remoteAppName"].ToString() + "' has been published successfully.");
@@ -90,6 +91,50 @@ namespace MSFT.WVDSaaS.API.BLL
             {
                 appResult.Add("isSuccess", false);
                 appResult.Add("message", "Remote app '" + rdMgmtRemoteApp["remoteAppName"].ToString() + "' has not been published." + ex.Message.ToString() + " Please try it later again.");
+            }
+            return appResult;
+        }
+
+        public JObject EditRemoteApp(string deploymentUrl, string accessToken, JObject rdMgmtRemoteApp)
+        {
+            try
+            {
+
+                //call rest api to publish remote appgroup app 
+                var content = new StringContent(JsonConvert.SerializeObject(rdMgmtRemoteApp), Encoding.UTF8, "application/json");
+                HttpResponseMessage response = CommonBL.PatchAsync(deploymentUrl, accessToken,"/RdsManagement/V1/TenantGroups/" + rdMgmtRemoteApp["tenantGroupName"].ToString() + "/Tenants/" + rdMgmtRemoteApp["tenantName"].ToString() + "/HostPools/" + rdMgmtRemoteApp["hostPoolName"].ToString() + "/AppGroups/" + rdMgmtRemoteApp["appGroupName"].ToString() + "/RemoteApps/" + rdMgmtRemoteApp["remoteAppName"].ToString(), content).Result;
+                string strJson = response.Content.ReadAsStringAsync().Result;
+                if (response.IsSuccessStatusCode)
+                {
+                    if (response.StatusCode == HttpStatusCode.OK)
+                    {
+                        appResult.Add("isSuccess", true);
+                        appResult.Add("message", "Remote app '" + rdMgmtRemoteApp["remoteAppName"].ToString() + "' has been updated successfully.");
+                    }
+                }
+                else if ((int)response.StatusCode == 429)
+                {
+                    appResult.Add("isSuccess", false);
+                    appResult.Add("message", strJson + " Please try again later.");
+                }
+                else
+                {
+                    if (!string.IsNullOrEmpty(strJson))
+                    {
+                        appResult.Add("isSuccess", false);
+                        appResult.Add("message", CommonBL.GetErrorMessage(strJson));
+                    }
+                    else
+                    {
+                        appResult.Add("isSuccess", false);
+                        appResult.Add("message", "Remote app '" + rdMgmtRemoteApp["remoteAppName"].ToString() + "' has not been updated. Please try it later again.");
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                appResult.Add("isSuccess", false);
+                appResult.Add("message", "Remote app '" + rdMgmtRemoteApp["remoteAppName"].ToString() + "' has not been updated." + ex.Message.ToString() + " Please try it later again.");
             }
             return appResult;
         }

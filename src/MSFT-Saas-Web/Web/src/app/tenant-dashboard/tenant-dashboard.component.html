@@ -54,7 +54,7 @@
       <div class="tab-content">
         <!-- General Tab Content -->
         <div class="tab-pane active" id="tab_default_1">
-          <div class="col-xs-12">
+          <div class="col-xs-8">
             <div class="Deployment-details" *ngIf="!getTenantlistErrorFound">
               <div class="row">
                 <div class="col-md-5">
@@ -65,7 +65,7 @@
                   <label>Tenant Unique Name</label>
                   <p>
                     <ng-template #TenantNameAvailable>{{tenantInfo.tenantName}}</ng-template>
-                    <ng-template #TenantNameNotAvailable>N/A</ng-template>
+                    <ng-template #TenantNameNotAvailable>NA</ng-template>
                     <span *ngIf="tenantInfo.tenantName ; then TenantNameAvailable else TenantNameNotAvailable"></span>
                   </p>
                 </div>
@@ -79,7 +79,7 @@
                   <label>Tenant Friendly Name</label>
                   <p>
                     <ng-template #TenantFrndNameAvailable>{{tenantInfo.friendlyName}}</ng-template>
-                    <ng-template #TenantFrndNameNotAvailable>N/A</ng-template>
+                    <ng-template #TenantFrndNameNotAvailable>NA</ng-template>
                     <span
                       *ngIf="tenantInfo.friendlyName ; then TenantFrndNameAvailable else TenantFrndNameNotAvailable"></span>
                   </p>
@@ -88,7 +88,7 @@
                   <label>Azure AD Tenant ID</label>
                   <p>
                     <ng-template #TenantAadIdAvailable>{{tenantInfo.aadTenantId}}</ng-template>
-                    <ng-template #TenantAadIdNotAvailable>N/A</ng-template>
+                    <ng-template #TenantAadIdNotAvailable>NA</ng-template>
                     <span
                       *ngIf="tenantInfo.aadTenantId ; then TenantAadIdAvailable else TenantAadIdNotAvailable"></span>
                   </p>
@@ -103,7 +103,7 @@
                   <label>Description</label>
                   <p>
                     <ng-template #TenantDescAvailable>{{tenantInfo.description}}</ng-template>
-                    <ng-template #TenantDescNotAvailable>N/A</ng-template>
+                    <ng-template #TenantDescNotAvailable>NA</ng-template>
                     <span *ngIf="tenantInfo.description ; then TenantDescAvailable else TenantDescNotAvailable"></span>
                   </p>
                 </div>

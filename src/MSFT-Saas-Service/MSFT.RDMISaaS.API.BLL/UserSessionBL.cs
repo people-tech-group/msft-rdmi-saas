@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
 using System.Text;
+using System.Web;
 #endregion "Import Namespaces"
 
 #region "MSFT.RDMISaaS.API.BLL"
@@ -47,7 +48,9 @@ namespace MSFT.WVDSaaS.API.BLL
                         new JProperty( "userPrincipalName" , item["userPrincipalName"]),
                         new JProperty("sessionId" , item["sessionId"]),
                         new JProperty( "applicationType" , item["applicationType"]),
-                        new JProperty( "adUserName" ,item["adUserName"])
+                        new JProperty( "adUserName" ,item["adUserName"]),
+                        new JProperty( "createTime" ,item["createTime"]),
+                        new JProperty("sessionState",item["sessionState"])
                     }).ToList().Where(x => x["sessionHostName"].ToString() == hostName).ToList();
 
                     return new HttpResponseMessage()
@@ -66,6 +69,8 @@ namespace MSFT.WVDSaaS.API.BLL
                 return null;
             }
         }
+
+
 
 
         public JObject LogOffUserSesion(string deploymentUrl, string accessToken, JObject userSession)
@@ -114,8 +119,7 @@ namespace MSFT.WVDSaaS.API.BLL
             {
                 //call rest service to log off user sessions 
                 var content = new StringContent(JsonConvert.SerializeObject(userSession), Encoding.UTF8, "application/json");
-                userSession["messageBody"] = userSession["messageBody"].ToString().Contains("&")==true? userSession["messageBody"].ToString().Replace("&", "and") : userSession["messageBody"];
-                HttpResponseMessage response = CommonBL.InitializeHttpClient(deploymentUrl, accessToken).PostAsync("/RdsManagement/V1/TenantGroups/" + userSession["tenantGroupName"] + "/Tenants/" + userSession["tenantName"] + "/HostPools/" + userSession["hostPoolName"] + "/SessionHosts/" + userSession["sessionHostName"] + "/Sessions/" + userSession["sessionId"] + "/actions/send-message-user?MessageTitle=" + userSession["messageTitle"].ToString() + "&MessageBody=" + userSession["messageBody"].ToString(), content).Result;
+                HttpResponseMessage response = CommonBL.InitializeHttpClient(deploymentUrl, accessToken).PostAsync("/RdsManagement/V1/TenantGroups/" + userSession["tenantGroupName"] + "/Tenants/" + userSession["tenantName"] + "/HostPools/" + userSession["hostPoolName"] + "/SessionHosts/" + userSession["sessionHostName"] + "/Sessions/" + userSession["sessionId"] + "/actions/send-message-user?MessageTitle=" + HttpUtility.UrlEncode(userSession["messageTitle"].ToString()) + "&MessageBody=" + HttpUtility.UrlEncode(userSession["messageBody"].ToString()), content).Result;
                 string strJson = response.Content.ReadAsStringAsync().Result;
                 if (response.IsSuccessStatusCode)
                 {

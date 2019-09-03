@@ -79,7 +79,7 @@ namespace MSFT.WVDSaaS.API.BLL
                 string strJson = response.Content.ReadAsStringAsync().Result;
                 if (response.IsSuccessStatusCode)
                 {
-                    if (response.StatusCode.ToString().ToLower() == "created" || response.StatusCode.ToString().ToLower() == "ok")
+                    if (response.StatusCode == System.Net.HttpStatusCode.Created || response.StatusCode == System.Net.HttpStatusCode.OK)
                     {
                         tenantResult.Add("isSuccess", true);
                         tenantResult.Add("message", "Tenant '" + tenantDataDTO["tenantName"] + "' has been created successfully.");

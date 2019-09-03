@@ -781,9 +781,12 @@ i.notify-close {
   }
 
 .rdsDeploymnt-rightcontent {
-  /* min-width: 800px; */
+  min-width: 72%;
+  position: fixed;
+  /* width: 100%; */
+  margin-left: 273px;
   float: left;
-  width: calc(100% - 281px);
+  /* width: calc(100% - 281px); */
   min-height: calc(100vh - 52px);
 }
 
@@ -795,6 +798,7 @@ i.notify-close {
   overflow: hidden;
   display: block;
   position: relative;
+  left:7px;
 }
 
   .rdsDeploymnt-rightcontent .rdsNotification {
@@ -1707,9 +1711,9 @@ app-breadcrum a {
 }*/
 
 .AppGrouptoggle {
-  position: fixed;
+  position: absolute;
   bottom: 0px;
-  left: 330px;
+  left: 9px;
   right: 0px;
   height: 50%;
   background-color: #fff;
@@ -1844,6 +1848,16 @@ div.AllDeployTable > table > thead > tr > th {
     overflow-x: auto;
     margin-left: 250px;
   }
+
+ 
+
+  .modal {
+    pointer-events: none;
+}
+
+.modal .modal-dialog {
+  pointer-events: auto;
+}
 
 .multi_tenent {
   float: left;

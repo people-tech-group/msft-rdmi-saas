@@ -530,223 +530,223 @@ export class TenantDashboardComponent implements OnInit {
    * tenantName - Accepts Tenant Name
    * ----------
    */
-  public previousPage() {
-    this.refreshHostpoolLoading = true;
-    this.hostpoollistErrorFound = false;
-    this.lastEntry = this.searchHostPools[0].hostPoolName;
-    this.curentIndex = this.curentIndex - 1;
-    let headers = new Headers({ 'Accept': 'application/json', 'Access-Control-Allow-Origin': '*' });
-    /*
-     * This block of code is used to check the Access level of Tenant
-     * Access level of Tenant block Start
-     */
-    if (this.scopeArray.length <= 2 || this.scopeArray.length > 3) {
-      this.GetTenantDetails(this.tenantName);
-    }
-    else {
-      this.tenantInfo = {
-        'tenantName': this.scopeArray[1]
-      };
-    }
-    /*
-     * Access level of Tenant block End
-     */
-    this.getHostpoolsUrl = this._AppService.ApiUrl + '/api/HostPool/GetHostPoolList?tenantGroupName=' + this.tenantGroupName + '&tenantName=' + this.tenantName + '&refresh_token=' + sessionStorage.getItem("Refresh_Token") + '&pageSize=' + this.pageSize + '&sortField=HostPoolName&isDescending=true&initialSkip=' + this.initialSkip + '&lastEntry=' + this.lastEntry;
-    this._AppService.GetTenantDetails(this.getHostpoolsUrl).subscribe(response => {
-      this.hostPoolsList = JSON.parse(response['_body']);
-      this.previousPageNo = this.currentPageNo;
-      this.currentPageNo = this.currentPageNo - 1;
-      //this.hostpoolsCount = this.tenantInfo.noOfHostpool
-      for (let i in this.hostPoolsList) {
-        if (this.hostPoolsList[i].enableUserProfileDisk === true) {
-          this.hostPoolsList[i].enableUserProfileDisk = 'Yes';
-        }
-        else {
-          this.hostPoolsList[i].enableUserProfileDisk = 'No';
-        }
-      }
-      if (this.hostPoolsList[0]) {
-        if (this.hostPoolsList[0].code == "Invalid Token") {
-          sessionStorage.clear();
-          this.router.navigate(['/invalidtokenmessage']);
-        }
-      }
-      this.searchHostPools = JSON.parse(response['_body']);
-      for (let i in this.searchHostPools) {
-        if (this.searchHostPools[i].enableUserProfileDisk === true) {
-          this.searchHostPools[i].enableUserProfileDisk = 'Yes';
-        }
-        else {
-          this.searchHostPools[i].enableUserProfileDisk = 'No';
-        }
-      }
-      if (this.searchHostPools.length == 0) {
-        this.editedBody = true;
-        this.showCreateHostpool = true;
-      }
-      else {
-        if (this.searchHostPools[0].Message == null) {
-          this.editedBody = false;
-        }
+  // public previousPage() {
+  //   this.refreshHostpoolLoading = true;
+  //   this.hostpoollistErrorFound = false;
+  //   this.lastEntry = this.searchHostPools[0].hostPoolName;
+  //   this.curentIndex = this.curentIndex - 1;
+  //   let headers = new Headers({ 'Accept': 'application/json', 'Access-Control-Allow-Origin': '*' });
+  //   /*
+  //    * This block of code is used to check the Access level of Tenant
+  //    * Access level of Tenant block Start
+  //    */
+  //   if (this.scopeArray.length <= 2 || this.scopeArray.length > 3) {
+  //     this.GetTenantDetails(this.tenantName);
+  //   }
+  //   else {
+  //     this.tenantInfo = {
+  //       'tenantName': this.scopeArray[1]
+  //     };
+  //   }
+  //   /*
+  //    * Access level of Tenant block End
+  //    */
+  //   this.getHostpoolsUrl = this._AppService.ApiUrl + '/api/HostPool/GetHostPoolList?tenantGroupName=' + this.tenantGroupName + '&tenantName=' + this.tenantName + '&refresh_token=' + sessionStorage.getItem("Refresh_Token") + '&pageSize=' + this.pageSize + '&sortField=HostPoolName&isDescending=true&initialSkip=' + this.initialSkip + '&lastEntry=' + this.lastEntry;
+  //   this._AppService.GetTenantDetails(this.getHostpoolsUrl).subscribe(response => {
+  //     this.hostPoolsList = JSON.parse(response['_body']);
+  //     this.previousPageNo = this.currentPageNo;
+  //     this.currentPageNo = this.currentPageNo - 1;
+  //     //this.hostpoolsCount = this.tenantInfo.noOfHostpool
+  //     for (let i in this.hostPoolsList) {
+  //       if (this.hostPoolsList[i].enableUserProfileDisk === true) {
+  //         this.hostPoolsList[i].enableUserProfileDisk = 'Yes';
+  //       }
+  //       else {
+  //         this.hostPoolsList[i].enableUserProfileDisk = 'No';
+  //       }
+  //     }
+  //     if (this.hostPoolsList[0]) {
+  //       if (this.hostPoolsList[0].code == "Invalid Token") {
+  //         sessionStorage.clear();
+  //         this.router.navigate(['/invalidtokenmessage']);
+  //       }
+  //     }
+  //     this.searchHostPools = JSON.parse(response['_body']);
+  //     for (let i in this.searchHostPools) {
+  //       if (this.searchHostPools[i].enableUserProfileDisk === true) {
+  //         this.searchHostPools[i].enableUserProfileDisk = 'Yes';
+  //       }
+  //       else {
+  //         this.searchHostPools[i].enableUserProfileDisk = 'No';
+  //       }
+  //     }
+  //     if (this.searchHostPools.length == 0) {
+  //       this.editedBody = true;
+  //       this.showCreateHostpool = true;
+  //     }
+  //     else {
+  //       if (this.searchHostPools[0].Message == null) {
+  //         this.editedBody = false;
+  //       }
 
-        this.showCreateHostpool = false;
-      }
-      this.refreshHostpoolLoading = false;
-    },
-      /*
-       * If Any Error (or) Problem With Services (or) Problem in internet this Error Block Will Exequte
-       */
-      error => {
-        this.refreshHostpoolLoading = false;
-        this.hostpoollistErrorFound = true;
-      }
-    );
-    this.isEditDisabled = true;
-    this.isDeleteDisabled = true;
-    for (let i = 0; i < this.searchHostPools.length; i++) {
-      this.checked[i] = false;
-    }
-    this.checkedMain = false;
-  }
+  //       this.showCreateHostpool = false;
+  //     }
+  //     this.refreshHostpoolLoading = false;
+  //   },
+  //     /*
+  //      * If Any Error (or) Problem With Services (or) Problem in internet this Error Block Will Exequte
+  //      */
+  //     error => {
+  //       this.refreshHostpoolLoading = false;
+  //       this.hostpoollistErrorFound = true;
+  //     }
+  //   );
+  //   this.isEditDisabled = true;
+  //   this.isDeleteDisabled = true;
+  //   for (let i = 0; i < this.searchHostPools.length; i++) {
+  //     this.checked[i] = false;
+  //   }
+  //   this.checkedMain = false;
+  // }
 
-  public NextPage() {
-    this.refreshHostpoolLoading = true;
-    this.hostpoollistErrorFound = false;
-    this.lastEntry = this.searchHostPools[this.searchHostPools.length - 1].hostPoolName;
-    this.curentIndex = this.curentIndex + 1;
-    /*
-     * Access level of Tenant block End
-     */
-    this.getHostpoolsUrl = this._AppService.ApiUrl + '/api/HostPool/GetHostPoolList?tenantGroupName=' + this.tenantGroupName + '&tenantName=' + this.tenantName + '&refresh_token=' + sessionStorage.getItem("Refresh_Token") + '&pageSize=' + this.pageSize + '&sortField=HostPoolName&isDescending=false&initialSkip=' + this.initialSkip + '&lastEntry=' + this.lastEntry;
-    this._AppService.GetTenantDetails(this.getHostpoolsUrl).subscribe(response => {
-      this.hostPoolsList = JSON.parse(response['_body']);
-      this.previousPageNo = this.currentPageNo;
-      this.currentPageNo = this.currentPageNo + 1;
-      for (let i in this.hostPoolsList) {
-        if (this.hostPoolsList[i].enableUserProfileDisk === true) {
-          this.hostPoolsList[i].enableUserProfileDisk = 'Yes';
-        }
-        else {
-          this.hostPoolsList[i].enableUserProfileDisk = 'No';
-        }
-      }
-      if (this.hostPoolsList[0]) {
-        if (this.hostPoolsList[0].code == "Invalid Token") {
-          sessionStorage.clear();
-          this.router.navigate(['/invalidtokenmessage']);
-        }
-      }
-      this.searchHostPools = JSON.parse(response['_body']);
-      for (let i in this.searchHostPools) {
-        if (this.searchHostPools[i].enableUserProfileDisk === true) {
-          this.searchHostPools[i].enableUserProfileDisk = 'Yes';
-        }
-        else {
-          this.searchHostPools[i].enableUserProfileDisk = 'No';
-        }
-      }
-      if (this.searchHostPools.length == 0) {
-        this.editedBody = true;
-        this.showCreateHostpool = true;
-      }
-      else {
-        if (this.searchHostPools[0].Message == null) {
-          this.editedBody = false;
-        }
+  // public NextPage() {
+  //   this.refreshHostpoolLoading = true;
+  //   this.hostpoollistErrorFound = false;
+  //   this.lastEntry = this.searchHostPools[this.searchHostPools.length - 1].hostPoolName;
+  //   this.curentIndex = this.curentIndex + 1;
+  //   /*
+  //    * Access level of Tenant block End
+  //    */
+  //   this.getHostpoolsUrl = this._AppService.ApiUrl + '/api/HostPool/GetHostPoolList?tenantGroupName=' + this.tenantGroupName + '&tenantName=' + this.tenantName + '&refresh_token=' + sessionStorage.getItem("Refresh_Token") + '&pageSize=' + this.pageSize + '&sortField=HostPoolName&isDescending=false&initialSkip=' + this.initialSkip + '&lastEntry=' + this.lastEntry;
+  //   this._AppService.GetTenantDetails(this.getHostpoolsUrl).subscribe(response => {
+  //     this.hostPoolsList = JSON.parse(response['_body']);
+  //     this.previousPageNo = this.currentPageNo;
+  //     this.currentPageNo = this.currentPageNo + 1;
+  //     for (let i in this.hostPoolsList) {
+  //       if (this.hostPoolsList[i].enableUserProfileDisk === true) {
+  //         this.hostPoolsList[i].enableUserProfileDisk = 'Yes';
+  //       }
+  //       else {
+  //         this.hostPoolsList[i].enableUserProfileDisk = 'No';
+  //       }
+  //     }
+  //     if (this.hostPoolsList[0]) {
+  //       if (this.hostPoolsList[0].code == "Invalid Token") {
+  //         sessionStorage.clear();
+  //         this.router.navigate(['/invalidtokenmessage']);
+  //       }
+  //     }
+  //     this.searchHostPools = JSON.parse(response['_body']);
+  //     for (let i in this.searchHostPools) {
+  //       if (this.searchHostPools[i].enableUserProfileDisk === true) {
+  //         this.searchHostPools[i].enableUserProfileDisk = 'Yes';
+  //       }
+  //       else {
+  //         this.searchHostPools[i].enableUserProfileDisk = 'No';
+  //       }
+  //     }
+  //     if (this.searchHostPools.length == 0) {
+  //       this.editedBody = true;
+  //       this.showCreateHostpool = true;
+  //     }
+  //     else {
+  //       if (this.searchHostPools[0].Message == null) {
+  //         this.editedBody = false;
+  //       }
 
-        this.showCreateHostpool = false;
-      }
-      this.refreshHostpoolLoading = false;
-    },
-      /*
-       * If Any Error (or) Problem With Services (or) Problem in internet this Error Block Will Exequte
-       */
-      error => {
-        this.refreshHostpoolLoading = false;
-        this.hostpoollistErrorFound = true;
-      }
-    );
-    this.isEditDisabled = true;
-    this.isDeleteDisabled = true;
-    for (let i = 0; i < this.searchHostPools.length; i++) {
-      this.checked[i] = false;
-    }
-    this.checkedMain = false;
-  }
+  //       this.showCreateHostpool = false;
+  //     }
+  //     this.refreshHostpoolLoading = false;
+  //   },
+  //     /*
+  //      * If Any Error (or) Problem With Services (or) Problem in internet this Error Block Will Exequte
+  //      */
+  //     error => {
+  //       this.refreshHostpoolLoading = false;
+  //       this.hostpoollistErrorFound = true;
+  //     }
+  //   );
+  //   this.isEditDisabled = true;
+  //   this.isDeleteDisabled = true;
+  //   for (let i = 0; i < this.searchHostPools.length; i++) {
+  //     this.checked[i] = false;
+  //   }
+  //   this.checkedMain = false;
+  // }
 
-  public CurrentPage(index) {
-    this.previousPageNo = this.currentPageNo;
-    this.currentPageNo = index + 1;
-    this.curentIndex = index;
-    this.refreshHostpoolLoading = true;
-    this.hostpoollistErrorFound = false;
-    let diff = this.currentPageNo - this.previousPageNo;
-    // to get intialskip
-    if (this.currentPageNo >= this.previousPageNo) {
-      this.isDescending = false;
-      this.pageSize = diff * this.pageSize;
-      this.lastEntry = this.searchHostPools[this.searchHostPools.length - 1].hostPoolName;
-    } else {
-      this.isDescending = true;
-      this.lastEntry = this.searchHostPools[0].hostPoolName;
-    }
-    /*
-     * Access level of Tenant block End
-     */
-    this.getHostpoolsUrl = this._AppService.ApiUrl + '/api/HostPool/GetHostPoolList?tenantGroupName=' + this.tenantGroupName + '&tenantName=' + this.tenantName + '&refresh_token=' + sessionStorage.getItem("Refresh_Token") + '&pageSize=' + this.pageSize + ' &sortField=HostPoolName&isDescending=' + this.isDescending + '&initialSkip=' + this.initialSkip + '&lastEntry=' + this.lastEntry;
-    this._AppService.GetTenantDetails(this.getHostpoolsUrl).subscribe(response => {
-      this.hostPoolsList = JSON.parse(response['_body']);
-      this.hostpoolsCount = this.tenantInfo.length;
-      for (let i in this.hostPoolsList) {
-        if (this.hostPoolsList[i].enableUserProfileDisk === true) {
-          this.hostPoolsList[i].enableUserProfileDisk = 'Yes';
-        }
-        else {
-          this.hostPoolsList[i].enableUserProfileDisk = 'No';
-        }
-      }
-      if (this.hostPoolsList[0]) {
-        if (this.hostPoolsList[0].code == "Invalid Token") {
-          sessionStorage.clear();
-          this.router.navigate(['/invalidtokenmessage']);
-        }
-      }
-      this.searchHostPools = JSON.parse(response['_body']);
-      for (let i in this.searchHostPools) {
-        if (this.searchHostPools[i].enableUserProfileDisk === true) {
-          this.searchHostPools[i].enableUserProfileDisk = 'Yes';
-        }
-        else {
-          this.searchHostPools[i].enableUserProfileDisk = 'No';
-        }
-      }
-      if (this.searchHostPools.length == 0) {
-        this.editedBody = true;
-        this.showCreateHostpool = true;
-      }
-      else {
-        if (this.searchHostPools[0].Message == null) {
-          this.editedBody = false;
-        }
-        this.showCreateHostpool = false;
-      }
-      this.refreshHostpoolLoading = false;
-    },
-      /*
-       * If Any Error (or) Problem With Services (or) Problem in internet this Error Block Will Exequte
-       */
-      error => {
-        this.refreshHostpoolLoading = false;
-        this.hostpoollistErrorFound = true;
-      }
-    );
-    this.isEditDisabled = true;
-    this.isDeleteDisabled = true;
-    for (let i = 0; i < this.searchHostPools.length; i++) {
-      this.checked[i] = false;
-    }
-    this.checkedMain = false;
-  }
+  // public CurrentPage(index) {
+  //   this.previousPageNo = this.currentPageNo;
+  //   this.currentPageNo = index + 1;
+  //   this.curentIndex = index;
+  //   this.refreshHostpoolLoading = true;
+  //   this.hostpoollistErrorFound = false;
+  //   let diff = this.currentPageNo - this.previousPageNo;
+  //   // to get intialskip
+  //   if (this.currentPageNo >= this.previousPageNo) {
+  //     this.isDescending = false;
+  //     this.pageSize = diff * this.pageSize;
+  //     this.lastEntry = this.searchHostPools[this.searchHostPools.length - 1].hostPoolName;
+  //   } else {
+  //     this.isDescending = true;
+  //     this.lastEntry = this.searchHostPools[0].hostPoolName;
+  //   }
+  //   /*
+  //    * Access level of Tenant block End
+  //    */
+  //   this.getHostpoolsUrl = this._AppService.ApiUrl + '/api/HostPool/GetHostPoolList?tenantGroupName=' + this.tenantGroupName + '&tenantName=' + this.tenantName + '&refresh_token=' + sessionStorage.getItem("Refresh_Token") + '&pageSize=' + this.pageSize + ' &sortField=HostPoolName&isDescending=' + this.isDescending + '&initialSkip=' + this.initialSkip + '&lastEntry=' + this.lastEntry;
+  //   this._AppService.GetTenantDetails(this.getHostpoolsUrl).subscribe(response => {
+  //     this.hostPoolsList = JSON.parse(response['_body']);
+  //     this.hostpoolsCount = this.tenantInfo.length;
+  //     for (let i in this.hostPoolsList) {
+  //       if (this.hostPoolsList[i].enableUserProfileDisk === true) {
+  //         this.hostPoolsList[i].enableUserProfileDisk = 'Yes';
+  //       }
+  //       else {
+  //         this.hostPoolsList[i].enableUserProfileDisk = 'No';
+  //       }
+  //     }
+  //     if (this.hostPoolsList[0]) {
+  //       if (this.hostPoolsList[0].code == "Invalid Token") {
+  //         sessionStorage.clear();
+  //         this.router.navigate(['/invalidtokenmessage']);
+  //       }
+  //     }
+  //     this.searchHostPools = JSON.parse(response['_body']);
+  //     for (let i in this.searchHostPools) {
+  //       if (this.searchHostPools[i].enableUserProfileDisk === true) {
+  //         this.searchHostPools[i].enableUserProfileDisk = 'Yes';
+  //       }
+  //       else {
+  //         this.searchHostPools[i].enableUserProfileDisk = 'No';
+  //       }
+  //     }
+  //     if (this.searchHostPools.length == 0) {
+  //       this.editedBody = true;
+  //       this.showCreateHostpool = true;
+  //     }
+  //     else {
+  //       if (this.searchHostPools[0].Message == null) {
+  //         this.editedBody = false;
+  //       }
+  //       this.showCreateHostpool = false;
+  //     }
+  //     this.refreshHostpoolLoading = false;
+  //   },
+  //     /*
+  //      * If Any Error (or) Problem With Services (or) Problem in internet this Error Block Will Exequte
+  //      */
+  //     error => {
+  //       this.refreshHostpoolLoading = false;
+  //       this.hostpoollistErrorFound = true;
+  //     }
+  //   );
+  //   this.isEditDisabled = true;
+  //   this.isDeleteDisabled = true;
+  //   for (let i = 0; i < this.searchHostPools.length; i++) {
+  //     this.checked[i] = false;
+  //   }
+  //   this.checkedMain = false;
+  // }
 
   public GetHostpoolsList(tenantName: any) {
     this.adminMenuComponent.GetHostpools(tenantName);
