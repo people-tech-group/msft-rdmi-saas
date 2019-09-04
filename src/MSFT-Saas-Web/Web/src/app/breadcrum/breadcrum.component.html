@@ -3,9 +3,9 @@
 </li>
 
 <li class="breadcrumb-item" *ngFor="let bc of breadCrumsList.Tenant let i=index">
-  <a (click)="Navigate(bc.path,bc.type,i, bc)" style="color:white"> <span class="icon icon-chevron-right breadArrow"></span> {{bc.name}}</a>
+  <span  class="icon icon-chevron-right breadArrow"  style="color:white"></span> <a (click)="Navigate(bc.path,bc.type,i, bc)" style="color:white">  {{bc.name}}</a>
 </li>
 
 <li class="breadcrumb-item" *ngFor="let bc of breadCrumsList.Hostpool let i=index">
-  <a (click)="Navigate(bc.path,bc.type,i, bc)" style="color:white"> <span class="icon icon-chevron-right breadArrow"></span> {{bc.name}}</a>
+ <span *ngIf="bc.name" class="icon icon-chevron-right breadArrow"  style="color:white" ></span><a (click)="Navigate(bc.path,bc.type,i, bc)" style="color:white">  {{bc.name}}</a>
 </li>

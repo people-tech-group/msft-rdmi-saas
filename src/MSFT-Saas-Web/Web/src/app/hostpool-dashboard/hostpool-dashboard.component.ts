@@ -1209,6 +1209,7 @@ export class HostpoolDashboardComponent implements OnInit {
         (error) => {
           this.error = true;
           let errorBody = JSON.parse(error['_body']);
+
           if (errorBody.error.code == "403") {
             this.errorMessage = "Access Denied! You are not authorized user to view host details.";
             this.showHostEmpty = true;
@@ -1283,7 +1284,11 @@ export class HostpoolDashboardComponent implements OnInit {
         }
       }
     }
+    else{
+      this.showHostEmpty=true;
+    }
     this.refreshHostpoolLoading = false;
+
   }
 
   /*
@@ -1293,7 +1298,7 @@ export class HostpoolDashboardComponent implements OnInit {
     this.refreshHostpoolLoading = true;
     for (let i = 0; i < this.selectedHostRows.length; i++) { 
       let index = this.selectedHostRows[i];
-      this.hostDeleteUrl = this._AppService.ApiUrl + 'api/SessionHost/DeleteSessionHost?tenantGroup=' + this.tenantGroupName + '&tenantName=' + this.tenantName + '&hostPoolName=' + this.hostPoolName + '&sessionHostName=' + this.sessionHostListsSearch[index].sessionHostName + '&refresh_token=' + sessionStorage.getItem("Refresh_Token");
+      this.hostDeleteUrl = this._AppService.ApiUrl + '/api/SessionHost/DeleteSessionHost?tenantGroup=' + this.tenantGroupName + '&tenantName=' + this.tenantName + '&hostPoolName=' + this.hostPoolName + '&sessionHostName=' + this.sessionHostListsSearch[index].sessionHostName + '&refresh_token=' + sessionStorage.getItem("Refresh_Token");
       this._AppService.DeleteHostService(this.hostDeleteUrl).subscribe(response => {
         this.refreshHostpoolLoading = false;
         var responseData = JSON.parse(response['_body']);
@@ -4449,7 +4454,7 @@ export class HostpoolDashboardComponent implements OnInit {
         if (responseData.isSuccess === true) {
           this._notificationsService.html(
             '<i class="icon icon-check angular-Notify col-xs-1 no-pad"></i>' +
-            '<label class="notify-label col-xs-10 no-pad"> Session(s) LoggedOff Successfully</label>' +
+            '<label class="notify-label col-xs-10 no-pad"> Session(s) Log Off Successfully</label>' +
             '<a class="close"><i class="icon icon-close notify-close" aria-hidden="true"></i></a>' +
             '<p class="notify-text col-xs-12 no-pad">' + responseData.message + '</p>',
             'content optional one',
@@ -4462,7 +4467,7 @@ export class HostpoolDashboardComponent implements OnInit {
               maxLength: 10
             }
           )
-          AppComponent.GetNotification('icon icon-check angular-Notify', ' Session(s) LoggedOff Successfully', responseData.message, new Date());
+          AppComponent.GetNotification('icon icon-check angular-Notify', ' Session(s) Log Off Successfully', responseData.message, new Date());
           this.RefreshUserSessions();
         }
         /* If response data is success then it enters into else and this block of code will execute to show the 'Failed To Remove Remote App' notification */
