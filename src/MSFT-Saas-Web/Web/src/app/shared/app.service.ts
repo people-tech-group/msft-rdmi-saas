@@ -120,9 +120,6 @@ export class AppService {
    * ----------
    */
   public CreateHostpool(hosturl: any, data) {
-    let result = {
-      "message": "success"
-    }
     let headers = new Headers({ 'Content-Type': 'application/json;charset=utf8', 'Accept': 'application/json' });
     let options = new RequestOptions({ headers: headers });
     return this.http.post(hosturl, JSON.stringify(data), options)

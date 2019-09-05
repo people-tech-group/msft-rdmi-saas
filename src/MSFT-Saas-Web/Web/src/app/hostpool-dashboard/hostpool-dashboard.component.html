@@ -652,7 +652,7 @@
                         <div class="row">
                           <div class="col-md-5">
                             <label>Description</label>
-                            <p>{{appGroupDetails.description}}</p>
+                            <p>{{appGroupDetails.description != null && appGroupDetails.description !="" ? appGroupDetails.description:'NA'  }}</p>
                           </div>
                         </div>
                       </div>
