@@ -192,8 +192,8 @@
                       (click)="SetSelectedHostRoute(absoluteIndex(hInd),i.tenantName,i.hostPoolName)">
                       {{i.hostPoolName}}
                     </td>
-                    <td style="width:15%;text-align:left;"><span>{{i.friendlyName}}</span></td>
-                    <td style="width:15%;text-align:center;">{{i.description}}</td>
+                    <td style="width:15%;text-align:left;"><span>{{i.friendlyName=="" || i.friendlyName==null? 'NA':i.friendlyName}}</span></td>
+                    <td style="width:15%;text-align:center;">{{i.description=="" || i.description==null? 'NA':i.description}}</td>
                     <td style="width:15%;text-align:center;">{{i.persistent == true ? 'Yes' : 'No'}}</td>
                     <!-- <td style="width:15%;text-align:center;">{{i.noOfUsers}}</td>
                     <td style="width:15%;text-align:center;">{{i.noOfActivehosts}}</td> -->

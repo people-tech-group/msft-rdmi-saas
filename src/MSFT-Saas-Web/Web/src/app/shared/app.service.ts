@@ -8,7 +8,7 @@ export class AppService {
   public ApiUrl: string;
 
   constructor(private http: Http) {
-    //this.ApiUrl = "https://msftrdmisaasapi.azurewebsites.net";
+   //this.ApiUrl = "https://msftrdmisaasapi.azurewebsites.net";
     this.ApiUrl = "http://localhost:34816/";
   }
 
@@ -120,9 +120,6 @@ export class AppService {
    * ----------
    */
   public CreateHostpool(hosturl: any, data) {
-    let result = {
-      "message": "success"
-    }
     let headers = new Headers({ 'Content-Type': 'application/json;charset=utf8', 'Accept': 'application/json' });
     let options = new RequestOptions({ headers: headers });
     return this.http.post(hosturl, JSON.stringify(data), options)
@@ -256,6 +253,20 @@ export class AppService {
     let headers = new Headers({ 'Accept': 'application/json', 'Authorization': sessionStorage.getItem('access_token') });
     let options = new RequestOptions({ headers: headers });
     return this.http.delete(appGroupDeleteurl, options)
+      .catch((error: any) => Observable.throw(error));
+  }
+/*
+   * This Function is used to make Service call to update Appgroup RemoteApp
+   * ----------
+   * Parameters
+   * remoteAppUpdateUrl - Accepts the Update AppGroup Remote App URL
+   * ----------
+   */
+  public UpdateRemoteApp(remoteAppUpdateUrl:any,data)
+  {
+    let headers = new Headers({ 'Content-Type': 'application/json;charset=utf8', 'Accept': 'application/json' });
+    let options = new RequestOptions({ headers: headers });
+    return this.http.put(remoteAppUpdateUrl, JSON.stringify(data), options)
       .catch((error: any) => Observable.throw(error));
   }
 
