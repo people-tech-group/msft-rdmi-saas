@@ -1343,19 +1343,20 @@
             <div style="clear:both"></div>
             <div id="" class="tab-content current">
               <div class="DeployUrl" id="">
+              
+                <div class="col-xs-12  form-group">
+                  <label for="usr">App Name<span class="important-Field">*</span></label>
+                  <input type="text" id="appName" formControlName="Name" disabled="disabled" placeholder="Enter Name of RemoteApp" />
+                  <div *ngIf="newAppEditGroup.controls['Name'].hasError('pattern')" class="colorRed">
+                    Please enter valid Name
+                  </div>
+                </div>
                 <div class="col-xs-12 form-group">
                   <label for="usr">Path<span class="important-Field">*</span></label>
                   <input type="text" id="imagepath" placeholder="Enter Valid Path" formControlName="AppPath">
                   <!--(ngModelChange)="PathChange($event)"-->
                   <div *ngIf="newAppEditGroup.controls['AppPath'].hasError('pattern')" class="colorRed">
                     Please enter valid path
-                  </div>
-                </div>
-                <div class="col-xs-12  form-group">
-                  <label for="usr">App Name<span class="important-Field">*</span></label>
-                  <input type="text" id="appName" formControlName="Name" placeholder="Enter Name of RemoteApp" />
-                  <div *ngIf="newAppEditGroup.controls['Name'].hasError('pattern')" class="colorRed">
-                    Please enter valid Name
                   </div>
                 </div>
                 <div class="col-xs-12  form-group">
