@@ -23,6 +23,7 @@ import { ClickOutsideModule } from 'ng-click-outside';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { NgxPaginationModule } from 'ngx-pagination';
 import { InvalidtokenmessageComponent } from './invalidtokenmessage/invalidtokenmessage.component';
+import { InvalidRoleAssignmentComponent } from './invalid-role-assignment/invalid-role-assignment.component';
 
 /* getting redirectURL from Session storage */
 var redirectUri = sessionStorage.getItem('redirectUri');
@@ -50,6 +51,7 @@ if (window.location.href != redirectUri) {
     SearchPipe,
     BreadcrumComponent,
     InvalidtokenmessageComponent,
+    InvalidRoleAssignmentComponent,
   ],
   imports: [
     BrowserModule,
@@ -67,6 +69,11 @@ if (window.location.href != redirectUri) {
       {
         path: 'invalidtokenmessage',
         component: InvalidtokenmessageComponent,
+        canActivate: [AuthGuard]
+      },
+      {
+        path: 'invalid-role-assignment',
+        component: InvalidRoleAssignmentComponent,
         canActivate: [AuthGuard]
       },
       {

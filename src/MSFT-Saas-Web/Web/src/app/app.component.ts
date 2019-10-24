@@ -121,7 +121,7 @@ export class AppComponent implements OnInit {
 
             /*This block of code is used to Split Letters from Username*/
             //Slit code -starts
-            this.splitName = respdata.UserName.split(' ');
+            this.splitName = respdata.UserName.trim().replace(/[^a-zA-Z0-9 ]/g, '').trim().split(' ');
             if (this.splitName.length > 1) {
               this.profileNameFirstName = this.splitName[0];
               this.profileNameLastName = this.splitName[this.splitName.length - 1];
@@ -138,45 +138,55 @@ export class AppComponent implements OnInit {
             this.tenantGroupNameList = respdata.TenantGroups;
             sessionStorage.setItem("profileIcon", this.profileIcon);
             sessionStorage.setItem("profileName", this.profileName);
-            sessionStorage.setItem("roleAssignments", JSON.stringify(respdata.RoleAssignment));
-            if (this.tenantGroupNameList != null && this.tenantGroupNameList.length > 0) {
-              this.roleDefinitionName = respdata.RoleAssignment[0].roleDefinitionName;
-              sessionStorage.setItem("roleDefinitionName", this.roleDefinitionName);
-
-              if (respdata.RoleAssignment[0].scope == '/') {
-                this.scope = 'All (Root)';
-                this.InfraPermission = 'All (Root)';
+           
+            if(respdata.RoleAssignment==null || respdata.RoleAssignment=="" || respdata.RoleAssignment.length==0)
+            {
+              this.router.navigate(['/invalid-role-assignment']);
+              this.appLoader = false;
+            }
+            else{
+              sessionStorage.setItem("roleAssignments", JSON.stringify(respdata.RoleAssignment));
+              if (this.tenantGroupNameList != null && this.tenantGroupNameList.length > 0) {
+                this.roleDefinitionName = respdata.RoleAssignment[0].roleDefinitionName;
+                sessionStorage.setItem("roleDefinitionName", this.roleDefinitionName);
+  
+                if (respdata.RoleAssignment[0].scope == '/') {
+                  this.scope = 'All (Root)';
+                  this.InfraPermission = 'All (Root)';
+                }
+                else {
+                  this.scope = respdata.RoleAssignment[0].scope;
+                  this.InfraPermission = respdata.RoleAssignment[0].scope;
+  
+                }
               }
               else {
-                this.scope = respdata.RoleAssignment[0].scope;
-                this.InfraPermission = respdata.RoleAssignment[0].scope;
-
+                const tenantGroupListData = ['Default Tenant Group'];
+                this.tenantGroupNameList = tenantGroupListData;
               }
+              const unique = (value, index, self) => {
+                return self.indexOf(value) === index;
+              };
+              const uniqueTenantGroups = this.tenantGroupNameList.filter(unique);
+              localStorage.setItem("TenantGroups", JSON.stringify(uniqueTenantGroups));
+              this.tenantGroupName = localStorage.getItem("TenantGroupName");
+              //Role Assignment Acces level -Ends
+              var roleDef = respdata.RoleAssignment[0].scope.substring(1).split("/");
+              //sessionStorage.setItem('Scope', this.scope);
+              sessionStorage.setItem('Scope', roleDef);
+              sessionStorage.setItem('infraPermission', this.scope);
+  
+  
+              this.profileEmail = respdata.Email;
+              sessionStorage.setItem("Refresh_Token", respdata.Refresh_Token);
+              sessionStorage.setItem("redirectUri", this.redirectUri);
+              sessionStorage.setItem('profileEmail', this.profileEmail);
+              sessionStorage.setItem('gotCode', 'no');
+              this.appLoader = false;
+              this.router.navigate(['/admin/Tenants']);
             }
-            else {
-              const tenantGroupListData = ['Default Tenant Group'];
-              this.tenantGroupNameList = tenantGroupListData;
-            }
-            const unique = (value, index, self) => {
-              return self.indexOf(value) === index;
-            };
-            const uniqueTenantGroups = this.tenantGroupNameList.filter(unique);
-            localStorage.setItem("TenantGroups", JSON.stringify(uniqueTenantGroups));
-            this.tenantGroupName = localStorage.getItem("TenantGroupName");
-            //Role Assignment Acces level -Ends
-            var roleDef = respdata.RoleAssignment[0].scope.substring(1).split("/");
-            //sessionStorage.setItem('Scope', this.scope);
-            sessionStorage.setItem('Scope', roleDef);
-            sessionStorage.setItem('infraPermission', this.scope);
-
-
-            this.profileEmail = respdata.Email;
-            sessionStorage.setItem("Refresh_Token", respdata.Refresh_Token);
-            sessionStorage.setItem("redirectUri", this.redirectUri);
-            sessionStorage.setItem('profileEmail', this.profileEmail);
-            sessionStorage.setItem('gotCode', 'no');
-            this.appLoader = false;
-            this.router.navigate(['/admin/Tenants']);
+           
+           
           }
         }).catch((error: any) => {
           this.router.navigate(['/invalidtokenmessage']);
@@ -297,7 +307,7 @@ export class AppComponent implements OnInit {
    * This function is used to Hide Nav Bar and Side Nav bar and it will run at a  new component is being instantiated
    */
   public onActivate() {
-    if (window.location.pathname == '/invalidtokenmessage') {
+    if (window.location.pathname == '/invalidtokenmessage' || window.location.pathname ==  '/invalid-role-assignment') {
       this.isInvalidToken = false;
     }
     else {
