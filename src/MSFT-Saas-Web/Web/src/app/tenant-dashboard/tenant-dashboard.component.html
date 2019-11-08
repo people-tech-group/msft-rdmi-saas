@@ -251,7 +251,7 @@
       </div>
     </div>
   </div>
-
+</div>
   <!-- Create Host pool Modal Dialog -->
   <div class="overlay" *ngIf="showHostpoolDialog">
     <div class="createTenent">
@@ -429,6 +429,41 @@
                   Please enter Valid Description details
                 </div>
               </div>
+              <div class="col-sm-12 form-group">
+                  <label>Validation Env</label>
+
+                <label class="radio-inline">
+                  <input type="radio" value='Yes' name="validationEnv" formControlName="validationEnv"
+                    id="validationEnv" />Yes
+                </label>
+                <label class="radio-inline">
+                  <input type="radio" value='No' name="validationEnv" formControlName="validationEnv"
+                    id="validationEnv" />No
+                </label>
+              </div>
+              <div class="col-sm-12 form-group">
+                <label>Custom Rdp Property  – <span class="ashColor">optional</span></label>
+                <textarea rows="2" cols="47" name="customRdpProperty" formControlName="customRdpProperty"
+                  [readonly]="isEnableUser"></textarea>
+              </div> 
+              <div class="col-sm-12 form-group" *ngIf="!persistentHostpool">
+                <label>Load Balancer Type </label>
+
+              <label class="radio-inline">
+                <input type="radio" value='0' name="loadBalancerType" formControlName="loadBalancerType"
+                  id="loadBalancerType" />BreadthFirst
+              </label>
+              <label class="radio-inline">
+                <input type="radio" value='1' name="loadBalancerType" formControlName="loadBalancerType"
+                  id="loadBalancerType" />DepthFirst
+              </label>
+            </div>
+            <div class="col-sm-12 form-group" *ngIf="!persistentHostpool">
+              <label>Max Session Limit  – <span class="ashColor">optional</span></label>
+              <input type="number" name="maxSessionLimit" formControlName="maxSessionLimit"
+               />
+            </div> 
+
             </div>
           </form>
         </div>
@@ -459,3 +494,4 @@
       </div>
     </div>
   </div>
+<!-- </div> -->

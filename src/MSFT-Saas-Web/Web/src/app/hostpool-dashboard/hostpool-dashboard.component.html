@@ -58,9 +58,15 @@
                     <p>
                       <ng-template #HostTypeAvailable>Persistance</ng-template>
                       <ng-template #HostTypeNotAvailable>Non-Persistance</ng-template>
-                      <span
-                        *ngIf="hostPoolDetails.persistent ; then HostTypeAvailable else HostTypeNotAvailable"></span>
+                      <span *ngIf="hostPoolDetails.persistent ; then HostTypeAvailable else HostTypeNotAvailable"></span>
                     </p>
+                  </div>
+                  <div class="col-md-3">
+                    <label>Load Balancer Type</label>
+                    <p *ngIf="hostPoolDetails.loadBalancerType==0"> BreadthFirst </p>
+                    <p *ngIf="hostPoolDetails.loadBalancerType==1"> DepthFirst  </p>
+                    <p *ngIf="hostPoolDetails.loadBalancerType==2"> Persistent  </p>
+                   
                   </div>
                   <!-- <div class="col-md-3">
                     <label>Active Hosts (Total Hosts)</label>
@@ -114,6 +120,18 @@
                     </p>
                   </div>
                   <div class="col-md-3"></div>
+                </div>
+                <div class="row">
+                  <div class="col-md-5">
+                    <label>Custom RDP Property</label>
+                    <p>
+                      <span>{{hostPoolDetails.customRdpProperty?hostPoolDetails.customRdpProperty : 'NA'}}</span>
+                    </p>
+                  </div>
+                  <div class="col-md-3">
+                    <label>Validation Env </label>
+                    <p>{{hostPoolDetails.validationEnv!=null || hostPoolDetails.validationEnv=='' ? hostPoolDetails.validationEnv==true? 'Yes':'No':'NA'}}</p>
+                  </div>
                 </div>
               </div>
               <div *ngIf="hostpoolDetailsErrorFound">
@@ -1345,15 +1363,15 @@
               <div class="DeployUrl" id="">
                 <div class="col-xs-12 form-group">
                   <label for="usr">Path<span class="important-Field">*</span></label>
-                  <input type="text" id="imagepath" placeholder="Enter Valid Path" formControlName="AppPath">
+                  <input type="text" id="imagepath" placeholder="Enter Valid Path" formControlName="AppPath" readonly>
                   <!--(ngModelChange)="PathChange($event)"-->
-                  <div *ngIf="newAppEditGroup.controls['AppPath'].hasError('pattern')" class="colorRed">
+                  <div *ngIf="newAppEditGroup.controls['AppPath'].hasError('pattern')" class="colorRed" >
                     Please enter valid path
                   </div>
                 </div>
                 <div class="col-xs-12  form-group">
                   <label for="usr">App Name<span class="important-Field">*</span></label>
-                  <input type="text" id="appName" formControlName="Name" placeholder="Enter Name of RemoteApp" />
+                  <input type="text" id="appName" formControlName="Name" placeholder="Enter Name of RemoteApp" readonly />
                   <div *ngIf="newAppEditGroup.controls['Name'].hasError('pattern')" class="colorRed">
                     Please enter valid Name
                   </div>

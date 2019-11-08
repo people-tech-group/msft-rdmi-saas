@@ -969,6 +969,14 @@ i.notify-close {
   margin-bottom: 15px;
 }
 
+.popup-main .modal-body input[type=number] {
+  height: 30px;
+  border: 1px solid #ddd;
+  width: 100%;
+  padding-left: 10px;
+  margin-bottom: 15px;
+}
+
 .popup-main label {
   font-weight: normal;
 }
@@ -1797,6 +1805,7 @@ div.AllDeployTable > table > thead > tr > th {
 
 .modal-close {
   top: 15px !important;
+  
 }
 
 #deleteModal .modal-dialog {
@@ -2284,7 +2293,7 @@ li.login-details {
   z-index: 9999;
   margin-top: 3px;
   position: absolute;
-  left: -172px;
+  left: -130px;
   overflow-y: auto;
   background-color: white;
   /*border: 1px solid gray;*/

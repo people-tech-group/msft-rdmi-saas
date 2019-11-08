@@ -82,6 +82,7 @@ export class TenantDashboardComponent implements OnInit {
   public error: boolean = false;
   public Hostpoollist: number = 1;
   public searchByHostName: any;
+  public persistentHostpool: boolean;
 
 
   /*This  is used to close the edit modal popup*/
@@ -136,7 +137,11 @@ export class TenantDashboardComponent implements OnInit {
       description: new FormControl("", Validators.compose([Validators.required, Validators.pattern(/^[\dA-Za-z]+[\dA-Za-z\s\.\-\_\!\@\#\$\%\^\&\*\(\)\{\}\[\]\:\'\"\?\>\<\,\;\/\+\=\|]{0,1600}$/)])),
       diskPath: new FormControl("", Validators.compose([Validators.required, Validators.pattern(/^((\\|\\\\)[a-z A-Z]+)+((\\|\\\\)[a-z0-9A-Z]+)$/)])),
       enableUserProfileDisk: new FormControl(""),
-      IsPersistent: new FormControl("false")
+      IsPersistent: new FormControl("false"),
+      validationEnv: new FormControl(""),
+      customRdpProperty : new FormControl(""),
+      maxSessionLimit:new FormControl(""),
+      loadBalancerType: new FormControl("")
     });
   }
 
@@ -363,15 +368,21 @@ export class TenantDashboardComponent implements OnInit {
     }
     /*If the selected checkbox length=1 then this block of code executes to show the selected hostpool name */
     if (this.checkedAllTrue.length == 1) {
+     
       this.isEditDisabled = false;
       this.isDeleteDisabled = false;
       this.deleteCount = this.searchHostPools[index].hostPoolName;
+      this.persistentHostpool=this.searchHostPools[index].persistent;//added by susmita
       this.hostpoolFormEdit = new FormGroup({
         hostPoolName: new FormControl(this.searchHostPools[index].hostPoolName),
         friendlyName: new FormControl(this.searchHostPools[index].friendlyName),
         description: new FormControl(this.searchHostPools[index].description),
         diskPath: new FormControl(this.searchHostPools[index].diskPath, Validators.compose([Validators.required, Validators.pattern(/^((\\|\\\\)[a-z A-Z]+)+((\\|\\\\)[a-z0-9A-Z]+)$/)])),
         enableUserProfileDisk: new FormControl(this.searchHostPools[index].enableUserProfileDisk),
+        validationEnv : new FormControl(this.searchHostPools[index].validationEnv),
+        customRdpProperty : new FormControl(this.searchHostPools[index].customRdpProperty),
+        maxSessionLimit:new FormControl(this.searchHostPools[index].maxSessionLimit),
+        loadBalancerType: new FormControl(this.searchHostPools[index].loadBalancerType.toString())
       });
     }
     /*If the selected checkbox length>1 then this block of code executes to show the no of selected hostpools(i.e; if we select multiple checkboxes) */
@@ -464,8 +475,14 @@ export class TenantDashboardComponent implements OnInit {
           description: new FormControl(this.searchHostPools[index].description, Validators.compose([Validators.required, Validators.pattern(/^[\dA-Za-z]+[\dA-Za-z\s\.\-\_\!\@\#\$\%\^\&\*\(\)\{\}\[\]\:\'\"\?\>\<\,\;\/\+\=\|]{0,1600}$/)])),
           diskPath: new FormControl(this.searchHostPools[index].diskPath, Validators.compose([Validators.required, Validators.pattern(/^((\\|\\\\)[a-z A-Z]+)+((\\|\\\\)[a-z0-9A-Z]+)$/)])),
           enableUserProfileDisk: new FormControl(this.searchHostPools[index].enableUserProfileDisk),
+          validationEnv: new FormControl(this.searchHostPools[index].validationEnv),
+          customRdpProperty : new FormControl(this.searchHostPools[index].customRdpProperty),
+          maxSessionLimit:new FormControl(this.searchHostPools[index].maxSessionLimit),
+          loadBalancerType: new FormControl(this.searchHostPools[index].loadBalancerType.toString())
         });
         this.deleteCount = this.searchHostPools[index].hostPoolName;
+        this.persistentHostpool=this.searchHostPools[index].persistent;//added by susmita
+
         if (this.searchHostPools[index].enableUserProfileDisk === 'Yes') {
           this.selectedHostpoolradio = true;
           this.isEnableUser = true;
@@ -890,6 +907,13 @@ export class TenantDashboardComponent implements OnInit {
       else {
         this.searchHostPools[i].enableUserProfileDisk = 'No';
       }
+
+      if (this.searchHostPools[i].validationEnv === true) {
+        this.searchHostPools[i].validationEnv = 'Yes';
+      }
+      else {
+        this.searchHostPools[i].validationEnv = 'No';
+      }
     }
     if (this.searchHostPools.length == 0) {
       this.editedBody = true;
@@ -1018,33 +1042,70 @@ export class TenantDashboardComponent implements OnInit {
    */
   public UpdateHostPool(hostpoolData: any) {
     var updateArray = {};
+    let loadbalancertype:any;
+    let maxSessionLimit:any;
     if (hostpoolData.enableUserProfileDisk === 'Yes') {
       this.selectedHostpoolradio = true;
     }
     else {
       this.selectedHostpoolradio = false;
     }
-    if (this.selectedHostpoolradio == true) {
-      updateArray = {
+if(!this.persistentHostpool)
+{
+  updateArray = {
         "refresh_token": sessionStorage.getItem("Refresh_Token"),
         "tenantGroupName": this.tenantGroupName,
         "tenantName": this.selectedTenantName,
         "hostPoolName": hostpoolData.hostPoolName,
-        "diskPath": hostpoolData.diskPath,
-        "enableUserProfileDisk": this.selectedHostpoolradio
+        "friendlyName": hostpoolData.friendlyName,
+        "description": hostpoolData.description,
+        "diskPath": this.selectedHostpoolradio==true? hostpoolData.diskPath:'',
+        "persistent":this.persistentHostpool,
+        "enableUserProfileDisk": this.selectedHostpoolradio,
+        "loadBalancerType":hostpoolData.loadBalancerType,
+        "maxSessionLimit":hostpoolData.maxSessionLimit,
+        "customRdpProperty":hostpoolData.customRdpProperty,
+        "validationEnv":hostpoolData.validationEnv=='Yes'?true:hostpoolData.validationEnv=='No'?false:'',
       };
-    }
-    else {
-      updateArray = {
-        "refresh_token": sessionStorage.getItem("Refresh_Token"),
-        "tenantGroupName": this.tenantGroupName,
-        "tenantName": this.selectedTenantName.trim(),
-        "hostPoolName": hostpoolData.hostPoolName.trim(),
-        "friendlyName": hostpoolData.friendlyName.trim(),
-        "description": hostpoolData.description.trim(),
-        "enableUserProfileDisk": this.selectedHostpoolradio
-      };
-    }
+}
+else{
+  updateArray = {
+    "refresh_token": sessionStorage.getItem("Refresh_Token"),
+    "tenantGroupName": this.tenantGroupName,
+    "tenantName": this.selectedTenantName,
+    "hostPoolName": hostpoolData.hostPoolName,
+    "friendlyName": hostpoolData.friendlyName,
+    "description": hostpoolData.description,
+    "diskPath": this.selectedHostpoolradio==true? hostpoolData.diskPath:'',
+    "persistent":this.persistentHostpool,
+    "enableUserProfileDisk": this.selectedHostpoolradio,
+    "customRdpProperty":hostpoolData.customRdpProperty,
+    "validationEnv":hostpoolData.validationEnv=='Yes'?true:hostpoolData.validationEnv=='No'?false:'',
+  };
+}
+
+
+    // if (this.selectedHostpoolradio == true) {
+    //   updateArray = {
+    //     "refresh_token": sessionStorage.getItem("Refresh_Token"),
+    //     "tenantGroupName": this.tenantGroupName,
+    //     "tenantName": this.selectedTenantName,
+    //     "hostPoolName": hostpoolData.hostPoolName,
+    //     "diskPath": hostpoolData.diskPath,
+    //     "enableUserProfileDisk": this.selectedHostpoolradio
+    //   };
+    // }
+    // else {
+    //   updateArray = {
+    //     "refresh_token": sessionStorage.getItem("Refresh_Token"),
+    //     "tenantGroupName": this.tenantGroupName,
+    //     "tenantName": this.selectedTenantName.trim(),
+    //     "hostPoolName": hostpoolData.hostPoolName.trim(),
+    //     "friendlyName": hostpoolData.friendlyName.trim(),
+    //     "description": hostpoolData.description.trim(),
+    //     "enableUserProfileDisk": this.selectedHostpoolradio
+    //   };
+    // }
     this.refreshHostpoolLoading = true;
     this.updateHostpoolUrl = this._AppService.ApiUrl + '/api/HostPool/Put';
     this._AppService.UpdateTenant(this.updateHostpoolUrl, updateArray).subscribe(response => {

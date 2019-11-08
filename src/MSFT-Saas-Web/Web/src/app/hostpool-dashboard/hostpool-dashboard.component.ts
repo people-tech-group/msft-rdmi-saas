@@ -643,8 +643,16 @@ export class HostpoolDashboardComponent implements OnInit {
    */
   public GetHostPoolDetails(hostPoolName: any) {
     let Hostpools = JSON.parse(sessionStorage.getItem('Hostpools'));
-    let data = Hostpools.filter(item => item.hostPoolName == hostPoolName);
-    this.hostPoolDetails = data[0];
+    if(Hostpools!=null && Hostpools!=undefined)
+    {
+      let data = Hostpools.filter(item => item.hostPoolName == hostPoolName);
+      if(data!=null && data!=undefined && data.length>0)
+      {
+        this.hostPoolDetails = data[0];
+  
+      }
+    }
+  
     //this.GetAllAppGroupsList(hostPoolName);
     // this.refreshHostpoolLoading = true;
     // this.hostpoolDetailsErrorFound = false;
@@ -2031,12 +2039,11 @@ export class HostpoolDashboardComponent implements OnInit {
   public IsCheckedAppGroup(appGroupIndex: any, event) {
     this.checked[appGroupIndex] = !this.checked[appGroupIndex];
     if (event.target.checked != null && event.target.checked != undefined) {
-      this.showAppGroupDashBoard = !event.target.checked;// !this.showAppGroupDashBoard;
+      this.showAppGroupDashBoard = !event.target.checked;
     }
     else if (event.type == "click") {
-      this.showAppGroupDashBoard = this.showAppGroupDashBoard == true ? false : true;// !this.showHostDashBoard;
+      this.showAppGroupDashBoard = this.showAppGroupDashBoard == true ? false : true;
     }
-    //this.showHostDashBoard = false;///addded by susmita
     this.appGroupcheckedTrue = [];
     for (let i = 0; i < this.checked.length; i++) {
       if (this.checked[i] == true) {
@@ -2044,7 +2051,7 @@ export class HostpoolDashboardComponent implements OnInit {
       }
       if (this.checked[i] == false) {
         this.checkedMainAppGroup = false;
-        break;
+      //  break;
       }
       else {
         if (this.appGroupsList.length == this.appGroupcheckedTrue.length) {
@@ -2052,9 +2059,11 @@ export class HostpoolDashboardComponent implements OnInit {
         }
       }
     }
+
     if(this.appGroupcheckedTrue.length==1)
       {
         this.state = 'up';
+        this.showAppGroupDashBoard=true;
       }
   }
 
