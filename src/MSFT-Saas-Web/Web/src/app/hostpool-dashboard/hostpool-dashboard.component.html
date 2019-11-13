@@ -33,7 +33,7 @@
       <div class="tabbable-line">
         <ul class="nav nav-tabs">
           <li class="active">
-            <a href="#tab_default_1" data-toggle="tab">
+            <a href="#tab_default_1" data-toggle="tab" (click)=HideHostAndAppGroupDetails()>
               General
             </a>
           </li>
@@ -1041,7 +1041,7 @@
         <h4 class="modal-title">Delete Host Confirmation</h4>
       </div>
       <div class="modal-body">
-        <p>Are you sure you want to delete '<span style="font-weight:bold;">{{hostDeleteData}}</span>' Host(s) ?</p>
+        <p>Are you sure you want to delete '<span style="font-weight:bold;">{{hostDeleteData}}</span>' host(s) ?</p>
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-primary" (click)="DeleteHost()" data-dismiss="modal">Yes</button>
@@ -1256,7 +1256,7 @@
       </div>
       <div class="modal-body">
         <p>Are you sure you want to delete '<span id="deleteModalSelectedAppGroupName"
-            style="font-weight:bold;">{{deleteCountSelectedAppgroups}}</span>' App Group(s)?</p>
+            style="font-weight:bold;">{{deleteCountSelectedAppgroups}}</span>' app group(s)?</p>
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-primary" (click)="DeleteAppGroups()" data-dismiss="modal">Yes</button>
@@ -1431,7 +1431,7 @@
       </div>
       <div class="modal-body">
         <p>Are you sure you want to remove '<span id="deleteModalSelectedAppUserName"
-            style="font-weight:bold;">{{deleteCountSelectedApp}}</span>' App(s)?</p>
+            style="font-weight:bold;">{{deleteCountSelectedApp}}</span>' app(s)?</p>
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-primary" (click)="DeleteRemoteapps()" data-dismiss="modal">Yes</button>
@@ -1499,7 +1499,7 @@
       </div>
       <div class="modal-body">
         <p>Are you sure you want to remove '<span id="deleteModalSelectedAppUserName"
-            style="font-weight:bold;">{{deleteCountSelectedUser}}</span>' App User(s)?</p>
+            style="font-weight:bold;">{{deleteCountSelectedUser}}</span>' app group user(s)?</p>
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-primary" (click)="DeleteAppUser()" data-dismiss="modal">Yes</button>

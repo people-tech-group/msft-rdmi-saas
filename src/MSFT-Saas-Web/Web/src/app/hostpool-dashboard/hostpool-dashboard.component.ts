@@ -786,17 +786,11 @@ export class HostpoolDashboardComponent implements OnInit {
 
 
   public ChangeDrainMode() {
-    // if (data.allowNewSession === 'Yes') {
-    //   data.allowNewSession = true;
-    // }
-    // else {
-    //   data.allowNewSession = false;
-    // }
     let updateArray = {
       "tenantName": this.hostDetails.tenantName,
       "hostPoolName": this.hostDetails.hostPoolName,
       "sessionHostName": this.hostDetails.sessionHostName,
-      "allowNewSession": false, //this.HostAllowNewSession,
+      "allowNewSession": false, 
       "refresh_token": sessionStorage.getItem("Refresh_Token"),
       "tenantGroupName": this.hostDetails.tenantGroupName,
     };
@@ -1217,7 +1211,6 @@ export class HostpoolDashboardComponent implements OnInit {
         (error) => {
           this.error = true;
           let errorBody = JSON.parse(error['_body']);
-
           if (errorBody.error.code == "403") {
             this.errorMessage = "Access Denied! You are not authorized user to view host details.";
             this.showHostEmpty = true;
@@ -1240,7 +1233,7 @@ export class HostpoolDashboardComponent implements OnInit {
   }
 
   gettingHosts() {
-    this.sessionHostLists = JSON.parse(sessionStorage.getItem('Hosts'));
+    this.sessionHostLists = JSON.parse(sessionStorage.getItem('Hosts')); 
 
     if (this.sessionHostLists != null && this.sessionHostLists.length > 0) {
       /* This Block of code is used to Exchange the allowNewSession value 'true' or 'false' to 'Yes' or 'No' */
@@ -1992,6 +1985,7 @@ export class HostpoolDashboardComponent implements OnInit {
          * If Any Error (or) Problem With Services (or) Problem in internet this Error Block Will Exequte
          */
         (error) => {
+        
           this.error = true;
           let errorBody = JSON.parse(error['_body']);
           this.errorMessage = errorBody.error.target;
@@ -2624,7 +2618,7 @@ export class HostpoolDashboardComponent implements OnInit {
   }
 
   public getusers() {
-    let appUsersList = JSON.parse(sessionStorage.getItem('Users'));
+    let appUsersList = sessionStorage.getItem('Users')!=null && sessionStorage.getItem('Users')!=undefined? JSON.parse(sessionStorage.getItem('Users')):null;
     if (this.appUsersList) {
       if (this.appUsersList.code == "Invalid Token") {
         sessionStorage.clear();
@@ -4248,6 +4242,12 @@ export class HostpoolDashboardComponent implements OnInit {
     this.showHostDashBoard = false;
     this.checkedMainAppGroup = false;
     this.checked = [];
+  }
+
+  HideHostAndAppGroupDetails()
+  {
+  this.HideAppGroupDetails();
+  this.HideHostDetails();
   }
 
   /*
