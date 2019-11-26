@@ -29,10 +29,24 @@
       <img src="assets/Images/loading.gif" />
     </div>
   </div>
-
-  <div class="addDeploy">
+  <div *ngIf="showHomePage" class="addDeploy">
+      <h3>Useful Links</h3>
+      <br>
     <div class="tabbable-panel">
-      <div class="tabbable-line">
+        <div class="tabbable-line" >
+          <div class="nav nav-tabs">
+              <p><a href="#" target="_blank">Add VM to existing host pool</a></p>
+              <p><a href="#" target="_blank">Update GPOs for session timeouts</a></p>
+              <p><a href="#" target="_blank">Update host pool with a new image</a></p>
+              <p><a href="#" target="_blank">Deploy diagnostic tool</a></p>
+              <p><a (click)="ShowTenantGrid()"><b>Go To Tenants Page</b></a></p>
+          </div>
+    </div>
+    </div>
+  </div>
+  <div  *ngIf="!showHomePage" class="addDeploy" >
+    <div class="tabbable-panel">
+      <div class="tabbable-line" >
         <ul class="nav nav-tabs">
           <li class="active">
             <a href="#tab_default_2" data-toggle="tab">

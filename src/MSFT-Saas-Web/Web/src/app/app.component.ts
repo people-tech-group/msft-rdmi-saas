@@ -4,6 +4,7 @@ import * as $ from 'jquery';
 import { Router, ActivatedRoute, Params } from '@angular/router';
 import { AppService } from "./shared/app.service";
 import { trigger, state, style, transition, animate, keyframes } from '@angular/animations';
+//import { DeploymentDashboardComponent } from './deployment-dashboard/deployment-dashboard.component';
 
 @Component({
   selector: 'app-root',
@@ -37,6 +38,7 @@ import { trigger, state, style, transition, animate, keyframes } from '@angular/
   ]
 })
 export class AppComponent implements OnInit {
+  //DeploymentDashboardComponent: DeploymentDashboardComponent
   state: string = 'slideup';
   public static notifications: any = [];
   public profileName: string;
@@ -289,7 +291,14 @@ export class AppComponent implements OnInit {
    * This function is used to Redirect to Home On click Home Icon
    */
   public OnClickHome() {
-    this.router.navigate(['/admin/Tenants']);
+    this.router.routeReuseStrategy.shouldReuseRoute = function(){return false;};
+    let currentUrl = '/admin/Tenants';//this.router.url;
+    this.router.navigateByUrl(currentUrl)
+      .then(() => {
+        this.router.navigated = false;
+        this.router.navigate([this.router.url]);
+      });
+    //this.router.navigate(['/admin/Tenants']);
   }
 
   /*

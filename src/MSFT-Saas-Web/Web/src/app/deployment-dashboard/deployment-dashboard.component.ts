@@ -83,7 +83,7 @@ export class DeploymentDashboardComponent implements OnInit {
   tenantFormEdit;
   deploymentID = 0;
   @ViewChild('editclose') editclose: ElementRef;
-
+  public showHomePage:boolean=true;
 
   /*This  is used to close the edit modal popup*/
   public tenantUpdateClose(): void {
@@ -92,8 +92,11 @@ export class DeploymentDashboardComponent implements OnInit {
 
   constructor(private _AppService: AppService, private _notificationsService: NotificationsService, private router: Router,
     private adminMenuComponent: AdminMenuComponent) {
+      this.showHomePage=true;
   }
 
+
+ 
   /* This function is  called directly on page load */
   public ngOnInit() {
     this.tenantGroupName = localStorage.getItem("TenantGroupName");
@@ -266,6 +269,12 @@ export class DeploymentDashboardComponent implements OnInit {
   public openDropDown() {
     this.showDropDown = this.showDropDown == true ? false : true;
   }
+
+  public ShowTenantGrid()
+  {
+    this.showHomePage=!this.showHomePage;
+  }
+
   /* This function is called  when we save a Tenanat group name in the Tenanat group modal
 * --------------
 * paremeters-
