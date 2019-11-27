@@ -79,7 +79,7 @@
               <p><span><b>Infrastructure Permission</b></span><br /><span>{{InfraPermission}}</span></p>
               <!--<p><span><b>Infrastructure Permission</b></span><br /><span>{{scope}}</span></p>-->
               <p style="border-bottom:1px solid #666666; margin:0px"></p>
-              <p><span><b>App Version</b></span><br /><span>1.0.1</span></p>
+              <p><span><b>App Version</b></span><br /><span>{{AppVersion}}</span></p>
             </div>
             <div class="signout-block">
               <p style="border-bottom:1px solid #666666; margin:0px"></p>
@@ -97,6 +97,7 @@
     text-align: left;"><span class="icon icon-chevron-right"></span></a>
   <a (click)="OnClickHome()"><span class="icon icon-home-outline"></span><span class="menu-text">Home</span> </a>
 </div>
+
 
 <div>
   <router-outlet (activate)='onActivate()'>

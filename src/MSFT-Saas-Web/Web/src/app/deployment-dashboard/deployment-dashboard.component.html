@@ -35,10 +35,10 @@
     <div class="tabbable-panel">
         <div class="tabbable-line" >
           <div class="nav nav-tabs">
-              <p><a href="#" target="_blank">Add VM to existing host pool</a></p>
+              <p><a href="https://docs.microsoft.com/en-us/azure/virtual-desktop/create-host-pools-arm-template" target="_blank">Add VM to existing host pool</a></p>
               <p><a href="#" target="_blank">Update GPOs for session timeouts</a></p>
-              <p><a href="#" target="_blank">Update host pool with a new image</a></p>
-              <p><a href="#" target="_blank">Deploy diagnostic tool</a></p>
+              <p><a href="https://docs.microsoft.com/en-us/azure/virtual-desktop/create-host-pools-arm-template" target="_blank">Update host pool with a new image</a></p>
+              <p><a href="https://docs.microsoft.com/en-us/azure/virtual-desktop/deploy-diagnostics" target="_blank">Deploy diagnostic tool</a></p>
               <p><a (click)="ShowTenantGrid()"><b>Go To Tenants Page</b></a></p>
           </div>
     </div>
@@ -388,6 +388,26 @@
         <div class="modal-footer">
           <button type="button" class="btn btn-primary" (click)="DeleteTenant()" data-dismiss="modal">Yes</button>
           <button type="button" class="btn btn-default" data-dismiss="modal">No</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div *ngIf="showUpdateAppVersion" class="overlay">
+<div   role="dialog">
+    <div class="modal-dialog">
+      <div class="modal-content popup-main">
+        <div class="modal-header">
+          <h4 class="modal-title">Update App Version</h4>
+        </div>
+        <div class="modal-body">
+          <p>Current App Version in Git hub: {{gitAppVersion}}</p>
+          <p>Do you want to update App version to current git hub app version?</p>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-primary" (click)="UpdateAppVersion($event)" data-dismiss="modal">Yes</button>
+          <button type="button" class="btn btn-default" id="btnCloseUpdate" (click)="closeUpdateAppModal($event)" data-dismiss="modal">No</button>
         </div>
       </div>
     </div>

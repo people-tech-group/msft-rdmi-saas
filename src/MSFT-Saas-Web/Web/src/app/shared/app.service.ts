@@ -331,4 +331,12 @@ export class AppService {
     return this.http.delete(regeneratekeyURL, options)
       .catch((error: any) => Observable.throw('Server error'));
   }
+
+  public UpdateAppVersion(updateUrl:string,appVersion:string)
+  {
+    let headers = new Headers({ 'Accept': 'application/json', 'Authorization': sessionStorage.getItem('access_token') });
+    let options = new RequestOptions({ headers: headers });
+    return this.http.put(updateUrl, JSON.stringify(appVersion), options)
+    .catch((error: any) => Observable.throw(error));
+  }
 }

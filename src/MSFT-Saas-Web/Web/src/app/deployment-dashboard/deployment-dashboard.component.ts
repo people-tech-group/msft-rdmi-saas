@@ -72,6 +72,10 @@ export class DeploymentDashboardComponent implements OnInit {
   public TenantGroups: any = [];
   public showDropDown: boolean = false;
   public getTenantDetailsUrl: any;
+  public showUpdateAppVersion:boolean=false;
+  public selectedAppVersion:string;
+  public gitAppVersion:string;
+  public AppVersion:string;
   public options: any = {
     timeOut: 2000,
     position: ["top", "right"]
@@ -91,7 +95,7 @@ export class DeploymentDashboardComponent implements OnInit {
   }
 
   constructor(private _AppService: AppService, private _notificationsService: NotificationsService, private router: Router,
-    private adminMenuComponent: AdminMenuComponent) {
+    private adminMenuComponent: AdminMenuComponent, private appcomponent:AppComponent) {
       this.showHomePage=true;
   }
 
@@ -129,6 +133,12 @@ export class DeploymentDashboardComponent implements OnInit {
       description: new FormControl("", Validators.compose([Validators.required, Validators.pattern(/^[\dA-Za-z]+[\dA-Za-z\s\.\-\_\!\@\#\$\%\^\&\*\(\)\{\}\[\]\:\'\"\?\>\<\,\;\/\\\+\=\|]{0,1600}$/)])),
     });
     this.CheckTenantAccess();
+    this.gitAppVersion=sessionStorage.getItem("gitAppVersion");
+    this.AppVersion=sessionStorage.getItem("ApplicationVersion");
+    if(this.gitAppVersion!=this.AppVersion)
+    {
+      this.showUpdateAppVersion=true;
+    }
   }
 
   /*
@@ -302,6 +312,9 @@ export class DeploymentDashboardComponent implements OnInit {
       sessionStorage.setItem('Scope', roleDef);
       sessionStorage.setItem('infraPermission', selectedRole[0].scope);
     }
+
+   
+
     //navigate to appcomponent page
     let url = sessionStorage.getItem("redirectUri");
     window.location.replace(url);
@@ -1084,5 +1097,45 @@ export class DeploymentDashboardComponent implements OnInit {
         }
       );
     }
+  }
+
+  public closeUpdateAppModal(event)
+  {
+    this.showUpdateAppVersion=false;
+  }
+
+  public UpdateAppVersion(event)
+  {
+    this.showUpdateAppVersion=false;
+    this.updateTenantUrl = this._AppService.ApiUrl + '/api/Login/UpdateAppVersion?appVersion='+this.gitAppVersion;
+    this._AppService.UpdateAppVersion(this.updateTenantUrl, this.gitAppVersion).subscribe(response => {
+      var responseData = JSON.parse(response['_body']);
+      if(response.statusText.toUpperCase()=="OK")
+      {
+        this.appcomponent.AppVersion=this.AppVersion=this.gitAppVersion;
+        
+        sessionStorage.setItem("ApplicationVersion",this.AppVersion);
+        this._notificationsService.html(
+          '<i class="icon icon-check angular-Notify col-xs-1 no-pad"></i>' +
+          '<label class="notify-label col-xs-10 no-pad">App Version Updated Successfully</label>' +
+          '<a class="close"><i class="icon icon-close notify-close" aria-hidden="true"></i></a>' +
+          '<p class="notify-text col-xs-12 no-pad">' + responseData + '</p>',
+          'content optional one',
+          {
+            position: ["top", "right"],
+            timeOut: 3000,
+            showProgressBar: false,
+            pauseOnHover: false,
+            clickToClose: true,
+            maxLength: 10
+          }
+        )
+        AppComponent.GetNotification('icon icon-check angular-Notify', 'App Version Updated Successfully', responseData, new Date());
+      }
+    },
+    error => {
+      AppComponent.GetNotification('fa fa-times-circle checkstyle', 'Failed To App Version', 'Problem with the service. Please try later', new Date());
+
+    });
   }
 }

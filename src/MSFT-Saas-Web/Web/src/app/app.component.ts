@@ -61,6 +61,7 @@ export class AppComponent implements OnInit {
   public tenantGroupName: any;
   public errorMessage: string;
   public InfraPermission: string;
+  public  AppVersion:string;
   constructor(private _AppService: AppService, private router: Router, private route: ActivatedRoute, private http: Http, ) {
     //localStorage.removeItem("TenantGroupName");
   }
@@ -96,6 +97,7 @@ export class AppComponent implements OnInit {
     this.roleDefinitionName = sessionStorage.getItem("roleDefinitionName");
     this.profileEmail = sessionStorage.getItem("profileEmail");
     this.scope = sessionStorage.getItem("Scope");
+    this.AppVersion= sessionStorage.getItem("ApplicationVersion"); 
     this.InfraPermission = sessionStorage.getItem("infraPermission");
     if (code != "undefined" && code != null && gotCode == 'yes') {
       this.appLoader = true;
@@ -140,7 +142,11 @@ export class AppComponent implements OnInit {
             this.tenantGroupNameList = respdata.TenantGroups;
             sessionStorage.setItem("profileIcon", this.profileIcon);
             sessionStorage.setItem("profileName", this.profileName);
-           
+            sessionStorage.setItem("gitAppVersion", respdata.GitAppVersion);//susmita
+            sessionStorage.setItem("ApplicationVersion", respdata.ApplicationVersion);//susmita
+            this.AppVersion= respdata.ApplicationVersion; 
+          
+       
             if(respdata.RoleAssignment==null || respdata.RoleAssignment=="" || respdata.RoleAssignment.length==0)
             {
               this.router.navigate(['/invalid-role-assignment']);
