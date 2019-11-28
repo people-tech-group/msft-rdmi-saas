@@ -142,6 +142,12 @@ namespace MSFT.WVDSaaS.API.BLL
                 {
                     rdMgmtHostPool["loadBalancerType"] =Convert.ToInt32( rdMgmtHostPool["loadBalancerType"]) ;
                 }
+                if (rdMgmtHostPool["assignmentType"] != null)
+                {
+                    rdMgmtHostPool["assignmentType"] = Convert.ToInt32(rdMgmtHostPool["assignmentType"]);
+                }
+
+
                 var content = new StringContent(JsonConvert.SerializeObject(rdMgmtHostPool), Encoding.UTF8, "application/json");
                 HttpResponseMessage response = CommonBL.PatchAsync(deploymentUrl, accessToken, "/RdsManagement/V1/TenantGroups/" + rdMgmtHostPool["tenantGroupName"].ToString() + "/Tenants/" + rdMgmtHostPool["tenantName"].ToString() + "/HostPools/" + rdMgmtHostPool["hostPoolName"].ToString(), content).Result;
                 string strJson = response.Content.ReadAsStringAsync().Result;

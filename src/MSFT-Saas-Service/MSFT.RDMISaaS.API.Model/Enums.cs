@@ -12,5 +12,11 @@ namespace MSFT.WVDSaaS.API.Model
             DepthFirst = 1,
             Persistent = 2,
         }
+
+        public enum assignmentType
+        {
+            Automatic=1,
+            Direct=2
+        }
     }
 }

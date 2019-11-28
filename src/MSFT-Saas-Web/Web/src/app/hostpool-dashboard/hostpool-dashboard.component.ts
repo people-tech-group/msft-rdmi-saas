@@ -272,6 +272,9 @@ export class HostpoolDashboardComponent implements OnInit {
   public isEditAppsDisabled: boolean = true;
   public showEditAppDialog: boolean = false;
   public selectedHostRows: any = [];
+  
+ 
+ 
   @ViewChild('closeModal') closeModal: ElementRef;
 
   constructor(private _AppService: AppService, private fb: FormBuilder, private http: Http, private route: ActivatedRoute, private _notificationsService: NotificationsService, private router: Router,
@@ -336,6 +339,8 @@ export class HostpoolDashboardComponent implements OnInit {
       UserPrincipalName: new FormControl('', Validators.required),
     });
 
+    
+
     this.sendMessageForm = new FormGroup({
       Title: new FormControl('', Validators.required),
       Message: new FormControl('', Validators.required)
@@ -350,6 +355,7 @@ export class HostpoolDashboardComponent implements OnInit {
     this.hostFormEdit = new FormGroup({
       sessionHostName: new FormControl(""),
       allowNewSession: new FormControl(""),
+      assignedUser: new FormControl("")
     });
     this.downloadFile = new FormGroup({
       filetype: new FormControl(""),
@@ -910,6 +916,7 @@ export class HostpoolDashboardComponent implements OnInit {
       this.hostFormEdit = new FormGroup({
         sessionHostName: new FormControl(this.sessionHostListsSearch[index].sessionHostName),
         allowNewSession: new FormControl(this.sessionHostListsSearch[index].allowNewSession),
+        assignedUser: new FormControl(this.sessionHostListsSearch[index].assignedUser)
       });
       this.hostDeleteData = this.sessionHostListsSearch[index].sessionHostName;
     }
@@ -1429,6 +1436,7 @@ export class HostpoolDashboardComponent implements OnInit {
     this.hostFormEdit = new FormGroup({
       sessionHostName: new FormControl(this.sessionHostListsSearch[hostIndex].sessionHostName),
       allowNewSession: new FormControl(this.sessionHostListsSearch[hostIndex].allowNewSession),
+      assignedUser: new FormControl(this.sessionHostListsSearch[index].assignedUser)
     });
   }
 
@@ -1446,7 +1454,8 @@ export class HostpoolDashboardComponent implements OnInit {
     else {
       data.allowNewSession = false;
     }
-    let updateArray = {
+    let updateArray:any;
+     updateArray = {
       "tenantName": this.tenantName,
       "hostPoolName": this.hostPoolName,
       "sessionHostName": data.sessionHostName,
@@ -1454,6 +1463,18 @@ export class HostpoolDashboardComponent implements OnInit {
       "refresh_token": sessionStorage.getItem("Refresh_Token"),
       "tenantGroupName": this.tenantGroupName,
     };
+    if(data.assignedUser!=null)
+    {
+      updateArray = {
+        "tenantName": this.tenantName,
+        "hostPoolName": this.hostPoolName,
+        "sessionHostName": data.sessionHostName,
+        "allowNewSession": data.allowNewSession,
+        "assignedUser":data.assignedUser,
+        "refresh_token": sessionStorage.getItem("Refresh_Token"),
+        "tenantGroupName": this.tenantGroupName,
+      };
+    }
     this.updateAppGroupLoading = true;
     this.updateHostUrl = this._AppService.ApiUrl + '/api/SessionHost/Put';
     this._AppService.UpdateHost(this.updateHostUrl, updateArray).subscribe(response => {
@@ -3022,6 +3043,8 @@ export class HostpoolDashboardComponent implements OnInit {
     this.userPrincipalName = false;
   }
 
+    
+
   public OpenSendMessagePanel() {
     this.showSendMessageDialog = true;
     this.sendMesageButtonDisable = true;
@@ -3051,6 +3074,7 @@ export class HostpoolDashboardComponent implements OnInit {
   public HideAppUserDialog() {
     this.showAddUserDialog = false;
   }
+
 
   /**
    * this function is used to close send message panel
@@ -3340,6 +3364,8 @@ export class HostpoolDashboardComponent implements OnInit {
       }
     );
   }
+
+  
 
   /*
    * This function is used to delete the selected Appgroup user

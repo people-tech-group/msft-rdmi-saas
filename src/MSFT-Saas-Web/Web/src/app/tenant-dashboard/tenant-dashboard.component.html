@@ -192,8 +192,10 @@
                       (click)="SetSelectedHostRoute(absoluteIndex(hInd),i.tenantName,i.hostPoolName)">
                       {{i.hostPoolName}}
                     </td>
-                    <td style="width:15%;text-align:left;"><span>{{i.friendlyName=="" || i.friendlyName==null? 'NA':i.friendlyName}}</span></td>
-                    <td style="width:15%;text-align:center;">{{i.description=="" || i.description==null? 'NA':i.description}}</td>
+                    <td style="width:15%;text-align:left;">
+                      <span>{{i.friendlyName=="" || i.friendlyName==null? 'NA':i.friendlyName}}</span></td>
+                    <td style="width:15%;text-align:center;">
+                      {{i.description=="" || i.description==null? 'NA':i.description}}</td>
                     <td style="width:15%;text-align:center;">{{i.persistent == true ? 'Yes' : 'No'}}</td>
                     <!-- <td style="width:15%;text-align:center;">{{i.noOfUsers}}</td>
                     <td style="width:15%;text-align:center;">{{i.noOfActivehosts}}</td> -->
@@ -252,202 +254,203 @@
     </div>
   </div>
 </div>
-  <!-- Create Host pool Modal Dialog -->
-  <div class="overlay" *ngIf="showHostpoolDialog">
-    <div class="createTenent">
-      <input type="hidden" id="TenantDashboardCreateOpen" value="{{isCreateOpen}}" />
-      <form [formGroup]="hostpoolForm">
-        <div class="createTenantHead">
-          <div class="TenantStatus">
-            <div id="tab-1" class="tab-content current" *ngIf="!showHostpoolTab2">
-              <ul class="tabs" style="float:left;">
-                <li class="tab-link current" data-tab="tab-1">1</li>
-                <li class="tab-link disable" data-tab="tab-2">2</li>
-              </ul>
-              <div style="clear:both"></div>
-              <h4>Create Host pool</h4>
-              <p>
-                Host pools were previously known as collections and are server host farms that host the remote desktops/
-                apps.
-              </p>
-              <div class="DeployUrl marginBottom30">
-                <div class="form-group">
-                  <label>Host pool Unique Name <span class="important-Field">*</span></label>
-                  <input type="text" name="hostPoolName" (ngModelChange)="HostpoolNameChange($event)"
-                    formControlName="hostPoolName" />
-                  <div *ngIf="hostpoolForm.controls['hostPoolName'].hasError('pattern')" class="colorRed">
-                    Please enter Valid Host pool unique name
-                  </div>
-                  <div *ngIf="createHostpoolUniqueName" class="colorRed">
-                    Please enter Host pool unique name
-                  </div>
-                </div>
-              </div>
-              <div class="DeployUrl marginBottom30">
-                <div class="form-group">
-                  <label>Host pool Friendly Name – <span class="ashColor">optional</span></label>
-                  <input type="text" name="friendlyName" formControlName="friendlyName" />
-                  <div *ngIf="hostpoolForm.controls['friendlyName'].hasError('pattern')" class="colorRed">
-                    Please enter Valid Host pool friendly name
-                  </div>
-                </div>
-              </div>
-              <div class="DeployUrl">
-                <div class="form-group">
-                  <label>Description – <span class="ashColor">optional</span></label>
-                  <textarea rows="3" cols="47" name="description" formControlName="description"></textarea>
-                  <div *ngIf="hostpoolForm.controls['description'].hasError('pattern')" class="colorRed">
-                    Please enter Valid Description details
-                  </div>
-                </div>
-              </div>
-            </div>
-            <div id="tab-2" class="tab-content current" *ngIf="showHostpoolTab2">
-              <ul class="tabs" style="float:left;">
-                <li class="tab-link disable" data-tab="tab-1">1</li>
-                <li class="tab-link current" data-tab="tab-2">2</li>
-              </ul>
-              <div style="clear:both"></div>
-              <h4>Host pool Settings</h4>
-              <div class="DeployUrl">
-                <p>Host pool Type</p>
-                <p class="red">Value cannot be modified after creation.</p>
-                <div class="col-xs-12 no-pad">
-                </div>
-                <input type="radio" value="Nonpersistent" name="Nonpersistent" id="RadioBtnNonpersistent"
-                  checked={{nonpersistentChecked}}
-                  (click)="nonPersistant=true;nonpersistentChecked='checked';PersistentChecked=''" /><label>Non-Persistent</label>
-                <p class="marginLeft25">Non-Persistent host pools assigns different host to the users every time they
-                  log in. [Placeholder to explain “Why”. Add in what scenarios, admins should select this type ]</p>
-                <input type="radio" value="Persistent" name="Nonpersistent" id="RadioBtnpersistent"
-                  checked={{PersistentChecked}}
-                  (click)="nonPersistant=false;nonpersistentChecked='';PersistentChecked='checked'" /><label>Persistent</label>
-                <p class="marginLeft25">Persistent host pools assigns same host to users every time they log in.
-                  [Placeholder to explain “Why”. Add in what scenarios, admins should select this type ]</p>
-              </div>
-              <div class="DeployUrl" id="Divpersistent" *ngIf="!nonPersistant">
-                <div class="col-xs-12 no-pad">
-                  <input type="checkbox" name="c1" checked="checked" /> <label>Auto assign desktop to users</label>
-                </div>
-                <div class="col-xs-12 no-pad">
-                  <input type="checkbox" name="c2" /> <label>Grant administrative privilege</label>
-                </div>
-              </div>
-              <div class="DeployUrl" id="DivNonpersistent" *ngIf="nonPersistant">
-                <!-- <div class="col-xs-12 paddingLeft0">
-                <label>User Profile Data Location</label>
-                <input type="text" name="Browse" />
-              </div> -->
-                <div class="col-xs-12 no-pad">
-                  <!-- <p>User profile data location is only for Non-Persistent host pools users to save data.</p> -->
-                  <div class="DeployUrl">
-                    <div class="form-group">
-                      <label>Number of Users per Host</label>
-                      <input type="text" name="NoPerHost" maxlength="1" />
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-            <div class="borderLine"> </div>
-          </div>
-        </div>
-        <a href="" class="close" id="btnSlideClose" (click)="CreateHostPoolSlideClose($event)"><i
-            class="icon icon-close" aria-hidden="true"></i></a>
-        <div class="botomBtn" *ngIf="!showHostpoolTab2">
-          <ul>
-            <li>
-              <input type=button value="Cancel" id="btnCancel" (click)="BtnCancel($event)" />
-            </li>
-            <li>
-              <input type="button" value="Next" id="btnNext" (click)="ShowNextTab()"
-                [disabled]="hostpoolNextButtonDisable ||hostpoolForm.controls['hostPoolName'].hasError('pattern')" />
-
-            </li>
-          </ul>
-        </div>
-        <div class="botomBtn" *ngIf="showHostpoolTab2">
-          <ul>
-            <li>
-              <input type=button value="Previous" id="btnPrevious" (click)="ShowPreviousTab(hostpoolForm.value)" />
-            </li>
-            <li>
-              <input type="button" value="Done" id="btnDone" (click)="CreateNewHostpool(hostpoolForm.value)" />
-            </li>
-          </ul>
-        </div>
-      </form>
-    </div>
-  </div>
-
-  <!--Edit Hostpool Modal Dialog-->
-  <div class="modal fade" id="editModal" role="dialog">
-    <div class="modal-dialog">
-      <div class="modal-content popup-main">
-        <div class="modal-header">
-          <i class="icon icon-close" aria-hidden="true" data-dismiss="modal"></i>
-          <h4 class="modal-title">Edit Host pool</h4>
-        </div>
-        <div class="modal-body">
-          <form [formGroup]="hostpoolFormEdit">
-            <div class="row">
-              <div class="col-sm-12 form-group">
+<!-- Create Host pool Modal Dialog -->
+<div class="overlay" *ngIf="showHostpoolDialog">
+  <div class="createTenent">
+    <input type="hidden" id="TenantDashboardCreateOpen" value="{{isCreateOpen}}" />
+    <form [formGroup]="hostpoolForm">
+      <div class="createTenantHead">
+        <div class="TenantStatus">
+          <div id="tab-1" class="tab-content current" *ngIf="!showHostpoolTab2">
+            <ul class="tabs" style="float:left;">
+              <li class="tab-link current" data-tab="tab-1">1</li>
+              <li class="tab-link disable" data-tab="tab-2">2</li>
+            </ul>
+            <div style="clear:both"></div>
+            <h4>Create Host pool</h4>
+            <p>
+              Host pools were previously known as collections and are server host farms that host the remote desktops/
+              apps.
+            </p>
+            <div class="DeployUrl marginBottom30">
+              <div class="form-group">
                 <label>Host pool Unique Name <span class="important-Field">*</span></label>
-                <input type="text" name="hostPoolName" formControlName="hostPoolName" readonly (keydown)="$event.preventDefault();" />
+                <input type="text" name="hostPoolName" (ngModelChange)="HostpoolNameChange($event)"
+                  formControlName="hostPoolName" />
+                <div *ngIf="hostpoolForm.controls['hostPoolName'].hasError('pattern')" class="colorRed">
+                  Please enter Valid Host pool unique name
+                </div>
+                <div *ngIf="createHostpoolUniqueName" class="colorRed">
+                  Please enter Host pool unique name
+                </div>
               </div>
-              <div class="col-sm-12 form-group">
+            </div>
+            <div class="DeployUrl marginBottom30">
+              <div class="form-group">
                 <label>Host pool Friendly Name – <span class="ashColor">optional</span></label>
                 <input type="text" name="friendlyName" formControlName="friendlyName" />
-                <div *ngIf="hostpoolFormEdit.controls['friendlyName'].hasError('pattern')" class="colorRed">
+                <div *ngIf="hostpoolForm.controls['friendlyName'].hasError('pattern')" class="colorRed">
                   Please enter Valid Host pool friendly name
                 </div>
               </div>
-              <div [hidden]="true" class="col-sm-12"><label>Enable User Profile Disk – <span
-                    class="ashColor">optional</span></label></div>
-              <div [hidden]="true" class="col-sm-12" style="padding:10px 25px">
-                <label class="radio-inline" style="padding-left: 30px">
-                  <input value=Yes type="radio" name="enableUserProfileDisk" formControlName="enableUserProfileDisk"
-                    (ngModelChange)="profileDiskChange($event)">Yes
-                </label>
-                <label class="radio-inline" style="padding-left: 30px">
-                  <input value=No type="radio" name="enableUserProfileDisk" formControlName="enableUserProfileDisk"
-                    (ngModelChange)="profileDiskChange($event)">No
-                </label>
-              </div>
-              <div [hidden]="true" class="col-sm-12 form-group">
-                <label>Disk Path – <span class="ashColor">optional</span></label>
-                <input type="text" name="diskPath" formControlName="diskPath" [readonly]="!isEnableUser" />
-                <div *ngIf="hostpoolFormEdit.controls['diskPath'].hasError('pattern')" class="colorRed">
-                  Please enter valid path
-                </div>
-              </div>
-              <div class="col-sm-12 form-group">
+            </div>
+            <div class="DeployUrl">
+              <div class="form-group">
                 <label>Description – <span class="ashColor">optional</span></label>
-                <textarea rows="3" cols="47" name="description" formControlName="description"
-                  [readonly]="isEnableUser"></textarea>
-                <div *ngIf="hostpoolFormEdit.controls['description'].hasError('pattern')" class="colorRed">
+                <textarea rows="3" cols="47" name="description" formControlName="description"></textarea>
+                <div *ngIf="hostpoolForm.controls['description'].hasError('pattern')" class="colorRed">
                   Please enter Valid Description details
                 </div>
               </div>
-              <div class="col-sm-12 form-group">
-                  <label>Validation Env</label>
-
-                <label class="radio-inline">
-                  <input type="radio" value='Yes' name="validationEnv" formControlName="validationEnv"
-                    id="validationEnv" />Yes
-                </label>
-                <label class="radio-inline">
-                  <input type="radio" value='No' name="validationEnv" formControlName="validationEnv"
-                    id="validationEnv" />No
-                </label>
+            </div>
+          </div>
+          <div id="tab-2" class="tab-content current" *ngIf="showHostpoolTab2">
+            <ul class="tabs" style="float:left;">
+              <li class="tab-link disable" data-tab="tab-1">1</li>
+              <li class="tab-link current" data-tab="tab-2">2</li>
+            </ul>
+            <div style="clear:both"></div>
+            <h4>Host pool Settings</h4>
+            <div class="DeployUrl">
+              <p>Host pool Type</p>
+              <p class="red">Value cannot be modified after creation.</p>
+              <div class="col-xs-12 no-pad">
               </div>
-              <div class="col-sm-12 form-group">
-                <label>Custom Rdp Property  – <span class="ashColor">optional</span></label>
-                <textarea rows="2" cols="47" name="customRdpProperty" formControlName="customRdpProperty"
-                  [readonly]="isEnableUser"></textarea>
-              </div> 
-              <div class="col-sm-12 form-group" *ngIf="!persistentHostpool">
-                <label>Load Balancer Type </label>
+              <input type="radio" value="Nonpersistent" name="Nonpersistent" id="RadioBtnNonpersistent"
+                checked={{nonpersistentChecked}}
+                (click)="nonPersistant=true;nonpersistentChecked='checked';PersistentChecked=''" /><label>Non-Persistent</label>
+              <p class="marginLeft25">Non-Persistent host pools assigns different host to the users every time they
+                log in. [Placeholder to explain “Why”. Add in what scenarios, admins should select this type ]</p>
+              <input type="radio" value="Persistent" name="Nonpersistent" id="RadioBtnpersistent"
+                checked={{PersistentChecked}}
+                (click)="nonPersistant=false;nonpersistentChecked='';PersistentChecked='checked'" /><label>Persistent</label>
+              <p class="marginLeft25">Persistent host pools assigns same host to users every time they log in.
+                [Placeholder to explain “Why”. Add in what scenarios, admins should select this type ]</p>
+            </div>
+            <div class="DeployUrl" id="Divpersistent" *ngIf="!nonPersistant">
+              <div class="col-xs-12 no-pad">
+                <input type="checkbox" name="c1" checked="checked" /> <label>Auto assign desktop to users</label>
+              </div>
+              <div class="col-xs-12 no-pad">
+                <input type="checkbox" name="c2" /> <label>Grant administrative privilege</label>
+              </div>
+            </div>
+            <div class="DeployUrl" id="DivNonpersistent" *ngIf="nonPersistant">
+              <!-- <div class="col-xs-12 paddingLeft0">
+                <label>User Profile Data Location</label>
+                <input type="text" name="Browse" />
+              </div> -->
+              <div class="col-xs-12 no-pad">
+                <!-- <p>User profile data location is only for Non-Persistent host pools users to save data.</p> -->
+                <div class="DeployUrl">
+                  <div class="form-group">
+                    <label>Number of Users per Host</label>
+                    <input type="text" name="NoPerHost" maxlength="1" />
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="borderLine"> </div>
+        </div>
+      </div>
+      <a href="" class="close" id="btnSlideClose" (click)="CreateHostPoolSlideClose($event)"><i class="icon icon-close"
+          aria-hidden="true"></i></a>
+      <div class="botomBtn" *ngIf="!showHostpoolTab2">
+        <ul>
+          <li>
+            <input type=button value="Cancel" id="btnCancel" (click)="BtnCancel($event)" />
+          </li>
+          <li>
+            <input type="button" value="Next" id="btnNext" (click)="ShowNextTab()"
+              [disabled]="hostpoolNextButtonDisable ||hostpoolForm.controls['hostPoolName'].hasError('pattern')" />
+
+          </li>
+        </ul>
+      </div>
+      <div class="botomBtn" *ngIf="showHostpoolTab2">
+        <ul>
+          <li>
+            <input type=button value="Previous" id="btnPrevious" (click)="ShowPreviousTab(hostpoolForm.value)" />
+          </li>
+          <li>
+            <input type="button" value="Done" id="btnDone" (click)="CreateNewHostpool(hostpoolForm.value)" />
+          </li>
+        </ul>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!--Edit Hostpool Modal Dialog-->
+<div class="modal fade" id="editModal" role="dialog">
+  <div class="modal-dialog">
+    <div class="modal-content popup-main">
+      <div class="modal-header">
+        <i class="icon icon-close" aria-hidden="true" data-dismiss="modal"></i>
+        <h4 class="modal-title">Edit Host pool</h4>
+      </div>
+      <div class="modal-body">
+        <form [formGroup]="hostpoolFormEdit">
+          <div class="row">
+            <div class="col-sm-12 form-group">
+              <label>Host pool Unique Name <span class="important-Field">*</span></label>
+              <input type="text" name="hostPoolName" formControlName="hostPoolName" readonly
+                (keydown)="$event.preventDefault();" />
+            </div>
+            <div class="col-sm-12 form-group">
+              <label>Host pool Friendly Name – <span class="ashColor">optional</span></label>
+              <input type="text" name="friendlyName" formControlName="friendlyName" />
+              <div *ngIf="hostpoolFormEdit.controls['friendlyName'].hasError('pattern')" class="colorRed">
+                Please enter Valid Host pool friendly name
+              </div>
+            </div>
+            <div [hidden]="true" class="col-sm-12"><label>Enable User Profile Disk – <span
+                  class="ashColor">optional</span></label></div>
+            <div [hidden]="true" class="col-sm-12" style="padding:10px 25px">
+              <label class="radio-inline" style="padding-left: 30px">
+                <input value=Yes type="radio" name="enableUserProfileDisk" formControlName="enableUserProfileDisk"
+                  (ngModelChange)="profileDiskChange($event)">Yes
+              </label>
+              <label class="radio-inline" style="padding-left: 30px">
+                <input value=No type="radio" name="enableUserProfileDisk" formControlName="enableUserProfileDisk"
+                  (ngModelChange)="profileDiskChange($event)">No
+              </label>
+            </div>
+            <div [hidden]="true" class="col-sm-12 form-group">
+              <label>Disk Path – <span class="ashColor">optional</span></label>
+              <input type="text" name="diskPath" formControlName="diskPath" [readonly]="!isEnableUser" />
+              <div *ngIf="hostpoolFormEdit.controls['diskPath'].hasError('pattern')" class="colorRed">
+                Please enter valid path
+              </div>
+            </div>
+            <div class="col-sm-12 form-group">
+              <label>Description – <span class="ashColor">optional</span></label>
+              <textarea rows="3" cols="47" name="description" formControlName="description"
+                [readonly]="isEnableUser"></textarea>
+              <div *ngIf="hostpoolFormEdit.controls['description'].hasError('pattern')" class="colorRed">
+                Please enter Valid Description details
+              </div>
+            </div>
+            <div class="col-sm-12 form-group">
+              <label>Validation Env</label>
+
+              <label class="radio-inline">
+                <input type="radio" value='Yes' name="validationEnv" formControlName="validationEnv"
+                  id="validationEnv" />Yes
+              </label>
+              <label class="radio-inline">
+                <input type="radio" value='No' name="validationEnv" formControlName="validationEnv"
+                  id="validationEnv" />No
+              </label>
+            </div>
+            <div class="col-sm-12 form-group">
+              <label>Custom Rdp Property – <span class="ashColor">optional</span></label>
+              <textarea rows="2" cols="47" name="customRdpProperty" formControlName="customRdpProperty"
+                [readonly]="isEnableUser"></textarea>
+            </div>
+            <div class="col-sm-12 form-group" *ngIf="!persistentHostpool">
+              <label>Load Balancer Type </label>
 
               <label class="radio-inline">
                 <input type="radio" value='0' name="loadBalancerType" formControlName="loadBalancerType"
@@ -458,40 +461,51 @@
                   id="loadBalancerType" />DepthFirst
               </label>
             </div>
-            <div class="col-sm-12 form-group" *ngIf="!persistentHostpool">
-              <label>Max Session Limit  – <span class="ashColor">optional</span></label>
-              <input type="number" name="maxSessionLimit" formControlName="maxSessionLimit"
-               />
-            </div> 
+            <div class="col-sm-12 form-group" *ngIf="persistentHostpool">
+              <label>Assignment Type </label>
 
+              <label class="radio-inline">
+                <input type="radio" value='1' name="assignmentType" formControlName="assignmentType"
+                  id="assignmentType" />Automatic
+              </label>
+              <label class="radio-inline">
+                <input type="radio" value='2' name="assignmentType" formControlName="assignmentType"
+                  id="assignmentType" />Direct
+              </label>
             </div>
-          </form>
-        </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-primary" (click)="UpdateHostPool(hostpoolFormEdit.value)">Update</button>
-          <button type="button" class="btn btn-default" data-dismiss="modal" id="CancelupdateHostpools"
-            #closeModal>Cancel</button>
-        </div>
-      </div>
-    </div>
-  </div>
+            <div class="col-sm-12 form-group" *ngIf="!persistentHostpool">
+              <label>Max Session Limit – <span class="ashColor">optional</span></label>
+              <input type="number" name="maxSessionLimit" formControlName="maxSessionLimit" />
+            </div>
 
-  <!-- Delete Hostpool Modal Dialog-->
-  <div class="modal fade" id="deleteModal" role="dialog">
-    <div class="modal-dialog">
-      <div class="modal-content popup-main">
-        <div class="modal-header">
-          <i class="icon icon-close" aria-hidden="true" (click)="RefreshHostpools()" data-dismiss="modal"></i>
-          <h4 class="modal-title">Delete Host pool Confirmation</h4>
-        </div>
-        <div class="modal-body">
-          <p>Are you sure you want to delete '<span style="font-weight:bold;">{{deleteCount}}</span>' host pool(s) ?</p>
-        </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-primary" (click)="DeleteHostpool()" data-dismiss="modal">Yes</button>
-          <button type="button" class="btn btn-default" data-dismiss="modal">No</button>
-        </div>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-primary" (click)="UpdateHostPool(hostpoolFormEdit.value)">Update</button>
+        <button type="button" class="btn btn-default" data-dismiss="modal" id="CancelupdateHostpools"
+          #closeModal>Cancel</button>
       </div>
     </div>
   </div>
+</div>
+
+<!-- Delete Hostpool Modal Dialog-->
+<div class="modal fade" id="deleteModal" role="dialog">
+  <div class="modal-dialog">
+    <div class="modal-content popup-main">
+      <div class="modal-header">
+        <i class="icon icon-close" aria-hidden="true" (click)="RefreshHostpools()" data-dismiss="modal"></i>
+        <h4 class="modal-title">Delete Host pool Confirmation</h4>
+      </div>
+      <div class="modal-body">
+        <p>Are you sure you want to delete '<span style="font-weight:bold;">{{deleteCount}}</span>' host pool(s) ?</p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-primary" (click)="DeleteHostpool()" data-dismiss="modal">Yes</button>
+        <button type="button" class="btn btn-default" data-dismiss="modal">No</button>
+      </div>
+    </div>
+  </div>
+</div>
 <!-- </div> -->

@@ -141,7 +141,8 @@ export class TenantDashboardComponent implements OnInit {
       validationEnv: new FormControl(""),
       customRdpProperty : new FormControl(""),
       maxSessionLimit:new FormControl(""),
-      loadBalancerType: new FormControl("")
+      loadBalancerType: new FormControl(""),
+      assignmentType: new FormControl("")
     });
   }
 
@@ -382,7 +383,8 @@ export class TenantDashboardComponent implements OnInit {
         validationEnv : new FormControl(this.searchHostPools[index].validationEnv),
         customRdpProperty : new FormControl(this.searchHostPools[index].customRdpProperty),
         maxSessionLimit:new FormControl(this.searchHostPools[index].maxSessionLimit),
-        loadBalancerType: new FormControl(this.searchHostPools[index].loadBalancerType.toString())
+        loadBalancerType: new FormControl(this.searchHostPools[index].loadBalancerType.toString()),
+        assignmentType: new FormControl(this.searchHostPools[index].assignmentType.toString()),
       });
     }
     /*If the selected checkbox length>1 then this block of code executes to show the no of selected hostpools(i.e; if we select multiple checkboxes) */
@@ -469,6 +471,7 @@ export class TenantDashboardComponent implements OnInit {
             var index = i;
           }
         }
+        this.persistentHostpool=this.searchHostPools[index].persistent;//added by susmita
         this.hostpoolFormEdit = new FormGroup({
           hostPoolName: new FormControl(this.searchHostPools[index].hostPoolName, Validators.compose([Validators.required, Validators.maxLength(36), Validators.pattern(/^[^\s\W\_]([A-Za-z0-9\s\-\_\.])+$/)])),
           friendlyName: new FormControl(this.searchHostPools[index].friendlyName, Validators.compose([Validators.required, Validators.pattern(/^[^\s\W\_]([A-Za-z0-9\s\.\-\_])+$/)])),
@@ -478,11 +481,10 @@ export class TenantDashboardComponent implements OnInit {
           validationEnv: new FormControl(this.searchHostPools[index].validationEnv),
           customRdpProperty : new FormControl(this.searchHostPools[index].customRdpProperty),
           maxSessionLimit:new FormControl(this.searchHostPools[index].maxSessionLimit),
-          loadBalancerType: new FormControl(this.searchHostPools[index].loadBalancerType.toString())
+          loadBalancerType: new FormControl(this.searchHostPools[index].loadBalancerType.toString()),
+          assignmentType: new FormControl(this.searchHostPools[index].assignmentType.toString()),
         });
         this.deleteCount = this.searchHostPools[index].hostPoolName;
-        this.persistentHostpool=this.searchHostPools[index].persistent;//added by susmita
-
         if (this.searchHostPools[index].enableUserProfileDisk === 'Yes') {
           this.selectedHostpoolradio = true;
           this.isEnableUser = true;
@@ -1081,6 +1083,7 @@ else{
     "enableUserProfileDisk": this.selectedHostpoolradio,
     "customRdpProperty":hostpoolData.customRdpProperty,
     "validationEnv":hostpoolData.validationEnv=='Yes'?true:hostpoolData.validationEnv=='No'?false:'',
+    "assignmentType":hostpoolData.assignmentType
   };
 }
 
