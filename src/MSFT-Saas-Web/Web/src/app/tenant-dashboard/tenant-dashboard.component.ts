@@ -139,8 +139,8 @@ export class TenantDashboardComponent implements OnInit {
       enableUserProfileDisk: new FormControl(""),
       IsPersistent: new FormControl("false"),
       validationEnv: new FormControl(""),
-      customRdpProperty : new FormControl(""),
-      maxSessionLimit:new FormControl(""),
+      customRdpProperty: new FormControl(""),
+      maxSessionLimit: new FormControl(""),
       loadBalancerType: new FormControl(""),
       assignmentType: new FormControl("")
     });
@@ -369,22 +369,22 @@ export class TenantDashboardComponent implements OnInit {
     }
     /*If the selected checkbox length=1 then this block of code executes to show the selected hostpool name */
     if (this.checkedAllTrue.length == 1) {
-     
+
       this.isEditDisabled = false;
       this.isDeleteDisabled = false;
       this.deleteCount = this.searchHostPools[index].hostPoolName;
-      this.persistentHostpool=this.searchHostPools[index].persistent;//added by susmita
+      this.persistentHostpool = this.searchHostPools[index].persistent;//added by susmita
       this.hostpoolFormEdit = new FormGroup({
         hostPoolName: new FormControl(this.searchHostPools[index].hostPoolName),
         friendlyName: new FormControl(this.searchHostPools[index].friendlyName),
         description: new FormControl(this.searchHostPools[index].description),
         diskPath: new FormControl(this.searchHostPools[index].diskPath, Validators.compose([Validators.required, Validators.pattern(/^((\\|\\\\)[a-z A-Z]+)+((\\|\\\\)[a-z0-9A-Z]+)$/)])),
         enableUserProfileDisk: new FormControl(this.searchHostPools[index].enableUserProfileDisk),
-        validationEnv : new FormControl(this.searchHostPools[index].validationEnv),
-        customRdpProperty : new FormControl(this.searchHostPools[index].customRdpProperty),
-        maxSessionLimit:new FormControl(this.searchHostPools[index].maxSessionLimit),
+        validationEnv: new FormControl(this.searchHostPools[index].validationEnv),
+        customRdpProperty: new FormControl(this.searchHostPools[index].customRdpProperty),
+        maxSessionLimit: new FormControl(this.searchHostPools[index].maxSessionLimit),
         loadBalancerType: new FormControl(this.searchHostPools[index].loadBalancerType.toString()),
-        assignmentType: new FormControl(this.searchHostPools[index].assignmentType.toString()),
+        assignmentType: new FormControl(this.searchHostPools[index].assignmentType?this.searchHostPools[index].assignmentType.toString():""),
       });
     }
     /*If the selected checkbox length>1 then this block of code executes to show the no of selected hostpools(i.e; if we select multiple checkboxes) */
@@ -471,7 +471,7 @@ export class TenantDashboardComponent implements OnInit {
             var index = i;
           }
         }
-        this.persistentHostpool=this.searchHostPools[index].persistent;//added by susmita
+        this.persistentHostpool = this.searchHostPools[index].persistent;//added by susmita
         this.hostpoolFormEdit = new FormGroup({
           hostPoolName: new FormControl(this.searchHostPools[index].hostPoolName, Validators.compose([Validators.required, Validators.maxLength(36), Validators.pattern(/^[^\s\W\_]([A-Za-z0-9\s\-\_\.])+$/)])),
           friendlyName: new FormControl(this.searchHostPools[index].friendlyName, Validators.compose([Validators.required, Validators.pattern(/^[^\s\W\_]([A-Za-z0-9\s\.\-\_])+$/)])),
@@ -479,10 +479,10 @@ export class TenantDashboardComponent implements OnInit {
           diskPath: new FormControl(this.searchHostPools[index].diskPath, Validators.compose([Validators.required, Validators.pattern(/^((\\|\\\\)[a-z A-Z]+)+((\\|\\\\)[a-z0-9A-Z]+)$/)])),
           enableUserProfileDisk: new FormControl(this.searchHostPools[index].enableUserProfileDisk),
           validationEnv: new FormControl(this.searchHostPools[index].validationEnv),
-          customRdpProperty : new FormControl(this.searchHostPools[index].customRdpProperty),
-          maxSessionLimit:new FormControl(this.searchHostPools[index].maxSessionLimit),
+          customRdpProperty: new FormControl(this.searchHostPools[index].customRdpProperty),
+          maxSessionLimit: new FormControl(this.searchHostPools[index].maxSessionLimit),
           loadBalancerType: new FormControl(this.searchHostPools[index].loadBalancerType.toString()),
-          assignmentType: new FormControl(this.searchHostPools[index].assignmentType.toString()),
+          assignmentType: new FormControl(this.searchHostPools[index].assignmentType?this.searchHostPools[index].assignmentType.toString():""),
         });
         this.deleteCount = this.searchHostPools[index].hostPoolName;
         if (this.searchHostPools[index].enableUserProfileDisk === 'Yes') {
@@ -1044,48 +1044,47 @@ export class TenantDashboardComponent implements OnInit {
    */
   public UpdateHostPool(hostpoolData: any) {
     var updateArray = {};
-    let loadbalancertype:any;
-    let maxSessionLimit:any;
+    let loadbalancertype: any;
+    let maxSessionLimit: any;
     if (hostpoolData.enableUserProfileDisk === 'Yes') {
       this.selectedHostpoolradio = true;
     }
     else {
       this.selectedHostpoolradio = false;
     }
-if(!this.persistentHostpool)
-{
-  updateArray = {
+    if (!this.persistentHostpool) {
+      updateArray = {
         "refresh_token": sessionStorage.getItem("Refresh_Token"),
         "tenantGroupName": this.tenantGroupName,
         "tenantName": this.selectedTenantName,
         "hostPoolName": hostpoolData.hostPoolName,
         "friendlyName": hostpoolData.friendlyName,
         "description": hostpoolData.description,
-        "diskPath": this.selectedHostpoolradio==true? hostpoolData.diskPath:'',
-        "persistent":this.persistentHostpool,
+        "diskPath": this.selectedHostpoolradio == true ? hostpoolData.diskPath : '',
+        "persistent": this.persistentHostpool,
         "enableUserProfileDisk": this.selectedHostpoolradio,
-        "loadBalancerType":hostpoolData.loadBalancerType,
-        "maxSessionLimit":hostpoolData.maxSessionLimit,
-        "customRdpProperty":hostpoolData.customRdpProperty,
-        "validationEnv":hostpoolData.validationEnv=='Yes'?true:hostpoolData.validationEnv=='No'?false:'',
+        "loadBalancerType": hostpoolData.loadBalancerType,
+        "maxSessionLimit": hostpoolData.maxSessionLimit,
+        "customRdpProperty": hostpoolData.customRdpProperty,
+        "validationEnv": hostpoolData.validationEnv == 'Yes' ? true : hostpoolData.validationEnv == 'No' ? false : '',
       };
-}
-else{
-  updateArray = {
-    "refresh_token": sessionStorage.getItem("Refresh_Token"),
-    "tenantGroupName": this.tenantGroupName,
-    "tenantName": this.selectedTenantName,
-    "hostPoolName": hostpoolData.hostPoolName,
-    "friendlyName": hostpoolData.friendlyName,
-    "description": hostpoolData.description,
-    "diskPath": this.selectedHostpoolradio==true? hostpoolData.diskPath:'',
-    "persistent":this.persistentHostpool,
-    "enableUserProfileDisk": this.selectedHostpoolradio,
-    "customRdpProperty":hostpoolData.customRdpProperty,
-    "validationEnv":hostpoolData.validationEnv=='Yes'?true:hostpoolData.validationEnv=='No'?false:'',
-    "assignmentType":hostpoolData.assignmentType
-  };
-}
+    }
+    else {
+      updateArray = {
+        "refresh_token": sessionStorage.getItem("Refresh_Token"),
+        "tenantGroupName": this.tenantGroupName,
+        "tenantName": this.selectedTenantName,
+        "hostPoolName": hostpoolData.hostPoolName,
+        "friendlyName": hostpoolData.friendlyName,
+        "description": hostpoolData.description,
+        "diskPath": this.selectedHostpoolradio == true ? hostpoolData.diskPath : '',
+        "persistent": this.persistentHostpool,
+        "enableUserProfileDisk": this.selectedHostpoolradio,
+        "customRdpProperty": hostpoolData.customRdpProperty,
+        "validationEnv": hostpoolData.validationEnv == 'Yes' ? true : hostpoolData.validationEnv == 'No' ? false : '',
+        "assignmentType": hostpoolData.assignmentType
+      };
+    }
 
 
     // if (this.selectedHostpoolradio == true) {

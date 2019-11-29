@@ -137,8 +137,9 @@
                   </div>
                 </div>
                 <div class="row">
-                  <div class="col-md-5">
+                  <div class="col-md-5" *ngIf="hostPoolDetails.persistent">
                     <label>Assignment Type</label>
+                    <p *ngIf="hostPoolDetails.assignmentType==null || hostPoolDetails.assignmentType==''">NA</p>
                     <p *ngIf="hostPoolDetails.assignmentType==1"> Automatic </p>
                     <p *ngIf="hostPoolDetails.assignmentType==2"> Direct </p>
                   </div>
@@ -284,10 +285,6 @@
                 </div>
               </div>
             </div>
-
-
-
-
           </div>
           <div class="AppGrouptoggle" id="HostDashboard" *ngIf="showHostDashBoard" [@slidemodal]="state"
             style="transform: translateY(0px);">
@@ -1147,8 +1144,9 @@
                   id="allowNewSessionId" />No
               </label>
             </div>
-            <br>
+
             <div class="col-sm-12" *ngIf="hostPoolDetails.assignmentType=='2'">
+              <br>
               <label>Assign User</label>
             </div>
             <div class="col-sm-12" *ngIf="hostPoolDetails.assignmentType=='2'">

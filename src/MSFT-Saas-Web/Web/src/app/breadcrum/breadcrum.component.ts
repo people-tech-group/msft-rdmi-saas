@@ -30,11 +30,11 @@ export class BreadcrumComponent {
       BreadcrumComponent.breadCrums['Tenant'].splice(index, 1);
       this.router.navigate(['/admin/Tenants']);
     }
-     if (type === 'Tenant') {
+    if (type === 'Tenant') {
       BreadcrumComponent.breadCrums['Hostpool'].splice(index, 1);
       this.router.navigate(['/admin/tenantDashboard/', bc.name]);
     }
-     if (type === 'Hostpool') {
+    if (type === 'Hostpool') {
       this.router.navigate(['/admin/hostpoolDashboard/', bc.name]);
     }
   }
@@ -51,16 +51,16 @@ export class BreadcrumComponent {
       delete BreadcrumComponent.breadCrums['Tenant']
       delete BreadcrumComponent.breadCrums['Hostpool']
     }
-     if (value[0].type == 'Tenants') {
+    if (value[0].type == 'Tenants') {
       delete BreadcrumComponent.breadCrums['Tenant']
       delete BreadcrumComponent.breadCrums['Hostpool']
     }
-     if (value[0].type == 'Tenant') {
-      delete BreadcrumComponent.breadCrums['Tenant'] 
+    if (value[0].type == 'Tenant') {
+      delete BreadcrumComponent.breadCrums['Tenant']
       delete BreadcrumComponent.breadCrums['Hostpool']
     }
-     if (value[0].type == 'Hostpool') {
-      delete BreadcrumComponent.breadCrums['Hostpool'] 
+    if (value[0].type == 'Hostpool') {
+      delete BreadcrumComponent.breadCrums['Hostpool']
     }
 
     BreadcrumComponent.breadCrums[value[0].type] = value;

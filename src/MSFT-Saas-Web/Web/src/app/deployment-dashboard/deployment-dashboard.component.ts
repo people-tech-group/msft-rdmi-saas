@@ -72,10 +72,10 @@ export class DeploymentDashboardComponent implements OnInit {
   public TenantGroups: any = [];
   public showDropDown: boolean = false;
   public getTenantDetailsUrl: any;
-  public showUpdateAppVersion:boolean=false;
-  public selectedAppVersion:string;
-  public gitAppVersion:string;
-  public AppVersion:string;
+  public showUpdateAppVersion: boolean = false;
+  public selectedAppVersion: string;
+  public gitAppVersion: string;
+  public AppVersion: string;
   public options: any = {
     timeOut: 2000,
     position: ["top", "right"]
@@ -87,7 +87,7 @@ export class DeploymentDashboardComponent implements OnInit {
   tenantFormEdit;
   deploymentID = 0;
   @ViewChild('editclose') editclose: ElementRef;
-  public showHomePage:boolean=true;
+  public showHomePage: boolean = true;
 
   /*This  is used to close the edit modal popup*/
   public tenantUpdateClose(): void {
@@ -95,12 +95,12 @@ export class DeploymentDashboardComponent implements OnInit {
   }
 
   constructor(private _AppService: AppService, private _notificationsService: NotificationsService, private router: Router,
-    private adminMenuComponent: AdminMenuComponent, private appcomponent:AppComponent) {
-      this.showHomePage=true;
+    private adminMenuComponent: AdminMenuComponent, private appcomponent: AppComponent) {
+    this.showHomePage = true;
   }
 
 
- 
+
   /* This function is  called directly on page load */
   public ngOnInit() {
     this.tenantGroupName = localStorage.getItem("TenantGroupName");
@@ -133,11 +133,10 @@ export class DeploymentDashboardComponent implements OnInit {
       description: new FormControl("", Validators.compose([Validators.required, Validators.pattern(/^[\dA-Za-z]+[\dA-Za-z\s\.\-\_\!\@\#\$\%\^\&\*\(\)\{\}\[\]\:\'\"\?\>\<\,\;\/\\\+\=\|]{0,1600}$/)])),
     });
     this.CheckTenantAccess();
-    this.gitAppVersion=sessionStorage.getItem("gitAppVersion");
-    this.AppVersion=sessionStorage.getItem("ApplicationVersion");
-    if(this.gitAppVersion!=this.AppVersion)
-    {
-      this.showUpdateAppVersion=true;
+    this.gitAppVersion = sessionStorage.getItem("gitAppVersion");
+    this.AppVersion = sessionStorage.getItem("ApplicationVersion");
+    if (this.gitAppVersion != this.AppVersion) {
+      this.showUpdateAppVersion = true;
     }
   }
 
@@ -267,12 +266,12 @@ export class DeploymentDashboardComponent implements OnInit {
     if (this.slectedtenantgroupname == null || this.slectedtenantgroupname == undefined || this.slectedtenantgroupname == "Choose tenant group") {
       // this.saveButtonDisable = true;
       this.ShowTenantgroupError = true;
-      this.tenantDoneButtonDisable=true;
+      this.tenantDoneButtonDisable = true;
     }
     else {
       // this.saveButtonDisable = false;
       this.ShowTenantgroupError = false;
-      this.tenantDoneButtonDisable=false;
+      this.tenantDoneButtonDisable = false;
     }
   }
 
@@ -280,9 +279,8 @@ export class DeploymentDashboardComponent implements OnInit {
     this.showDropDown = this.showDropDown == true ? false : true;
   }
 
-  public ShowTenantGrid()
-  {
-    this.showHomePage=!this.showHomePage;
+  public ShowTenantGrid() {
+    this.showHomePage = !this.showHomePage;
   }
 
   /* This function is called  when we save a Tenanat group name in the Tenanat group modal
@@ -313,7 +311,7 @@ export class DeploymentDashboardComponent implements OnInit {
       sessionStorage.setItem('infraPermission', selectedRole[0].scope);
     }
 
-   
+
 
     //navigate to appcomponent page
     let url = sessionStorage.getItem("redirectUri");
@@ -512,7 +510,7 @@ export class DeploymentDashboardComponent implements OnInit {
    * TenantName- Accepts tenantname .
    * --------------
   */
-  public SetSelectedTenant(index: any, TenantName: any,subscriptionId:any) {
+  public SetSelectedTenant(index: any, TenantName: any, subscriptionId: any) {
     sessionStorage.setItem("TenantName", TenantName);
     sessionStorage.setItem("TenantNameIndex", index);
 
@@ -543,7 +541,7 @@ export class DeploymentDashboardComponent implements OnInit {
       }
     );
 
-    this.adminMenuComponent.SetSelectedTenant(index, TenantName,subscriptionId);
+    this.adminMenuComponent.SetSelectedTenant(index, TenantName, subscriptionId);
     this.router.navigate(['/admin/tenantDashboard/', TenantName]);
     let data = [{
       name: TenantName,
@@ -1099,22 +1097,19 @@ export class DeploymentDashboardComponent implements OnInit {
     }
   }
 
-  public closeUpdateAppModal(event)
-  {
-    this.showUpdateAppVersion=false;
+  public closeUpdateAppModal(event) {
+    this.showUpdateAppVersion = false;
   }
 
-  public UpdateAppVersion(event)
-  {
-    this.showUpdateAppVersion=false;
-    this.updateTenantUrl = this._AppService.ApiUrl + '/api/Login/UpdateAppVersion?appVersion='+this.gitAppVersion;
+  public UpdateAppVersion(event) {
+    this.showUpdateAppVersion = false;
+    this.updateTenantUrl = this._AppService.ApiUrl + '/api/Login/UpdateAppVersion?appVersion=' + this.gitAppVersion;
     this._AppService.UpdateAppVersion(this.updateTenantUrl, this.gitAppVersion).subscribe(response => {
       var responseData = JSON.parse(response['_body']);
-      if(response.statusText.toUpperCase()=="OK")
-      {
-        this.appcomponent.AppVersion=this.AppVersion=this.gitAppVersion;
-        
-        sessionStorage.setItem("ApplicationVersion",this.AppVersion);
+      if (response.statusText.toUpperCase() == "OK") {
+        this.appcomponent.AppVersion = this.AppVersion = this.gitAppVersion;
+
+        sessionStorage.setItem("ApplicationVersion", this.AppVersion);
         this._notificationsService.html(
           '<i class="icon icon-check angular-Notify col-xs-1 no-pad"></i>' +
           '<label class="notify-label col-xs-10 no-pad">App Version Updated Successfully</label>' +
@@ -1133,9 +1128,9 @@ export class DeploymentDashboardComponent implements OnInit {
         AppComponent.GetNotification('icon icon-check angular-Notify', 'App Version Updated Successfully', responseData, new Date());
       }
     },
-    error => {
-      AppComponent.GetNotification('fa fa-times-circle checkstyle', 'Failed To App Version', 'Problem with the service. Please try later', new Date());
+      error => {
+        AppComponent.GetNotification('fa fa-times-circle checkstyle', 'Failed To App Version', 'Problem with the service. Please try later', new Date());
 
-    });
+      });
   }
 }
