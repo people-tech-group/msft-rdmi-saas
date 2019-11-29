@@ -12,6 +12,3 @@ Click the button below to deploy:
 
 ## Version
 - 1.0.1
-
-
-https#3A%2F%2Fraw.githubusercontent.com%2Fpeople-tech-group%2Fmsft-rdmi-saas%2Fmaster%2Fdeploy%2FmainTemplate.json
