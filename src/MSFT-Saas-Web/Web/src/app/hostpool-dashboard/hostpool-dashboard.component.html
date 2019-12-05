@@ -1323,14 +1323,14 @@
                   <input type="text" id="imagepath" placeholder="Enter Valid Path" formControlName="AppPath">
                   <!--(ngModelChange)="PathChange($event)"-->
                   <div *ngIf="newAppCreateGroup2.controls['AppPath'].hasError('pattern')" class="colorRed">
-                    Please enter valid path
+                    Please enter valid App path
                   </div>
                 </div>
                 <div class="col-xs-12  form-group">
                   <label for="usr">App Name<span class="important-Field">*</span></label>
                   <input type="text" id="appName" formControlName="Name" placeholder="Enter Name of RemoteApp" />
                   <div *ngIf="newAppCreateGroup2.controls['Name'].hasError('pattern')" class="colorRed">
-                    Please enter valid Name
+                    Please enter valid App Name
                   </div>
                 </div>
                 <div class="col-xs-12  form-group">
@@ -1338,7 +1338,7 @@
                   <input type="number" id="IconIndex" formControlName="IconIndex" placeholder="Enter Icon Index "
                     value="0" style="width:100%" />
                   <div *ngIf="newAppCreateGroup2.controls['IconIndex'].hasError('pattern')" class="colorRed">
-                    Please enter Icon Index
+                    Please enter App Icon Index
                   </div>
                 </div>
                 <div class="col-xs-12 form-group">
@@ -1348,7 +1348,7 @@
                   <input type="text" id="IconPath" placeholder="Enter Valid Icon Path" formControlName="IconPath">
                   <!--(ngModelChange)="PathChange($event)"-->
                   <div *ngIf="newAppCreateGroup2.controls['IconPath'].hasError('pattern')" class="colorRed">
-                    Please enter valid icon path
+                    Please enter valid App icon path
                   </div>
                 </div>
                 <div class="col-xs-12 form-group">

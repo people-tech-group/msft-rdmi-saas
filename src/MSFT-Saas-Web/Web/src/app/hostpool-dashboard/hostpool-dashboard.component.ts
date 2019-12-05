@@ -1520,6 +1520,7 @@ export class HostpoolDashboardComponent implements OnInit {
           }
         )
         AppComponent.GetNotification('icon icon-fail angular-NotifyFail', 'Failed To Update Host', responseData.message, new Date());
+        $("#editHostModal .icon-close").trigger('click');
         this.RefreshHost();
       }
     },
@@ -1543,6 +1544,7 @@ export class HostpoolDashboardComponent implements OnInit {
           }
         )
         AppComponent.GetNotification('icon icon-fail angular-NotifyFail', 'Failed To Update Host', 'Problem with server, Please try again', new Date());
+        $("#editHostModal .icon-close").trigger('click');
       }
     );
     this.sessionHostCheckedMain = false;
