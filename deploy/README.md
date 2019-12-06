@@ -20,7 +20,7 @@ Update the existing management-ux deployment with latest build release follow th
     You need to provide existing depoyment details for to update the existing webapp and APIApp with latest build release files. Enter following parameter values to template.
 
     - ResourceGroupName: Webapp existing Resourcegroupname
-    - ExistingApplicationName: Name of the Existing WebApplication.
+    - ExistingApplicationName: Name of the Existing WebApp.
 
     [![Deploy to Azure](https://azuredeploy.net/deploybutton.png)](https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2Fpeople-tech-group%2Fmsft-rdmi-saas%2Fmaster%2Fdeploy%2FupdateTemplate.json)
 
