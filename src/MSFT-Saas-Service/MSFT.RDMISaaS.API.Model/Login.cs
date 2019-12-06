@@ -24,6 +24,8 @@ namespace MSFT.WVDSaaS.API.Model
         public JObject Error { get; set; }
         public string ApplicationVersion { get; set; }
         public string GitAppVersion { get; set; }
+
+        public string GithubUpdateDeployUrl { get; set; }
     }
     #endregion
 

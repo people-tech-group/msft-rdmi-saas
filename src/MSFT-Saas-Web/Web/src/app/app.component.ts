@@ -4,6 +4,8 @@ import * as $ from 'jquery';
 import { Router, ActivatedRoute, Params } from '@angular/router';
 import { AppService } from "./shared/app.service";
 import { trigger, state, style, transition, animate, keyframes } from '@angular/animations';
+import { NotificationsService } from "angular2-notifications";
+
 //import { DeploymentDashboardComponent } from './deployment-dashboard/deployment-dashboard.component';
 
 @Component({
@@ -40,7 +42,8 @@ import { trigger, state, style, transition, animate, keyframes } from '@angular/
 export class AppComponent implements OnInit {
   //DeploymentDashboardComponent: DeploymentDashboardComponent
   state: string = 'slideup';
-  public static notifications: any = [];
+  //public static notifications: any = [];
+  public static notifications:  any = [];
   public profileName: string;
   public profileIcon: string;
   public splitName: any = [];
@@ -62,7 +65,10 @@ export class AppComponent implements OnInit {
   public errorMessage: string;
   public InfraPermission: string;
   public AppVersion: string;
-  constructor(private _AppService: AppService, private router: Router, private route: ActivatedRoute, private http: Http, ) {
+  public gitAppVersion: string;
+  public githubupdateDeployUrl:string;
+ // public AppVersion: string;
+  constructor(private _AppService: AppService,private _notificationsService: NotificationsService, private router: Router, private route: ActivatedRoute, private http: Http, ) {
     //localStorage.removeItem("TenantGroupName");
   }
 
@@ -75,12 +81,15 @@ export class AppComponent implements OnInit {
    * date - Accepts Date of notification
    * --------------  
    */
-  static GetNotification(status: any, title: any, msg: any, date: any) {
+  static GetNotification(status: any, title: any, msg: any, date: any,isLink:boolean=false,url:string=null,linkText:string=null) {
     AppComponent.notifications.push({
       "icon": status,
       "title": title,
-      "msg": msg,
+      "msg" :  msg,
       "time": date,
+      "isLink":isLink,
+      "url":url,
+      "linkText":linkText,
     });
   }
 
@@ -142,11 +151,11 @@ export class AppComponent implements OnInit {
             this.tenantGroupNameList = respdata.TenantGroups;
             sessionStorage.setItem("profileIcon", this.profileIcon);
             sessionStorage.setItem("profileName", this.profileName);
-            sessionStorage.setItem("gitAppVersion", respdata.GitAppVersion);//susmita
-            sessionStorage.setItem("ApplicationVersion", respdata.ApplicationVersion);//susmita
+            sessionStorage.setItem("gitAppVersion", respdata.GitAppVersion);
+            sessionStorage.setItem("ApplicationVersion", respdata.ApplicationVersion?respdata.ApplicationVersion:"");
             this.AppVersion = respdata.ApplicationVersion;
-
-
+            sessionStorage.setItem("GithubUpdateDeployUrl",respdata.GithubUpdateDeployUrl?respdata.GithubUpdateDeployUrl:"");
+             this.githubupdateDeployUrl= respdata.GithubUpdateDeployUrl;
             if (respdata.RoleAssignment == null || respdata.RoleAssignment == "" || respdata.RoleAssignment.length == 0) {
               this.router.navigate(['/invalid-role-assignment']);
               this.appLoader = false;
@@ -217,6 +226,30 @@ export class AppComponent implements OnInit {
     else if (tenantGroup && window.location.pathname == "/") {
       this.router.navigate(['/admin/Tenants']);
     }
+
+/**show app version notification */
+this.gitAppVersion = sessionStorage.getItem("gitAppVersion");
+this.githubupdateDeployUrl=sessionStorage.getItem("GithubUpdateDeployUrl");
+      this.AppVersion = sessionStorage.getItem("ApplicationVersion");
+      if (this.gitAppVersion != this.AppVersion) {
+        this._notificationsService.html(
+          '<i class="icon icon-check angular-Notify col-xs-1 no-pad"></i>' +
+          '<label class="notify-label col-xs-10 no-pad">A New App Version Availble</label>' +
+          '<a class="close"><i class="icon icon-close notify-close" aria-hidden="true"></i></a>' +
+          '<p class="notify-text col-xs-12 no-pad"> New App Version : '+this.gitAppVersion +'</p>',
+          'content optional one',
+          {
+            position: ["top", "right"],
+            timeOut: 3000,
+            showProgressBar: false,
+            pauseOnHover: false,
+            clickToClose: true,
+            maxLength: 10
+          }
+        )
+        AppComponent.GetNotification('icon icon-check angular-Notify', 'A New App Version Availble', 'New App Version : '+this.gitAppVersion, new Date(),true, this.githubupdateDeployUrl,"Update");
+      }
+
   }
 
   /*

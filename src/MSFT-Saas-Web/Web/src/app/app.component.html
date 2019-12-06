@@ -42,7 +42,9 @@
                   </p>
                 </div>
                 <div class="col-xs-12">
-                  <span>{{data.msg}}</span>
+                   <span >{{data.msg}}</span>
+                   <br>
+                   <a *ngIf="data.isLink" target="_blank" href="{{data.url}}">{{data.linkText}}</a>
                 </div>
                 <p class="pull-right">{{data.time | date:'shortTime'}}</p>
                 <a class="close"><i class="icon icon-close" (click)="NotifyClose(data)"></i></a>

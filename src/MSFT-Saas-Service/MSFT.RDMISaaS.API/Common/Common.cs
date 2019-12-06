@@ -194,9 +194,10 @@ namespace MSFT.WVDSaaS.API.Common
                 if (loginDetails != null && loginDetails.Error==null)
                 {
                     loginDetails.ApplicationVersion = configurations.applicationVersion;
-                    var giturl = configurations.gitHubUrl;
+                    var giturl = configurations.gitHubVersionUrl;
                     var content = (new WebClient()).DownloadString(giturl);
                     loginDetails.GitAppVersion = content;
+                    loginDetails.GithubUpdateDeployUrl = configurations.gitHubUpdateDeployUrl;
                 }
                 return loginDetails;
             }

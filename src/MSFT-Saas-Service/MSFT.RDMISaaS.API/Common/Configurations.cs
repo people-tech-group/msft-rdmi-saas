@@ -21,7 +21,8 @@ namespace MSFT.WVDSaaS.API.Common
         public string clientSecret = "";
         public string aadTokenUrl = "";
         public string applicationVersion = "";
-        public string gitHubUrl = "";
+        public string gitHubVersionUrl = "";
+        public string gitHubUpdateDeployUrl = "";
         #endregion
 
         #region " Constructor "
@@ -35,7 +36,8 @@ namespace MSFT.WVDSaaS.API.Common
             clientSecret = System.Web.Configuration.WebConfigurationManager.AppSettings["ApplicationSecret"];
             aadTokenUrl = System.Web.Configuration.WebConfigurationManager.AppSettings["AADTokenURL"];
             applicationVersion = System.Web.Configuration.WebConfigurationManager.AppSettings["ApplicationVersion"];
-            gitHubUrl= System.Web.Configuration.WebConfigurationManager.AppSettings["GitHubUrl"];
+            gitHubVersionUrl = System.Web.Configuration.WebConfigurationManager.AppSettings["GitHubVersionUrl"];
+            gitHubUpdateDeployUrl=System.Web.Configuration.WebConfigurationManager.AppSettings["gitHubUpdateDeployUrl"];
         }
         #endregion
 
