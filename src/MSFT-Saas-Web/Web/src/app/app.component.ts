@@ -68,6 +68,7 @@ export class AppComponent implements OnInit {
   public gitAppVersion: string;
   public githubupdateDeployUrl:string;
  // public AppVersion: string;
+ public isOpen:boolean;
   constructor(private _AppService: AppService,private _notificationsService: NotificationsService, private router: Router, private route: ActivatedRoute, private http: Http, ) {
     //localStorage.removeItem("TenantGroupName");
   }
@@ -234,7 +235,7 @@ this.githubupdateDeployUrl=sessionStorage.getItem("GithubUpdateDeployUrl");
       if (this.gitAppVersion != this.AppVersion) {
         this._notificationsService.html(
           '<i class="icon icon-check angular-Notify col-xs-1 no-pad"></i>' +
-          '<label class="notify-label col-xs-10 no-pad">A New App Version Availble</label>' +
+          '<label class="notify-label col-xs-10 no-pad">A New App Version Available</label>' +
           '<a class="close"><i class="icon icon-close notify-close" aria-hidden="true"></i></a>' +
           '<p class="notify-text col-xs-12 no-pad"> New App Version : '+this.gitAppVersion +'</p>',
           'content optional one',
@@ -247,7 +248,7 @@ this.githubupdateDeployUrl=sessionStorage.getItem("GithubUpdateDeployUrl");
             maxLength: 10
           }
         )
-        AppComponent.GetNotification('icon icon-check angular-Notify', 'A New App Version Availble', 'New App Version : '+this.gitAppVersion, new Date(),true, this.githubupdateDeployUrl,"Update");
+        AppComponent.GetNotification('icon icon-check angular-Notify', 'A New App Version Available', 'New App Version : '+this.gitAppVersion, new Date(),true, this.githubupdateDeployUrl,"Update");
       }
 
   }

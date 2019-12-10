@@ -584,7 +584,7 @@ i.notify-close {
   transition: 0.5s;
   width: 50px;
   float: left;
-  z-index: 1;
+  /* z-index: 1; */
 }
 
   .sidenav a {

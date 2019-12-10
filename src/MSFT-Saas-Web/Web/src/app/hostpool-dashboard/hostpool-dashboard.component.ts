@@ -2609,6 +2609,7 @@ export class HostpoolDashboardComponent implements OnInit {
     this.SessionsListErrorFound = false;
     this.getUserSessionUrl = this._AppService.ApiUrl + '/api/UserSession/GetListOfUserSessions?tenantGroupName=' + this.tenantGroupName + '&tenantName=' + this.tenantName + '&hostPoolName=' + this.hostPoolName + '&hostName=' + this.selectedHostName + '&refresh_token=' + sessionStorage.getItem("Refresh_Token");
     this._AppService.GetData(this.getUserSessionUrl).subscribe(response => {
+      setTimeout(()=>{ this.userSessions = JSON.parse(response['_body']); }, 15000)
       this.refreshHostpoolLoading = false;
       if (response.status == 429) {
         this.error = true;
