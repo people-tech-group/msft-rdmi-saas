@@ -8,7 +8,6 @@ import { SearchPipe } from "../../assets/Pipes/Search.pipe";
 import { AppComponent } from "../app.component";
 import { BreadcrumComponent } from "../breadcrum/breadcrum.component";
 import { AdminMenuComponent } from "../admin-menu/admin-menu.component";
-
 @Component({
   selector: 'app-tenant-dashboard',
   templateUrl: './tenant-dashboard.component.html',
@@ -210,7 +209,7 @@ export class TenantDashboardComponent implements OnInit {
     this.showHostpoolDialog = true;
   }
 
-  /* This function is used to  to close the create host pool slider
+  /* This function is used to  to close the create hostpool slider
   * --------------
    * Parameters
    * event - Accepts event
@@ -225,7 +224,7 @@ export class TenantDashboardComponent implements OnInit {
     this.closeModal.nativeElement.click();
   }
 
-  /* This function is used to close the create host pool slider
+  /* This function is used to close the create hostpool slider
    * --------------
    * Parameters
    * event - Accepts event
@@ -238,12 +237,12 @@ export class TenantDashboardComponent implements OnInit {
     this.ShowPreviousTab();
   }
 
-  /* This function is used to show next slider of create host pool modal */
+  /* This function is used to show next slider of create hostpool modal */
   public ShowNextTab() {
     this.showHostpoolTab2 = true;
   }
 
-  /* This function is used to show previous slider of create host pool modal */
+  /* This function is used to show previous slider of create hostpool modal */
   public ShowPreviousTab() {
     this.showHostpoolTab2 = false;
   }
@@ -967,7 +966,7 @@ export class TenantDashboardComponent implements OnInit {
       if (responseData.isSuccess === true) {
         this._notificationsService.html(
           '<i class="icon icon-check angular-Notify col-xs-1 no-pad"></i>' +
-          '<label class="notify-label col-xs-10 no-pad">Host pool Created Successfully</label>' +
+          '<label class="notify-label col-xs-10 no-pad">Hostpool Created Successfully</label>' +
           '<a class="close"><i class="icon icon-close notify-close" aria-hidden="true"></i></a>' +
           '<p class="notify-text col-xs-12 no-pad">' + responseData.message + '</p>',
           'content optional one',
@@ -980,7 +979,7 @@ export class TenantDashboardComponent implements OnInit {
             maxLength: 10
           }
         )
-        AppComponent.GetNotification('icon icon-check angular-Notify', 'Host pool Created Successfully', responseData.message, new Date());
+        AppComponent.GetNotification('icon icon-check angular-Notify', 'Hostpool Created Successfully', responseData.message, new Date());
         this.RefreshHostpools();
         this.BtnCancel(event);
       }
@@ -988,7 +987,7 @@ export class TenantDashboardComponent implements OnInit {
       else {
         this._notificationsService.html(
           '<i class="icon icon-fail angular-NotifyFail col-xs-1 no-pad"></i>' +
-          '<label class="notify-label col-xs-10 no-pad">Failed To Create Host pool</label>' +
+          '<label class="notify-label col-xs-10 no-pad">Failed To Create Hostpool</label>' +
           '<a class="close"><i class="icon icon-close notify-close" aria-hidden="true"></i></a>' +
           '<p class="notify-text col-xs-12 no-pad">' + responseData.message + '</p>',
           'content optional one',
@@ -1001,7 +1000,7 @@ export class TenantDashboardComponent implements OnInit {
             maxLength: 10
           }
         )
-        AppComponent.GetNotification('icon icon-fail angular-NotifyFail', 'Failed To Create Host pool', responseData.message, new Date());
+        AppComponent.GetNotification('icon icon-fail angular-NotifyFail', 'Failed To Create Hostpool', responseData.message, new Date());
         //this.RefreshHostpools();
         this.BtnCancel(event);
       }
@@ -1011,7 +1010,7 @@ export class TenantDashboardComponent implements OnInit {
         this.refreshHostpoolLoading = false;
         this._notificationsService.html(
           '<i class="icon icon-close angular-NotifyFail"></i>' +
-          '<label class="notify-label padleftright">Failed To Create Host pool</label>' +
+          '<label class="notify-label padleftright">Failed To Create Hostpool</label>' +
           '<a class="close"><i class="icon icon-close notify-close" aria-hidden="true"></i></a>' +
           '<p class="notify-text">Problem with the service. Please try later</p>',
           'content optional one',
@@ -1024,7 +1023,7 @@ export class TenantDashboardComponent implements OnInit {
             maxLength: 10
           }
         )
-        AppComponent.GetNotification('fa fa-times-circle checkstyle', 'Failed To Create Host pool', 'Problem with the service. Please try later', new Date());
+        AppComponent.GetNotification('fa fa-times-circle checkstyle', 'Failed To Create Hostpool', 'Problem with the service. Please try later', new Date());
       }
     );
     this.hostpoolForm = new FormGroup({
@@ -1109,6 +1108,8 @@ export class TenantDashboardComponent implements OnInit {
     //   };
     // }
     this.refreshHostpoolLoading = true;
+    this.hostpoolUpdateClose();
+
     this.updateHostpoolUrl = this._AppService.ApiUrl + '/api/HostPool/Put';
     this._AppService.UpdateTenant(this.updateHostpoolUrl, updateArray).subscribe(response => {
       this.refreshHostpoolLoading = false;
@@ -1121,7 +1122,7 @@ export class TenantDashboardComponent implements OnInit {
       if (responseData.isSuccess === true) {
         this._notificationsService.html(
           '<i class="icon icon-check angular-Notify col-xs-1 no-pad"></i>' +
-          '<label class="notify-label col-xs-10 no-pad">Host pool Updated Successfully</label>' +
+          '<label class="notify-label col-xs-10 no-pad">Hostpool Updated Successfully</label>' +
           '<a class="close"><i class="icon icon-close notify-close" aria-hidden="true"></i></a>' +
           '<p class="notify-text col-xs-12 no-pad">' + responseData.message + '</p>',
           'content optional one',
@@ -1134,15 +1135,14 @@ export class TenantDashboardComponent implements OnInit {
             maxLength: 10
           }
         )
-        AppComponent.GetNotification('icon icon-check angular-Notify', 'Host pool Updated Successfully', responseData.message, new Date());
-        this.hostpoolUpdateClose();
+        AppComponent.GetNotification('icon icon-check angular-Notify', 'Hostpool Updated Successfully', responseData.message, new Date());
         this.RefreshHostpools();
       }
       /* If response data is success then it enters into else and this block of code will execute to show the 'Failed To Update Hostpool' notification */
       else {
         this._notificationsService.html(
           '<i class="icon icon-fail angular-NotifyFail col-xs-1 no-pad"></i>' +
-          '<label class="notify-label col-xs-10 no-pad">Failed To Update Host pool</label>' +
+          '<label class="notify-label col-xs-10 no-pad">Failed To Update Hostpool</label>' +
           '<a class="close"><i class="icon icon-close notify-close" aria-hidden="true"></i></a>' +
           '<p class="notify-text col-xs-12 no-pad">' + responseData.message + '</p>',
           'content optional one',
@@ -1155,8 +1155,7 @@ export class TenantDashboardComponent implements OnInit {
             maxLength: 10
           }
         )
-        AppComponent.GetNotification('icon icon-fail angular-NotifyFail', 'Failed To Update Host pool', responseData.message, new Date());
-        this.hostpoolUpdateClose();
+        AppComponent.GetNotification('icon icon-fail angular-NotifyFail', 'Failed To Update Hostpool', responseData.message, new Date());
         //this.RefreshHostpools();
       }
     },
@@ -1165,7 +1164,7 @@ export class TenantDashboardComponent implements OnInit {
         this.refreshHostpoolLoading = false;
         this._notificationsService.html(
           '<i class="icon icon-close angular-NotifyFail"></i>' +
-          '<label class="notify-label padleftright">Failed To Update Host pool</label>' +
+          '<label class="notify-label padleftright">Failed To Update Hostpool</label>' +
           '<a class="close"><i class="icon icon-close notify-close" aria-hidden="true"></i></a>' +
           '<p class="notify-text">Problem with the service. Please try later</p>',
           'content optional one',
@@ -1178,7 +1177,7 @@ export class TenantDashboardComponent implements OnInit {
             maxLength: 10
           }
         )
-        AppComponent.GetNotification('fa fa-times-circle checkstyle', 'Failed To Update Host pool', 'Problem with the service. Please try later', new Date());
+        AppComponent.GetNotification('fa fa-times-circle checkstyle', 'Failed To Update Hostpool', 'Problem with the service. Please try later', new Date());
       }
     );
   }
@@ -1200,7 +1199,7 @@ export class TenantDashboardComponent implements OnInit {
         if (responseData.isSuccess === true) {
           this._notificationsService.html(
             '<i class="icon icon-check angular-Notify col-xs-1 no-pad"></i>' +
-            '<label class="notify-label col-xs-10 no-pad">Host pool Deleted Successfully</label>' +
+            '<label class="notify-label col-xs-10 no-pad">Hostpool Deleted Successfully</label>' +
             '<a class="close"><i class="icon icon-close notify-close" aria-hidden="true"></i></a>' +
             '<p class="notify-text col-xs-12 no-pad">' + responseData.message + '</p>',
             'content optional one',
@@ -1213,14 +1212,14 @@ export class TenantDashboardComponent implements OnInit {
               maxLength: 10
             }
           )
-          AppComponent.GetNotification('icon icon-check angular-Notify', 'Host pool Deleted Successfully', responseData.message, new Date());
+          AppComponent.GetNotification('icon icon-check angular-Notify', 'Hostpool Deleted Successfully', responseData.message, new Date());
           this.RefreshHostpools();
         }
         /* If response data is success then it enters into else and this block of code will execute to show the 'Failed To Delete Hostpool' notification */
         else {
           this._notificationsService.html(
             '<i class="icon icon-fail angular-NotifyFail col-xs-1 no-pad"></i>' +
-            '<label class="notify-label col-xs-10 no-pad">Failed To Delete Host pool</label>' +
+            '<label class="notify-label col-xs-10 no-pad">Failed To Delete Hostpool</label>' +
             '<a class="close"><i class="icon icon-close notify-close" aria-hidden="true"></i></a>' +
             '<p class="notify-text col-xs-12 no-pad">' + responseData.message + '</p>',
             'content optional one',
@@ -1233,7 +1232,7 @@ export class TenantDashboardComponent implements OnInit {
               maxLength: 10
             }
           )
-          AppComponent.GetNotification('icon icon-fail angular-NotifyFail', 'Failed To Delete Host pool', responseData.message, new Date());
+          AppComponent.GetNotification('icon icon-fail angular-NotifyFail', 'Failed To Delete Hostpool', responseData.message, new Date());
           //this.RefreshHostpools();
         }
       },
@@ -1242,7 +1241,7 @@ export class TenantDashboardComponent implements OnInit {
           this.refreshHostpoolLoading = false;
           this._notificationsService.html(
             '<i class="icon icon-close angular-NotifyFail"></i>' +
-            '<label class="notify-label padleftright">Failed To Delete Host pool</label>' +
+            '<label class="notify-label padleftright">Failed To Delete Hostpool</label>' +
             '<a class="close"><i class="icon icon-close notify-close" aria-hidden="true"></i></a>' +
             '<p class="notify-text">Problem with the service. Please try later</p>',
             'content optional one',
@@ -1255,7 +1254,7 @@ export class TenantDashboardComponent implements OnInit {
               maxLength: 10
             }
           )
-          AppComponent.GetNotification('fa fa-times-circle checkstyle', 'Failed To Delete Host pool', 'Problem with the service. Please try later', new Date());
+          AppComponent.GetNotification('fa fa-times-circle checkstyle', 'Failed To Delete Hostpool', 'Problem with the service. Please try later', new Date());
         }
       );
     }

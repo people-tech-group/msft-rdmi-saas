@@ -42,7 +42,7 @@
                   </p>
                 </div>
                 <div class="col-xs-12">
-                   <span >{{data.msg}}</span>
+                   <span [innerHTML]="data.msg"></span>
                    <br>
                    <a *ngIf="data.isLink" target="_blank" href="{{data.url}}">{{data.linkText}}</a>
                 </div>

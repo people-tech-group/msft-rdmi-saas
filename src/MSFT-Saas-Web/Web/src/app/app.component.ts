@@ -248,7 +248,7 @@ this.githubupdateDeployUrl=sessionStorage.getItem("GithubUpdateDeployUrl");
             maxLength: 10
           }
         )
-        AppComponent.GetNotification('icon icon-check angular-Notify', 'A New App Version Available', 'New App Version : '+this.gitAppVersion, new Date(),true, this.githubupdateDeployUrl,"Update");
+        AppComponent.GetNotification('icon icon-check angular-Notify', 'A New App Version Available', 'Current App Version : '+this.AppVersion+'<br>New App Version : '+this.gitAppVersion, new Date(),true, this.githubupdateDeployUrl,"Update");
       }
 
   }

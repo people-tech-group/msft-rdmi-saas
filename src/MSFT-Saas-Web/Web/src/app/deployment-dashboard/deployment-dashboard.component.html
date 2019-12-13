@@ -29,23 +29,51 @@
       <img src="assets/Images/loading.gif" />
     </div>
   </div>
+   
   <div *ngIf="showHomePage" class="addDeploy">
+     <!--display app details-->
+   <div *ngIf="showUpdateAppVersion" class="tabbable-line" style="float: right;" >
+    <div class="nav nav-tabs">
+      <h4 >
+       A New App Version Available.
+      </h4>
+      <span >Current App Version : {{AppVersion}}</span>
+      <br>
+      <span >New App Version : {{gitAppVersion}}</span>
+      <br>
+      <span>Click <a  target="_blank" href="{{githubupdateDeployUrl}}" alt="Click here to update app"><b>here</b></a> to update app</span>
+    </div>
+  </div>
     <h3>Useful Links</h3>
     <br>
     <div class="tabbable-panel">
       <div class="tabbable-line">
         <div class="nav nav-tabs">
           <p><a href="https://docs.microsoft.com/en-us/azure/virtual-desktop/create-host-pools-arm-template"
-              target="_blank">Add VM to existing host pool</a></p>
+              target="_blank">Add VM to existing hostpool</a></p>
           <p><a href="#" >Update GPOs for session timeouts</a></p>
           <p><a href="https://docs.microsoft.com/en-us/azure/virtual-desktop/create-host-pools-arm-template"
-              target="_blank">Update host pool with a new image</a></p>
+              target="_blank">Update hostpool with a new image</a></p>
           <p><a href="https://docs.microsoft.com/en-us/azure/virtual-desktop/deploy-diagnostics" target="_blank">Deploy
               diagnostic tool</a></p>
           <p><a (click)="ShowTenantGrid()"><b>Go To Tenants Page</b></a></p>
         </div>
       </div>
+      <!--display app details-->
+      <!-- <div *ngIf="showUpdateAppVersion" class="tabbable-line">
+        <div class="nav nav-tabs">
+          <h4 >
+           A New App Version Available.
+          </h4>
+          <span >Current App Version : {{AppVersion}}</span>
+          <br>
+          <span >New App Version : {{gitAppVersion}}</span>
+          <br>
+          <span>Click <a  target="_blank" href="{{githubupdateDeployUrl}}" alt="Click here to update app"><b>here</b></a> to update app</span>
+        </div>
+      </div> -->
     </div>
+   
   </div>
   <div *ngIf="!showHomePage" class="addDeploy">
     <div class="tabbable-panel">
@@ -128,9 +156,9 @@
                       (click)="SetSelectedTenant(absoluteIndex(ind), i.tenantName,i.azureSubscriptionId)">
                       {{i.tenantName}}
                     </td>
-                    <td style="width: 15%;text-align:left;"><span>{{i.friendlyName}}</span></td>
-                    <td style="width:12%;text-align:center;"><span>{{i.description}}</span></td>
-                    <td style="width:12%;text-align:center;"><span>{{i.azureSubscriptionId}}</span></td>
+                    <td style="width: 15%;text-align:left;"><span>{{i.friendlyName?i.friendlyName:'NA'}}</span></td>
+                    <td style="width:12%;text-align:center;"><span>{{i.description?i.description:'NA'}}</span></td>
+                    <td style="width:12%;text-align:center;"><span>{{i.azureSubscriptionId?i.azureSubscriptionId:'NA'}}</span></td>
                     <!-- <td style="width:12%;text-align:center;"><span>{{i.noOfUsers}}</span></td>
                     <td style="width:12%;text-align:center;"><span>{{i.noOfActivehosts}}</span></td> -->
                   </tr>
@@ -338,48 +366,50 @@
   </div>
 
   <!--Edit Tenant Modal Dialog-->
-  <div class="modal fade" id="editModal" role="dialog">
-    <div class="modal-dialog">
-      <div class="modal-content popup-main">
-        <div class="modal-header">
-          <i class="icon icon-close" aria-hidden="true" data-dismiss="modal"></i>
-          <h4 class="modal-title">Edit Tenant</h4>
-        </div>
-        <div class="modal-body">
-          <form [formGroup]="tenantFormEdit">
-            <div class="row">
-
-              <div class="col-sm-12 form-group">
-                <label>Tenant Unique Name <span class="important-Field">*</span></label>
-                <input type="text" [readonly]="true" (keydown)="$event.preventDefault();" name="tenantName"
-                  formControlName="tenantName" />
-              </div>
-
-              <div class="col-sm-12 form-group">
-                <label>Tenant Friendly Name – <span class="ashColor">optional</span></label>
-                <input type="text" name="friendlyName" formControlName="friendlyName" />
-                <div *ngIf="tenantFormEdit.controls['friendlyName'].hasError('pattern')" class="colorRed">
-                  Please enter Valid Tenant friendly name
+    <div class="modal fade" id="editModal" role="dialog">
+      <div class="modal-dialog">
+        <div class="modal-content popup-main">
+          <div class="modal-header">
+            <i class="icon icon-close" aria-hidden="true" data-dismiss="modal"></i>
+            <h4 class="modal-title">Edit Tenant</h4>
+          </div>
+          <div class="modal-body">
+            <form [formGroup]="tenantFormEdit">
+              <div class="row">
+  
+                <div class="col-sm-12 form-group">
+                  <label>Tenant Unique Name <span class="important-Field">*</span></label>
+                  <input type="text" [attr.disabled]="true" (keydown)="$event.preventDefault();" name="tenantName"
+                    formControlName="tenantName" />
+                </div>
+  
+                <div class="col-sm-12 form-group">
+                  <label>Tenant Friendly Name – <span class="ashColor">optional</span></label>
+                  <input type="text" name="friendlyName" formControlName="friendlyName" />
+                  <div *ngIf="tenantFormEdit.controls['friendlyName'].hasError('pattern')" class="colorRed">
+                    Please enter Valid Tenant friendly name
+                  </div>
+                </div>
+                <div class="col-sm-12 form-group">
+                  <label>Description – <span class="ashColor">optional</span></label>
+                  <textarea rows="3" cols="47" name="description" formControlName="description"></textarea>
+                  <div *ngIf="tenantFormEdit.controls['description'].hasError('pattern')" class="colorRed">
+                    Please enter Valid Description details
+                  </div>
                 </div>
               </div>
-              <div class="col-sm-12 form-group">
-                <label>Description – <span class="ashColor">optional</span></label>
-                <textarea rows="3" cols="47" name="description" formControlName="description"></textarea>
-                <div *ngIf="tenantFormEdit.controls['description'].hasError('pattern')" class="colorRed">
-                  Please enter Valid Description details
-                </div>
-              </div>
-            </div>
-          </form>
-        </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-primary" (click)="UpdateTenant(tenantFormEdit.value)">Update</button>
-          <button type="button" class="btn btn-default" data-dismiss="modal" id="Cancelupdatedeployment"
-            #editclose>Cancel</button>
+            </form>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-primary" (click)="UpdateTenant(tenantFormEdit.value)">Update</button>
+            <button type="button" class="btn btn-default" data-dismiss="modal" id="Cancelupdatedeployment"
+              #editclose>Cancel</button>
+          </div>
         </div>
       </div>
     </div>
-  </div>
+
+  
 
   <!-- Delete Tenant Modal Dialog-->
   <div class="modal fade" id="deleteModal" role="dialog">

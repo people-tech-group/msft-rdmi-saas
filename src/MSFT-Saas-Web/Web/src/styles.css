@@ -16,6 +16,7 @@ body {
   margin: 0px;
   padding: 0px;
   overflow-x: hidden;
+  overflow-y: hidden;
   font-family: segoe ui;
 }
 
@@ -2338,3 +2339,4 @@ li.login-details {
 #loadmore:hover{
   text-decoration:underline !important;
 }
+

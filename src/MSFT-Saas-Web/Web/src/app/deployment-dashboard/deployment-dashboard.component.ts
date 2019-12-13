@@ -74,8 +74,10 @@ export class DeploymentDashboardComponent implements OnInit {
   public getTenantDetailsUrl: any;
   public showUpdateAppVersion: boolean = false;
   public selectedAppVersion: string;
-  // public gitAppVersion: string;
-  // public AppVersion: string;
+  public gitAppVersion: string;
+  public AppVersion: string;
+  public githubupdateDeployUrl: string;
+
   public options: any = {
     timeOut: 2000,
     position: ["top", "right"]
@@ -103,31 +105,13 @@ export class DeploymentDashboardComponent implements OnInit {
 
   /* This function is  called directly on page load */
   public ngOnInit() {
-
-    
-     //  this.gitAppVersion = sessionStorage.getItem("gitAppVersion");
-      // this.AppVersion = sessionStorage.getItem("ApplicationVersion");
-      // if (this.gitAppVersion != this.AppVersion) {
-      //   this.showUpdateAppVersion = true;
-      //   this._notificationsService.html(
-      //     '<i class="icon icon-check angular-Notify col-xs-1 no-pad"></i>' +
-      //     '<label class="notify-label col-xs-10 no-pad">A New App Version Availble</label>' +
-      //     '<a class="close"><i class="icon icon-close notify-close" aria-hidden="true"></i></a>' +
-      //     '<p class="notify-text col-xs-12 no-pad"> New App Version : '+this.gitAppVersion +'</p>',
-      //     'content optional one',
-      //     {
-      //       position: ["top", "right"],
-      //       timeOut: 3000,
-      //       showProgressBar: false,
-      //       pauseOnHover: false,
-      //       clickToClose: true,
-      //       maxLength: 10
-      //     }
-      //   )
-      //   AppComponent.GetNotification('icon icon-check angular-Notify', 'A New App Version Availble', 'New App Version : '+this.gitAppVersion, new Date(),true,"http://abc.com","Update");
-      // }
-    
-    
+    this.gitAppVersion = sessionStorage.getItem("gitAppVersion");
+    this.AppVersion = sessionStorage.getItem("ApplicationVersion");
+    if (this.gitAppVersion != this.AppVersion) {
+      this.AppVersion=sessionStorage.getItem("ApplicationVersion");
+      this.githubupdateDeployUrl = sessionStorage.getItem("GithubUpdateDeployUrl");
+      this.showUpdateAppVersion = true;
+    }
 
     this.tenantGroupName = localStorage.getItem("TenantGroupName");
     if (this.tenantGroupName === null) {
@@ -159,10 +143,10 @@ export class DeploymentDashboardComponent implements OnInit {
       description: new FormControl("", Validators.compose([Validators.required, Validators.pattern(/^[\dA-Za-z]+[\dA-Za-z\s\.\-\_\!\@\#\$\%\^\&\*\(\)\{\}\[\]\:\'\"\?\>\<\,\;\/\\\+\=\|]{0,1600}$/)])),
     });
     this.CheckTenantAccess();
-   
+
   }
 
- 
+
 
   /*
    * This Function is called on Component Load and it is used to check the Access level of Tenant 
@@ -937,7 +921,7 @@ export class DeploymentDashboardComponent implements OnInit {
             maxLength: 10
           }
         )
-        let msg:any='Problem with the service. Please try later';
+        let msg: any = 'Problem with the service. Please try later';
         AppComponent.GetNotification('fa fa-times-circle checkstyle', 'Failed To Create Tenant', msg, new Date());
       }
     );
@@ -967,6 +951,7 @@ export class DeploymentDashboardComponent implements OnInit {
       "aadTenantId": this.aadTenantId,
       "id": "00000000-0000-0000-0000-000000000000",
     };
+    this.tenantUpdateClose();
     this.refreshTenantLoading = true;
     this.updateTenantUrl = this._AppService.ApiUrl + '/api/Tenant/Put';
     this._AppService.UpdateTenant(this.updateTenantUrl, updateArray).subscribe(response => {
@@ -994,7 +979,6 @@ export class DeploymentDashboardComponent implements OnInit {
           }
         )
         AppComponent.GetNotification('icon icon-check angular-Notify', 'Tenant Updated Successfully', responseData.message, new Date());
-        this.tenantUpdateClose();
         this.RefreshTenant();
         this.refreshTenantLoading = false;
 
@@ -1017,7 +1001,6 @@ export class DeploymentDashboardComponent implements OnInit {
           }
         )
         AppComponent.GetNotification('icon icon-fail angular-NotifyFail', 'Failed To Update Tenant', responseData.message, new Date());
-        this.tenantUpdateClose();
         //this.RefreshTenant();
       }
     },
@@ -1039,8 +1022,7 @@ export class DeploymentDashboardComponent implements OnInit {
             maxLength: 10
           }
         )
-        let msg:any='Problem with the service. Please try later';
-
+        let msg: any = 'Problem with the service. Please try later';
         AppComponent.GetNotification('fa fa-times-circle checkstyle', 'Failed To Update Tenant', msg, new Date());
       }
     );

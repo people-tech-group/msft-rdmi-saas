@@ -27,11 +27,11 @@ export class BreadcrumComponent {
    */
   public Navigate(path: any, type: any, index: any, bc: any) {
     if (type === 'Tenants') {
-      BreadcrumComponent.breadCrums['Tenant'].splice(index, 1);
+      BreadcrumComponent.breadCrums['Tenant']? BreadcrumComponent.breadCrums['Tenant'].splice(index, 1):null;
       this.router.navigate(['/admin/Tenants']);
     }
     if (type === 'Tenant') {
-      BreadcrumComponent.breadCrums['Hostpool'].splice(index, 1);
+      BreadcrumComponent.breadCrums['Hostpool']?BreadcrumComponent.breadCrums['Hostpool'].splice(index, 1):null;
       this.router.navigate(['/admin/tenantDashboard/', bc.name]);
     }
     if (type === 'Hostpool') {
