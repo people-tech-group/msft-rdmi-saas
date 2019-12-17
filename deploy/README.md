@@ -4,7 +4,7 @@ Deploy the web app to your azure environment.
 
 Click the button below to deploy:
 
-[![Deploy to Azure](https://azuredeploy.net/deploybutton.png)](https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2Fpeople-tech-group%2Fmsft-rdmi-saas%2Fmaster%2Fdeploy%2FmainTemplate.json)
+[![Deploy to Azure](https://azuredeploy.net/deploybutton.png)](https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2FAzure%2FRDS-Templates%2Fmaster%2Fwvd-templates%2Fwvd-management-ux%2Fdeploy%2FmainTemplate.json)
 
 ## Azure resouces deployed
 - Azure App Services (Web App &  API App)
@@ -19,10 +19,10 @@ Update the existing management-ux deployment with latest build release follow th
 
     You need to provide existing depoyment details for to update the existing webapp and APIApp with latest build release files. Enter following parameter values to template.
 
-    - ResourceGroupName: Webapp existing Resourcegroupname
-    - ExistingApplicationName: Name of the Existing WebApp.
+    - ResourceGroupName: Application existing Resourcegroupname.
+    - ExistingApplicationName: Name of the existing Application.
 
-    [![Deploy to Azure](https://azuredeploy.net/deploybutton.png)](https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2Fpeople-tech-group%2Fmsft-rdmi-saas%2Fmaster%2Fdeploy%2FupdateTemplate.json)
+    [![Deploy to Azure](https://azuredeploy.net/deploybutton.png)](https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2FAzure%2FRDS-Templates%2Fwvd-mgmt-ux%2Fwvd-templates%2Fwvd-management-ux%2Fdeploy%2FupdateTemplate.json)
 
 
 
