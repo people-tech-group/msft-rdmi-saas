@@ -22,6 +22,10 @@ namespace MSFT.WVDSaaS.API.Model
         //public RdMgmtRoleAssignment RoleAssignment { get; set; }
         public string[] TenantGroups { get; set; }
         public JObject Error { get; set; }
+        public string ApplicationVersion { get; set; }
+        public string GitAppVersion { get; set; }
+
+        public string GithubUpdateDeployUrl { get; set; }
     }
     #endregion
 

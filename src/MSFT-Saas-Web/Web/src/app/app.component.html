@@ -42,7 +42,9 @@
                   </p>
                 </div>
                 <div class="col-xs-12">
-                  <span>{{data.msg}}</span>
+                   <span [innerHTML]="data.msg"></span>
+                   <br>
+                   <a *ngIf="data.isLink" target="_blank" href="{{data.url}}">{{data.linkText}}</a>
                 </div>
                 <p class="pull-right">{{data.time | date:'shortTime'}}</p>
                 <a class="close"><i class="icon icon-close" (click)="NotifyClose(data)"></i></a>
@@ -79,7 +81,7 @@
               <p><span><b>Infrastructure Permission</b></span><br /><span>{{InfraPermission}}</span></p>
               <!--<p><span><b>Infrastructure Permission</b></span><br /><span>{{scope}}</span></p>-->
               <p style="border-bottom:1px solid #666666; margin:0px"></p>
-              <p><span><b>App Version</b></span><br /><span>1.0.1</span></p>
+              <p><span><b>App Version</b></span><br /><span>{{AppVersion}}</span></p>
             </div>
             <div class="signout-block">
               <p style="border-bottom:1px solid #666666; margin:0px"></p>
@@ -92,11 +94,13 @@
   </div>
 </nav>
 
-<div id="mySidenav" class="sidenav" *ngIf="isInvalidToken">
-  <a href="javascript:void(0)" class="menu-opener" onclick="toggleNav()" style="width: 100%;
+<div id="mySidenav" class="sidenav" *ngIf="isInvalidToken" >
+  <a href="javascript:void(0)" class="menu-opener"  onclick="toggleNav()" style="width: 100%;
     text-align: left;"><span class="icon icon-chevron-right"></span></a>
-  <a (click)="OnClickHome()"><span class="icon icon-home-outline"></span><span class="menu-text">Home</span> </a>
+  <a (click)="OnClickHome()" ><span class="icon icon-home-outline"></span>   </a>
+  <!-- <span  class="menu-text">Home</span>  -->
 </div>
+
 
 <div>
   <router-outlet (activate)='onActivate()'>

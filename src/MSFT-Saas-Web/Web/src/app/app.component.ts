@@ -4,6 +4,9 @@ import * as $ from 'jquery';
 import { Router, ActivatedRoute, Params } from '@angular/router';
 import { AppService } from "./shared/app.service";
 import { trigger, state, style, transition, animate, keyframes } from '@angular/animations';
+import { NotificationsService } from "angular2-notifications";
+
+//import { DeploymentDashboardComponent } from './deployment-dashboard/deployment-dashboard.component';
 
 @Component({
   selector: 'app-root',
@@ -37,8 +40,10 @@ import { trigger, state, style, transition, animate, keyframes } from '@angular/
   ]
 })
 export class AppComponent implements OnInit {
+  //DeploymentDashboardComponent: DeploymentDashboardComponent
   state: string = 'slideup';
-  public static notifications: any = [];
+  //public static notifications: any = [];
+  public static notifications:  any = [];
   public profileName: string;
   public profileIcon: string;
   public splitName: any = [];
@@ -59,7 +64,12 @@ export class AppComponent implements OnInit {
   public tenantGroupName: any;
   public errorMessage: string;
   public InfraPermission: string;
-  constructor(private _AppService: AppService, private router: Router, private route: ActivatedRoute, private http: Http, ) {
+  public AppVersion: string;
+  public gitAppVersion: string;
+  public githubupdateDeployUrl:string;
+ // public AppVersion: string;
+ public isOpen:boolean;
+  constructor(private _AppService: AppService,private _notificationsService: NotificationsService, private router: Router, private route: ActivatedRoute, private http: Http, ) {
     //localStorage.removeItem("TenantGroupName");
   }
 
@@ -72,12 +82,15 @@ export class AppComponent implements OnInit {
    * date - Accepts Date of notification
    * --------------  
    */
-  static GetNotification(status: any, title: any, msg: any, date: any) {
+  static GetNotification(status: any, title: any, msg: any, date: any,isLink:boolean=false,url:string=null,linkText:string=null) {
     AppComponent.notifications.push({
       "icon": status,
       "title": title,
-      "msg": msg,
+      "msg" :  msg,
       "time": date,
+      "isLink":isLink,
+      "url":url,
+      "linkText":linkText,
     });
   }
 
@@ -94,6 +107,7 @@ export class AppComponent implements OnInit {
     this.roleDefinitionName = sessionStorage.getItem("roleDefinitionName");
     this.profileEmail = sessionStorage.getItem("profileEmail");
     this.scope = sessionStorage.getItem("Scope");
+    this.AppVersion = sessionStorage.getItem("ApplicationVersion");
     this.InfraPermission = sessionStorage.getItem("infraPermission");
     if (code != "undefined" && code != null && gotCode == 'yes') {
       this.appLoader = true;
@@ -138,18 +152,21 @@ export class AppComponent implements OnInit {
             this.tenantGroupNameList = respdata.TenantGroups;
             sessionStorage.setItem("profileIcon", this.profileIcon);
             sessionStorage.setItem("profileName", this.profileName);
-           
-            if(respdata.RoleAssignment==null || respdata.RoleAssignment=="" || respdata.RoleAssignment.length==0)
-            {
+            sessionStorage.setItem("gitAppVersion", respdata.GitAppVersion);
+            sessionStorage.setItem("ApplicationVersion", respdata.ApplicationVersion?respdata.ApplicationVersion:"");
+            this.AppVersion = respdata.ApplicationVersion;
+            sessionStorage.setItem("GithubUpdateDeployUrl",respdata.GithubUpdateDeployUrl?respdata.GithubUpdateDeployUrl:"");
+             this.githubupdateDeployUrl= respdata.GithubUpdateDeployUrl;
+            if (respdata.RoleAssignment == null || respdata.RoleAssignment == "" || respdata.RoleAssignment.length == 0) {
               this.router.navigate(['/invalid-role-assignment']);
               this.appLoader = false;
             }
-            else{
+            else {
               sessionStorage.setItem("roleAssignments", JSON.stringify(respdata.RoleAssignment));
               if (this.tenantGroupNameList != null && this.tenantGroupNameList.length > 0) {
                 this.roleDefinitionName = respdata.RoleAssignment[0].roleDefinitionName;
                 sessionStorage.setItem("roleDefinitionName", this.roleDefinitionName);
-  
+
                 if (respdata.RoleAssignment[0].scope == '/') {
                   this.scope = 'All (Root)';
                   this.InfraPermission = 'All (Root)';
@@ -157,7 +174,7 @@ export class AppComponent implements OnInit {
                 else {
                   this.scope = respdata.RoleAssignment[0].scope;
                   this.InfraPermission = respdata.RoleAssignment[0].scope;
-  
+
                 }
               }
               else {
@@ -175,8 +192,8 @@ export class AppComponent implements OnInit {
               //sessionStorage.setItem('Scope', this.scope);
               sessionStorage.setItem('Scope', roleDef);
               sessionStorage.setItem('infraPermission', this.scope);
-  
-  
+
+
               this.profileEmail = respdata.Email;
               sessionStorage.setItem("Refresh_Token", respdata.Refresh_Token);
               sessionStorage.setItem("redirectUri", this.redirectUri);
@@ -185,8 +202,8 @@ export class AppComponent implements OnInit {
               this.appLoader = false;
               this.router.navigate(['/admin/Tenants']);
             }
-           
-           
+
+
           }
         }).catch((error: any) => {
           this.router.navigate(['/invalidtokenmessage']);
@@ -210,6 +227,30 @@ export class AppComponent implements OnInit {
     else if (tenantGroup && window.location.pathname == "/") {
       this.router.navigate(['/admin/Tenants']);
     }
+
+/**show app version notification */
+this.gitAppVersion = sessionStorage.getItem("gitAppVersion");
+this.githubupdateDeployUrl=sessionStorage.getItem("GithubUpdateDeployUrl");
+      this.AppVersion = sessionStorage.getItem("ApplicationVersion");
+      if (this.gitAppVersion != this.AppVersion) {
+        this._notificationsService.html(
+          '<i class="icon icon-check angular-Notify col-xs-1 no-pad"></i>' +
+          '<label class="notify-label col-xs-10 no-pad">A New App Version Available</label>' +
+          '<a class="close"><i class="icon icon-close notify-close" aria-hidden="true"></i></a>' +
+          '<p class="notify-text col-xs-12 no-pad"> New App Version : '+this.gitAppVersion +'</p>',
+          'content optional one',
+          {
+            position: ["top", "right"],
+            timeOut: 3000,
+            showProgressBar: false,
+            pauseOnHover: false,
+            clickToClose: true,
+            maxLength: 10
+          }
+        )
+        AppComponent.GetNotification('icon icon-check angular-Notify', 'A New App Version Available', 'Current App Version : '+this.AppVersion+'<br>New App Version : '+this.gitAppVersion, new Date(),true, this.githubupdateDeployUrl,"Update");
+      }
+
   }
 
   /*
@@ -289,7 +330,14 @@ export class AppComponent implements OnInit {
    * This function is used to Redirect to Home On click Home Icon
    */
   public OnClickHome() {
-    this.router.navigate(['/admin/Tenants']);
+    this.router.routeReuseStrategy.shouldReuseRoute = function () { return false; };
+    let currentUrl = '/admin/Tenants';//this.router.url;
+    this.router.navigateByUrl(currentUrl)
+      .then(() => {
+        this.router.navigated = false;
+        this.router.navigate([this.router.url]);
+      });
+    //this.router.navigate(['/admin/Tenants']);
   }
 
   /*
@@ -307,7 +355,7 @@ export class AppComponent implements OnInit {
    * This function is used to Hide Nav Bar and Side Nav bar and it will run at a  new component is being instantiated
    */
   public onActivate() {
-    if (window.location.pathname == '/invalidtokenmessage' || window.location.pathname ==  '/invalid-role-assignment') {
+    if (window.location.pathname == '/invalidtokenmessage' || window.location.pathname == '/invalid-role-assignment') {
       this.isInvalidToken = false;
     }
     else {

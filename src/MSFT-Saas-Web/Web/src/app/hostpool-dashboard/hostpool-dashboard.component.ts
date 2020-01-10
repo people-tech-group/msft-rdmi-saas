@@ -15,7 +15,6 @@ import { ClipboardModule } from 'ngx-clipboard';
 import { trigger, state, style, animate, transition } from '@angular/animations';
 import { AdminMenuComponent } from '../admin-menu/admin-menu.component';
 
-
 @Component({
 
   selector: 'app-hostpool-dashboard',
@@ -272,7 +271,16 @@ export class HostpoolDashboardComponent implements OnInit {
   public isEditAppsDisabled: boolean = true;
   public showEditAppDialog: boolean = false;
   public selectedHostRows: any = [];
+  public hostpoolFormEdit;
+  public searchHostPools:any;
+public showEditForm:boolean=false;
+public isEnableUser: boolean;
+public persistentHostpool: boolean;
+public selectedHostpoolradio: any;
+public hostPoolsList:any=[];
   @ViewChild('closeModal') closeModal: ElementRef;
+  @ViewChild('closeHostpoolModal') closeHostpoolModal: ElementRef;
+  
 
   constructor(private _AppService: AppService, private fb: FormBuilder, private http: Http, private route: ActivatedRoute, private _notificationsService: NotificationsService, private router: Router,
     private adminMenuComponent: AdminMenuComponent) {
@@ -336,6 +344,8 @@ export class HostpoolDashboardComponent implements OnInit {
       UserPrincipalName: new FormControl('', Validators.required),
     });
 
+
+
     this.sendMessageForm = new FormGroup({
       Title: new FormControl('', Validators.required),
       Message: new FormControl('', Validators.required)
@@ -350,6 +360,7 @@ export class HostpoolDashboardComponent implements OnInit {
     this.hostFormEdit = new FormGroup({
       sessionHostName: new FormControl(""),
       allowNewSession: new FormControl(""),
+      assignedUser: new FormControl("")
     });
     this.downloadFile = new FormGroup({
       filetype: new FormControl(""),
@@ -363,6 +374,60 @@ export class HostpoolDashboardComponent implements OnInit {
     });
     this.formCreateNewAppGroup.patchValue({ radiobtnAppType: 'Desktop' });
     this.scopeArray = sessionStorage.getItem("Scope").split(",");
+   
+   
+    this.hostpoolFormEdit = new FormGroup({
+      hostPoolName: new FormControl('', Validators.compose([Validators.required, Validators.maxLength(36), Validators.pattern(/^[^\s\W\_]([A-Za-z0-9\s\-\_\.])+$/)])),
+      friendlyName: new FormControl("", Validators.compose([Validators.required, Validators.pattern(/^[^\s\W\_]([A-Za-z0-9\s\.\-\_])+$/)])),
+      description: new FormControl("", Validators.compose([Validators.required, Validators.pattern(/^[\dA-Za-z]+[\dA-Za-z\s\.\-\_\!\@\#\$\%\^\&\*\(\)\{\}\[\]\:\'\"\?\>\<\,\;\/\+\=\|]{0,1600}$/)])),
+      diskPath: new FormControl("", Validators.compose([Validators.required, Validators.pattern(/^((\\|\\\\)[a-z A-Z]+)+((\\|\\\\)[a-z0-9A-Z]+)$/)])),
+      enableUserProfileDisk: new FormControl(""),
+      IsPersistent: new FormControl("false"),
+      validationEnv: new FormControl(""),
+      customRdpProperty: new FormControl(""),
+      maxSessionLimit: new FormControl(""),
+      loadBalancerType: new FormControl(""),
+     assignmentType: new FormControl("")
+    });
+
+  }
+
+  public GetHostPoolEdit(hostpool:any)
+  {
+    let hostpools = JSON.parse(sessionStorage.getItem('Hostpools'));
+    
+      this.searchHostPools = hostpools.filter(x=>x["hostPoolName"]==hostpool);
+      this.persistentHostpool = this.searchHostPools[0].persistent;
+      if (this.searchHostPools[0].validationEnv === true) {
+        this.searchHostPools[0].validationEnv = 'Yes';
+      }
+      else {
+        this.searchHostPools[0].validationEnv = 'No';
+      }
+      this.hostpoolFormEdit = new FormGroup({
+        hostPoolName: new FormControl(this.searchHostPools[0].hostPoolName, Validators.compose([Validators.required, Validators.maxLength(36), Validators.pattern(/^[^\s\W\_]([A-Za-z0-9\s\-\_\.])+$/)])),
+        friendlyName: new FormControl(this.searchHostPools[0].friendlyName, Validators.compose([Validators.required, Validators.pattern(/^[^\s\W\_]([A-Za-z0-9\s\.\-\_])+$/)])),
+        description: new FormControl(this.searchHostPools[0].description, Validators.compose([Validators.required, Validators.pattern(/^[\dA-Za-z]+[\dA-Za-z\s\.\-\_\!\@\#\$\%\^\&\*\(\)\{\}\[\]\:\'\"\?\>\<\,\;\/\+\=\|]{0,1600}$/)])),
+        diskPath: new FormControl(this.searchHostPools[0].diskPath, Validators.compose([Validators.required, Validators.pattern(/^((\\|\\\\)[a-z A-Z]+)+((\\|\\\\)[a-z0-9A-Z]+)$/)])),
+        enableUserProfileDisk: new FormControl(this.searchHostPools[0].enableUserProfileDisk),
+        validationEnv: new FormControl(this.searchHostPools[0].validationEnv),
+        customRdpProperty: new FormControl(this.searchHostPools[0].customRdpProperty),
+        maxSessionLimit: new FormControl(this.searchHostPools[0].maxSessionLimit),
+        loadBalancerType: new FormControl(this.searchHostPools[0].loadBalancerType.toString()),
+       assignmentType: new FormControl(this.searchHostPools[0].assignmentType?this.searchHostPools[0].assignmentType.toString():""),
+      });
+      this.showEditForm=true;
+    
+    
+  }
+
+  public profileDiskChange(event: any) {
+    if (event === 'Yes') {
+      this.isEnableUser = true;
+    }
+    else {
+      this.isEnableUser = false;
+    }
   }
 
   public options: any = {
@@ -643,8 +708,13 @@ export class HostpoolDashboardComponent implements OnInit {
    */
   public GetHostPoolDetails(hostPoolName: any) {
     let Hostpools = JSON.parse(sessionStorage.getItem('Hostpools'));
-    let data = Hostpools.filter(item => item.hostPoolName == hostPoolName);
-    this.hostPoolDetails = data[0];
+    if (Hostpools != null && Hostpools != undefined) {
+      let data = Hostpools.filter(item => item.hostPoolName == hostPoolName);
+      if (data != null && data != undefined && data.length > 0) {
+        this.hostPoolDetails = data[0];
+      }
+    }
+
     //this.GetAllAppGroupsList(hostPoolName);
     // this.refreshHostpoolLoading = true;
     // this.hostpoolDetailsErrorFound = false;
@@ -778,17 +848,11 @@ export class HostpoolDashboardComponent implements OnInit {
 
 
   public ChangeDrainMode() {
-    // if (data.allowNewSession === 'Yes') {
-    //   data.allowNewSession = true;
-    // }
-    // else {
-    //   data.allowNewSession = false;
-    // }
     let updateArray = {
       "tenantName": this.hostDetails.tenantName,
       "hostPoolName": this.hostDetails.hostPoolName,
       "sessionHostName": this.hostDetails.sessionHostName,
-      "allowNewSession": false, //this.HostAllowNewSession,
+      "allowNewSession": false,
       "refresh_token": sessionStorage.getItem("Refresh_Token"),
       "tenantGroupName": this.hostDetails.tenantGroupName,
     };
@@ -881,7 +945,7 @@ export class HostpoolDashboardComponent implements OnInit {
     this.showHostDashBoard = false;
     this.sessionHostCheckedMain = !this.sessionHostCheckedMain;
     var index;
-    this.selectedHostRows=[];
+    this.selectedHostRows = [];
     for (let i = 0; i < this.sessionHostListsSearch.length; i++) {
       if (event.target.checked) {
         this.sessionHostchecked[i] = true;
@@ -908,6 +972,7 @@ export class HostpoolDashboardComponent implements OnInit {
       this.hostFormEdit = new FormGroup({
         sessionHostName: new FormControl(this.sessionHostListsSearch[index].sessionHostName),
         allowNewSession: new FormControl(this.sessionHostListsSearch[index].allowNewSession),
+        assignedUser: new FormControl(this.sessionHostListsSearch[index].assignedUser)
       });
       this.hostDeleteData = this.sessionHostListsSearch[index].sessionHostName;
     }
@@ -1209,7 +1274,6 @@ export class HostpoolDashboardComponent implements OnInit {
         (error) => {
           this.error = true;
           let errorBody = JSON.parse(error['_body']);
-
           if (errorBody.error.code == "403") {
             this.errorMessage = "Access Denied! You are not authorized user to view host details.";
             this.showHostEmpty = true;
@@ -1284,8 +1348,8 @@ export class HostpoolDashboardComponent implements OnInit {
         }
       }
     }
-    else{
-      this.showHostEmpty=true;
+    else {
+      this.showHostEmpty = true;
     }
     this.refreshHostpoolLoading = false;
 
@@ -1296,7 +1360,7 @@ export class HostpoolDashboardComponent implements OnInit {
    */
   public DeleteHost() {
     this.refreshHostpoolLoading = true;
-    for (let i = 0; i < this.selectedHostRows.length; i++) { 
+    for (let i = 0; i < this.selectedHostRows.length; i++) {
       let index = this.selectedHostRows[i];
       this.hostDeleteUrl = this._AppService.ApiUrl + '/api/SessionHost/DeleteSessionHost?tenantGroup=' + this.tenantGroupName + '&tenantName=' + this.tenantName + '&hostPoolName=' + this.hostPoolName + '&sessionHostName=' + this.sessionHostListsSearch[index].sessionHostName + '&refresh_token=' + sessionStorage.getItem("Refresh_Token");
       this._AppService.DeleteHostService(this.hostDeleteUrl).subscribe(response => {
@@ -1385,7 +1449,7 @@ export class HostpoolDashboardComponent implements OnInit {
     this.SessionHostIsChecked(hostIndex, event);
     this.sessionHostName = hostName;
     this.sessionHostCheckedTrue = [];
-    this.selectedHostRows=[];
+    this.selectedHostRows = [];
     var index = hostIndex;
     for (var i = 0; i < this.sessionHostchecked.length; i++) {
       if (this.sessionHostchecked[i] == true) {
@@ -1428,6 +1492,7 @@ export class HostpoolDashboardComponent implements OnInit {
     this.hostFormEdit = new FormGroup({
       sessionHostName: new FormControl(this.sessionHostListsSearch[hostIndex].sessionHostName),
       allowNewSession: new FormControl(this.sessionHostListsSearch[hostIndex].allowNewSession),
+      assignedUser: new FormControl(this.sessionHostListsSearch[index].assignedUser)
     });
   }
 
@@ -1445,7 +1510,8 @@ export class HostpoolDashboardComponent implements OnInit {
     else {
       data.allowNewSession = false;
     }
-    let updateArray = {
+    let updateArray: any;
+    updateArray = {
       "tenantName": this.tenantName,
       "hostPoolName": this.hostPoolName,
       "sessionHostName": data.sessionHostName,
@@ -1453,6 +1519,17 @@ export class HostpoolDashboardComponent implements OnInit {
       "refresh_token": sessionStorage.getItem("Refresh_Token"),
       "tenantGroupName": this.tenantGroupName,
     };
+    if (data.assignedUser != null) {
+      updateArray = {
+        "tenantName": this.tenantName,
+        "hostPoolName": this.hostPoolName,
+        "sessionHostName": data.sessionHostName,
+        "allowNewSession": data.allowNewSession,
+        "assignedUser": data.assignedUser,
+        "refresh_token": sessionStorage.getItem("Refresh_Token"),
+        "tenantGroupName": this.tenantGroupName,
+      };
+    }
     this.updateAppGroupLoading = true;
     this.updateHostUrl = this._AppService.ApiUrl + '/api/SessionHost/Put';
     this._AppService.UpdateHost(this.updateHostUrl, updateArray).subscribe(response => {
@@ -1501,6 +1578,7 @@ export class HostpoolDashboardComponent implements OnInit {
           }
         )
         AppComponent.GetNotification('icon icon-fail angular-NotifyFail', 'Failed To Update Host', responseData.message, new Date());
+        $("#editHostModal .icon-close").trigger('click');
         this.RefreshHost();
       }
     },
@@ -1524,6 +1602,7 @@ export class HostpoolDashboardComponent implements OnInit {
           }
         )
         AppComponent.GetNotification('icon icon-fail angular-NotifyFail', 'Failed To Update Host', 'Problem with server, Please try again', new Date());
+        $("#editHostModal .icon-close").trigger('click');
       }
     );
     this.sessionHostCheckedMain = false;
@@ -1984,6 +2063,7 @@ export class HostpoolDashboardComponent implements OnInit {
          * If Any Error (or) Problem With Services (or) Problem in internet this Error Block Will Exequte
          */
         (error) => {
+
           this.error = true;
           let errorBody = JSON.parse(error['_body']);
           this.errorMessage = errorBody.error.target;
@@ -2031,12 +2111,11 @@ export class HostpoolDashboardComponent implements OnInit {
   public IsCheckedAppGroup(appGroupIndex: any, event) {
     this.checked[appGroupIndex] = !this.checked[appGroupIndex];
     if (event.target.checked != null && event.target.checked != undefined) {
-      this.showAppGroupDashBoard = !event.target.checked;// !this.showAppGroupDashBoard;
+      this.showAppGroupDashBoard = !event.target.checked;
     }
     else if (event.type == "click") {
-      this.showAppGroupDashBoard = this.showAppGroupDashBoard == true ? false : true;// !this.showHostDashBoard;
+      this.showAppGroupDashBoard = this.showAppGroupDashBoard == true ? false : true;
     }
-    //this.showHostDashBoard = false;///addded by susmita
     this.appGroupcheckedTrue = [];
     for (let i = 0; i < this.checked.length; i++) {
       if (this.checked[i] == true) {
@@ -2044,7 +2123,7 @@ export class HostpoolDashboardComponent implements OnInit {
       }
       if (this.checked[i] == false) {
         this.checkedMainAppGroup = false;
-        break;
+        //  break;
       }
       else {
         if (this.appGroupsList.length == this.appGroupcheckedTrue.length) {
@@ -2052,10 +2131,11 @@ export class HostpoolDashboardComponent implements OnInit {
         }
       }
     }
-    if(this.appGroupcheckedTrue.length==1)
-      {
-        this.state = 'up';
-      }
+
+    if (this.appGroupcheckedTrue.length == 1) {
+      this.state = 'up';
+      this.showAppGroupDashBoard = true;
+    }
   }
 
   /*
@@ -2587,6 +2667,7 @@ export class HostpoolDashboardComponent implements OnInit {
     this.SessionsListErrorFound = false;
     this.getUserSessionUrl = this._AppService.ApiUrl + '/api/UserSession/GetListOfUserSessions?tenantGroupName=' + this.tenantGroupName + '&tenantName=' + this.tenantName + '&hostPoolName=' + this.hostPoolName + '&hostName=' + this.selectedHostName + '&refresh_token=' + sessionStorage.getItem("Refresh_Token");
     this._AppService.GetData(this.getUserSessionUrl).subscribe(response => {
+      setTimeout(()=>{ this.userSessions = JSON.parse(response['_body']); }, 15000)
       this.refreshHostpoolLoading = false;
       if (response.status == 429) {
         this.error = true;
@@ -2615,7 +2696,7 @@ export class HostpoolDashboardComponent implements OnInit {
   }
 
   public getusers() {
-    let appUsersList = JSON.parse(sessionStorage.getItem('Users'));
+    let appUsersList = sessionStorage.getItem('Users') != null && sessionStorage.getItem('Users') != undefined ? JSON.parse(sessionStorage.getItem('Users')) : null;
     if (this.appUsersList) {
       if (this.appUsersList.code == "Invalid Token") {
         sessionStorage.clear();
@@ -3019,6 +3100,8 @@ export class HostpoolDashboardComponent implements OnInit {
     this.userPrincipalName = false;
   }
 
+
+
   public OpenSendMessagePanel() {
     this.showSendMessageDialog = true;
     this.sendMesageButtonDisable = true;
@@ -3048,6 +3131,7 @@ export class HostpoolDashboardComponent implements OnInit {
   public HideAppUserDialog() {
     this.showAddUserDialog = false;
   }
+
 
   /**
    * this function is used to close send message panel
@@ -3337,6 +3421,8 @@ export class HostpoolDashboardComponent implements OnInit {
       }
     );
   }
+
+
 
   /*
    * This function is used to delete the selected Appgroup user
@@ -4241,6 +4327,11 @@ export class HostpoolDashboardComponent implements OnInit {
     this.checked = [];
   }
 
+  HideHostAndAppGroupDetails() {
+    this.HideAppGroupDetails();
+    this.HideHostDetails();
+  }
+
   /*
    * This function is used to Create\Add Apps from Gallery
    */
@@ -4531,4 +4622,163 @@ export class HostpoolDashboardComponent implements OnInit {
     }];
     BreadcrumComponent.GetCurrentPage(data);
   }
+
+  public UpdateHostPool(hostpoolData: any) {
+    var updateArray = {};
+    if (hostpoolData.enableUserProfileDisk === 'Yes') {
+      this.selectedHostpoolradio = true;
+    }
+    else {
+      this.selectedHostpoolradio = false;
+    }
+    if (!this.persistentHostpool) {
+      updateArray = {
+        "refresh_token": sessionStorage.getItem("Refresh_Token"),
+        "tenantGroupName": this.tenantGroupName,
+        "tenantName": this.tenantName,
+        "hostPoolName": hostpoolData.hostPoolName,
+        "friendlyName": hostpoolData.friendlyName,
+        "description": hostpoolData.description,
+        "diskPath": this.selectedHostpoolradio == true ? hostpoolData.diskPath : '',
+        "persistent": this.persistentHostpool,
+        "enableUserProfileDisk": this.selectedHostpoolradio,
+        "loadBalancerType": hostpoolData.loadBalancerType,
+        "maxSessionLimit": hostpoolData.maxSessionLimit,
+        "customRdpProperty": hostpoolData.customRdpProperty,
+        "validationEnv": hostpoolData.validationEnv == 'Yes' ? true : hostpoolData.validationEnv == 'No' ? false : '',
+      };
+    }
+    else {
+      updateArray = {
+        "refresh_token": sessionStorage.getItem("Refresh_Token"),
+        "tenantGroupName": this.tenantGroupName,
+        "tenantName": this.tenantName,
+        "hostPoolName": hostpoolData.hostPoolName,
+        "friendlyName": hostpoolData.friendlyName,
+        "description": hostpoolData.description,
+        "diskPath": this.selectedHostpoolradio == true ? hostpoolData.diskPath : '',
+        "persistent": this.persistentHostpool,
+        "enableUserProfileDisk": this.selectedHostpoolradio,
+        "customRdpProperty": hostpoolData.customRdpProperty,
+        "validationEnv": hostpoolData.validationEnv == 'Yes' ? true : hostpoolData.validationEnv == 'No' ? false : '',
+        "assignmentType": hostpoolData.assignmentType
+      };
+    }
+    this.hostpoolUpdateClose();
+    this.refreshHostpoolLoading = true;
+    let updateHostpoolUrl = this._AppService.ApiUrl + '/api/HostPool/Put';
+    this._AppService.UpdateTenant(updateHostpoolUrl, updateArray).subscribe(response => {
+      this.refreshHostpoolLoading = false;
+      var responseData = JSON.parse(response['_body']);
+      if (responseData.message == "Invalid Token") {
+        sessionStorage.clear();
+        this.router.navigate(['/invalidtokenmessage']);
+      }
+      /* If response data is success then it enters into if and this block of code will execute to show the 'Hostpool Updated Successfully' notification */
+      if (responseData.isSuccess === true) {
+        this._notificationsService.html(
+          '<i class="icon icon-check angular-Notify col-xs-1 no-pad"></i>' +
+          '<label class="notify-label col-xs-10 no-pad">Hostpool Updated Successfully</label>' +
+          '<a class="close"><i class="icon icon-close notify-close" aria-hidden="true"></i></a>' +
+          '<p class="notify-text col-xs-12 no-pad">' + responseData.message + '</p>',
+          'content optional one',
+          {
+            position: ["top", "right"],
+            timeOut: 3000,
+            showProgressBar: false,
+            pauseOnHover: false,
+            clickToClose: true,
+            maxLength: 10
+          }
+        )
+        AppComponent.GetNotification('icon icon-check angular-Notify', 'Hostpool Updated Successfully', responseData.message, new Date());
+        this.RefreshHostpools();
+      }
+      /* If response data is success then it enters into else and this block of code will execute to show the 'Failed To Update Hostpool' notification */
+      else {
+        this._notificationsService.html(
+          '<i class="icon icon-fail angular-NotifyFail col-xs-1 no-pad"></i>' +
+          '<label class="notify-label col-xs-10 no-pad">Failed To Update Hostpool</label>' +
+          '<a class="close"><i class="icon icon-close notify-close" aria-hidden="true"></i></a>' +
+          '<p class="notify-text col-xs-12 no-pad">' + responseData.message + '</p>',
+          'content optional one',
+          {
+            position: ["top", "right"],
+            timeOut: 3000,
+            showProgressBar: false,
+            pauseOnHover: false,
+            clickToClose: true,
+            maxLength: 10
+          }
+        )
+        AppComponent.GetNotification('icon icon-fail angular-NotifyFail', 'Failed To Update Hostpool', responseData.message, new Date());
+      }
+    },
+      /* If Any Error (or) Problem With Services (or) Problem in internet this Error Block Will Exequte */
+      error => {
+        this.refreshHostpoolLoading = false;
+        this._notificationsService.html(
+          '<i class="icon icon-close angular-NotifyFail"></i>' +
+          '<label class="notify-label padleftright">Failed To Update Hostpool</label>' +
+          '<a class="close"><i class="icon icon-close notify-close" aria-hidden="true"></i></a>' +
+          '<p class="notify-text">Problem with the service. Please try later</p>',
+          'content optional one',
+          {
+            position: ["top", "right"],
+            timeOut: 3000,
+            showProgressBar: false,
+            pauseOnHover: false,
+            clickToClose: true,
+            maxLength: 10
+          }
+        )
+        AppComponent.GetNotification('fa fa-times-circle checkstyle', 'Failed To Update Hostpool', 'Problem with the service. Please try later', new Date());
+      }
+    );
+  }
+
+/* This function is used to  to close the Edit hostpool modal popup */
+public hostpoolUpdateClose(): void {
+  this.closeHostpoolModal.nativeElement.click();
+}
+public RefreshHostpools() {
+  this.GetHostpools(this.tenantName);
+}
+
+ 
+
+public GetHostpools(tenantName: any) {
+  this.refreshHostpoolLoading = true;
+    /*
+     * Access level of Tenant block End
+     */
+    // this.getHostpoolsUrl = this._AppService.ApiUrl + '/api/HostPool/GetHostPoolList?tenantGroupName=' + this.tenantGroupName + '&tenantName=' + tenantName + '&refresh_token=' + sessionStorage.getItem("Refresh_Token") + '&pageSize=' + this.pageSize + '&sortField=HostPoolName&isDescending=false&initialSkip=' + this.initialSkip + ' &lastEntry=' + this.lastEntry;
+    let getHostpoolsUrl = this._AppService.ApiUrl + '/api/HostPool/GetHostPoolList?tenantGroupName=' + this.tenantGroupName + '&tenantName=' + tenantName + '&refresh_token=' + sessionStorage.getItem("Refresh_Token");
+    this._AppService.GetTenantDetails(getHostpoolsUrl).subscribe(response => {
+      this.refreshHostpoolLoading = false;
+      if (response.status == 429) {
+        this.error = true;
+        this.errorMessage = response.statusText;
+      }
+      else {
+        this.error = false;
+        this.hostPoolsList = JSON.parse(response['_body']);
+        sessionStorage.setItem('Hostpools', JSON.stringify(this.hostPoolsList));
+        sessionStorage.setItem('SelectedTenantName', tenantName);
+        this.hostPoolDetails =  this.hostPoolsList!=null && this.hostPoolsList.length>0?this.hostPoolsList.filter(item=>item.hostPoolName==this.hostPoolName)[0]:this.hostPoolDetails;
+      }
+    },
+      /*
+       * If Any Error (or) Problem With Services (or) Problem in internet this Error Block Will Exequte
+       */
+      error => {
+        this.error = true;
+        let errorBody = JSON.parse(error['_body']);
+        this.errorMessage = errorBody.error.target;
+        this.refreshHostpoolLoading = false;
+      }
+    );
+  
+}
+
 }

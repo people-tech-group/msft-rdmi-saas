@@ -16,6 +16,7 @@ body {
   margin: 0px;
   padding: 0px;
   overflow-x: hidden;
+  overflow-y: hidden;
   font-family: segoe ui;
 }
 
@@ -584,7 +585,7 @@ i.notify-close {
   transition: 0.5s;
   width: 50px;
   float: left;
-  z-index: 1;
+  /* z-index: 1; */
 }
 
   .sidenav a {
@@ -962,6 +963,14 @@ i.notify-close {
 }
 
 .popup-main .modal-body input[type=text] {
+  height: 30px;
+  border: 1px solid #ddd;
+  width: 100%;
+  padding-left: 10px;
+  margin-bottom: 15px;
+}
+
+.popup-main .modal-body input[type=number] {
   height: 30px;
   border: 1px solid #ddd;
   width: 100%;
@@ -1797,6 +1806,7 @@ div.AllDeployTable > table > thead > tr > th {
 
 .modal-close {
   top: 15px !important;
+  
 }
 
 #deleteModal .modal-dialog {
@@ -2284,7 +2294,7 @@ li.login-details {
   z-index: 9999;
   margin-top: 3px;
   position: absolute;
-  left: -172px;
+  left: -130px;
   overflow-y: auto;
   background-color: white;
   /*border: 1px solid gray;*/
@@ -2329,3 +2339,4 @@ li.login-details {
 #loadmore:hover{
   text-decoration:underline !important;
 }
+

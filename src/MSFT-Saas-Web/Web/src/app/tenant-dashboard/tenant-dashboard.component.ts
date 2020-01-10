@@ -8,7 +8,6 @@ import { SearchPipe } from "../../assets/Pipes/Search.pipe";
 import { AppComponent } from "../app.component";
 import { BreadcrumComponent } from "../breadcrum/breadcrum.component";
 import { AdminMenuComponent } from "../admin-menu/admin-menu.component";
-
 @Component({
   selector: 'app-tenant-dashboard',
   templateUrl: './tenant-dashboard.component.html',
@@ -82,6 +81,7 @@ export class TenantDashboardComponent implements OnInit {
   public error: boolean = false;
   public Hostpoollist: number = 1;
   public searchByHostName: any;
+  public persistentHostpool: boolean;
 
 
   /*This  is used to close the edit modal popup*/
@@ -136,7 +136,12 @@ export class TenantDashboardComponent implements OnInit {
       description: new FormControl("", Validators.compose([Validators.required, Validators.pattern(/^[\dA-Za-z]+[\dA-Za-z\s\.\-\_\!\@\#\$\%\^\&\*\(\)\{\}\[\]\:\'\"\?\>\<\,\;\/\+\=\|]{0,1600}$/)])),
       diskPath: new FormControl("", Validators.compose([Validators.required, Validators.pattern(/^((\\|\\\\)[a-z A-Z]+)+((\\|\\\\)[a-z0-9A-Z]+)$/)])),
       enableUserProfileDisk: new FormControl(""),
-      IsPersistent: new FormControl("false")
+      IsPersistent: new FormControl("false"),
+      validationEnv: new FormControl(""),
+      customRdpProperty: new FormControl(""),
+      maxSessionLimit: new FormControl(""),
+      loadBalancerType: new FormControl(""),
+      assignmentType: new FormControl("")
     });
   }
 
@@ -204,7 +209,7 @@ export class TenantDashboardComponent implements OnInit {
     this.showHostpoolDialog = true;
   }
 
-  /* This function is used to  to close the create host pool slider
+  /* This function is used to  to close the create hostpool slider
   * --------------
    * Parameters
    * event - Accepts event
@@ -219,7 +224,7 @@ export class TenantDashboardComponent implements OnInit {
     this.closeModal.nativeElement.click();
   }
 
-  /* This function is used to close the create host pool slider
+  /* This function is used to close the create hostpool slider
    * --------------
    * Parameters
    * event - Accepts event
@@ -232,12 +237,12 @@ export class TenantDashboardComponent implements OnInit {
     this.ShowPreviousTab();
   }
 
-  /* This function is used to show next slider of create host pool modal */
+  /* This function is used to show next slider of create hostpool modal */
   public ShowNextTab() {
     this.showHostpoolTab2 = true;
   }
 
-  /* This function is used to show previous slider of create host pool modal */
+  /* This function is used to show previous slider of create hostpool modal */
   public ShowPreviousTab() {
     this.showHostpoolTab2 = false;
   }
@@ -363,15 +368,22 @@ export class TenantDashboardComponent implements OnInit {
     }
     /*If the selected checkbox length=1 then this block of code executes to show the selected hostpool name */
     if (this.checkedAllTrue.length == 1) {
+
       this.isEditDisabled = false;
       this.isDeleteDisabled = false;
       this.deleteCount = this.searchHostPools[index].hostPoolName;
+      this.persistentHostpool = this.searchHostPools[index].persistent;//added by susmita
       this.hostpoolFormEdit = new FormGroup({
         hostPoolName: new FormControl(this.searchHostPools[index].hostPoolName),
         friendlyName: new FormControl(this.searchHostPools[index].friendlyName),
         description: new FormControl(this.searchHostPools[index].description),
         diskPath: new FormControl(this.searchHostPools[index].diskPath, Validators.compose([Validators.required, Validators.pattern(/^((\\|\\\\)[a-z A-Z]+)+((\\|\\\\)[a-z0-9A-Z]+)$/)])),
         enableUserProfileDisk: new FormControl(this.searchHostPools[index].enableUserProfileDisk),
+        validationEnv: new FormControl(this.searchHostPools[index].validationEnv),
+        customRdpProperty: new FormControl(this.searchHostPools[index].customRdpProperty),
+        maxSessionLimit: new FormControl(this.searchHostPools[index].maxSessionLimit),
+        loadBalancerType: new FormControl(this.searchHostPools[index].loadBalancerType.toString()),
+        assignmentType: new FormControl(this.searchHostPools[index].assignmentType?this.searchHostPools[index].assignmentType.toString():""),
       });
     }
     /*If the selected checkbox length>1 then this block of code executes to show the no of selected hostpools(i.e; if we select multiple checkboxes) */
@@ -458,12 +470,18 @@ export class TenantDashboardComponent implements OnInit {
             var index = i;
           }
         }
+        this.persistentHostpool = this.searchHostPools[index].persistent;//added by susmita
         this.hostpoolFormEdit = new FormGroup({
           hostPoolName: new FormControl(this.searchHostPools[index].hostPoolName, Validators.compose([Validators.required, Validators.maxLength(36), Validators.pattern(/^[^\s\W\_]([A-Za-z0-9\s\-\_\.])+$/)])),
           friendlyName: new FormControl(this.searchHostPools[index].friendlyName, Validators.compose([Validators.required, Validators.pattern(/^[^\s\W\_]([A-Za-z0-9\s\.\-\_])+$/)])),
           description: new FormControl(this.searchHostPools[index].description, Validators.compose([Validators.required, Validators.pattern(/^[\dA-Za-z]+[\dA-Za-z\s\.\-\_\!\@\#\$\%\^\&\*\(\)\{\}\[\]\:\'\"\?\>\<\,\;\/\+\=\|]{0,1600}$/)])),
           diskPath: new FormControl(this.searchHostPools[index].diskPath, Validators.compose([Validators.required, Validators.pattern(/^((\\|\\\\)[a-z A-Z]+)+((\\|\\\\)[a-z0-9A-Z]+)$/)])),
           enableUserProfileDisk: new FormControl(this.searchHostPools[index].enableUserProfileDisk),
+          validationEnv: new FormControl(this.searchHostPools[index].validationEnv),
+          customRdpProperty: new FormControl(this.searchHostPools[index].customRdpProperty),
+          maxSessionLimit: new FormControl(this.searchHostPools[index].maxSessionLimit),
+          loadBalancerType: new FormControl(this.searchHostPools[index].loadBalancerType.toString()),
+          assignmentType: new FormControl(this.searchHostPools[index].assignmentType?this.searchHostPools[index].assignmentType.toString():""),
         });
         this.deleteCount = this.searchHostPools[index].hostPoolName;
         if (this.searchHostPools[index].enableUserProfileDisk === 'Yes') {
@@ -890,6 +908,13 @@ export class TenantDashboardComponent implements OnInit {
       else {
         this.searchHostPools[i].enableUserProfileDisk = 'No';
       }
+
+      if (this.searchHostPools[i].validationEnv === true) {
+        this.searchHostPools[i].validationEnv = 'Yes';
+      }
+      else {
+        this.searchHostPools[i].validationEnv = 'No';
+      }
     }
     if (this.searchHostPools.length == 0) {
       this.editedBody = true;
@@ -941,7 +966,7 @@ export class TenantDashboardComponent implements OnInit {
       if (responseData.isSuccess === true) {
         this._notificationsService.html(
           '<i class="icon icon-check angular-Notify col-xs-1 no-pad"></i>' +
-          '<label class="notify-label col-xs-10 no-pad">Host pool Created Successfully</label>' +
+          '<label class="notify-label col-xs-10 no-pad">Hostpool Created Successfully</label>' +
           '<a class="close"><i class="icon icon-close notify-close" aria-hidden="true"></i></a>' +
           '<p class="notify-text col-xs-12 no-pad">' + responseData.message + '</p>',
           'content optional one',
@@ -954,7 +979,7 @@ export class TenantDashboardComponent implements OnInit {
             maxLength: 10
           }
         )
-        AppComponent.GetNotification('icon icon-check angular-Notify', 'Host pool Created Successfully', responseData.message, new Date());
+        AppComponent.GetNotification('icon icon-check angular-Notify', 'Hostpool Created Successfully', responseData.message, new Date());
         this.RefreshHostpools();
         this.BtnCancel(event);
       }
@@ -962,7 +987,7 @@ export class TenantDashboardComponent implements OnInit {
       else {
         this._notificationsService.html(
           '<i class="icon icon-fail angular-NotifyFail col-xs-1 no-pad"></i>' +
-          '<label class="notify-label col-xs-10 no-pad">Failed To Create Host pool</label>' +
+          '<label class="notify-label col-xs-10 no-pad">Failed To Create Hostpool</label>' +
           '<a class="close"><i class="icon icon-close notify-close" aria-hidden="true"></i></a>' +
           '<p class="notify-text col-xs-12 no-pad">' + responseData.message + '</p>',
           'content optional one',
@@ -975,7 +1000,7 @@ export class TenantDashboardComponent implements OnInit {
             maxLength: 10
           }
         )
-        AppComponent.GetNotification('icon icon-fail angular-NotifyFail', 'Failed To Create Host pool', responseData.message, new Date());
+        AppComponent.GetNotification('icon icon-fail angular-NotifyFail', 'Failed To Create Hostpool', responseData.message, new Date());
         //this.RefreshHostpools();
         this.BtnCancel(event);
       }
@@ -985,7 +1010,7 @@ export class TenantDashboardComponent implements OnInit {
         this.refreshHostpoolLoading = false;
         this._notificationsService.html(
           '<i class="icon icon-close angular-NotifyFail"></i>' +
-          '<label class="notify-label padleftright">Failed To Create Host pool</label>' +
+          '<label class="notify-label padleftright">Failed To Create Hostpool</label>' +
           '<a class="close"><i class="icon icon-close notify-close" aria-hidden="true"></i></a>' +
           '<p class="notify-text">Problem with the service. Please try later</p>',
           'content optional one',
@@ -998,7 +1023,7 @@ export class TenantDashboardComponent implements OnInit {
             maxLength: 10
           }
         )
-        AppComponent.GetNotification('fa fa-times-circle checkstyle', 'Failed To Create Host pool', 'Problem with the service. Please try later', new Date());
+        AppComponent.GetNotification('fa fa-times-circle checkstyle', 'Failed To Create Hostpool', 'Problem with the service. Please try later', new Date());
       }
     );
     this.hostpoolForm = new FormGroup({
@@ -1018,34 +1043,73 @@ export class TenantDashboardComponent implements OnInit {
    */
   public UpdateHostPool(hostpoolData: any) {
     var updateArray = {};
+    let loadbalancertype: any;
+    let maxSessionLimit: any;
     if (hostpoolData.enableUserProfileDisk === 'Yes') {
       this.selectedHostpoolradio = true;
     }
     else {
       this.selectedHostpoolradio = false;
     }
-    if (this.selectedHostpoolradio == true) {
+    if (!this.persistentHostpool) {
       updateArray = {
         "refresh_token": sessionStorage.getItem("Refresh_Token"),
         "tenantGroupName": this.tenantGroupName,
         "tenantName": this.selectedTenantName,
         "hostPoolName": hostpoolData.hostPoolName,
-        "diskPath": hostpoolData.diskPath,
-        "enableUserProfileDisk": this.selectedHostpoolradio
+        "friendlyName": hostpoolData.friendlyName,
+        "description": hostpoolData.description,
+        "diskPath": this.selectedHostpoolradio == true ? hostpoolData.diskPath : '',
+        "persistent": this.persistentHostpool,
+        "enableUserProfileDisk": this.selectedHostpoolradio,
+        "loadBalancerType": hostpoolData.loadBalancerType,
+        "maxSessionLimit": hostpoolData.maxSessionLimit,
+        "customRdpProperty": hostpoolData.customRdpProperty,
+        "validationEnv": hostpoolData.validationEnv == 'Yes' ? true : hostpoolData.validationEnv == 'No' ? false : '',
       };
     }
     else {
       updateArray = {
         "refresh_token": sessionStorage.getItem("Refresh_Token"),
         "tenantGroupName": this.tenantGroupName,
-        "tenantName": this.selectedTenantName.trim(),
-        "hostPoolName": hostpoolData.hostPoolName.trim(),
-        "friendlyName": hostpoolData.friendlyName.trim(),
-        "description": hostpoolData.description.trim(),
-        "enableUserProfileDisk": this.selectedHostpoolradio
+        "tenantName": this.selectedTenantName,
+        "hostPoolName": hostpoolData.hostPoolName,
+        "friendlyName": hostpoolData.friendlyName,
+        "description": hostpoolData.description,
+        "diskPath": this.selectedHostpoolradio == true ? hostpoolData.diskPath : '',
+        "persistent": this.persistentHostpool,
+        "enableUserProfileDisk": this.selectedHostpoolradio,
+        "customRdpProperty": hostpoolData.customRdpProperty,
+        "validationEnv": hostpoolData.validationEnv == 'Yes' ? true : hostpoolData.validationEnv == 'No' ? false : '',
+        "assignmentType": hostpoolData.assignmentType
       };
     }
+
+
+    // if (this.selectedHostpoolradio == true) {
+    //   updateArray = {
+    //     "refresh_token": sessionStorage.getItem("Refresh_Token"),
+    //     "tenantGroupName": this.tenantGroupName,
+    //     "tenantName": this.selectedTenantName,
+    //     "hostPoolName": hostpoolData.hostPoolName,
+    //     "diskPath": hostpoolData.diskPath,
+    //     "enableUserProfileDisk": this.selectedHostpoolradio
+    //   };
+    // }
+    // else {
+    //   updateArray = {
+    //     "refresh_token": sessionStorage.getItem("Refresh_Token"),
+    //     "tenantGroupName": this.tenantGroupName,
+    //     "tenantName": this.selectedTenantName.trim(),
+    //     "hostPoolName": hostpoolData.hostPoolName.trim(),
+    //     "friendlyName": hostpoolData.friendlyName.trim(),
+    //     "description": hostpoolData.description.trim(),
+    //     "enableUserProfileDisk": this.selectedHostpoolradio
+    //   };
+    // }
     this.refreshHostpoolLoading = true;
+    this.hostpoolUpdateClose();
+
     this.updateHostpoolUrl = this._AppService.ApiUrl + '/api/HostPool/Put';
     this._AppService.UpdateTenant(this.updateHostpoolUrl, updateArray).subscribe(response => {
       this.refreshHostpoolLoading = false;
@@ -1058,7 +1122,7 @@ export class TenantDashboardComponent implements OnInit {
       if (responseData.isSuccess === true) {
         this._notificationsService.html(
           '<i class="icon icon-check angular-Notify col-xs-1 no-pad"></i>' +
-          '<label class="notify-label col-xs-10 no-pad">Host pool Updated Successfully</label>' +
+          '<label class="notify-label col-xs-10 no-pad">Hostpool Updated Successfully</label>' +
           '<a class="close"><i class="icon icon-close notify-close" aria-hidden="true"></i></a>' +
           '<p class="notify-text col-xs-12 no-pad">' + responseData.message + '</p>',
           'content optional one',
@@ -1071,15 +1135,14 @@ export class TenantDashboardComponent implements OnInit {
             maxLength: 10
           }
         )
-        AppComponent.GetNotification('icon icon-check angular-Notify', 'Host pool Updated Successfully', responseData.message, new Date());
-        this.hostpoolUpdateClose();
+        AppComponent.GetNotification('icon icon-check angular-Notify', 'Hostpool Updated Successfully', responseData.message, new Date());
         this.RefreshHostpools();
       }
       /* If response data is success then it enters into else and this block of code will execute to show the 'Failed To Update Hostpool' notification */
       else {
         this._notificationsService.html(
           '<i class="icon icon-fail angular-NotifyFail col-xs-1 no-pad"></i>' +
-          '<label class="notify-label col-xs-10 no-pad">Failed To Update Host pool</label>' +
+          '<label class="notify-label col-xs-10 no-pad">Failed To Update Hostpool</label>' +
           '<a class="close"><i class="icon icon-close notify-close" aria-hidden="true"></i></a>' +
           '<p class="notify-text col-xs-12 no-pad">' + responseData.message + '</p>',
           'content optional one',
@@ -1092,8 +1155,7 @@ export class TenantDashboardComponent implements OnInit {
             maxLength: 10
           }
         )
-        AppComponent.GetNotification('icon icon-fail angular-NotifyFail', 'Failed To Update Host pool', responseData.message, new Date());
-        this.hostpoolUpdateClose();
+        AppComponent.GetNotification('icon icon-fail angular-NotifyFail', 'Failed To Update Hostpool', responseData.message, new Date());
         //this.RefreshHostpools();
       }
     },
@@ -1102,7 +1164,7 @@ export class TenantDashboardComponent implements OnInit {
         this.refreshHostpoolLoading = false;
         this._notificationsService.html(
           '<i class="icon icon-close angular-NotifyFail"></i>' +
-          '<label class="notify-label padleftright">Failed To Update Host pool</label>' +
+          '<label class="notify-label padleftright">Failed To Update Hostpool</label>' +
           '<a class="close"><i class="icon icon-close notify-close" aria-hidden="true"></i></a>' +
           '<p class="notify-text">Problem with the service. Please try later</p>',
           'content optional one',
@@ -1115,7 +1177,7 @@ export class TenantDashboardComponent implements OnInit {
             maxLength: 10
           }
         )
-        AppComponent.GetNotification('fa fa-times-circle checkstyle', 'Failed To Update Host pool', 'Problem with the service. Please try later', new Date());
+        AppComponent.GetNotification('fa fa-times-circle checkstyle', 'Failed To Update Hostpool', 'Problem with the service. Please try later', new Date());
       }
     );
   }
@@ -1137,7 +1199,7 @@ export class TenantDashboardComponent implements OnInit {
         if (responseData.isSuccess === true) {
           this._notificationsService.html(
             '<i class="icon icon-check angular-Notify col-xs-1 no-pad"></i>' +
-            '<label class="notify-label col-xs-10 no-pad">Host pool Deleted Successfully</label>' +
+            '<label class="notify-label col-xs-10 no-pad">Hostpool Deleted Successfully</label>' +
             '<a class="close"><i class="icon icon-close notify-close" aria-hidden="true"></i></a>' +
             '<p class="notify-text col-xs-12 no-pad">' + responseData.message + '</p>',
             'content optional one',
@@ -1150,14 +1212,14 @@ export class TenantDashboardComponent implements OnInit {
               maxLength: 10
             }
           )
-          AppComponent.GetNotification('icon icon-check angular-Notify', 'Host pool Deleted Successfully', responseData.message, new Date());
+          AppComponent.GetNotification('icon icon-check angular-Notify', 'Hostpool Deleted Successfully', responseData.message, new Date());
           this.RefreshHostpools();
         }
         /* If response data is success then it enters into else and this block of code will execute to show the 'Failed To Delete Hostpool' notification */
         else {
           this._notificationsService.html(
             '<i class="icon icon-fail angular-NotifyFail col-xs-1 no-pad"></i>' +
-            '<label class="notify-label col-xs-10 no-pad">Failed To Delete Host pool</label>' +
+            '<label class="notify-label col-xs-10 no-pad">Failed To Delete Hostpool</label>' +
             '<a class="close"><i class="icon icon-close notify-close" aria-hidden="true"></i></a>' +
             '<p class="notify-text col-xs-12 no-pad">' + responseData.message + '</p>',
             'content optional one',
@@ -1170,7 +1232,7 @@ export class TenantDashboardComponent implements OnInit {
               maxLength: 10
             }
           )
-          AppComponent.GetNotification('icon icon-fail angular-NotifyFail', 'Failed To Delete Host pool', responseData.message, new Date());
+          AppComponent.GetNotification('icon icon-fail angular-NotifyFail', 'Failed To Delete Hostpool', responseData.message, new Date());
           //this.RefreshHostpools();
         }
       },
@@ -1179,7 +1241,7 @@ export class TenantDashboardComponent implements OnInit {
           this.refreshHostpoolLoading = false;
           this._notificationsService.html(
             '<i class="icon icon-close angular-NotifyFail"></i>' +
-            '<label class="notify-label padleftright">Failed To Delete Host pool</label>' +
+            '<label class="notify-label padleftright">Failed To Delete Hostpool</label>' +
             '<a class="close"><i class="icon icon-close notify-close" aria-hidden="true"></i></a>' +
             '<p class="notify-text">Problem with the service. Please try later</p>',
             'content optional one',
@@ -1192,7 +1254,7 @@ export class TenantDashboardComponent implements OnInit {
               maxLength: 10
             }
           )
-          AppComponent.GetNotification('fa fa-times-circle checkstyle', 'Failed To Delete Host pool', 'Problem with the service. Please try later', new Date());
+          AppComponent.GetNotification('fa fa-times-circle checkstyle', 'Failed To Delete Hostpool', 'Problem with the service. Please try later', new Date());
         }
       );
     }

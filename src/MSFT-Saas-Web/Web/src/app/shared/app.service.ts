@@ -197,6 +197,14 @@ export class AppService {
       .catch((error: any) => Observable.throw(error));
   }
 
+  public AddingUserstoDesktop(updateHosturl:any,data)
+  {
+    let headers = new Headers({ 'Content-Type': 'application/json;charset=utf8', 'Accept': 'application/json' });
+    let options = new RequestOptions({ headers: headers });
+    return this.http.put(updateHosturl, JSON.stringify(data), options)
+      .catch((error: any) => Observable.throw(error));
+  }
+
   /*
    * This Function is used to make Service call to Generate Key for Host
    * ----------
@@ -330,5 +338,13 @@ export class AppService {
     let options = new RequestOptions({ headers: headers });
     return this.http.delete(regeneratekeyURL, options)
       .catch((error: any) => Observable.throw('Server error'));
+  }
+
+  public UpdateAppVersion(updateUrl:string,appVersion:string)
+  {
+    let headers = new Headers({ 'Accept': 'application/json', 'Authorization': sessionStorage.getItem('access_token') });
+    let options = new RequestOptions({ headers: headers });
+    return this.http.put(updateUrl, JSON.stringify(appVersion), options)
+    .catch((error: any) => Observable.throw(error));
   }
 }

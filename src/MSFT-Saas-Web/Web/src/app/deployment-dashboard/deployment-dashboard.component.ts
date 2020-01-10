@@ -72,6 +72,12 @@ export class DeploymentDashboardComponent implements OnInit {
   public TenantGroups: any = [];
   public showDropDown: boolean = false;
   public getTenantDetailsUrl: any;
+  public showUpdateAppVersion: boolean = false;
+  public selectedAppVersion: string;
+  public gitAppVersion: string;
+  public AppVersion: string;
+  public githubupdateDeployUrl: string;
+
   public options: any = {
     timeOut: 2000,
     position: ["top", "right"]
@@ -83,7 +89,7 @@ export class DeploymentDashboardComponent implements OnInit {
   tenantFormEdit;
   deploymentID = 0;
   @ViewChild('editclose') editclose: ElementRef;
-
+  public showHomePage: boolean = true;
 
   /*This  is used to close the edit modal popup*/
   public tenantUpdateClose(): void {
@@ -91,11 +97,22 @@ export class DeploymentDashboardComponent implements OnInit {
   }
 
   constructor(private _AppService: AppService, private _notificationsService: NotificationsService, private router: Router,
-    private adminMenuComponent: AdminMenuComponent) {
+    private adminMenuComponent: AdminMenuComponent, private appcomponent: AppComponent) {
+    this.showHomePage = true;
   }
+
+
 
   /* This function is  called directly on page load */
   public ngOnInit() {
+    this.gitAppVersion = sessionStorage.getItem("gitAppVersion");
+    this.AppVersion = sessionStorage.getItem("ApplicationVersion");
+    if (this.gitAppVersion != this.AppVersion) {
+      this.AppVersion=sessionStorage.getItem("ApplicationVersion");
+      this.githubupdateDeployUrl = sessionStorage.getItem("GithubUpdateDeployUrl");
+      this.showUpdateAppVersion = true;
+    }
+
     this.tenantGroupName = localStorage.getItem("TenantGroupName");
     if (this.tenantGroupName === null) {
       this.OpenManageTenant();
@@ -126,7 +143,10 @@ export class DeploymentDashboardComponent implements OnInit {
       description: new FormControl("", Validators.compose([Validators.required, Validators.pattern(/^[\dA-Za-z]+[\dA-Za-z\s\.\-\_\!\@\#\$\%\^\&\*\(\)\{\}\[\]\:\'\"\?\>\<\,\;\/\\\+\=\|]{0,1600}$/)])),
     });
     this.CheckTenantAccess();
+
   }
+
+
 
   /*
    * This Function is called on Component Load and it is used to check the Access level of Tenant 
@@ -254,18 +274,23 @@ export class DeploymentDashboardComponent implements OnInit {
     if (this.slectedtenantgroupname == null || this.slectedtenantgroupname == undefined || this.slectedtenantgroupname == "Choose tenant group") {
       // this.saveButtonDisable = true;
       this.ShowTenantgroupError = true;
-      this.tenantDoneButtonDisable=true;
+      this.tenantDoneButtonDisable = true;
     }
     else {
       // this.saveButtonDisable = false;
       this.ShowTenantgroupError = false;
-      this.tenantDoneButtonDisable=false;
+      this.tenantDoneButtonDisable = false;
     }
   }
 
   public openDropDown() {
     this.showDropDown = this.showDropDown == true ? false : true;
   }
+
+  public ShowTenantGrid() {
+    this.showHomePage = !this.showHomePage;
+  }
+
   /* This function is called  when we save a Tenanat group name in the Tenanat group modal
 * --------------
 * paremeters-
@@ -293,6 +318,9 @@ export class DeploymentDashboardComponent implements OnInit {
       sessionStorage.setItem('Scope', roleDef);
       sessionStorage.setItem('infraPermission', selectedRole[0].scope);
     }
+
+
+
     //navigate to appcomponent page
     let url = sessionStorage.getItem("redirectUri");
     window.location.replace(url);
@@ -490,7 +518,7 @@ export class DeploymentDashboardComponent implements OnInit {
    * TenantName- Accepts tenantname .
    * --------------
   */
-  public SetSelectedTenant(index: any, TenantName: any,subscriptionId:any) {
+  public SetSelectedTenant(index: any, TenantName: any, subscriptionId: any) {
     sessionStorage.setItem("TenantName", TenantName);
     sessionStorage.setItem("TenantNameIndex", index);
 
@@ -521,7 +549,7 @@ export class DeploymentDashboardComponent implements OnInit {
       }
     );
 
-    this.adminMenuComponent.SetSelectedTenant(index, TenantName,subscriptionId);
+    this.adminMenuComponent.SetSelectedTenant(index, TenantName, subscriptionId);
     this.router.navigate(['/admin/tenantDashboard/', TenantName]);
     let data = [{
       name: TenantName,
@@ -893,7 +921,8 @@ export class DeploymentDashboardComponent implements OnInit {
             maxLength: 10
           }
         )
-        AppComponent.GetNotification('fa fa-times-circle checkstyle', 'Failed To Create Tenant', 'Problem with the service. Please try later', new Date());
+        let msg: any = 'Problem with the service. Please try later';
+        AppComponent.GetNotification('fa fa-times-circle checkstyle', 'Failed To Create Tenant', msg, new Date());
       }
     );
 
@@ -922,6 +951,7 @@ export class DeploymentDashboardComponent implements OnInit {
       "aadTenantId": this.aadTenantId,
       "id": "00000000-0000-0000-0000-000000000000",
     };
+    this.tenantUpdateClose();
     this.refreshTenantLoading = true;
     this.updateTenantUrl = this._AppService.ApiUrl + '/api/Tenant/Put';
     this._AppService.UpdateTenant(this.updateTenantUrl, updateArray).subscribe(response => {
@@ -949,7 +979,6 @@ export class DeploymentDashboardComponent implements OnInit {
           }
         )
         AppComponent.GetNotification('icon icon-check angular-Notify', 'Tenant Updated Successfully', responseData.message, new Date());
-        this.tenantUpdateClose();
         this.RefreshTenant();
         this.refreshTenantLoading = false;
 
@@ -972,7 +1001,6 @@ export class DeploymentDashboardComponent implements OnInit {
           }
         )
         AppComponent.GetNotification('icon icon-fail angular-NotifyFail', 'Failed To Update Tenant', responseData.message, new Date());
-        this.tenantUpdateClose();
         //this.RefreshTenant();
       }
     },
@@ -994,7 +1022,8 @@ export class DeploymentDashboardComponent implements OnInit {
             maxLength: 10
           }
         )
-        AppComponent.GetNotification('fa fa-times-circle checkstyle', 'Failed To Update Tenant', 'Problem with the service. Please try later', new Date());
+        let msg: any = 'Problem with the service. Please try later';
+        AppComponent.GetNotification('fa fa-times-circle checkstyle', 'Failed To Update Tenant', msg, new Date());
       }
     );
   }
@@ -1076,4 +1105,9 @@ export class DeploymentDashboardComponent implements OnInit {
       );
     }
   }
+
+  public closeUpdateAppModal(event) {
+    this.showUpdateAppVersion = false;
+  }
+
 }

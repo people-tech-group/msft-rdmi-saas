@@ -191,6 +191,14 @@ namespace MSFT.WVDSaaS.API.Common
                 {
                     loginDetails.Error = new JObject() { { "StatusCode", (int)HttpStatusCode.BadRequest }, { "Message", Constants.invalidCode } };
                 }
+                if (loginDetails != null && loginDetails.Error==null)
+                {
+                    loginDetails.ApplicationVersion = configurations.applicationVersion;
+                    var giturl = configurations.gitHubVersionUrl;
+                    var content = (new WebClient()).DownloadString(giturl);
+                    loginDetails.GitAppVersion = content;
+                    loginDetails.GithubUpdateDeployUrl = configurations.gitHubUpdateDeployUrl;
+                }
                 return loginDetails;
             }
             catch (Exception ex)

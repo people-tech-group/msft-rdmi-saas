@@ -36,7 +36,7 @@ namespace MSFT.WVDSaaS.API.Controllers
             {
                 Common.Common obj = new Common.Common();
                 List<Login> lst = new List<Login>();
-                login =await obj.Login(data.Code);
+                login = await obj.Login(data.Code);
             }
             catch (Exception ex)
             {
@@ -73,6 +73,19 @@ namespace MSFT.WVDSaaS.API.Controllers
         public string GetRedirectUrl()
         {
             return configurations.redirectUrl;
+        }
+
+        [HttpPut]
+        public IHttpActionResult UpdateAppVersion(string appVersion)
+        {
+            System.Configuration.Configuration webConfigApp = System.Web.Configuration.WebConfigurationManager.OpenWebConfiguration("~");
+
+            //Modifying the AppKey from AppValue to AppValue1
+            webConfigApp.AppSettings.Settings["ApplicationVersion"].Value = appVersion;
+
+            //Save the Modified settings of AppSettings.
+            webConfigApp.Save();
+            return Ok("Version Updated");
         }
     }
     #endregion  "Class - LoginController"

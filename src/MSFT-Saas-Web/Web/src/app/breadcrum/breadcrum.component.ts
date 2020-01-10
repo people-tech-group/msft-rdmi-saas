@@ -27,14 +27,14 @@ export class BreadcrumComponent {
    */
   public Navigate(path: any, type: any, index: any, bc: any) {
     if (type === 'Tenants') {
-      BreadcrumComponent.breadCrums['Tenant'].splice(index, 1);
+      BreadcrumComponent.breadCrums['Tenant']? BreadcrumComponent.breadCrums['Tenant'].splice(index, 1):null;
       this.router.navigate(['/admin/Tenants']);
     }
-    else if (type === 'Tenant') {
-      BreadcrumComponent.breadCrums['Hostpool'].splice(index, 1);
+    if (type === 'Tenant') {
+      BreadcrumComponent.breadCrums['Hostpool']?BreadcrumComponent.breadCrums['Hostpool'].splice(index, 1):null;
       this.router.navigate(['/admin/tenantDashboard/', bc.name]);
     }
-    else if (type === 'Hostpool') {
+    if (type === 'Hostpool') {
       this.router.navigate(['/admin/hostpoolDashboard/', bc.name]);
     }
   }
@@ -55,13 +55,15 @@ export class BreadcrumComponent {
       delete BreadcrumComponent.breadCrums['Tenant']
       delete BreadcrumComponent.breadCrums['Hostpool']
     }
-
     if (value[0].type == 'Tenant') {
+      delete BreadcrumComponent.breadCrums['Tenant']
       delete BreadcrumComponent.breadCrums['Hostpool']
     }
-   
+    if (value[0].type == 'Hostpool') {
+      delete BreadcrumComponent.breadCrums['Hostpool']
+    }
+
     BreadcrumComponent.breadCrums[value[0].type] = value;
-    
   }
 
   /*
