@@ -712,7 +712,6 @@ public hostPoolsList:any=[];
       let data = Hostpools.filter(item => item.hostPoolName == hostPoolName);
       if (data != null && data != undefined && data.length > 0) {
         this.hostPoolDetails = data[0];
-        console.log( this.hostPoolDetails);
       }
     }
 

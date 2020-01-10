@@ -1091,9 +1091,9 @@
         <form [formGroup]="hostFormEdit">
           <div class="row">
             <div class="col-sm-12">
-              <label>SeesionHost Name <span class="important-Field">*</span></label>
+              <label>SessionHost Name <span class="important-Field">*</span></label>
               <input type="text" name="sessionHostName" formControlName="sessionHostName"
-                (keydown)="$event.preventDefault();" readonly />
+                (keydown)="$event.preventDefault();" [attr.disabled]="true" />
             </div>
             <div class="col-sm-12">
               <label>Allow New Sessions</label>
