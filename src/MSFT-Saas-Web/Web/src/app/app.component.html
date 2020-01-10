@@ -34,20 +34,22 @@
               </span>
             </div>
             <ul class="notification-list">
-              <li *ngFor="let data of NotificationList">
-                <div class="col-xs-1 no-pad"><i class="{{data.icon}}"></i></div>
-                <div class="col-xs-11 no-pad">
-                  <p class="notification-text">
-                    {{data.title}}
-                  </p>
-                </div>
-                <div class="col-xs-12">
-                   <span [innerHTML]="data.msg"></span>
-                   <br>
-                   <a *ngIf="data.isLink" target="_blank" href="{{data.url}}">{{data.linkText}}</a>
-                </div>
-                <p class="pull-right">{{data.time | date:'shortTime'}}</p>
-                <a class="close"><i class="icon icon-close" (click)="NotifyClose(data)"></i></a>
+              <li *ngFor="let data of NotificationList; let i = index">
+                <div *ngIf="NotificationList[NotificationList.length-i-1] as data">
+                  <div class="col-xs-1 no-pad"><i class="{{data.icon}}"></i></div>
+                  <div class="col-xs-11 no-pad">
+                    <p class="notification-text">
+                      {{data.title}}
+                    </p>
+                  </div>
+                  <div class="col-xs-12">
+                     <span [innerHTML]="data.msg"></span>
+                     <br>
+                     <a *ngIf="data.isLink" target="_blank" href="{{data.url}}">{{data.linkText}}</a>
+                  </div>
+                  <p class="pull-right">{{data.time | date:'shortTime'}}</p>
+                  <a class="close"><i class="icon icon-close" (click)="NotifyClose(data)"></i></a>
+                </div >
               </li>
             </ul>
           </div>

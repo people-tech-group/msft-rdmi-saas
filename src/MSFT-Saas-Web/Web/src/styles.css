@@ -1813,6 +1813,10 @@ div.AllDeployTable > table > thead > tr > th {
   top: 30%;
 }
 
+#logoffModal .modal-dialog{
+  top: 30%;
+}
+
 #deleteModalApps .modal-dialog {
   top: 30%;
 }

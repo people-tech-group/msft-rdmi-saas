@@ -51,7 +51,7 @@
         <div class="nav nav-tabs">
           <p><a href="https://docs.microsoft.com/en-us/azure/virtual-desktop/create-host-pools-arm-template"
               target="_blank">Add VM to existing hostpool</a></p>
-          <p><a href="#" >Update GPOs for session timeouts</a></p>
+          <!-- <p><a href="#" >Update GPOs for session timeouts</a></p> -->
           <p><a href="https://docs.microsoft.com/en-us/azure/virtual-desktop/create-host-pools-arm-template"
               target="_blank">Update hostpool with a new image</a></p>
           <p><a href="https://docs.microsoft.com/en-us/azure/virtual-desktop/deploy-diagnostics" target="_blank">Deploy
@@ -285,10 +285,10 @@
                   <input type="text" name="aadTenantId" placeholder="ex- 63a20bdc-47e2-4cad-b482-400169b6c670"
                     (ngModelChange)="TenantChange($event)" formControlName="aadTenantId" />
                   <div *ngIf="tenantForm.controls['aadTenantId'].hasError('pattern')" class="colorRed">
-                    Please enter Valid Azure AD Tenant ID
+                    Please enter valid AAD Tenant ID
                   </div>
                   <div *ngIf="createTenantId" class="colorRed">
-                    Please enter Azure AD Tenant ID
+                    Please enter AAD Tenant ID
                   </div>
                 </div>
               </div>
@@ -306,10 +306,10 @@
                   <input type="text" name="tenantName" placeholder="ex- Tenant One"
                     (ngModelChange)="TenantNameChange($event)" formControlName="tenantName" />
                   <div *ngIf="tenantForm.controls['tenantName'].hasError('pattern')" class="colorRed">
-                    Please enter Valid Tenant unique name
+                    Please enter valid tenant unique name
                   </div>
                   <div *ngIf="createTenantUniqueName" class="colorRed">
-                    Please enter Tenant unique name
+                    Please enter tenant unique name
                   </div>
                 </div>
               </div>
@@ -319,7 +319,7 @@
                   <input type="text" name="friendlyName" placeholder="ex- Honolulu Hospital"
                     formControlName="friendlyName" />
                   <div *ngIf="tenantForm.controls['friendlyName'].hasError('pattern')" class="colorRed">
-                    Please enter Valid Tenant friendly name
+                    Please enter valid tenant friendly name
                   </div>
                 </div>
               </div>
@@ -329,7 +329,7 @@
                   <textarea rows="3" cols="47" name="description"
                     placeholder="ex- Implementing on-prem Active Directory" formControlName="description"></textarea>
                   <div *ngIf="tenantForm.controls['description'].hasError('pattern')" class="colorRed">
-                    Please enter Valid Description details
+                    Please enter valid description details
                   </div>
                 </div>
               </div>
@@ -387,14 +387,14 @@
                   <label>Tenant Friendly Name – <span class="ashColor">optional</span></label>
                   <input type="text" name="friendlyName" formControlName="friendlyName" />
                   <div *ngIf="tenantFormEdit.controls['friendlyName'].hasError('pattern')" class="colorRed">
-                    Please enter Valid Tenant friendly name
+                    Please enter valid tenant friendly name
                   </div>
                 </div>
                 <div class="col-sm-12 form-group">
                   <label>Description – <span class="ashColor">optional</span></label>
                   <textarea rows="3" cols="47" name="description" formControlName="description"></textarea>
                   <div *ngIf="tenantFormEdit.controls['description'].hasError('pattern')" class="colorRed">
-                    Please enter Valid Description details
+                    Please enter valid description details
                   </div>
                 </div>
               </div>

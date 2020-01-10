@@ -324,9 +324,9 @@
                           </div>
                           <div class="col-md-3">
                           </div>
-                          <div class="col-md-3" *ngIf="hostPoolDetails.assignmentType=='2'">
+                          <div class="col-md-3" *ngIf="hostPoolDetails.assignmentType"> <!--*ngIf="hostPoolDetails.assignmentType=='2'"-->
                             <label>Assigned User</label>
-                            <p>{{hostDetails.assignedUser}}</p>
+                            <p>{{hostDetails.assignedUser!='' && hostDetails.assignedUser!=null ? hostDetails.assignedUser:'NA'}}</p>
                           </div>
                         </div>
                       </div>
@@ -1109,11 +1109,11 @@
               </label>
             </div>
 
-            <div class="col-sm-12" *ngIf="hostPoolDetails.assignmentType=='2'">
+            <div class="col-sm-12" *ngIf="hostPoolDetails.assignmentType"> <!--*ngIf="hostPoolDetails.assignmentType=='2'"-->
               <br>
               <label>Assign User</label>
             </div>
-            <div class="col-sm-12" *ngIf="hostPoolDetails.assignmentType=='2'">
+            <div class="col-sm-12" *ngIf="hostPoolDetails.assignmentType"> <!--*ngIf="hostPoolDetails.assignmentType=='2'"-->
               <input type="text" name="name" formControlName="assignedUser"
                 (ngModelChange)="UserPrincipalNameChange($event)" style="width: 359px;"
                 placeholder="Ex. example@demo.onmicrosoft.com" />
@@ -1156,10 +1156,10 @@
                   <input type="text" name="txtAppGroupName" placeholder="ex- Contoso App Group"
                     (ngModelChange)="AppGroupNameChange($event)" formControlName="txtAppGroupName" />
                   <div *ngIf="formCreateNewAppGroup.controls['txtAppGroupName'].hasError('pattern')" class="colorRed">
-                    Please enter valid App Group Name
+                    Please enter valid app group name
                   </div>
                   <div *ngIf="createAppGroupName" class="colorRed">
-                    Please enter App Group Name
+                    Please enter app group name
                   </div>
                 </div>
               </div>
@@ -1287,14 +1287,14 @@
                   <input type="text" id="imagepath" placeholder="Enter Valid Path" formControlName="AppPath">
                   <!--(ngModelChange)="PathChange($event)"-->
                   <div *ngIf="newAppCreateGroup2.controls['AppPath'].hasError('pattern')" class="colorRed">
-                    Please enter valid App path
+                    Please enter valid app path
                   </div>
                 </div>
                 <div class="col-xs-12  form-group">
                   <label for="usr">App Name<span class="important-Field">*</span></label>
                   <input type="text" id="appName" formControlName="Name" placeholder="Enter Name of RemoteApp" />
                   <div *ngIf="newAppCreateGroup2.controls['Name'].hasError('pattern')" class="colorRed">
-                    Please enter valid App Name
+                    Please enter valid app name
                   </div>
                 </div>
                 <div class="col-xs-12  form-group">
@@ -1302,7 +1302,7 @@
                   <input type="number" id="IconIndex" formControlName="IconIndex" placeholder="Enter Icon Index "
                     value="0" style="width:100%" />
                   <div *ngIf="newAppCreateGroup2.controls['IconIndex'].hasError('pattern')" class="colorRed">
-                    Please enter App Icon Index
+                    Please enter app icon index
                   </div>
                 </div>
                 <div class="col-xs-12 form-group">
@@ -1312,7 +1312,7 @@
                   <input type="text" id="IconPath" placeholder="Enter Valid Icon Path" formControlName="IconPath">
                   <!--(ngModelChange)="PathChange($event)"-->
                   <div *ngIf="newAppCreateGroup2.controls['IconPath'].hasError('pattern')" class="colorRed">
-                    Please enter valid App icon path
+                    Please enter valid app icon path
                   </div>
                 </div>
                 <div class="col-xs-12 form-group">
@@ -1377,7 +1377,7 @@
                   <input type="text" id="appName" formControlName="Name" placeholder="Enter Name of RemoteApp"
                     [attr.disabled]="true" />
                   <div *ngIf="newAppEditGroup.controls['Name'].hasError('pattern')" class="colorRed">
-                    Please enter valid Name
+                    Please enter valid name
                   </div>
                 </div>
                 <div class="col-xs-12  form-group">
@@ -1465,10 +1465,10 @@
                     (ngModelChange)="UserPrincipalNameChange($event)" style="width: 359px;"
                     placeholder="Ex. example@demo.onmicrosoft.com" />
                   <div *ngIf="addUserForm.controls['UserPrincipalName'].hasError('pattern')" class="colorRed">
-                    Please enter valid User Principal Name(Ex: cris@contoso.com)
+                    Please enter valid user principal name(Ex: cris@contoso.com)
                   </div>
                   <div *ngIf="userPrincipalName" class="colorRed">
-                    Please enter User Principal Name
+                    Please enter user principal name
                   </div>
                 </div>
               </div>
@@ -1680,7 +1680,6 @@
   </div>
 </div>
 
-
 <!-- Send message Panel-->
 <div class="overlay" *ngIf="showSendMessageDialog">
   <div class="createUserName">
@@ -1758,7 +1757,7 @@
                 <label>Hostpool Friendly Name – <span class="ashColor">optional</span></label>
                 <input type="text" name="friendlyName" formControlName="friendlyName" />
                 <div *ngIf="hostpoolFormEdit.controls['friendlyName'].hasError('pattern')" class="colorRed">
-                  Please enter Valid Hostpool friendly name
+                  Please enter valid hostpool friendly name
                 </div>
               </div>
               <div [hidden]="true" class="col-sm-12"><label>Enable User Profile Disk – <span
@@ -1785,7 +1784,7 @@
                 <textarea rows="3" cols="47" name="description" formControlName="description"
                   [readonly]="isEnableUser"></textarea>
                 <div *ngIf="hostpoolFormEdit.controls['description'].hasError('pattern')" class="colorRed">
-                  Please enter Valid Description details
+                  Please enter valid description details
                 </div>
               </div>
               <div class="col-sm-12 form-group" *ngIf="persistentHostpool">
