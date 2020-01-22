@@ -78,7 +78,16 @@ namespace MSFT.WVDSaaS.API.BLL
                     if (!string.IsNullOrEmpty(strJson))
                     {
                         appResult.Add("isSuccess", false);
-                        appResult.Add("message", CommonBL.GetErrorMessage(strJson));
+                        ErrorResult objerrror = Newtonsoft.Json.JsonConvert.DeserializeObject<ErrorResult>(strJson);
+                        if (objerrror.error.message == "RemoteAppAlreadyExists")
+                        {
+                           string  errMessage = "'"+rdMgmtRemoteApp["remoteAppName"].ToString()+"'"+" is already published to "+ "'"+rdMgmtRemoteApp["appGroupName"].ToString()+"'" + " and cannot be republished.";
+                            appResult.Add("message", errMessage);
+                        }
+                        else
+                        {
+                            appResult.Add("message", CommonBL.GetErrorMessage(strJson));
+                        }
                     }
                     else
                     {

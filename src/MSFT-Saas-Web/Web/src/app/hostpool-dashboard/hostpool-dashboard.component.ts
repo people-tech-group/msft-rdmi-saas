@@ -633,22 +633,22 @@ public hostPoolsList:any=[];
         //this.showHostCreate = false;
         let errorBody = JSON.parse(error['_body']);
         if (error.status == 404) {
-          this._notificationsService.html(
-            '<i class="icon icon-fail angular-NotifyFail col-xs-1 no-pad"></i>' +
-            '<label class="notify-label col-xs-10 no-pad">' + errorBody.error.message + '</label>' +
-            '<a class="close"><i class="icon icon-close notify-close" aria-hidden="true"></i></a>' +
-            '<p class="notify-text col-xs-12 no-pad">' + errorBody.error.target + '</p>',
-            'content optional one',
-            {
-              position: ["top", "right"],
-              timeOut: 3000,
-              showProgressBar: false,
-              pauseOnHover: false,
-              clickToClose: true,
-              maxLength: 10
-            }
-          )
-          AppComponent.GetNotification('icon icon-fail angular-NotifyFail', errorBody.error.message, errorBody.error.target, new Date());
+          // this._notificationsService.html(
+          //   '<i class="icon icon-fail angular-NotifyFail col-xs-1 no-pad"></i>' +
+          //   '<label class="notify-label col-xs-10 no-pad">' + errorBody.error.message + '</label>' +
+          //   '<a class="close"><i class="icon icon-close notify-close" aria-hidden="true"></i></a>' +
+          //   '<p class="notify-text col-xs-12 no-pad">' + errorBody.error.target + '</p>',
+          //   'content optional one',
+          //   {
+          //     position: ["top", "right"],
+          //     timeOut: 3000,
+          //     showProgressBar: false,
+          //     pauseOnHover: false,
+          //     clickToClose: true,
+          //     maxLength: 10
+          //   }
+          // )
+          //AppComponent.GetNotification('icon icon-fail angular-NotifyFail', errorBody.error.message, errorBody.error.target, new Date());
         }
         else {
           this._notificationsService.html(
@@ -4343,7 +4343,7 @@ public hostPoolsList:any=[];
         "tenantName": this.appGroupAppListGallery[index].tenantName,
         "hostPoolName": this.appGroupAppListGallery[index].hostPoolName,
         "appGroupName": this.appGroupAppListGallery[index].appGroupName,
-        "remoteAppName": this.appGroupAppListGallery[index].appAlias,
+        "remoteAppName": this.appGroupAppListGallery[index].friendlyName,
         "appAlias": this.appGroupAppListGallery[index].appAlias,
         "filePath": this.appGroupAppListGallery[index].filePath,
         "commandLineSetting": 1,
