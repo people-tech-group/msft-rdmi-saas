@@ -1865,12 +1865,17 @@ div.AllDeployTable > table > thead > tr > th {
 
  
 
-  .modal {
+  /* .modal {
     pointer-events: none;
 }
 
 .modal .modal-dialog {
   pointer-events: auto;
+} */
+
+
+.modal {
+    pointer-events: auto !important;
 }
 
 .multi_tenent {
