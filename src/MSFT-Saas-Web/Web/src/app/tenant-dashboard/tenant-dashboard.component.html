@@ -290,9 +290,9 @@
               <div class="form-group">
                 <label>Hostpool Friendly Name – <span class="ashColor">optional</span></label>
                 <input type="text" name="friendlyName" formControlName="friendlyName" />
-                <div *ngIf="hostpoolForm.controls['friendlyName'].hasError('pattern')" class="colorRed">
+                <!-- <div *ngIf="hostpoolForm.controls['friendlyName'].hasError('pattern')" class="colorRed">
                   Please enter valid hostpool friendly name
-                </div>
+                </div> -->
               </div>
             </div>
             <div class="DeployUrl">
@@ -402,9 +402,9 @@
             <div class="col-sm-12 form-group">
               <label>Hostpool Friendly Name – <span class="ashColor">optional</span></label>
               <input type="text" name="friendlyName" formControlName="friendlyName" />
-              <div *ngIf="hostpoolFormEdit.controls['friendlyName'].hasError('pattern')" class="colorRed">
+              <!-- <div *ngIf="hostpoolFormEdit.controls['friendlyName'].hasError('pattern')" class="colorRed">
                 Please enter valid hostpool friendly name
-              </div>
+              </div> -->
             </div>
             <div [hidden]="true" class="col-sm-12"><label>Enable User Profile Disk – <span
                   class="ashColor">optional</span></label></div>

@@ -2349,3 +2349,18 @@ li.login-details {
   text-decoration:underline !important;
 }
 
+.btn-default:active:focus, .btn-default:focus ,input[type=button]:focus  ,button:focus {
+  outline: #74B9EF auto 1px;
+  outline-color: #74B9EF;
+  outline-style: auto;
+  outline-width: 1px; 
+  outline-offset: -2px;
+} 
+a:focus {
+  outline: #74B9EF auto 1px;
+  outline-offset: -2px;
+}
+input[type=text]:focus ,input[type=number]:focus,textarea:focus{
+  outline: #74B9EF auto 1px;
+  outline-offset: -2px; 
+}
