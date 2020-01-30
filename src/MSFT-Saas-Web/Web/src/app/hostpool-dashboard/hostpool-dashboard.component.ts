@@ -697,6 +697,7 @@ public hostPoolsList:any=[];
     this.appGroupsListSearch = [];
     sessionStorage.removeItem('Appgroups');
     this.CheckAppGroupAccess(this.hostPoolName);
+    this.RefreshHost();
   }
 
   /*
