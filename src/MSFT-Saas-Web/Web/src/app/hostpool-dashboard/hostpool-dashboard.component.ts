@@ -2356,7 +2356,7 @@ public hostPoolsList:any=[];
             '<i class="icon icon-fail angular-NotifyFail col-xs-1 no-pad"></i>' +
             '<label class="notify-label col-xs-10 no-pad">Failed To Create App Group</label>' +
             '<a class="close"><i class="icon icon-close notify-close" aria-hidden="true"></i></a>' +
-            '<p class="notify-text col-xs-12 no-pad">' + responseData.message + '</p>',
+            '<p class="notify-text col-xs-12 no-pad">' + responseData.message.replace("persistent", "personal")  + '</p>',
             'content optional one',
             {
               position: ["top", "right"],
@@ -2367,7 +2367,7 @@ public hostPoolsList:any=[];
               maxLength: 10
             }
           )
-          AppComponent.GetNotification('icon icon-fail angular-NotifyFail', 'Failed To Create App Group', responseData.message, new Date());
+          AppComponent.GetNotification('icon icon-fail angular-NotifyFail', 'Failed To Create App Group', responseData.message.replace("persistent", "personal"), new Date());
           this.HideNewAppGroup();
           this.RefreshAppgroups();
         }
