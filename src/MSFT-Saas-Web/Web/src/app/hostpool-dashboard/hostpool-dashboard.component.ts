@@ -2888,16 +2888,25 @@ public hostPoolsList:any=[];
     }
     /* If we check the multiple checkboxes then this block of code executes*/
     this.checkedAllTrueUsers = [];
+    var indexSelectAll = null;
     for (let j = 0; j < this.checkedUsers.length; j++) {
       if (this.checkedUsers[j] == true) {
         this.checkedAllTrueUsers.push(this.checkedUsers[j]);
         this.selectedUsersRows.push(j);
+        indexSelectAll = j;
       }
     }
-    this.deleteCountSelectedUser = this.checkedAllTrueUsers.length;
-    this.selectedUsersRows.length = this.deleteCountSelectedUser;
-    if (this.checkedAllTrueUsers.length >= 1) {
+    if (this.checkedAllTrueUsers.length > 1) {
       this.isDeleteUserDisabled = false;
+      this.deleteCountSelectedUser = this.checkedAllTrueUsers.length;
+      this.selectedUsersRows.length = this.deleteCountSelectedUser;
+
+
+    }else if(this.checkedAllTrueUsers.length == 1){
+      this.isDeleteUserDisabled = false;
+      this.deleteCountSelectedUser = this.appUsersListSearch[indexSelectAll].userPrincipalName.toLowerCase();
+      this.selectedUsersRows.length = this.deleteCountSelectedUser;
+
     }
     else if (this.checkedAllTrueUsers.length == 0) {
       this.isDeleteUserDisabled = true;
@@ -3341,7 +3350,7 @@ public hostPoolsList:any=[];
       tenantName: this.tenantName,
       hostPoolName: this.hostPoolName,
       appGroupName: this.AppgroupName,
-      userPrincipalName: createNewActiveDrctryData.UserPrincipalName,
+      userPrincipalName: createNewActiveDrctryData.UserPrincipalName.toLowerCase(),
       refresh_token: sessionStorage.getItem("Refresh_Token"),
       tenantGroupName: this.tenantGroupName
     };
@@ -3433,7 +3442,7 @@ public hostPoolsList:any=[];
     for (let i = 0; i < this.selectedUsersRows.length; i++) {
       let index = this.selectedUsersRows[i];
       let selectedUserName = this.appUsersListSearch[index].userPrincipalName;
-      this.usersDeleteUrl = this._AppService.ApiUrl + '/api/AppGroup/DeleteAssignedUser?tenantGroupName=' + this.tenantGroupName + '&tenantName=' + this.tenantName + '&hostPoolName=' + this.hostPoolName + '&appGroupName=' + this.selectedAppGroupName + '&appGroupUser=' + selectedUserName + '&refresh_token=' + sessionStorage.getItem("Refresh_Token");
+      this.usersDeleteUrl = this._AppService.ApiUrl + '/api/AppGroup/DeleteAssignedUser?tenantGroupName=' + this.tenantGroupName + '&tenantName=' + this.tenantName + '&hostPoolName=' + this.hostPoolName + '&appGroupName=' + this.selectedAppGroupName + '&appGroupUser=' + selectedUserName.toLowerCase() + '&refresh_token=' + sessionStorage.getItem("Refresh_Token");
       this._AppService.DeleteUsersList(this.usersDeleteUrl).subscribe(response => {
         this.refreshHostpoolLoading = false;
         var responseData = JSON.parse(response['_body']);

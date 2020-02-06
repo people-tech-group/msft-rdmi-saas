@@ -28,7 +28,7 @@
     <a class="close" (click)="error = false"><i class="icon icon-close" aria-hidden="true"></i></a>
   </div>
   <div class="addDeploy">
-    <h3>"{{hostPoolName}}" Hostpool <button type="button" id="btnEditHostPool"  class="ManageLink" style=""
+    <h3>"{{hostPoolName}}" Hostpool <button type="button" id="btnEditHostPool"  class="ManageLink" 
     data-toggle="modal" (click)="GetHostPoolEdit(hostPoolName)" data-target="#editHostpoolModal" ><i class="icon icon-edit" aria-hidden="true"></i>
     </button></h3> 
     <!--  -->
@@ -870,7 +870,7 @@
                             <td style="width:30%; word-wrap: break-word;">
                               <span _ngcontent-c3="" class="marginRight3">
                                 <i class="icon icon-win-contact iconAlignment" style="float:left;"></i>
-                              </span>{{UserList.userPrincipalName}}
+                              </span>{{UserList.userPrincipalName | lowercase}}
                             </td>
                             <td style="width:15%;text-align:center">{{UserList.sessionState}}</td>
                             <td style="width:15%;text-align:center">{{UserList.createTime}}</td>
@@ -1185,7 +1185,7 @@
                 applications in a remote session. You don’t need to assign apps to the users.</p>
               <input type="radio" value="RemoteApp" name="radiobtnAppType" [(ngModel)]="searchByDesktop"
                 formControlName="radiobtnAppType" /><label>RemoteApp</label>
-              <p class="marginLeft25 fontsizeSmaller">RemoteApp® group doesn’t allow users to install and uninstall
+                <p class="marginLeft25 fontsizeSmaller">RemoteApp® group doesn’t allow users to install and uninstall
                 applications in a remote session. You would need to assign apps to the users beforehand.</p>
             </div>
           </div>
@@ -1462,7 +1462,7 @@
                 <div class="form-group">
                   <label>User Principal Name <span class="important-Field">*</span></label>
                   <input type="text" name="name" formControlName="UserPrincipalName"
-                    (ngModelChange)="UserPrincipalNameChange($event)" style="width: 359px;"
+                    (ngModelChange)="UserPrincipalNameChange($event)" style="width: 359px;text-transform: lowercase;"
                     placeholder="Ex. example@demo.onmicrosoft.com" />
                   <div *ngIf="addUserForm.controls['UserPrincipalName'].hasError('pattern')" class="colorRed">
                     Please enter valid user principal name(Ex: cris@contoso.com)
@@ -1505,7 +1505,7 @@
       </div>
       <div class="modal-body">
         <p>Are you sure you want to remove '<span id="deleteModalSelectedAppUserName"
-            style="font-weight:bold;">{{deleteCountSelectedUser}}</span>' app group user(s)?</p>
+            style="font-weight:bold;text-transform: lowercase;">{{deleteCountSelectedUser}}</span>' app group user(s)?</p>
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-primary" (click)="DeleteAppUser()" data-dismiss="modal">Yes</button>

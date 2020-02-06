@@ -2364,10 +2364,7 @@ input[type=text]:focus ,input[type=number]:focus,textarea:focus{
   outline: #74B9EF auto 1px;
   outline-offset: -2px; 
 }
-.btn:active:focus, .btn:focus {
+.btn.active.focus, .btn.active:focus, .btn.focus, .btn:active.focus, .btn:active:focus, .btn:focus {
   outline: #74B9EF auto 1px;
-  outline-color: #74B9EF;
-  outline-style: auto;
-  outline-width: 1px; 
   outline-offset: -2px;
 }
