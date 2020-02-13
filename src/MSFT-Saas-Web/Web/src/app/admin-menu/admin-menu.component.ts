@@ -1,5 +1,5 @@
-import { Component } from '@angular/core';
-import * as $ from 'jquery';
+import { Component  } from '@angular/core';
+
 import { BreadcrumComponent } from '../breadcrum/breadcrum.component';
 import { Router } from '@angular/router';
 import { AppService } from '../shared/app.service';
@@ -234,4 +234,6 @@ export class AdminMenuComponent {
       }
     });
   }
+
+
 }

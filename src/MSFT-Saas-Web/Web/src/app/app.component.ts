@@ -330,14 +330,12 @@ this.githubupdateDeployUrl=sessionStorage.getItem("GithubUpdateDeployUrl");
    * This function is used to Redirect to Home On click Home Icon
    */
   public OnClickHome() {
-    this.router.routeReuseStrategy.shouldReuseRoute = function () { return false; };
     let currentUrl = '/admin/Tenants';//this.router.url;
     this.router.navigateByUrl(currentUrl)
       .then(() => {
         this.router.navigated = false;
         this.router.navigate([this.router.url]);
       });
-    //this.router.navigate(['/admin/Tenants']);
   }
 
   /*

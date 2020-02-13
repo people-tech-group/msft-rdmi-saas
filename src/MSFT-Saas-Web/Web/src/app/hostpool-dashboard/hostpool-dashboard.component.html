@@ -169,11 +169,11 @@
               <div class="col-md-3 pull-right">
                 <div class="search marginTop10">
                   <div class="input-group" id="searchFormTop">
-                    <input type="text" class="form-control" name="q" id="q" placeholder="Search"
+                    <input type="text" class="form-control no-outline" name="q" id="q1" placeholder="Search"
                       [(ngModel)]="searchBySHSName" (ngModelChange)="GetSearchBySessionHostName(searchBySHSName)"
                       [ngModelOptions]="{standalone: true}">
                     <span class="input-group-btn">
-                      <button class="btn btn-default" type="button"><i class="icon icon-search"></i></button>
+                      <button class="btn btn-default search-icon" type="button"><i class="icon icon-search"></i></button>
                     </span>
                   </div>
                 </div>
@@ -199,7 +199,7 @@
                     <th style="width:20%;text-align: left;">Last Updated Time</th>
                   </tr>
                 </thead>
-                <tbody *ngIf="!(hostListErrorFound || showHostEmpty)">
+                <tbody *ngIf="!(hostListErrorFound || showHostEmpty )">
                   <tr
                     *ngFor="let SHSList of sessionHostListsSearch | paginate: { itemsPerPage: listItems, currentPage: Hostslist, id: 'Hosts' }; let hostIndex=index"
                     class="TableData" id="row-tenant-{{SHSList.sessionHostName}}"
@@ -236,7 +236,7 @@
                       style="position: relative; width: 10%; left: 44%;" />
                     <h5 style="color:#808080;font-weight:400;"> No Host to display</h5>
                     <p style="color:#808080"> To Add a host, click Add Host button and generate a key to add a host </p>
-                    <button class="btn btn-sm btn-primary linkHostpoolDashboardtable" style="border-radius:0px;" id=""
+                    <button class="btn btn-sm btn-primary linkHostpoolDashboardtable" style="border-radius:0px;" [disabled]="refreshHostpoolLoading" id="lnkbtnDashboard"
                       (click)="OpenAddHostDialog()">Add Host</button>
                   </div>
                 </div>
@@ -249,7 +249,7 @@
                       style="position: relative; width: 10%; left: 44%;" />
                     <h5 style="color:#808080;font-weight:400;">Error</h5>
                     <p style="color:#808080"> Problem with server, Please try again </p>
-                    <button class="btn btn-sm btn-primary" style="border-radius:0px;" id=""
+                    <button class="btn btn-sm btn-primary" style="border-radius:0px;" id="btnRefreshHost"
                       (click)="RefreshHost()">Refresh</button>
                   </div>
                 </div>
@@ -362,12 +362,12 @@
                           <div class="col-md-3 pull-right">
                             <div class="search marginTop10">
                               <div class="input-group" id="searchFormTop">
-                                <input type="text" class="form-control" name="q" id="q" placeholder="Search"
+                                <input type="text" class="form-control no-outline" name="q" id="q2" placeholder="Search"
                                   [(ngModel)]="SearchBySessionList"
                                   (ngModelChange)="GetSearchByUserSessionList(SearchBySessionList)"
                                   [ngModelOptions]="{standalone: true}">
                                 <span class="input-group-btn">
-                                  <button class="btn btn-default" type="button"><i
+                                  <button class="btn btn-default search-icon" type="button"><i
                                       class="icon icon-search"></i></button>
                                 </span>
                               </div>
@@ -488,11 +488,11 @@
               <div class="col-md-3 pull-right">
                 <div class="search marginTop10">
                   <div class="input-group" id="searchFormTop">
-                    <input type="text" class="form-control" name="q" id="q" placeholder="Search"
+                    <input type="text" class="form-control no-outline" name="q" id="q3" placeholder="Search"
                       [(ngModel)]="searchByAppName" (ngModelChange)="GetSearchByAppName(searchByAppName)"
                       [ngModelOptions]="{standalone: true}">
                     <span class="input-group-btn">
-                      <button class="btn btn-default" type="button"><i class="icon icon-search"></i></button>
+                      <button class="btn btn-default search-icon" type="button"><i class="icon icon-search"></i></button>
                     </span>
                   </div>
                 </div>
@@ -695,11 +695,11 @@
                         <div class="col-md-3 pull-right">
                           <div class="search marginTop10">
                             <div class="input-group" id="searchFormTop">
-                              <input type="text" class="form-control" name="q" id="q" placeholder="Search"
+                              <input type="text" class="form-control no-outline" name="q" id="q4" placeholder="Search"
                                 [(ngModel)]="SearchByAppList" (ngModelChange)="GetSearchByAppList(SearchByAppList)"
                                 [ngModelOptions]="{standalone: true}">
                               <span class="input-group-btn">
-                                <button class="btn btn-default" type="button"><i class="icon icon-search"></i></button>
+                                <button class="btn btn-default search-icon" type="button"><i class="icon icon-search"></i></button>
                               </span>
                             </div>
                           </div>
@@ -815,11 +815,11 @@
                     <div class="col-md-3 pull-right">
                       <div class="search marginTop10">
                         <div class="input-group" id="searchUserFormTop">
-                          <input type="text" class="form-control" name="q" id="q" placeholder="Search"
+                          <input type="text" class="form-control no-outline" name="q" id="q" placeholder="Search"
                             [(ngModel)]="SearchByAppUser" (ngModelChange)="GetSearchByAppUser(SearchByAppUser)"
                             [ngModelOptions]="{standalone: true}">
                           <span class="input-group-btn">
-                            <button class="btn btn-default" type="button"><i class="icon icon-search"></i></button>
+                            <button class="btn btn-default search-icon" type="button"><i class="icon icon-search"></i></button>
                           </span>
                         </div>
                       </div>
@@ -1101,11 +1101,11 @@
             <div class="col-sm-12">
               <label class="radio-inline">
                 <input type="radio" value="Yes" name="allowNewSession" formControlName="allowNewSession"
-                  id="allowNewSessionId" />Yes
+                  id="allowNewSessionId1" />Yes
               </label>
               <label class="radio-inline">
                 <input type="radio" value="No" name="allowNewSession" formControlName="allowNewSession"
-                  id="allowNewSessionId" />No
+                  id="allowNewSessionId2" />No
               </label>
             </div>
 
@@ -1182,10 +1182,10 @@
               <input type="radio" value="Desktop" name="radiobtnAppType" [(ngModel)]="searchByDesktop"
                 id="RadioBtnNonpersistent" formControlName="radiobtnAppType" /><label>Desktop</label>
               <p class="marginLeft25 fontsizeSmaller">Desktop app group allows users to install and uninstall
-                applications in a remote session. You don’t need to assign apps to the users.</p>
+                applications in a remote session. You don't need to assign apps to the users.</p>
               <input type="radio" value="RemoteApp" name="radiobtnAppType" [(ngModel)]="searchByDesktop"
                 formControlName="radiobtnAppType" /><label>RemoteApp</label>
-                <p class="marginLeft25 fontsizeSmaller">RemoteApp® group doesn’t allow users to install and uninstall
+                <p class="marginLeft25 fontsizeSmaller">RemoteApp® group doesn't allow users to install and uninstall
                 applications in a remote session. You would need to assign apps to the users beforehand.</p>
             </div>
           </div>
@@ -1804,11 +1804,11 @@
   
                 <label class="radio-inline">
                   <input type="radio" value='0' name="loadBalancerType" formControlName="loadBalancerType"
-                    id="loadBalancerType" />BreadthFirst
+                    id="loadBalancerType1" />BreadthFirst
                 </label>
                 <label class="radio-inline">
                   <input type="radio" value='1' name="loadBalancerType" formControlName="loadBalancerType"
-                    id="loadBalancerType" />DepthFirst
+                    id="loadBalancerType2" />DepthFirst
                 </label>
               </div>
              
@@ -1816,11 +1816,11 @@
                 <label>Validation Env</label>
                 <label class="radio-inline">
                   <input type="radio" value='Yes' name="validationEnv" formControlName="validationEnv"
-                    id="validationEnv" />Yes
+                    id="validationEnv1" />Yes
                 </label>
                 <label class="radio-inline">
                   <input type="radio" value='No' name="validationEnv" formControlName="validationEnv"
-                    id="validationEnv" />No
+                    id="validationEnv2" />No
                 </label>
               </div>
               <div class="col-sm-12 form-group" *ngIf="!persistentHostpool">

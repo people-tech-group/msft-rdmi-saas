@@ -17,13 +17,14 @@
                 (click)="RedirectToTenants(displayTenantList)">
                 <a class="sub-menu">Tenants</a>
               </label>
+
               <ul class="sub-group-list-open">
                 <li *ngFor=" let tenants of displayTenantList; let y = index">
                   <input id="sub-group-{{tenants.tenantName}}" type="checkbox" hidden />
                   <label
                     [ngClass]="{'selectedTenant':selectedTenant === y && selectedAllTenants !== true, 'selectedparentTenant': selectedHostPool !== null && selectedTenant === y && selectedAllTenants !== true }"
                     (click)="SetSelectedTenant(y, tenants.tenantName,tenants.azureSubscriptionId)"
-                    [routerLink]="['tenantDashboard/', tenants.tenantName]" style="padding-left: 24px;">
+                    [routerLink]="['tenantDashboard/', tenants.tenantName]" style="padding-left: 24px;" class="outline">
                     <span
                       [ngClass]="{'icon': true, 'icon-chevron-right' : selectedTenant !== y, 'icon-chevron-down' : selectedTenant === y}"></span>
                     <a class="sub-menu">

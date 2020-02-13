@@ -72,4 +72,6 @@ export class BreadcrumComponent {
   get breadCrumsList() {
     return BreadcrumComponent.breadCrums;
   }
+
+ 
 }
