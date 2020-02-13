@@ -143,10 +143,10 @@
               <div class="search marginTop10">
                 <!-- search bar -->
                 <div class="input-group" id="searchFormTop">
-                  <input type="text" class="form-control" name="q" id="q" placeholder="Search"
+                  <input type="text" class="form-control no-outline" name="q" id="q" placeholder="Search"
                     [(ngModel)]="searchByHostName" (ngModelChange)="GetSearchByHostName(searchByHostName)">
                   <span class="input-group-btn">
-                    <button class="btn btn-default" type="button"><i class="icon icon-search"></i></button>
+                    <button class="btn btn-default search-icon" type="button"><i class="icon icon-search"></i></button>
                   </span>
                 </div>
               </div>
@@ -450,11 +450,11 @@
 
               <label class="radio-inline">
                 <input type="radio" value='0' name="loadBalancerType" formControlName="loadBalancerType"
-                  id="loadBalancerType" />BreadthFirst
+                  id="loadBalancerType1" />BreadthFirst
               </label>
               <label class="radio-inline">
                 <input type="radio" value='1' name="loadBalancerType" formControlName="loadBalancerType"
-                  id="loadBalancerType" />DepthFirst
+                  id="loadBalancerType2" />DepthFirst
               </label>
             </div>
            
@@ -462,11 +462,11 @@
               <label>Validation Env</label>
               <label class="radio-inline">
                 <input type="radio" value='Yes' name="validationEnv" formControlName="validationEnv"
-                  id="validationEnv" />Yes
+                  id="validationEnv1" />Yes
               </label>
               <label class="radio-inline">
                 <input type="radio" value='No' name="validationEnv" formControlName="validationEnv"
-                  id="validationEnv" />No
+                  id="validationEnv2" />No
               </label>
             </div>
             <div class="col-sm-12 form-group" *ngIf="!persistentHostpool">

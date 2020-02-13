@@ -272,15 +272,17 @@ export class HostpoolDashboardComponent implements OnInit {
   public showEditAppDialog: boolean = false;
   public selectedHostRows: any = [];
   public hostpoolFormEdit;
-  public searchHostPools:any;
-public showEditForm:boolean=false;
-public isEnableUser: boolean;
-public persistentHostpool: boolean;
-public selectedHostpoolradio: any;
-public hostPoolsList:any=[];
+  public searchHostPools: any;
+  public showEditForm: boolean = false;
+  public isEnableUser: boolean;
+  public persistentHostpool: boolean;
+  public selectedHostpoolradio: any;
+  public hostPoolsList: any = [];
+  public isHostMatch: boolean = false;
+  public isAppGroupMatch: boolean = false;
   @ViewChild('closeModal') closeModal: ElementRef;
   @ViewChild('closeHostpoolModal') closeHostpoolModal: ElementRef;
-  
+
 
   constructor(private _AppService: AppService, private fb: FormBuilder, private http: Http, private route: ActivatedRoute, private _notificationsService: NotificationsService, private router: Router,
     private adminMenuComponent: AdminMenuComponent) {
@@ -374,8 +376,8 @@ public hostPoolsList:any=[];
     });
     this.formCreateNewAppGroup.patchValue({ radiobtnAppType: 'Desktop' });
     this.scopeArray = sessionStorage.getItem("Scope").split(",");
-   
-   
+
+
     this.hostpoolFormEdit = new FormGroup({
       hostPoolName: new FormControl('', Validators.compose([Validators.required, Validators.maxLength(36), Validators.pattern(/^[^\s\W\_]([A-Za-z0-9\s\-\_\.])+$/)])),
       friendlyName: new FormControl("", Validators.compose([Validators.required, Validators.pattern(/^[^\s\W\_]([A-Za-z0-9\s\.\-\_])+$/)])),
@@ -387,38 +389,37 @@ public hostPoolsList:any=[];
       customRdpProperty: new FormControl(""),
       maxSessionLimit: new FormControl(""),
       loadBalancerType: new FormControl(""),
-     assignmentType: new FormControl("")
+      assignmentType: new FormControl("")
     });
 
   }
 
-  public GetHostPoolEdit(hostpool:any)
-  {
+  public GetHostPoolEdit(hostpool: any) {
     let hostpools = JSON.parse(sessionStorage.getItem('Hostpools'));
-    
-      this.searchHostPools = hostpools.filter(x=>x["hostPoolName"]==hostpool);
-      this.persistentHostpool = this.searchHostPools[0].persistent;
-      if (this.searchHostPools[0].validationEnv === true) {
-        this.searchHostPools[0].validationEnv = 'Yes';
-      }
-      else {
-        this.searchHostPools[0].validationEnv = 'No';
-      }
-      this.hostpoolFormEdit = new FormGroup({
-        hostPoolName: new FormControl(this.searchHostPools[0].hostPoolName, Validators.compose([Validators.required, Validators.maxLength(36), Validators.pattern(/^[^\s\W\_]([A-Za-z0-9\s\-\_\.])+$/)])),
-        friendlyName: new FormControl(this.searchHostPools[0].friendlyName, Validators.compose([Validators.required, Validators.pattern(/^[^\s\W\_]([A-Za-z0-9\s\.\-\_])+$/)])),
-        description: new FormControl(this.searchHostPools[0].description, Validators.compose([Validators.required, Validators.pattern(/^[\dA-Za-z]+[\dA-Za-z\s\.\-\_\!\@\#\$\%\^\&\*\(\)\{\}\[\]\:\'\"\?\>\<\,\;\/\+\=\|]{0,1600}$/)])),
-        diskPath: new FormControl(this.searchHostPools[0].diskPath, Validators.compose([Validators.required, Validators.pattern(/^((\\|\\\\)[a-z A-Z]+)+((\\|\\\\)[a-z0-9A-Z]+)$/)])),
-        enableUserProfileDisk: new FormControl(this.searchHostPools[0].enableUserProfileDisk),
-        validationEnv: new FormControl(this.searchHostPools[0].validationEnv),
-        customRdpProperty: new FormControl(this.searchHostPools[0].customRdpProperty),
-        maxSessionLimit: new FormControl(this.searchHostPools[0].maxSessionLimit),
-        loadBalancerType: new FormControl(this.searchHostPools[0].loadBalancerType.toString()),
-       assignmentType: new FormControl(this.searchHostPools[0].assignmentType?this.searchHostPools[0].assignmentType.toString():""),
-      });
-      this.showEditForm=true;
-    
-    
+
+    this.searchHostPools = hostpools.filter(x => x["hostPoolName"] == hostpool);
+    this.persistentHostpool = this.searchHostPools[0].persistent;
+    if (this.searchHostPools[0].validationEnv === true) {
+      this.searchHostPools[0].validationEnv = 'Yes';
+    }
+    else {
+      this.searchHostPools[0].validationEnv = 'No';
+    }
+    this.hostpoolFormEdit = new FormGroup({
+      hostPoolName: new FormControl(this.searchHostPools[0].hostPoolName, Validators.compose([Validators.required, Validators.maxLength(36), Validators.pattern(/^[^\s\W\_]([A-Za-z0-9\s\-\_\.])+$/)])),
+      friendlyName: new FormControl(this.searchHostPools[0].friendlyName, Validators.compose([Validators.required, Validators.pattern(/^[^\s\W\_]([A-Za-z0-9\s\.\-\_])+$/)])),
+      description: new FormControl(this.searchHostPools[0].description, Validators.compose([Validators.required, Validators.pattern(/^[\dA-Za-z]+[\dA-Za-z\s\.\-\_\!\@\#\$\%\^\&\*\(\)\{\}\[\]\:\'\"\?\>\<\,\;\/\+\=\|]{0,1600}$/)])),
+      diskPath: new FormControl(this.searchHostPools[0].diskPath, Validators.compose([Validators.required, Validators.pattern(/^((\\|\\\\)[a-z A-Z]+)+((\\|\\\\)[a-z0-9A-Z]+)$/)])),
+      enableUserProfileDisk: new FormControl(this.searchHostPools[0].enableUserProfileDisk),
+      validationEnv: new FormControl(this.searchHostPools[0].validationEnv),
+      customRdpProperty: new FormControl(this.searchHostPools[0].customRdpProperty),
+      maxSessionLimit: new FormControl(this.searchHostPools[0].maxSessionLimit),
+      loadBalancerType: new FormControl(this.searchHostPools[0].loadBalancerType.toString()),
+      assignmentType: new FormControl(this.searchHostPools[0].assignmentType ? this.searchHostPools[0].assignmentType.toString() : ""),
+    });
+    this.showEditForm = true;
+
+
   }
 
   public profileDiskChange(event: any) {
@@ -697,6 +698,7 @@ public hostPoolsList:any=[];
     this.appGroupsListSearch = [];
     sessionStorage.removeItem('Appgroups');
     this.CheckAppGroupAccess(this.hostPoolName);
+    this.RefreshHost();
   }
 
   /*
@@ -1242,6 +1244,7 @@ public hostPoolsList:any=[];
   // }
   //This.hostsCount=this.hostPoolDetails.noOfActivehosts
   public GetAllSessionHost() {
+    this.isHostMatch = false;
     this.refreshHostpoolLoading = true;
     this.sessionHostCheckedMain = false;
     this.sessionHostchecked = [];
@@ -1254,7 +1257,7 @@ public hostPoolsList:any=[];
       sessionStorage.setItem('SelectedHostpool', this.hostPoolName);
       // this.getAllSessionHostUrl = this._AppService.ApiUrl + '/api/SessionHost/GetSessionhostList?tenantGroupName=' + this.tenantGroupName + '&tenantName=' + this.tenantName + '&hostPoolName=' + this.hostPoolName + '&refresh_token=' + sessionStorage.getItem("Refresh_Token") + '&pageSize=' + this.HostpageSize + '&sortField=SessionHostName&isDescending=false&initialSkip=' + this.hostinitialSkip + '&lastEntry=%22%20%22';
       this.getAllSessionHostUrl = this._AppService.ApiUrl + '/api/SessionHost/GetSessionhostList?tenantGroupName=' + this.tenantGroupName + '&tenantName=' + this.tenantName + '&hostPoolName=' + this.hostPoolName + '&refresh_token=' + sessionStorage.getItem("Refresh_Token") + '&subscriptionId=' + sessionStorage.getItem("SubscriptionId");
-      this._AppService.GetData(this.getAllSessionHostUrl).subscribe(response => {
+      let hostListService = this._AppService.GetData(this.getAllSessionHostUrl).subscribe(response => {
         this.refreshHostpoolLoading = false;
         if (response.status == 429) {
           this.error = true;
@@ -1262,11 +1265,30 @@ public hostPoolsList:any=[];
         }
         else {
           this.error = false;
-          this.sessionHostLists = JSON.parse(response['_body']);
-          sessionStorage.setItem('Hosts', JSON.stringify(this.sessionHostLists));
-          this.gettingHosts();
-        }
+          this.showHostEmpty = false;
+          if (this.isHostMatch == false) {
+            this.refreshHostpoolLoading = true;
+            this.sessionHostLists = JSON.parse(response['_body']);
+            if (this.sessionHostLists != null && this.sessionHostLists.length > 0) {
+              if (this.hostPoolName == this.sessionHostLists[0].hostPoolName) {
+                sessionStorage.setItem('Hosts', JSON.stringify(this.sessionHostLists));
+                this.isHostMatch = true;
+                this.gettingHosts();
 
+              }
+              else {
+                this.isHostMatch = false;
+                this.refreshHostpoolLoading = false;
+              }
+            }
+            else {
+              this.isHostMatch = false;
+              sessionStorage.setItem('Hosts', JSON.stringify(this.sessionHostLists));
+              this.gettingHosts();
+            }
+          }
+
+        }
       },
         /*
          * If Any Error (or) Problem With Services (or) Problem in internet this Error Block Will Exequte
@@ -1350,9 +1372,9 @@ public hostPoolsList:any=[];
     }
     else {
       this.showHostEmpty = true;
+
     }
     this.refreshHostpoolLoading = false;
-
   }
 
   /*
@@ -2032,6 +2054,7 @@ public hostPoolsList:any=[];
   // * This function is used to make service call to get all the respective Appgrops of the selected hostpool
   // */
   public GetAllAppGroupsList(hostPoolName) {
+    this.isAppGroupMatch = false;
     this.checked = [];
     this.checkedMainAppGroup = false;
     this.refreshHostpoolLoading = true;
@@ -2054,9 +2077,28 @@ public hostPoolsList:any=[];
         }
         else {
           this.error = false;
-          this.appGroupsList = JSON.parse(response['_body']);
-          sessionStorage.setItem('Appgroups', JSON.stringify(this.appGroupsList));
-          this.gettingAppgroups();
+          if (this.isAppGroupMatch == false) {
+            this.refreshHostpoolLoading = true;
+            this.appGroupsList = JSON.parse(response['_body']);
+            if (this.appGroupsList != null && this.appGroupsList.length > 0) {
+              if (this.hostPoolName == this.appGroupsList[0].hostPoolName) {
+                sessionStorage.setItem('Appgroups', JSON.stringify(this.appGroupsList));
+                this.isAppGroupMatch = true;
+                this.gettingAppgroups();
+              }
+              else {
+                this.isAppGroupMatch = false;
+                this.refreshHostpoolLoading = false;
+              }
+            }
+            else {
+              this.isAppGroupMatch = false;
+              this.refreshHostpoolLoading = false;
+              sessionStorage.setItem('Appgroups', JSON.stringify(this.appGroupsList));
+              this.editedBodyAppGroup = true;
+              this.editedLBody = false;
+            }
+          }
         }
       },
         /*
@@ -2355,7 +2397,7 @@ public hostPoolsList:any=[];
             '<i class="icon icon-fail angular-NotifyFail col-xs-1 no-pad"></i>' +
             '<label class="notify-label col-xs-10 no-pad">Failed To Create App Group</label>' +
             '<a class="close"><i class="icon icon-close notify-close" aria-hidden="true"></i></a>' +
-            '<p class="notify-text col-xs-12 no-pad">' + responseData.message + '</p>',
+            '<p class="notify-text col-xs-12 no-pad">' + responseData.message.replace("persistent", "personal") + '</p>',
             'content optional one',
             {
               position: ["top", "right"],
@@ -2366,7 +2408,7 @@ public hostPoolsList:any=[];
               maxLength: 10
             }
           )
-          AppComponent.GetNotification('icon icon-fail angular-NotifyFail', 'Failed To Create App Group', responseData.message, new Date());
+          AppComponent.GetNotification('icon icon-fail angular-NotifyFail', 'Failed To Create App Group', responseData.message.replace("persistent", "personal"), new Date());
           this.HideNewAppGroup();
           this.RefreshAppgroups();
         }
@@ -2667,7 +2709,7 @@ public hostPoolsList:any=[];
     this.SessionsListErrorFound = false;
     this.getUserSessionUrl = this._AppService.ApiUrl + '/api/UserSession/GetListOfUserSessions?tenantGroupName=' + this.tenantGroupName + '&tenantName=' + this.tenantName + '&hostPoolName=' + this.hostPoolName + '&hostName=' + this.selectedHostName + '&refresh_token=' + sessionStorage.getItem("Refresh_Token");
     this._AppService.GetData(this.getUserSessionUrl).subscribe(response => {
-      setTimeout(()=>{ this.userSessions = JSON.parse(response['_body']); }, 15000)
+      setTimeout(() => { this.userSessions = JSON.parse(response['_body']); }, 15000)
       this.refreshHostpoolLoading = false;
       if (response.status == 429) {
         this.error = true;
@@ -2887,16 +2929,25 @@ public hostPoolsList:any=[];
     }
     /* If we check the multiple checkboxes then this block of code executes*/
     this.checkedAllTrueUsers = [];
+    var indexSelectAll = null;
     for (let j = 0; j < this.checkedUsers.length; j++) {
       if (this.checkedUsers[j] == true) {
         this.checkedAllTrueUsers.push(this.checkedUsers[j]);
         this.selectedUsersRows.push(j);
+        indexSelectAll = j;
       }
     }
-    this.deleteCountSelectedUser = this.checkedAllTrueUsers.length;
-    this.selectedUsersRows.length = this.deleteCountSelectedUser;
-    if (this.checkedAllTrueUsers.length >= 1) {
+    if (this.checkedAllTrueUsers.length > 1) {
       this.isDeleteUserDisabled = false;
+      this.deleteCountSelectedUser = this.checkedAllTrueUsers.length;
+      this.selectedUsersRows.length = this.deleteCountSelectedUser;
+
+
+    } else if (this.checkedAllTrueUsers.length == 1) {
+      this.isDeleteUserDisabled = false;
+      this.deleteCountSelectedUser = this.appUsersListSearch[indexSelectAll].userPrincipalName.toLowerCase();
+      this.selectedUsersRows.length = this.deleteCountSelectedUser;
+
     }
     else if (this.checkedAllTrueUsers.length == 0) {
       this.isDeleteUserDisabled = true;
@@ -3340,7 +3391,7 @@ public hostPoolsList:any=[];
       tenantName: this.tenantName,
       hostPoolName: this.hostPoolName,
       appGroupName: this.AppgroupName,
-      userPrincipalName: createNewActiveDrctryData.UserPrincipalName,
+      userPrincipalName: createNewActiveDrctryData.UserPrincipalName.toLowerCase(),
       refresh_token: sessionStorage.getItem("Refresh_Token"),
       tenantGroupName: this.tenantGroupName
     };
@@ -3432,7 +3483,7 @@ public hostPoolsList:any=[];
     for (let i = 0; i < this.selectedUsersRows.length; i++) {
       let index = this.selectedUsersRows[i];
       let selectedUserName = this.appUsersListSearch[index].userPrincipalName;
-      this.usersDeleteUrl = this._AppService.ApiUrl + '/api/AppGroup/DeleteAssignedUser?tenantGroupName=' + this.tenantGroupName + '&tenantName=' + this.tenantName + '&hostPoolName=' + this.hostPoolName + '&appGroupName=' + this.selectedAppGroupName + '&appGroupUser=' + selectedUserName + '&refresh_token=' + sessionStorage.getItem("Refresh_Token");
+      this.usersDeleteUrl = this._AppService.ApiUrl + '/api/AppGroup/DeleteAssignedUser?tenantGroupName=' + this.tenantGroupName + '&tenantName=' + this.tenantName + '&hostPoolName=' + this.hostPoolName + '&appGroupName=' + this.selectedAppGroupName + '&appGroupUser=' + selectedUserName.toLowerCase() + '&refresh_token=' + sessionStorage.getItem("Refresh_Token");
       this._AppService.DeleteUsersList(this.usersDeleteUrl).subscribe(response => {
         this.refreshHostpoolLoading = false;
         var responseData = JSON.parse(response['_body']);
@@ -4031,6 +4082,7 @@ public hostPoolsList:any=[];
       /*If the selected checkbox length=1 then this block of code executes to show the selected remoteapp name */
       if (this.checkedAllTrueApps.length == 1) {
         this.isDeleteAppsDisabled = false;
+        this.isEditAppsDisabled = false;
         this.deleteCountSelectedApp = this.appGroupsAppListSearch[index].remoteAppName;
         this.newAppEditGroup = new FormGroup({
           AppPath: new FormControl(this.appGroupsAppListSearch[index].filePath, Validators.compose([Validators.required])),
@@ -4133,9 +4185,9 @@ public hostPoolsList:any=[];
       "hostPoolName": this.hostPoolName,
       "appGroupName": this.selectedAppGroupName,
       "remoteAppName": createAppGroupData.Name,
-      "appAlias": createAppGroupData.Name,
+      "appAlias": '',
       "filePath": createAppGroupData.AppPath,
-      "commandLineSetting": 1,
+      "commandLineSetting": 0,
       "description": null,
       "friendlyName": createAppGroupData.friendlyName,
       "iconIndex": createAppGroupData.IconIndex != null ? createAppGroupData.IconIndex : 0,
@@ -4737,18 +4789,18 @@ public hostPoolsList:any=[];
     );
   }
 
-/* This function is used to  to close the Edit hostpool modal popup */
-public hostpoolUpdateClose(): void {
-  this.closeHostpoolModal.nativeElement.click();
-}
-public RefreshHostpools() {
-  this.GetHostpools(this.tenantName);
-}
+  /* This function is used to  to close the Edit hostpool modal popup */
+  public hostpoolUpdateClose(): void {
+    this.closeHostpoolModal.nativeElement.click();
+  }
+  public RefreshHostpools() {
+    this.GetHostpools(this.tenantName);
+  }
 
- 
 
-public GetHostpools(tenantName: any) {
-  this.refreshHostpoolLoading = true;
+
+  public GetHostpools(tenantName: any) {
+    this.refreshHostpoolLoading = true;
     /*
      * Access level of Tenant block End
      */
@@ -4765,7 +4817,7 @@ public GetHostpools(tenantName: any) {
         this.hostPoolsList = JSON.parse(response['_body']);
         sessionStorage.setItem('Hostpools', JSON.stringify(this.hostPoolsList));
         sessionStorage.setItem('SelectedTenantName', tenantName);
-        this.hostPoolDetails =  this.hostPoolsList!=null && this.hostPoolsList.length>0?this.hostPoolsList.filter(item=>item.hostPoolName==this.hostPoolName)[0]:this.hostPoolDetails;
+        this.hostPoolDetails = this.hostPoolsList != null && this.hostPoolsList.length > 0 ? this.hostPoolsList.filter(item => item.hostPoolName == this.hostPoolName)[0] : this.hostPoolDetails;
       }
     },
       /*
@@ -4778,7 +4830,7 @@ public GetHostpools(tenantName: any) {
         this.refreshHostpoolLoading = false;
       }
     );
-  
-}
+
+  }
 
 }

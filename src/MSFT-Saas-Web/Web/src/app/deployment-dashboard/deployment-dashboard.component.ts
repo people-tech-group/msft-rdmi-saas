@@ -289,6 +289,8 @@ export class DeploymentDashboardComponent implements OnInit {
 
   public ShowTenantGrid() {
     this.showHomePage = !this.showHomePage;
+    this.refreshTenantLoading = true;
+    this.GetTenants();
   }
 
   /* This function is called  when we save a Tenanat group name in the Tenanat group modal
@@ -298,6 +300,7 @@ export class DeploymentDashboardComponent implements OnInit {
 * -------------
 */
   public ManageTenant() {
+    this.showHomePage = true;
     let tenantGroup = this.slectedtenantgroupname == "" ? 'Default Tenant Group' : this.slectedtenantgroupname;
     this.refreshTenantLoading = true;
     localStorage.removeItem("TenantGroupName");
