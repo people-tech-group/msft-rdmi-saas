@@ -26,6 +26,12 @@ namespace MSFT.WVDSaaS.API.Model
         public string GitAppVersion { get; set; }
 
         public string GithubUpdateDeployUrl { get; set; }
+
+        public string GroupObjectId { get; set; }
+
+        public string TenantId { get; set; }
+
+
     }
     #endregion
 

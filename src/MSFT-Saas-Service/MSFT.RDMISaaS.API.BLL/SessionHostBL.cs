@@ -46,7 +46,18 @@ namespace MSFT.WVDSaaS.API.BLL
             }
 
         }
-
+        public HttpResponseMessage GetAzureVMList(string deploymentUrl, string accessToken, string subscriptionId)
+        {
+            try
+            {
+                HttpResponseMessage response = CommonBL.InitializeHttpClient(deploymentUrl, accessToken).GetAsync("subscriptions/" + subscriptionId + "/providers/Microsoft.Compute/virtualMachines?api-version=2018-04-01").Result;
+                return response;
+            }
+            catch
+            {
+                return null;
+            }
+        }
         public async Task<HttpResponseMessage> GetSessionhostList(string deploymentUrl, string wvdAccessToken, string tenantGroup, string tenantName, string hostPoolName, string azureDeployUrl = null, string azureAccessToken = null, string subscriptionId = null)
         {
             try
@@ -60,7 +71,7 @@ namespace MSFT.WVDSaaS.API.BLL
                         var arrWVD = (JArray)JsonConvert.DeserializeObject(wvdData);
                         var WVDresult = ((JArray)arrWVD).ToList();
                         var AzureResult = await GetAzureVMs(azureDeployUrl, azureAccessToken, subscriptionId);
-                        if (AzureResult != null && AzureResult.Count >0)
+                        if (AzureResult != null && AzureResult.Count > 0)
                         {
                             var finalVmList = AzureResult.ToList().Where(r => WVDresult.ToList().Any(d => r["vmName"].ToString() == d["sessionHostName"].ToString().Split('.')[0].ToString())).ToList();
                             finalVmList.ForEach(item =>
@@ -82,6 +93,113 @@ namespace MSFT.WVDSaaS.API.BLL
                                 item["lastUpdateTime"] = element["lastUpdateTime"];
                                 item["updateErrorMessage"] = element["updateErrorMessage"];
                             });
+
+                            if (WVDresult.Count > finalVmList.Count)
+                            {
+                                var wvdList = WVDresult.ToList().Select(item => item["sessionHostName"]).ToList();
+                                var comparedList = finalVmList.ToList().Select(item => item["sessionHostName"]).ToList();
+                                var filteredSessionHostList = wvdList.ToList().Except(comparedList.ToList());
+
+                                if (subscriptionId != null && azureDeployUrl != null && azureAccessToken != null)
+                                {
+
+                                    var scalesetInfo = GetScaleSetInstances(azureDeployUrl, azureAccessToken, subscriptionId);
+                                    var scalesetInstancesContant = scalesetInfo.Content.ReadAsStringAsync().Result;
+                                    JObject scalesetInstancesjson = JObject.Parse(scalesetInstancesContant);
+                                    var scalesetInstancesList = ((JArray)scalesetInstancesjson["value"]).ToList();
+
+                                    foreach (var element in scalesetInstancesList)
+                                    {
+                                        var resGrpName = element["id"].ToString().Split('/')[4].ToLower();
+                                        var scalesetName = element["name"].ToString();
+                                        var AzureScaleSetresponse = GetScaleSetVms(azureDeployUrl, azureAccessToken, subscriptionId, resGrpName, scalesetName);
+                                        var AzurescalesetVmsContant = AzureScaleSetresponse.Content.ReadAsStringAsync().Result;
+                                        JObject AzurescalesetVmsjson = JObject.Parse(AzurescalesetVmsContant);
+                                        var AzurescalesetVmsList = ((JArray)AzurescalesetVmsjson["value"]).ToList();
+                                        var GettingAzureScalesetDetails = AzurescalesetVmsList.Select(item => new JObject()
+                                        {
+                                               new JProperty("subscriptionId",  item["id"]== null ? null: item["id"].ToString().Split('/')[2]),
+                                               new JProperty("resourceGroupName",   item["id"]== null ? null:item["id"].ToString().Split('/')[4]),
+                                               new JProperty("scaleSetName",   item["id"]== null ? null:item["id"].ToString().Split('/')[8]),
+                                               new JProperty("instanceId",   item["id"]== null ? null:item["instanceId"]),
+                                               new JProperty("vmName",   item["properties"]["osProfile"]["computerName"]== null ? null:item["properties"]["osProfile"]["computerName"])
+                                        }).ToList();
+
+                                        var matchedHostWithScaleSetVms = GettingAzureScalesetDetails.Where(r => filteredSessionHostList.ToList().Any(d => r["vmName"].ToString() == d.ToString().Split('.')[0].ToString())).ToList();
+                                        var matchedvms = matchedHostWithScaleSetVms.Select(item => item["vmName"].ToString()).ToList();
+                                        // var filteredList= filteredSessionHostList.SelectMany(item => item.ToString().Split('.')[0].ToString()).Select(item1=> item1.ToString()).ToList();
+                                        var filteredList = new List<object>();
+                                        foreach (var item in filteredSessionHostList)
+                                        {
+                                            filteredList.Add(item.ToString().Split('.')[0].ToString());
+                                        }
+                                        var notMatchedHostWithScaleSetVms = filteredList.Except(matchedvms.ToList());
+
+                                        matchedHostWithScaleSetVms.ToList().ForEach(item =>
+                                        {
+
+                                            var filter = WVDresult.ToList().Where(x => x["sessionHostName"].ToString().Split('.')[0] == item["vmName"].ToString()).ToList()[0];
+
+                                            JObject jObject = new JObject
+                                                 {
+                                             new JProperty("sessionHostName",  filter["sessionHostName"] ),
+                                             new JProperty("tenantName",  filter["tenantName"] ),
+                                             new JProperty("tenantGroupName",  filter["tenantGroupName"] ),
+                                             new JProperty("hostPoolName",  filter["hostPoolName"] ),
+                                             new JProperty("allowNewSession",  filter["allowNewSession"] ),
+                                             new JProperty("sessions",  filter["sessions"] ),
+                                             new JProperty("lastHeartBeat",  filter["lastHeartBeat"] ),
+                                             new JProperty("agentVersion",  filter["agentVersion"] ),
+                                             new JProperty("assignedUser",  filter["assignedUser"] ),
+                                             new JProperty("osVersion",  filter["osVersion"] ),
+                                             new JProperty("sxSStackVersion",  filter["sxSStackVersion"] ),
+                                             new JProperty("status",  filter["status"] ),
+                                             new JProperty("updateState",  filter["updateState"] ),
+                                             new JProperty("lastUpdateTime",  filter["lastUpdateTime"] ),
+                                             new JProperty("updateErrorMessage",  filter["updateErrorMessage"] ),
+                                             new JProperty("resourceGroupName",  item["resourceGroupName"] ),
+                                             new JProperty("scaleSetName",  item["scaleSetName"] ),
+                                             new JProperty("instanceId",  item["instanceId"] ),
+                                             new JProperty("vmName",  item["vmName"] ),
+                                                 };
+                                            finalVmList.Add(jObject);
+                                        });
+
+                                        notMatchedHostWithScaleSetVms.ToList().ForEach(vm =>
+                                        {
+
+                                            var filter = WVDresult.ToList().Where(x => x["sessionHostName"].ToString().Split('.')[0] == vm.ToString()).ToList()[0];
+
+                                            JObject jObject = new JObject
+                                                 {
+                                             new JProperty("sessionHostName",  filter["sessionHostName"] ),
+                                             new JProperty("tenantName",  filter["tenantName"] ),
+                                             new JProperty("tenantGroupName",  filter["tenantGroupName"] ),
+                                             new JProperty("hostPoolName",  filter["hostPoolName"] ),
+                                             new JProperty("allowNewSession",  filter["allowNewSession"] ),
+                                             new JProperty("sessions",  filter["sessions"] ),
+                                             new JProperty("lastHeartBeat",  filter["lastHeartBeat"] ),
+                                             new JProperty("agentVersion",  filter["agentVersion"] ),
+                                             new JProperty("assignedUser",  filter["assignedUser"] ),
+                                             new JProperty("osVersion",  filter["osVersion"] ),
+                                             new JProperty("sxSStackVersion",  filter["sxSStackVersion"] ),
+                                             new JProperty("status",  filter["status"] ),
+                                             new JProperty("updateState",  filter["updateState"] ),
+                                             new JProperty("lastUpdateTime",  filter["lastUpdateTime"] ),
+                                             new JProperty("updateErrorMessage",  filter["updateErrorMessage"] )
+
+                                                 };
+                                            finalVmList.Add(jObject);
+                                        });
+
+
+
+
+
+                                    }
+
+                                }
+                            }
                             return new HttpResponseMessage()
                             {
                                 StatusCode = HttpStatusCode.OK,
@@ -109,11 +227,11 @@ namespace MSFT.WVDSaaS.API.BLL
             }
         }
 
-        public HttpResponseMessage GetAzureVMList(string deploymentUrl, string accessToken, string subscriptionId)
+        public HttpResponseMessage GetScaleSetInstances(string azureDeployUrl, string accessToken, string subscriptionId)
         {
             try
             {
-                HttpResponseMessage response = CommonBL.InitializeHttpClient(deploymentUrl, accessToken).GetAsync("subscriptions/" + subscriptionId + "/providers/Microsoft.Compute/virtualMachines?api-version=2018-04-01").Result;
+                HttpResponseMessage response = CommonBL.InitializeHttpClient(azureDeployUrl, accessToken).GetAsync("subscriptions/" + subscriptionId + "/providers/Microsoft.Compute/virtualMachineScaleSets?api-version=2019-03-01").Result;
                 return response;
             }
             catch
@@ -122,13 +240,56 @@ namespace MSFT.WVDSaaS.API.BLL
             }
         }
 
+        public HttpResponseMessage GetScaleSetVms(string azureDeployUrl, string accessToken, string subscriptionId, string resourceGroupName, string scaleSetName)
+        {
+            try
+            {
+                HttpResponseMessage response = CommonBL.InitializeHttpClient(azureDeployUrl, accessToken).GetAsync("subscriptions/" + subscriptionId + "/resourceGroups/" + resourceGroupName + "/providers/Microsoft.Compute/virtualMachineScaleSets/" + scaleSetName + "/virtualMachines?api-version=2019-03-01").Result;
+                return response;
+            }
+            catch
+            {
+                return null;
+            }
+        }
+        public JObject RestartScaleSetVms(string azureDeployUrl, string accessToken, string subscriptionId, string resourceGroupName, string scaleSetName, JObject InstanceId, string sessionHostName)
+        {
+            try
+            {
+                var content = new StringContent(JsonConvert.SerializeObject(InstanceId), Encoding.UTF8, "application/json");
+
+                HttpResponseMessage response = CommonBL.InitializeHttpClient(azureDeployUrl, accessToken).PostAsync("subscriptions/" + subscriptionId + "/resourceGroups/" + resourceGroupName + "/providers/Microsoft.Compute/virtualMachineScaleSets/" + scaleSetName + "/restart?api-version=2019-07-01", content).Result;
+                string strJson = response.Content.ReadAsStringAsync().Result;
+                if (response.StatusCode == HttpStatusCode.OK || response.StatusCode == HttpStatusCode.Accepted)
+                {
+                    hostResult.Add("isSuccess", true);
+                    hostResult.Add("message", sessionHostName + " is restarted successfully");
+                }
+                else
+                {
+                    hostResult.Add("isSuccess", false);
+                    hostResult.Add("message", CommonBL.GetErrorMessage(strJson));
+                }
+
+            }
+            catch (Exception ex)
+            {
+                hostResult.Add("isSuccess", false);
+                hostResult.Add("message", ex.Message.ToString());
+            }
+
+            return hostResult;
+        }
+
+
+
         public async Task<List<JObject>> GetAzureVMs(string deploymentUrl, string accessToken, string subscriptionId)
         {
             string nextLink = "";
             HttpResponseMessage responseNext = null;
             try
             {
-                HttpResponseMessage response =  CommonBL.InitializeHttpClient(deploymentUrl, accessToken).GetAsync("subscriptions/" + subscriptionId + "/providers/Microsoft.Compute/virtualMachines?api-version=2018-04-01").Result;
+                HttpResponseMessage response = CommonBL.InitializeHttpClient(deploymentUrl, accessToken).GetAsync("subscriptions/" + subscriptionId + "/providers/Microsoft.Compute/virtualMachines?api-version=2018-04-01").Result;
                 var azureData = response.Content.ReadAsStringAsync().Result;
                 var arrAzure1 = (JObject)JsonConvert.DeserializeObject(azureData);
                 var arrAzure = arrAzure1["value"];
@@ -152,7 +313,7 @@ namespace MSFT.WVDSaaS.API.BLL
                         var azureData1 = responseNext.Content.ReadAsStringAsync().Result;
                         var arrAzureNext = (JObject)JsonConvert.DeserializeObject(azureData1);
                         var arrAzureData = arrAzureNext["value"];
-                        nextLink = arrAzureNext["nextLink"]!=null ? arrAzureNext["nextLink"].ToString():null;
+                        nextLink = arrAzureNext["nextLink"] != null ? arrAzureNext["nextLink"].ToString() : null;
                         AzureResult = ((JArray)arrAzureData).Select(item => new JObject()
                         {
                                new JProperty("vmName",  item["name"]),

@@ -155,7 +155,10 @@ export class DeploymentDashboardComponent implements OnInit {
 
     this.scopeArray = sessionStorage.getItem("Scope").split(",");
     let roledefinition = sessionStorage.getItem("roleDefinitionName");
-    if (this.scopeArray != null && this.scopeArray.length > 2 || (this.scopeArray != null && this.scopeArray.length == 2 && roledefinition != "RDS Owner" && roledefinition != "RDS Contributor")) {
+    let groupObjId = sessionStorage.getItem("groupObjId");
+    if (this.scopeArray != null && this.scopeArray.length > 2 
+      || (this.scopeArray != null && this.scopeArray.length == 2 && roledefinition != "RDS Owner" && roledefinition != "RDS Contributor")  
+      || groupObjId!='' ) { 
       this.tenants = [{
         "tenantGroupName": "",
         "aadTenantId": "",

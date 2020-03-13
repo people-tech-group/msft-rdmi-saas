@@ -282,6 +282,8 @@ export class HostpoolDashboardComponent implements OnInit {
   public isAppGroupMatch: boolean = false;
   @ViewChild('closeModal') closeModal: ElementRef;
   @ViewChild('closeHostpoolModal') closeHostpoolModal: ElementRef;
+  ScaleSetRestartHostUrl: any;
+  refreshAppGroupLoading: boolean;
 
 
   constructor(private _AppService: AppService, private fb: FormBuilder, private http: Http, private route: ActivatedRoute, private _notificationsService: NotificationsService, private router: Router,
@@ -688,7 +690,7 @@ export class HostpoolDashboardComponent implements OnInit {
     this.sessionHostListsSearch = [];
     sessionStorage.removeItem('Hosts');
     this.CheckAppGroupAccess(this.hostPoolName);
-    this.GetAllSessionHost();
+    //this.GetAllSessionHost();
   }
 
   public RefreshAppgroups() {
@@ -698,7 +700,7 @@ export class HostpoolDashboardComponent implements OnInit {
     this.appGroupsListSearch = [];
     sessionStorage.removeItem('Appgroups');
     this.CheckAppGroupAccess(this.hostPoolName);
-    this.RefreshHost();
+    // this.RefreshHost();
   }
 
   /*
@@ -827,7 +829,8 @@ export class HostpoolDashboardComponent implements OnInit {
         this.editHostDisabled = false;
         this.drainHostDisabled = false;
         this.deleteHostDisabled = false;
-        this.restartHostDisabled = sessionStorage.getItem("roleDefinitionName") == "RDS Owner" ? false : true;
+     //   this.restartHostDisabled = sessionStorage.getItem("roleDefinitionName") == "RDS Owner" ? false : true;
+     this.restartHostDisabled = false;
         this.state = "up";
 
       }
@@ -970,7 +973,9 @@ export class HostpoolDashboardComponent implements OnInit {
       this.drainHostDisabled = false;
       this.state = "up";
       this.showHostDashBoard = true;
-      this.restartHostDisabled = sessionStorage.getItem("roleDefinitionName") == "RDS Owner" ? false : true;
+    //  this.restartHostDisabled = sessionStorage.getItem("roleDefinitionName") == "RDS Owner" ? false : true;
+    this.restartHostDisabled = false;
+
       this.hostFormEdit = new FormGroup({
         sessionHostName: new FormControl(this.sessionHostListsSearch[index].sessionHostName),
         allowNewSession: new FormControl(this.sessionHostListsSearch[index].allowNewSession),
@@ -1485,7 +1490,8 @@ export class HostpoolDashboardComponent implements OnInit {
       this.editHostDisabled = false;
       this.deleteHostDisabled = false;
       this.drainHostDisabled = false;
-      this.restartHostDisabled = sessionStorage.getItem("roleDefinitionName") == "RDS Owner" ? false : true;
+    //  this.restartHostDisabled = sessionStorage.getItem("roleDefinitionName") == "RDS Owner" ? false : true;
+    this.restartHostDisabled = false;
       this.hostDeleteData = this.sessionHostListsSearch[index].sessionHostName;
       this.hostDetails = this.sessionHostListsSearch[index];
       this.HostAllowNewSession = this.hostDetails.allowNewSession == "Yes" ? false : true;
@@ -2057,7 +2063,7 @@ export class HostpoolDashboardComponent implements OnInit {
     this.isAppGroupMatch = false;
     this.checked = [];
     this.checkedMainAppGroup = false;
-    this.refreshHostpoolLoading = true;
+    this.refreshAppGroupLoading = true;
     this.appGroupListErrorFound = false;
     this.editedBodyAppGroup = false;
     this.checkedMainAppGroup = false;
@@ -2065,12 +2071,12 @@ export class HostpoolDashboardComponent implements OnInit {
     let appGroups = JSON.parse(sessionStorage.getItem('Appgroups'));
     if (sessionStorage.getItem('Appgroups') && appGroups.length != 0 && appGroups != null && sessionStorage.getItem('SelectedHostpool') == this.hostPoolName) {
       this.gettingAppgroups();
-      this.refreshHostpoolLoading = false;
+      this.refreshAppGroupLoading = false;
     } else {
       //this.getAllAppGroupsListUrl = this._AppService.ApiUrl + '/api/AppGroup/GetAppGroupsList?tenantGroupName=' + this.tenantGroupName + '&tenantName=' + this.tenantName + '&hostPoolName=' + hostPoolName + '&refresh_token=' + sessionStorage.getItem("Refresh_Token") + ' &pageSize=' + this.pageSize + '&sortField=AppGroupName&isDescending=false&initialSkip=' + this.initialSkip + '&lastEntry=%22%20%22';
       this.getAllAppGroupsListUrl = this._AppService.ApiUrl + '/api/AppGroup/GetAppGroupsList?tenantGroupName=' + this.tenantGroupName + '&tenantName=' + this.tenantName + '&hostPoolName=' + hostPoolName + '&refresh_token=' + sessionStorage.getItem("Refresh_Token");// + ' &pageSize=' + this.pageSize + '&sortField=AppGroupName&isDescending=false&initialSkip=' + this.initialSkip + '&lastEntry=%22%20%22';
       this._AppService.GetData(this.getAllAppGroupsListUrl).subscribe(response => {
-        this.refreshHostpoolLoading = false;
+        this.refreshAppGroupLoading = true;
         if (response.status == 429) {
           this.error = true;
           this.errorMessage = response.statusText;
@@ -2078,7 +2084,6 @@ export class HostpoolDashboardComponent implements OnInit {
         else {
           this.error = false;
           if (this.isAppGroupMatch == false) {
-            this.refreshHostpoolLoading = true;
             this.appGroupsList = JSON.parse(response['_body']);
             if (this.appGroupsList != null && this.appGroupsList.length > 0) {
               if (this.hostPoolName == this.appGroupsList[0].hostPoolName) {
@@ -2088,14 +2093,36 @@ export class HostpoolDashboardComponent implements OnInit {
               }
               else {
                 this.isAppGroupMatch = false;
-                this.refreshHostpoolLoading = false;
               }
+              this.refreshHostpoolLoading = false;
+              this.refreshAppGroupLoading = false;
             }
             else {
+              var testUrl = this._AppService.ApiUrl + '/api/AppGroup/GetAppGroupDetails?tenantGroupName=' + this.tenantGroupName + '&tenantName=' + this.tenantName + '&hostPoolName=' + hostPoolName + '&appGroupName=Desktop Application Group ' + '&refresh_token=' + sessionStorage.getItem("Refresh_Token");// + ' &pageSize=' + this.pageSize + '&sortField=AppGroupName&isDescending=false&initialSkip=' + this.initialSkip + '&lastEntry=%22%20%22';
+              this._AppService.GetData(testUrl).subscribe(response => {
+                this.appGroupsList = [];
+                this.appGroupsList.push(JSON.parse(response['_body']));
+                if (this.appGroupsList.length == 0) {
+                  this.editedBodyAppGroup = true;
+                }
+                if (this.hostPoolName == this.appGroupsList[0].hostPoolName) {
+                  sessionStorage.setItem('Appgroups', JSON.stringify(this.appGroupsList));
+                  this.isAppGroupMatch = true;
+                  this.gettingAppgroups();
+                  this.refreshAppGroupLoading = false;
+                  this.refreshHostpoolLoading = false;
+                }
+                else {
+                  this.isAppGroupMatch = false;
+                  this.refreshAppGroupLoading = false;
+                  this.refreshHostpoolLoading = false;
+
+                }
+              })
               this.isAppGroupMatch = false;
-              this.refreshHostpoolLoading = false;
-              sessionStorage.setItem('Appgroups', JSON.stringify(this.appGroupsList));
-              this.editedBodyAppGroup = true;
+              //this.refreshHostpoolLoading = false;
+              //   sessionStorage.setItem('Appgroups', JSON.stringify(this.appGroupsList));
+              this.editedBodyAppGroup = false;
               this.editedLBody = false;
             }
           }
@@ -2134,13 +2161,13 @@ export class HostpoolDashboardComponent implements OnInit {
       this.editedLBody = false;
     }
     else {
-      if (this.appGroupsListSearch[0].Message == null) {
+      if (this.appGroupsListSearch[0] && this.appGroupsListSearch[0].Message == null) {
         this.editedLBody = true;
         this.editedBodyAppGroup = false;
       }
     }
-    this.GetcurrentNoOfPagesCountAppgroup();
-    this.GetcurrentNoOfPagesCountHost();
+    // this.GetcurrentNoOfPagesCountAppgroup();
+    // this.GetcurrentNoOfPagesCountHost();
   }
 
   /*
@@ -2448,6 +2475,9 @@ export class HostpoolDashboardComponent implements OnInit {
    * ----------
    */
   public UpdateAppGroup(updateAppGroupData: any) {
+    this.AppGroupsUpdateClose();
+    // this.reFreAppGroupLoading = true;
+    this.refreshAppGroupLoading = true;
     var updateArray = {
       "tenantGroupName": this.tenantGroupName,
       "tenantName": this.tenantName,
@@ -2458,10 +2488,11 @@ export class HostpoolDashboardComponent implements OnInit {
       "resourceType": "0",
       "refresh_token": sessionStorage.getItem("Refresh_Token"),
     };
-    this.updateAppGroupLoading = true;
     this.updateAppgroupUrl = this._AppService.ApiUrl + '/api/AppGroup/Put';
     this._AppService.UpdateAppGroup(this.updateAppgroupUrl, updateArray).subscribe(response => {
-      this.updateAppGroupLoading = false;
+      // this.updateAppGroupLoading = false;
+    this.refreshAppGroupLoading = false;
+
       var responseData = JSON.parse(response['_body']);
       if (responseData.message == "Invalid Token") {
         sessionStorage.clear();
@@ -3302,82 +3333,153 @@ export class HostpoolDashboardComponent implements OnInit {
   public RestartHost() {
     var hostName = this.selectedHostName;
     let subscriptionId = this.hostDetails.subscriptionId != null ? this.hostDetails.subscriptionId : sessionStorage.getItem("SubscriptionId");
-    this.RestartHostUrl = this._AppService.ApiUrl + '/api/SessionHost/RestartHost?subscriptionId=' + subscriptionId + '&resourceGroupName=' + this.hostDetails.resourceGroupName + '&sessionHostName=' + this.hostDetails.vmName + '&refresh_token=' + sessionStorage.getItem("Refresh_Token");
-    this._AppService.RestartHost(this.RestartHostUrl).subscribe(response => {
-      this.refreshHostpoolLoading = false;
-      var responseData = JSON.parse(response['_body']);
-      if (responseData.message == "Invalid Token") {
-        sessionStorage.clear();
-        this.router.navigate(['/invalidtokenmessage']);
+    if (this.hostDetails && this.hostDetails.instanceId !== null && this.hostDetails.instanceId !== undefined && this.hostDetails.scaleSetName !== null && this.hostDetails.resourceGroupName) {
+
+      this.ScaleSetRestartHostUrl = this._AppService.ApiUrl + '/api/SessionHost/RestartScaleSetVm?accessToken=' + sessionStorage.getItem("Refresh_Token") + '&subscriptionId=' + subscriptionId + '&resourceGroupName=' + this.hostDetails.resourceGroupName + '&scaleSetName=' + this.hostDetails.scaleSetName + '&sessionHostName=' + this.hostDetails.sessionHostName;
+      var formdata = {
+        instanceIds: [this.hostDetails.instanceId]
       }
-      /* If response data is success then it enters into if and this block of code will execute to show the ' Remote App Removed Successfully' notification */
-      if (responseData.isSuccess === true) {
-        this._notificationsService.html(
-          '<i class="icon icon-check angular-Notify col-xs-1 no-pad"></i>' +
-          '<label class="notify-label col-xs-10 no-pad"> Host Restarted Successfully</label>' +
-          '<a class="close"><i class="icon icon-close notify-close" aria-hidden="true"></i></a>' +
-          '<p class="notify-text col-xs-12 no-pad">' + responseData.message + '</p>',
-          'content optional one',
-          {
-            position: ["top", "right"],
-            timeOut: 3000,
-            showProgressBar: false,
-            pauseOnHover: false,
-            clickToClose: true,
-            maxLength: 10
-          }
-        )
-        AppComponent.GetNotification('icon icon-check angular-Notify', ' Host Restarted Successfully', responseData.message, new Date());
-        this.RefreshHost();
-      }
-      /* If response data is success then it enters into else and this block of code will execute to show the 'Failed To Remove Remote App' notification */
-      else {
-        this._notificationsService.html(
-          '<i class="icon icon-fail angular-NotifyFail col-xs-1 no-pad"></i>' +
-          '<label class="notify-label col-xs-10 no-pad">Failed To Restart Host</label>' +
-          '<a class="close"><i class="icon icon-close notify-close" aria-hidden="true"></i></a>' +
-          '<p class="notify-text col-xs-12 no-pad">' + responseData.message + '</p>',
-          'content optional one',
-          {
-            position: ["top", "right"],
-            timeOut: 3000,
-            showProgressBar: false,
-            pauseOnHover: false,
-            clickToClose: true,
-            maxLength: 10
-          }
-        )
-        AppComponent.GetNotification('icon icon-fail angular-NotifyFail', 'Failed To Restart Host', responseData.message, new Date());
-        this.RefreshHost();
-      }
-    },
-      /*
-       * If Any Error (or) Problem With Services (or) Problem in internet this Error Block Will Exequte
-       */
-      (error) => {
-        this._notificationsService.html(
-          '<i class="icon icon-fail angular-NotifyFail col-xs-1 no-pad"></i>' +
-          '<label class="notify-label col-xs-10 no-pad">Failed To Restart Host</label>' +
-          '<a class="close"><i class="icon icon-close notify-close" aria-hidden="true"></i></a>' +
-          '<p class="notify-text col-xs-12 no-pad">Problem with server, Please try again</p>',
-          'content optional one',
-          {
-            position: ["top", "right"],
-            timeOut: 3000,
-            showProgressBar: false,
-            pauseOnHover: false,
-            clickToClose: true,
-            maxLength: 10
-          }
-        )
-        AppComponent.GetNotification('icon icon-fail angular-NotifyFail', 'Failed To Restart Host', 'Problem with server, Please try again', new Date());
-        this.RefreshHost();
-      }
-    );
-    // this.HideRestartHostDialog();
+      this._AppService.ScaleSetRestartHost(this.ScaleSetRestartHostUrl, formdata).subscribe(response => {
+        var responseData = JSON.parse(response['_body']);
+        if (responseData.isSuccess === true) {
+          this._notificationsService.html(
+            '<i class="icon icon-check angular-Notify col-xs-1 no-pad"></i>' +
+            '<label class="notify-label col-xs-10 no-pad"> Host Restarted Successfully</label>' +
+            '<a class="close"><i class="icon icon-close notify-close" aria-hidden="true"></i></a>' +
+            '<p class="notify-text col-xs-12 no-pad">' + responseData.message + '</p>',
+            'content optional one',
+            {
+              position: ["top", "right"],
+              timeOut: 3000,
+              showProgressBar: false,
+              pauseOnHover: false,
+              clickToClose: true,
+              maxLength: 10
+            }
+          )
+          AppComponent.GetNotification('icon icon-check angular-Notify', ' Host Restarted Successfully', responseData.message, new Date());
+          this.RefreshHost();
+        }
+        /* If response data is success then it enters into else and this block of code will execute to show the 'Failed To Remove Remote App' notification */
+        else {
+          this._notificationsService.html(
+            '<i class="icon icon-fail angular-NotifyFail col-xs-1 no-pad"></i>' +
+            '<label class="notify-label col-xs-10 no-pad">Failed To Restart Host</label>' +
+            '<a class="close"><i class="icon icon-close notify-close" aria-hidden="true"></i></a>' +
+            '<p class="notify-text col-xs-12 no-pad">' + responseData.message + '</p>',
+            'content optional one',
+            {
+              position: ["top", "right"],
+              timeOut: 3000,
+              showProgressBar: false,
+              pauseOnHover: false,
+              clickToClose: true,
+              maxLength: 10
+            }
+          )
+          AppComponent.GetNotification('icon icon-fail angular-NotifyFail', 'Failed To Restart Host', responseData.message, new Date());
+          this.RefreshHost();
+        }
+      },
+        /*
+         * If Any Error (or) Problem With Services (or) Problem in internet this Error Block Will Exequte
+         */
+        (error) => {
+          this._notificationsService.html(
+            '<i class="icon icon-fail angular-NotifyFail col-xs-1 no-pad"></i>' +
+            '<label class="notify-label col-xs-10 no-pad">Failed To Restart Host</label>' +
+            '<a class="close"><i class="icon icon-close notify-close" aria-hidden="true"></i></a>' +
+            '<p class="notify-text col-xs-12 no-pad">Problem with server, Please try again</p>',
+            'content optional one',
+            {
+              position: ["top", "right"],
+              timeOut: 3000,
+              showProgressBar: false,
+              pauseOnHover: false,
+              clickToClose: true,
+              maxLength: 10
+            }
+          )
+          AppComponent.GetNotification('icon icon-fail angular-NotifyFail', 'Failed To Restart Host', 'Problem with server, Please try again', new Date());
+          this.RefreshHost();
+        }
+      );
+    } else {
+      this.RestartHostUrl = this._AppService.ApiUrl + '/api/SessionHost/RestartHost?subscriptionId=' + subscriptionId + '&resourceGroupName=' + this.hostDetails.resourceGroupName + '&sessionHostName=' + this.hostDetails.vmName + '&refresh_token=' + sessionStorage.getItem("Refresh_Token");
+      this._AppService.RestartHost(this.RestartHostUrl).subscribe(response => {
+        this.refreshHostpoolLoading = false;
+        var responseData = JSON.parse(response['_body']);
+        if (responseData.message == "Invalid Token") {
+          sessionStorage.clear();
+          this.router.navigate(['/invalidtokenmessage']);
+        }
+        /* If response data is success then it enters into if and this block of code will execute to show the ' Remote App Removed Successfully' notification */
+        if (responseData.isSuccess === true) {
+          this._notificationsService.html(
+            '<i class="icon icon-check angular-Notify col-xs-1 no-pad"></i>' +
+            '<label class="notify-label col-xs-10 no-pad"> Host Restarted Successfully</label>' +
+            '<a class="close"><i class="icon icon-close notify-close" aria-hidden="true"></i></a>' +
+            '<p class="notify-text col-xs-12 no-pad">' + responseData.message + '</p>',
+            'content optional one',
+            {
+              position: ["top", "right"],
+              timeOut: 3000,
+              showProgressBar: false,
+              pauseOnHover: false,
+              clickToClose: true,
+              maxLength: 10
+            }
+          )
+          AppComponent.GetNotification('icon icon-check angular-Notify', ' Host Restarted Successfully', responseData.message, new Date());
+          this.RefreshHost();
+        }
+        /* If response data is success then it enters into else and this block of code will execute to show the 'Failed To Remove Remote App' notification */
+        else {
+          this._notificationsService.html(
+            '<i class="icon icon-fail angular-NotifyFail col-xs-1 no-pad"></i>' +
+            '<label class="notify-label col-xs-10 no-pad">Failed To Restart Host</label>' +
+            '<a class="close"><i class="icon icon-close notify-close" aria-hidden="true"></i></a>' +
+            '<p class="notify-text col-xs-12 no-pad">' + responseData.message + '</p>',
+            'content optional one',
+            {
+              position: ["top", "right"],
+              timeOut: 3000,
+              showProgressBar: false,
+              pauseOnHover: false,
+              clickToClose: true,
+              maxLength: 10
+            }
+          )
+          AppComponent.GetNotification('icon icon-fail angular-NotifyFail', 'Failed To Restart Host', responseData.message, new Date());
+          this.RefreshHost();
+        }
+      },
+        /*
+         * If Any Error (or) Problem With Services (or) Problem in internet this Error Block Will Exequte
+         */
+        (error) => {
+          this._notificationsService.html(
+            '<i class="icon icon-fail angular-NotifyFail col-xs-1 no-pad"></i>' +
+            '<label class="notify-label col-xs-10 no-pad">Failed To Restart Host</label>' +
+            '<a class="close"><i class="icon icon-close notify-close" aria-hidden="true"></i></a>' +
+            '<p class="notify-text col-xs-12 no-pad">Problem with server, Please try again</p>',
+            'content optional one',
+            {
+              position: ["top", "right"],
+              timeOut: 3000,
+              showProgressBar: false,
+              pauseOnHover: false,
+              clickToClose: true,
+              maxLength: 10
+            }
+          )
+          AppComponent.GetNotification('icon icon-fail angular-NotifyFail', 'Failed To Restart Host', 'Problem with server, Please try again', new Date());
+          this.RefreshHost();
+        }
+      );
+      // this.HideRestartHostDialog();
+    }
   }
-
-
   /*
    * This function is used to Create\Add the Appgroup AppUser from Active directory
    * ----------
@@ -4336,7 +4438,7 @@ export class HostpoolDashboardComponent implements OnInit {
         )
         AppComponent.GetNotification('icon icon-fail angular-NotifyFail', 'Failed To Update Remote App', responseData.message, new Date());
         this.HideAppEditDialog();
-        this.RefreshHost();
+        //this.RefreshHost();
       }
     },
       /*

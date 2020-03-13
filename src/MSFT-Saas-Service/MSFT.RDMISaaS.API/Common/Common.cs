@@ -125,6 +125,7 @@ namespace MSFT.WVDSaaS.API.Common
                 return Constants.invalidCode.ToString();
             }
         }
+
         /// <summary>
         /// Description : Get login details from code
         /// </summary>
@@ -136,13 +137,16 @@ namespace MSFT.WVDSaaS.API.Common
             try
             {
                 string token = GetAccessToken(Code);
-                if(token!=Constants.invalidCode && token != Constants.invalidToken)
+
+                if (token != Constants.invalidCode && token != Constants.invalidToken)
                 {
                     loginDetails = JsonConvert.DeserializeObject<Login>(token);
                     var handler = new JwtSecurityTokenHandler();
                     var tokenS = handler.ReadToken(loginDetails.Access_Token) as JwtSecurityToken;
                     loginDetails.UserName = tokenS.Claims.First(claim => claim.Type.Equals("name")).Value.ToString();
                     loginDetails.Email = tokenS.Claims.First(claim => claim.Type.Equals("unique_name")).Value;
+
+
                     loginDetails.Code = "";
 
                     // to get role assignment
@@ -155,11 +159,21 @@ namespace MSFT.WVDSaaS.API.Common
 
                         if (httpResponse.IsSuccessStatusCode)
                         {
+
                             loginDetails.RoleAssignment = (JArray)JsonConvert.DeserializeObject(strJson);
+                            if (loginDetails.RoleAssignment.Count == 0)
+                            {
+                                loginDetails.GroupObjectId = tokenS.Claims.First(claim => claim.Type.Equals("groups")).Value;
+                                loginDetails.TenantId = tokenS.Claims.First(claim => claim.Type.Equals("tid")).Value;
+                                HttpResponseMessage httpResponse2 = await authorizationBL.GetRoleAssignmentsByGroupId(deploymentUrl, loginDetails.Access_Token, loginDetails.GroupObjectId);
+                                string strJson1 = httpResponse2.Content.ReadAsStringAsync().Result;
+                                loginDetails.RoleAssignment = (JArray)JsonConvert.DeserializeObject(strJson1);
+                            }
+
                             for (int i = 0; i < loginDetails.RoleAssignment.Count; i++)
                             {
-                               // loginDetails.RoleAssignment = new JObject() { { "roleDefinitionName", rdMgmtRoleAssignments[i]["roleDefinitionName"].ToString() }, { "scope", rdMgmtRoleAssignments[i]["scope"].ToString() } };
-                                if (loginDetails.RoleAssignment[i]["signInName"] != null && loginDetails.RoleAssignment[i]["signInName"].ToString().ToLower() == loginDetails.Email.ToString().ToLower())
+                                // loginDetails.RoleAssignment = new JObject() { { "roleDefinitionName", rdMgmtRoleAssignments[i]["roleDefinitionName"].ToString() }, { "scope", rdMgmtRoleAssignments[i]["scope"].ToString() } };
+                                if ((loginDetails.RoleAssignment[i]["signInName"] != null && loginDetails.RoleAssignment[i]["signInName"].ToString().ToLower() == loginDetails.Email.ToString().ToLower()) || (loginDetails.GroupObjectId != null))
                                 {
                                     if (loginDetails.RoleAssignment[i]["scope"].ToString().Split('/').Length > 1)
                                     {
@@ -168,9 +182,11 @@ namespace MSFT.WVDSaaS.API.Common
                                     else
                                     {
                                         list.Add(Constants.tenantGroupName);
+
                                     }
                                 }
                             }
+
                             loginDetails.TenantGroups = list.ToArray();
                         }
                         else if ((int)httpResponse.StatusCode == 429)
@@ -191,7 +207,7 @@ namespace MSFT.WVDSaaS.API.Common
                 {
                     loginDetails.Error = new JObject() { { "StatusCode", (int)HttpStatusCode.BadRequest }, { "Message", Constants.invalidCode } };
                 }
-                if (loginDetails != null && loginDetails.Error==null)
+                if (loginDetails != null && loginDetails.Error == null)
                 {
                     loginDetails.ApplicationVersion = configurations.applicationVersion;
                     var giturl = configurations.gitHubVersionUrl;
@@ -310,6 +326,7 @@ namespace MSFT.WVDSaaS.API.Common
             }
             return access_token;
         }
+
         #endregion
 
     }

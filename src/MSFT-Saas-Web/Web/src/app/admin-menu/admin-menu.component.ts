@@ -170,8 +170,8 @@ export class AdminMenuComponent {
    * ----------
    */
   public GetHostpools(tenantName: any) {
-    let hostpoolData = sessionStorage.getItem('sideMenuHostpools') ? JSON.parse(sessionStorage.getItem('sideMenuHostpools')) : [];
     this.hostPoolList = [];
+    let hostpoolData = sessionStorage.getItem('sideMenuHostpools') ? JSON.parse(sessionStorage.getItem('sideMenuHostpools')) : [];
     this.hostPoolList = hostpoolData;
     let data = [{
       name: tenantName,

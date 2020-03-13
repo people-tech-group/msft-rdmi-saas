@@ -40,16 +40,16 @@ namespace MSFT.WVDSaaS.API.Controllers
         /// <param name="refresh_token">Refresh token to get access token</param>
         /// //old parameters -- , int pageSize, string sortField, bool isDescending = false, int initialSkip = 0, string lastEntry = null
         /// <returns></returns>
-        public async Task<HttpResponseMessage> GetSessionhostList(string tenantGroupName, string tenantName, string hostPoolName, string refresh_token, string subscriptionId=null)
+        public async Task<HttpResponseMessage> GetSessionhostList(string tenantGroupName, string tenantName, string hostPoolName, string refresh_token, string subscriptionId = null)
         {
             //get deployment url
             deploymentUrl = configurations.rdBrokerUrl;
-           string  azureDeployUrl = configurations.managementResourceUrl;
+            string azureDeployUrl = configurations.managementResourceUrl;
             try
             {
                 if (!string.IsNullOrEmpty(refresh_token))
                 {
-                    string wvdAccessToken = "", AzureAccessToken="";
+                    string wvdAccessToken = "", AzureAccessToken = "";
                     //get token value
                     wvdAccessToken = common.GetTokenValue(refresh_token);
                     AzureAccessToken = common.GetManagementTokenValue(refresh_token);
@@ -70,6 +70,103 @@ namespace MSFT.WVDSaaS.API.Controllers
                 return null;
             }
         }
+
+
+        // List Scaleset
+        public HttpResponseMessage GetScaleSetList(string refresh_token, string subscriptionId)
+        {
+            //get deployment url
+
+            string azureDeployUrl = configurations.managementResourceUrl;
+            try
+            {
+                if (!string.IsNullOrEmpty(refresh_token))
+                {
+                    string AzureAccessToken = "";
+                    //get token value
+                    AzureAccessToken = common.GetManagementTokenValue(refresh_token);
+                    if (!string.IsNullOrEmpty(AzureAccessToken) && AzureAccessToken.ToString().ToLower() != invalidToken && AzureAccessToken.ToString().ToLower() != invalidCode)
+                    {
+                        return sessionHostBL.GetScaleSetInstances(azureDeployUrl, AzureAccessToken, subscriptionId);
+
+                    }
+                    else
+                    {
+                        return Request.CreateResponse(HttpStatusCode.OK, new JArray() { new JObject() { { "code", Constants.invalidToken } } });
+                    }
+
+                }
+                else
+                { return null; }
+            }
+            catch
+            {
+                return null;
+            }
+
+        }
+
+
+        // AzureVmss
+        public HttpResponseMessage GetScaleSetVms(string refresh_token, string subscriptionId, string resourceGroupName, string scalesetname)
+        {
+            //get deployment url
+
+            string azureDeployUrl = configurations.managementResourceUrl;
+            try
+            {
+                if (!string.IsNullOrEmpty(refresh_token))
+                {
+                    string AzureAccessToken = "";
+                    //get token value
+                    AzureAccessToken = common.GetManagementTokenValue(refresh_token);
+                    if (!string.IsNullOrEmpty(AzureAccessToken) && AzureAccessToken.ToString().ToLower() != invalidToken && AzureAccessToken.ToString().ToLower() != invalidCode)
+                    {
+                        return sessionHostBL.GetScaleSetVms(azureDeployUrl, AzureAccessToken, subscriptionId, resourceGroupName, scalesetname);
+
+                    }
+                    else
+                    {
+                        return Request.CreateResponse(HttpStatusCode.OK, new JArray() { new JObject() { { "code", Constants.invalidToken } } });
+                    }
+
+                }
+                else
+                { return null; }
+            }
+            catch
+            {
+                return null;
+            }
+
+        }
+
+        public IHttpActionResult RestartScaleSetVm(string accessToken, string subscriptionId, string resourceGroupName, string scaleSetName, JObject InstanceId, string sessionHostName)
+        {
+            string azureDeployUrl = configurations.managementResourceUrl;
+
+            try
+            {
+                if (!string.IsNullOrEmpty(accessToken))
+                {
+                    string AzureAccessToken = "";
+                    //get token value
+                    AzureAccessToken = common.GetManagementTokenValue(accessToken);
+                    if (!string.IsNullOrEmpty(AzureAccessToken) && AzureAccessToken.ToString().ToLower() != invalidToken && AzureAccessToken.ToString().ToLower() != invalidCode)
+                    {
+                        hostResult = sessionHostBL.RestartScaleSetVms(azureDeployUrl, AzureAccessToken, subscriptionId, resourceGroupName, scaleSetName, InstanceId, sessionHostName);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                hostResult.Add("isSuccess", false);
+                hostResult.Add("message", "Failed to restart host. " + ex.Message);
+            }
+            return Ok(hostResult);
+
+        }
+
 
         /// <summary>
         /// Description : Gets a Rds HostPool associated with the Tenant specified in the Rds context.
@@ -237,12 +334,12 @@ namespace MSFT.WVDSaaS.API.Controllers
             try
             {
                 string accessToken = common.GetManagementTokenValue(refresh_token);
-                hostResult =  sessionHostBL.RestartHost(deploymentUrl, accessToken, subscriptionId, resourceGroupName, sessionHostName);
+                hostResult = sessionHostBL.RestartHost(deploymentUrl, accessToken, subscriptionId, resourceGroupName, sessionHostName);
             }
             catch (Exception ex)
             {
                 hostResult.Add("isSuccess", false);
-                hostResult.Add("message", "Failed to restart host. "+ ex.Message);
+                hostResult.Add("message", "Failed to restart host. " + ex.Message);
             }
             return Ok(hostResult);
 

@@ -18,7 +18,7 @@ namespace MSFT.WVDSaaS.API.BLL
     public class AuthorizationBL
     {
 
-        public  Task<HttpResponseMessage> GetRoleAssignments(string deploymentUrl, string accessToken, string upn)
+        public Task<HttpResponseMessage> GetRoleAssignments(string deploymentUrl, string accessToken, string upn)
         {
             try
             {
@@ -27,10 +27,25 @@ namespace MSFT.WVDSaaS.API.BLL
             }
             catch (Exception ex)
             {
-                HttpResponseMessage response=  new HttpResponseMessage(System.Net.HttpStatusCode.RequestTimeout) { Content = new StringContent(ex.InnerException.Message.ToString(), System.Text.Encoding.UTF8, "application/json") };
-                return  Task.FromResult(response);
+                HttpResponseMessage response = new HttpResponseMessage(System.Net.HttpStatusCode.RequestTimeout) { Content = new StringContent(ex.InnerException.Message.ToString(), System.Text.Encoding.UTF8, "application/json") };
+                return Task.FromResult(response);
             }
         }
+
+        public Task<HttpResponseMessage> GetRoleAssignmentsByGroupId(string deploymentUrl, string accessToken, string groupObjectid)
+        {
+            try
+            {
+                HttpResponseMessage response = CommonBL.InitializeHttpClient(deploymentUrl, accessToken).GetAsync("/RdsManagement/V1/Rds.Authorization/roleAssignments?GroupObjectId=" + groupObjectid).Result;//.Result; //.ConfigureAwait(true).GetAwaiter().GetResult();
+                return Task.FromResult(response);
+            }
+            catch (Exception ex)
+            {
+                HttpResponseMessage response = new HttpResponseMessage(System.Net.HttpStatusCode.RequestTimeout) { Content = new StringContent(ex.InnerException.Message.ToString(), System.Text.Encoding.UTF8, "application/json") };
+                return Task.FromResult(response);
+            }
+        }
+
 
         public List<RdMgmtRoleAssignment> GetRoleAssignmentsByUser(string deploymentUrl, string accessToken, string loginUserName)
         {

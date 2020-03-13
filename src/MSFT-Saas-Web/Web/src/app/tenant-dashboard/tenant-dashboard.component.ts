@@ -383,7 +383,7 @@ export class TenantDashboardComponent implements OnInit {
         customRdpProperty: new FormControl(this.searchHostPools[index].customRdpProperty),
         maxSessionLimit: new FormControl(this.searchHostPools[index].maxSessionLimit),
         loadBalancerType: new FormControl(this.searchHostPools[index].loadBalancerType.toString()),
-        assignmentType: new FormControl(this.searchHostPools[index].assignmentType?this.searchHostPools[index].assignmentType.toString():""),
+        assignmentType: new FormControl(this.searchHostPools[index].assignmentType ? this.searchHostPools[index].assignmentType.toString() : ""),
       });
     }
     /*If the selected checkbox length>1 then this block of code executes to show the no of selected hostpools(i.e; if we select multiple checkboxes) */
@@ -481,7 +481,7 @@ export class TenantDashboardComponent implements OnInit {
           customRdpProperty: new FormControl(this.searchHostPools[index].customRdpProperty),
           maxSessionLimit: new FormControl(this.searchHostPools[index].maxSessionLimit),
           loadBalancerType: new FormControl(this.searchHostPools[index].loadBalancerType.toString()),
-          assignmentType: new FormControl(this.searchHostPools[index].assignmentType?this.searchHostPools[index].assignmentType.toString():""),
+          assignmentType: new FormControl(this.searchHostPools[index].assignmentType ? this.searchHostPools[index].assignmentType.toString() : ""),
         });
         this.deleteCount = this.searchHostPools[index].hostPoolName;
         if (this.searchHostPools[index].enableUserProfileDisk === 'Yes') {
@@ -801,10 +801,29 @@ export class TenantDashboardComponent implements OnInit {
         else {
           this.error = false;
           var list = JSON.parse(response['_body']);
-          sessionStorage.setItem('sideMenuHostpools', JSON.stringify(list));
-          sessionStorage.setItem('SelectedTenantName', tenantName);
-          this.hostpoolsCount = list.length;
-          this.adminMenuComponent.GetHostpools(tenantName);
+          if (list.length > 0) {
+            sessionStorage.setItem('sideMenuHostpools', JSON.stringify(list));
+            sessionStorage.setItem('SelectedTenantName', tenantName);
+            this.hostpoolsCount = list.length;
+            this.adminMenuComponent.GetHostpools(tenantName);
+          } else {
+            let hostpoolName = sessionStorage.getItem('Scope').split(',').length >= 3 ? sessionStorage.getItem('Scope').split(',')[2] : null;
+            if (hostpoolName != null) {
+              var testURl = this._AppService.ApiUrl + '/api/HostPool/GetHostPoolDetails?tenantGroupName=' + this.tenantGroupName + '&tenantName=' + tenantName + '&hostPoolName=' + hostpoolName + '&refresh_token=' + sessionStorage.getItem("Refresh_Token");
+              this._AppService.GetTenantDetails(testURl).subscribe(response1 => {
+                var list1 = JSON.parse(response1['_body']);
+                var dataHostPoolList = [];
+                dataHostPoolList.push(list1)
+                sessionStorage.setItem('sideMenuHostpools', JSON.stringify(dataHostPoolList));
+                sessionStorage.setItem('SelectedTenantName', tenantName);
+                this.hostpoolsCount = dataHostPoolList.length;
+                this.adminMenuComponent.GetHostpools(tenantName);
+              })
+            }
+
+
+          }
+
         }
       },
         error => {
@@ -851,11 +870,32 @@ export class TenantDashboardComponent implements OnInit {
           this.errorMessage = response.statusText;
         }
         else {
-          this.error = false;
-          this.hostPoolsList = JSON.parse(response['_body']);
-          sessionStorage.setItem('Hostpools', JSON.stringify(this.hostPoolsList));
-          sessionStorage.setItem('SelectedTenantName', tenantName);
-          this.gettingHostpools();
+          var list = JSON.parse(response['_body']);
+          if (list.length > 0) {
+            this.error = false;
+            this.hostPoolsList = list;
+            sessionStorage.setItem('Hostpools', JSON.stringify(this.hostPoolsList));
+            sessionStorage.setItem('SelectedTenantName', tenantName);
+            this.gettingHostpools();
+          } else {
+            let hostpoolName = sessionStorage.getItem('Scope').split(',').length >= 3 ? sessionStorage.getItem('Scope').split(',')[2] : null;
+            if (hostpoolName != null) {
+              var testURl = this._AppService.ApiUrl + '/api/HostPool/GetHostPoolDetails?tenantGroupName=' + this.tenantGroupName + '&tenantName=' + tenantName + '&hostPoolName=' + hostpoolName + '&refresh_token=' + sessionStorage.getItem("Refresh_Token");
+              this._AppService.GetTenantDetails(testURl).subscribe(response1 => {
+                var list1 = JSON.parse(response1['_body']);
+                var dataHostPoolList = [];
+                dataHostPoolList.push(list1)
+                this.error = false;
+                this.hostPoolsList = dataHostPoolList;
+                sessionStorage.setItem('Hostpools', JSON.stringify(this.hostPoolsList));
+                sessionStorage.setItem('SelectedTenantName', tenantName);
+                this.gettingHostpools();
+              })
+
+            }
+          }
+
+
         }
       },
         /*
@@ -1260,5 +1300,5 @@ export class TenantDashboardComponent implements OnInit {
     }
   }
 
-  
+
 }

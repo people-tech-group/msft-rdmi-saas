@@ -153,6 +153,8 @@ export class AppComponent implements OnInit {
             sessionStorage.setItem("profileIcon", this.profileIcon);
             sessionStorage.setItem("profileName", this.profileName);
             sessionStorage.setItem("gitAppVersion", respdata.GitAppVersion);
+            let groupId = respdata &&  respdata.GroupObjectId ? respdata.GroupObjectId:'';
+            sessionStorage.setItem("groupObjId",groupId)
             sessionStorage.setItem("ApplicationVersion", respdata.ApplicationVersion?respdata.ApplicationVersion:"");
             this.AppVersion = respdata.ApplicationVersion;
             sessionStorage.setItem("GithubUpdateDeployUrl",respdata.GithubUpdateDeployUrl?respdata.GithubUpdateDeployUrl:"");
@@ -250,6 +252,8 @@ this.githubupdateDeployUrl=sessionStorage.getItem("GithubUpdateDeployUrl");
         )
         AppComponent.GetNotification('icon icon-check angular-Notify', 'A New App Version Available', 'Current App Version : '+this.AppVersion+'<br>New App Version : '+this.gitAppVersion, new Date(),true, this.githubupdateDeployUrl,"Update");
       }
+
+      this._notificationsService.error
 
   }
 

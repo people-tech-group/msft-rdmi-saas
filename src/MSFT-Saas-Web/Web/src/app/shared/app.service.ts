@@ -8,7 +8,7 @@ export class AppService {
   public ApiUrl: string;
 
   constructor(private http: Http) {
-   //this.ApiUrl = "https://msftrdmisaasapi.azurewebsites.net";
+    //this.ApiUrl = "https://msftrdmisaasapi.azurewebsites.net";
     this.ApiUrl = "http://localhost:34816/";
   }
 
@@ -197,8 +197,7 @@ export class AppService {
       .catch((error: any) => Observable.throw(error));
   }
 
-  public AddingUserstoDesktop(updateHosturl:any,data)
-  {
+  public AddingUserstoDesktop(updateHosturl: any, data) {
     let headers = new Headers({ 'Content-Type': 'application/json;charset=utf8', 'Accept': 'application/json' });
     let options = new RequestOptions({ headers: headers });
     return this.http.put(updateHosturl, JSON.stringify(data), options)
@@ -263,15 +262,14 @@ export class AppService {
     return this.http.delete(appGroupDeleteurl, options)
       .catch((error: any) => Observable.throw(error));
   }
-/*
-   * This Function is used to make Service call to update Appgroup RemoteApp
-   * ----------
-   * Parameters
-   * remoteAppUpdateUrl - Accepts the Update AppGroup Remote App URL
-   * ----------
-   */
-  public UpdateRemoteApp(remoteAppUpdateUrl:any,data)
-  {
+  /*
+     * This Function is used to make Service call to update Appgroup RemoteApp
+     * ----------
+     * Parameters
+     * remoteAppUpdateUrl - Accepts the Update AppGroup Remote App URL
+     * ----------
+     */
+  public UpdateRemoteApp(remoteAppUpdateUrl: any, data) {
     let headers = new Headers({ 'Content-Type': 'application/json;charset=utf8', 'Accept': 'application/json' });
     let options = new RequestOptions({ headers: headers });
     return this.http.put(remoteAppUpdateUrl, JSON.stringify(data), options)
@@ -340,11 +338,27 @@ export class AppService {
       .catch((error: any) => Observable.throw('Server error'));
   }
 
-  public UpdateAppVersion(updateUrl:string,appVersion:string)
-  {
+  public UpdateAppVersion(updateUrl: string, appVersion: string) {
     let headers = new Headers({ 'Accept': 'application/json', 'Authorization': sessionStorage.getItem('access_token') });
     let options = new RequestOptions({ headers: headers });
     return this.http.put(updateUrl, JSON.stringify(appVersion), options)
-    .catch((error: any) => Observable.throw(error));
+      .catch((error: any) => Observable.throw(error));
+  }
+
+
+  /*
+* This Function is used to make Service call to Restart the Scale set vms
+* ----------
+* Parameters
+* ScaleSetvms - Accepts the Post & Restart ScaleSet URL
+* ----------
+*/
+  ScaleSetRestartHost(hosturl: any,data:any) {
+    let headers = new Headers({ 'Content-Type': 'application/json;charset=utf8', 'Accept': 'application/json' });
+    let options = new RequestOptions({ headers: headers });
+    return this.http.post(hosturl,data, options)
+      .catch((error: any) => Observable.throw(error));
   }
 }
+
+
