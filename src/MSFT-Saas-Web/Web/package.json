@@ -27,7 +27,7 @@
     "angular2-notifications": "^0.7.7",
     "core-js": "^2.4.1",
     "file-saver": "^1.3.3",
-    "jquery": "^3.2.1",
+    "jquery": "^3.5.0",
     "mydatepicker": "^2.0.31",
     "ng-click-outside": "^3.3.0",
     "ng2-breadcrumb": "^0.5.14",
